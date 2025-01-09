@@ -1,3 +1,4 @@
+import NaveBar from "@/MyComponents/NaveBar/NaveBar";
 import Image from "next/image";
 
 export default function Home() {
@@ -5,7 +6,7 @@ export default function Home() {
    <>
    <main>
 
-   <h1>Wellcome</h1>
+ {/* <NaveBar/> */}
    </main>
    </>
   );

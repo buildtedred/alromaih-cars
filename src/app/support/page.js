@@ -2,9 +2,9 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div>
-      this is brand page 
-    </div>
+  <>
+  <h1> this is suport us page</h1>
+  </>
   )
 }
 
