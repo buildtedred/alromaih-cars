@@ -7,18 +7,32 @@ export default {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  theme: {
-  	extend: {
-  		colors: {
-  			background: 'var(--background)',
-  			foreground: 'var(--foreground)'
-  		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		}
-  	}
+//   theme: {
+//   	extend: {
+//   		colors: {
+//   			background: 'var(--background)',
+//   			foreground: 'var(--foreground)'
+//   		},
+//   		borderRadius: {
+//   			lg: 'var(--radius)',
+//   			md: 'calc(var(--radius) - 2px)',
+//   			sm: 'calc(var(--radius) - 4px)'
+//   		}
+//   	}
+//   },
+theme: {
+    extend: {
+      fontFamily: {
+        noto: ['var(--font-noto-sans-arabic)'],
+      },
+      colors: {
+        brand: {
+          primary: '#71308A',
+          light: '#8B44A5',
+          dark: '#5A2670',
+        },
+      },
+    },
   },
   plugins: [require("tailwindcss-animate")],
 };
