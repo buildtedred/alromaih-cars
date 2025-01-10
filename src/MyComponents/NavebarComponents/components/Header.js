@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import Nav from './Nav';
 import SearchModal from './search/SearchModal';
 import Image from 'next/image';
+import { useLogoContext } from '@/contexts/LogoContext';
+
 
 const Header = () => {
   const { t, i18n } = useTranslation();
@@ -14,6 +16,10 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState({});
   const [mounted, setMounted] = useState(false);
+
+  const { logos, loading, error } = useLogoContext();
+  
+  console.log("logo image ",logos[0]?.image_url)// Get logos from context
 
   useEffect(() => {
     setMounted(true);
@@ -34,13 +40,27 @@ const Header = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
-              <Image 
+              {/* <Image 
                 src="https://iili.io/2rf88Kv.png" 
                 alt={t('site.title')} 
                 width={48}
                 height={48}
                 className="h-8 md:h-12 w-auto"
+              /> */}
+                {loading ? (
+                <span>Loading logos...</span>
+              ) : error ? (
+                <span>Error: {error}</span>
+              ) : logos.length > 0 ? (
+                <img
+                src={`http://localhost:8069${logos[0].image_url}`} // Make sure no double slashes
+                alt={logos[0]?.name || 'Default Logo'}
+               
+                className="h-8 md:h-12 w-auto"
               />
+              ) : (
+                <span>No logo available</span>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
