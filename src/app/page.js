@@ -1,12 +1,10 @@
-import NaveBar from "@/MyComponents/NaveBar/NaveBar";
-import Image from "next/image";
+import { HeroSection } from "@/MyComponents/HeroSection/HeroSection";
 
 export default function Home() {
   return (
    <>
    <main>
-
-   <h1>Wellcome</h1>
+<HeroSection/>
    </main>
    </>
   );
