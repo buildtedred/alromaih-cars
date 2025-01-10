@@ -4,12 +4,7 @@ export default function Home() {
   return (
    <>
    <main>
-<<<<<<< HEAD
-
- {/* <NaveBar/> */}
-=======
 <HeroSection/>
->>>>>>> ubaidbranch
    </main>
    </>
   );
