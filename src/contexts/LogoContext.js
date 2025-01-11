@@ -20,7 +20,7 @@ export const LogoProvider = ({ children }) => {
   useEffect(() => {
     const fetchLogos = async () => {
       try {
-        const response = await axios.get('http://localhost:8069/api/logos'); // Adjust API URL if needed
+        const response = await axios.get('https://xn--mgbml9eg4a.com/api/logos'); // Adjust API URL if needed
         setLogos(response.data.data); // Set the logos data
       } catch (err) {
         setError(err.message || 'Error fetching logos');

@@ -7,6 +7,7 @@ import Nav from './Nav';
 import SearchModal from './search/SearchModal';
 import Image from 'next/image';
 import { useLogoContext } from '@/contexts/LogoContext';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 const Header = () => {
@@ -48,7 +49,9 @@ const Header = () => {
                 className="h-8 md:h-12 w-auto"
               /> */}
                 {loading ? (
-                <span>Loading logos...</span>
+                <span>
+                  <Skeleton className="w-[100px] h-[40px] rounded-full"/>
+                </span>
               ) : error ? (
                 <span>Error: {error}</span>
               ) : logos.length > 0 ? (
