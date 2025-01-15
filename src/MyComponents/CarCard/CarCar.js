@@ -11,7 +11,7 @@ const CarCard = () => {
           name: "تويوتا كامري 2024",
           price: "129,900 ريال",
           image:
-            "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGNhbXJ5fGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
+            "k",
           year: 2024,
           fuelType: "بنزين",
           condition: "جديد",
@@ -25,7 +25,7 @@ const CarCard = () => {
           name: "هوندا أكورد 2023",
           price: "114,500 ريال",
           image:
-            "https://images.unsplash.com/photo-1571731956672-d3cd9705d6ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGNhciUyMGJsb3dzfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
+            "h",
           year: 2023,
           fuelType: "بنزين",
           condition: "جديد",
@@ -39,7 +39,7 @@ const CarCard = () => {
           name: "مرسيدس بنز C200 2022",
           price: "235,00 ريال",
           image:
-            "https://images.unsplash.com/photo-1571680123773-b945fc8b0b9c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVybmVkZXolMjBiZW56fGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
+            "j",
           year: 2022,
           fuelType: "بنزين",
           condition: "مستعمل",
@@ -53,7 +53,7 @@ const CarCard = () => {
           name: "هيونداي سوناتا 2023",
           price: "97,300 ريال",
           image:
-            "https://images.unsplash.com/photo-1571957322887-5c05b7b814bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y2FyJTIwZm9yJTIwc2FsZXxlbnwwfHwwfHx8MA&auto=format&fit=crop&w=800&q=60",
+            "j",
           year: 2023,
           fuelType: "بنزين",
           condition: "جديد",
@@ -73,7 +73,7 @@ const CarCard = () => {
           <div className="relative bg-white rounded-lg overflow-hidden shadow-lg max-w-sm hover:shadow-xl transition-shadow duration-300 group">
             <div className="relative h-48 overflow-hidden">
               <Image
-                src={car.image}
+                src={"https://xn--mgbml9eg4a.com/web/image/custom.logo/1/image"}
                 alt={car.name}
                 layout="fill"
                 objectFit="cover"
