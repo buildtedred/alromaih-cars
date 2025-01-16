@@ -56,11 +56,10 @@ const Header = () => {
                 <span>Error: {error}</span>
               ) : logos.length > 0 ? (
                 <img
-                src={`http://localhost:8069${logos[0].image_url}`} // Make sure no double slashes
-                alt={logos[0]?.name || 'Default Logo'}
-               
-                className="h-8 md:h-12 w-auto"
-              />
+  src={`https://xn--mgbml9eg4a.com${logos[0].image_url}`}
+  alt={logos[0]?.name || 'Default Logo'}
+  style={{ height: '40px', width: 'auto' }} // Inline style for custom size
+/>
               ) : (
                 <span>No logo available</span>
               )}
