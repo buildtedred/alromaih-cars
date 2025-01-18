@@ -89,9 +89,9 @@ const CarCard = () => {
                   handleFavorite(car.id); // Toggle favorite status
                 }}
               >
-                <Heart
+                {/* <Heart
                   className={`w-5 h-5 ${favorites.includes(car.id) ? 'fill-red-500' : 'text-gray-600'}`}
-                />
+                /> */}
               </button>
 
               {car.discount && (
