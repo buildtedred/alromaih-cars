@@ -6,74 +6,65 @@ import Image from 'next/image';
 import { Heart, Calendar, Droplet, ChevronLeft, Gift } from 'lucide-react';
 
 const CarCard = () => {
-  const [favorites, setFavorites] = useState([]); // To store favorite car IDs
-
-  const cars = [
-    {
-      id: 1,
-      name: "تويوتا كامري 2024",
-      price: "129,900 ريال",
-      image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGNhbXJ5fGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
-      year: 2024,
-      fuelType: "بنزين",
-      condition: "جديد",
-      monthlyInstallment: "2,799 ريال/شهر",
-      interestedPeople: 32,
-      slug: "toyota-camry-2024",
-      discount: "50%",
-    },
-    {
-      id: 2,
-      name: "هوندا أكورد 2023",
-      price: "114,500 ريال",
-      image: "https://images.unsplash.com/photo-1699550915467-421188f24aff?q=80&w=1935&auto=format&fit=crop&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      year: 2023,
-      fuelType: "بنزين",
-      condition: "جديد",
-      monthlyInstallment: "2,499 ريال/شهر",
-      interestedPeople: 28,
-      slug: "honda-accord-2023",
-      discount: "20%",
-    },
-    {
-      id: 3,
-      name: "مرسيدس بنز C200 2022",
-      price: "235,00 ريال",
-      image: "https://images.unsplash.com/photo-1597687210367-a4915552d886?q=80&w=1964&auto=format&fit=crop&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      year: 2022,
-      fuelType: "بنزين",
-      condition: "مستعمل",
-      monthlyInstallment: "4,999 ريال/شهر",
-      interestedPeople: 50,
-      slug: "mercedes-benz-c200-2022",
-      discount: null,
-    },
-    {
-      id: 4,
-      name: "هيونداي سوناتا 2023",
-      price: "97,300 ريال",
-      image: "https://images.unsplash.com/photo-1606220838325-6e68d55e22fe?q=80&w=1964&auto=format&fit=crop&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      year: 2023,
-      fuelType: "بنزين",
-      condition: "جديد",
-      monthlyInstallment: "1,999 ريال/شهر",
-      interestedPeople: 45,
-      slug: "hyundai-sonata-2023",
-      discount: "30%",
-    },
-  ];
-
-  const handleFavorite = (carId) => {
-    // Toggle favorite status
-    setFavorites((prevFavorites) => {
-      if (prevFavorites.includes(carId)) {
-        return prevFavorites.filter((id) => id !== carId); // Remove from favorites
-      } else {
-        return [...prevFavorites, carId]; // Add to favorites
-      }
-    });
-  };
-
+    const cars = [
+        {
+          id: 1,
+          name: "تويوتا كامري 2024",
+          price: "129,900 ريال",
+          image:
+            "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGNhbXJ5fGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
+          year: 2024,
+          fuelType: "بنزين",
+          condition: "جديد",
+          monthlyInstallment: "2,799 ريال/شهر",
+          interestedPeople: 32,
+          slug: "toyota-camry-2024",
+          discount: "50%",
+        },
+        {
+          id: 2,
+          name: "هوندا أكورد 2023",
+          price: "114,500 ريال",
+          image:
+            "https://images.unsplash.com/photo-1571731956672-d3cd9705d6ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGNhciUyMGJsb3dzfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
+          year: 2023,
+          fuelType: "بنزين",
+          condition: "جديد",
+          monthlyInstallment: "2,499 ريال/شهر",
+          interestedPeople: 28,
+          slug: "honda-accord-2023",
+          discount: "20%",
+        },
+        {
+          id: 3,
+          name: "مرسيدس بنز C200 2022",
+          price: "235,00 ريال",
+          image:
+            "https://images.unsplash.com/photo-1571680123773-b945fc8b0b9c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVybmVkZXolMjBiZW56fGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
+          year: 2022,
+          fuelType: "بنزين",
+          condition: "مستعمل",
+          monthlyInstallment: "4,999 ريال/شهر",
+          interestedPeople: 50,
+          slug: "mercedes-benz-c200-2022",
+          discount: null,
+        },
+        {
+          id: 4,
+          name: "هيونداي سوناتا 2023",
+          price: "97,300 ريال",
+          image:
+            "https://images.unsplash.com/photo-1571957322887-5c05b7b814bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y2FyJTIwZm9yJTIwc2FsZXxlbnwwfHwwfHx8MA&auto=format&fit=crop&w=800&q=60",
+          year: 2023,
+          fuelType: "بنزين",
+          condition: "جديد",
+          monthlyInstallment: "1,999 ريال/شهر",
+          interestedPeople: 45,
+          slug: "hyundai-sonata-2023",
+          discount: "30%",
+        },
+      ];
+      
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4">
       {cars.map((car) => (
@@ -81,7 +72,7 @@ const CarCard = () => {
           <div className="relative bg-white rounded-lg overflow-hidden shadow-lg max-w-sm hover:shadow-xl transition-shadow duration-300 group">
             <div className="relative h-48 overflow-hidden flex items-center justify-center">
               <Image
-                src={car.image}
+                src={"https://xn--mgbml9eg4a.com/web/image/custom.logo/1/image"}
                 alt={car.name}
                 width={340}
                 height={192}
