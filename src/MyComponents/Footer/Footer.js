@@ -11,13 +11,13 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-brand-primary to-brand-light text-white">
+    <footer className="bg-white text-gray-800 shadow-lg shadow-gray-300">
       <div className="container mx-auto px-4 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Buy Online Section */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold mb-6">
+            <h3 className="text-2xl font-bold mb-6 text-brand-primary">
               Buy online with confidence
             </h3>
             <div className="flex gap-4">
@@ -40,28 +40,32 @@ export default function Footer() {
 
           {/* Contact Info Section */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold mb-6">Contact Us</h3>
+            <h3 className="text-2xl font-bold mb-6 text-brand-primary">Contact Us</h3>
             <div className="space-y-4">
+              {/* Call Us */}
               <Link
                 href="tel:+966123456789"
-                className="flex items-center gap-3 hover:text-purple-200 transition-colors w-fit-content"
+                className="flex items-center gap-3 hover:text-brand-primary transition-colors w-fit-content"
               >
-                <div className="bg-brand-primary p-2 rounded-full">
-                  <Phone className="h-5 w-5" />
+                <div className="bg-brand-light p-2 rounded-full">
+                  <Phone className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-medium w-fit-content">Call Us</p>
-                  <p>+966 123 456 789</p>
+                  <p className="font-medium w-fit-content text-black">
+                    Call Us
+                  </p>
+                  <p className="text-black">+966 123 456 789</p>
                 </div>
               </Link>
 
+              {/* WhatsApp */}
               <Link
                 href="https://wa.me/966123323"
-                className="flex items-center gap-3 hover:text-purple-200 transition-colors w-fit-content"
+                className="flex items-center gap-3 hover:text-brand-primary transition-colors w-fit-content"
               >
-                <div className="bg-brand-primary p-2 rounded-full">
+                <div className="bg-brand-light p-2 rounded-full">
                   <svg
-                    className="h-5 w-5"
+                    className="h-5 w-5 text-white"
                     fill="currentColor"
                     viewBox="0 0 24 24"
                   >
@@ -69,21 +73,22 @@ export default function Footer() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium">WhatsApp</p>
-                  <p>+966 123 323</p>
+                  <p className="font-medium text-black">WhatsApp</p>
+                  <p className="text-black">+966 123 323</p>
                 </div>
               </Link>
 
+              {/* Email Address */}
               <Link
                 href="mailto:alromaih@gmail.com"
-                className="flex items-center gap-3 hover:text-purple-200 transition-colors w-fit-content"
+                className="flex items-center gap-3 hover:text-brand-primary transition-colors w-fit-content"
               >
-                <div className="bg-brand-primary p-2 rounded-full">
-                  <Mail className="h-5 w-5" />
+                <div className="bg-brand-light p-2 rounded-full">
+                  <Mail className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-medium">Email Address</p>
-                  <p>alromaih@gmail.com</p>
+                  <p className="font-medium text-black">Email Address</p>
+                  <p className="text-black">alromaih@gmail.com</p>
                 </div>
               </Link>
             </div>
@@ -91,66 +96,53 @@ export default function Footer() {
 
           {/* Company Info Section */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold mb-6">Company</h3>
+            <h3 className="text-2xl font-bold mb-6 text-brand-primary">
+              Company
+            </h3>
             <div className="space-y-4">
               <Link
                 href="/about"
-                className="block hover:text-purple-200 transition-colors w-fit-content"
+                className="block hover:text-brand-primary transition-colors w-fit-content"
               >
                 About Us
               </Link>
               <Link
                 href="/contact"
-                className="block hover:text-purple-200 transition-colors w-fit-content"
+                className="block hover:text-brand-primary transition-colors w-fit-content"
               >
                 Contact Us
               </Link>
 
-              <div className="flex items-center >">
-                <MapPin className="h-5  text-purple-300" />
+              <div className="flex items-center">
+  <MapPin className="h-5 text-brand-primary" />
 
-                {/* ///////////////////////////////// */}
-                <Select className="border-0 ring-0 ring-offset-0 shadow-none">
-                  <SelectTrigger className="w-[90px] left-0 hover:text-purple-200 transition-colors bg-transparent border-none outline-none cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none">
-                    <SelectValue placeholder="Riyadh" />
-                  </SelectTrigger>
-                  <SelectContent className="w-12 hover:text-purple-200 transition-colors border-none outline-none cursor-pointer shadow-none">
-                    <SelectItem
-                      value="Riyadh"
-                      className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
-                    >
-                      Riyadh
-                    </SelectItem>
-                    <SelectItem
-                      value="Ar Ar"
-                      className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
-                    >
-                      Ar Ar
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+  {/* ///////////////////////////////// */}
+  <Select className="border-0 ring-0 ring-offset-0 shadow-none">
+    <SelectTrigger className="w-[90px] left-0 hover:text-brand-primary transition-colors bg-transparent border-none outline-none cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none">
+      <SelectValue placeholder="Riyadh" />
+    </SelectTrigger>
+    <SelectContent className="w-12 hover:text-brand-primary transition-colors border-none outline-none cursor-pointer shadow-lg">
+      <SelectItem
+        value="Riyadh"
+        className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
+      >
+        Riyadh
+      </SelectItem>
+      <SelectItem
+        value="Ar Ar"
+        className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
+      >
+        Ar Ar
+      </SelectItem>
+    </SelectContent>
+  </Select>
 
-                {/* ///////////////////////////////// */}
+  {/* ///////////////////////////////// */}
+</div>
 
-                {/* <select className="hover:text-purple-200 transition-colors bg-transparent border-none outline-none cursor-pointer">
-                  <option
-                    value="Riyadh"
-                    className="!bg-brand-primary hover:!bg-brand-primary"
-                  >
-                    Riyadh
-                  </option>
-
-                  <option
-                    value="Ar Ar"
-                    className="bg-brand-primary hover:bg-brand-light custom-class"
-                  >
-                    Ar Ar
-                  </option>
-                </select> */}
-              </div>
 
               <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-purple-300" />
+                <Clock className="h-5 w-5 text-brand-primary" />
                 <span>24/7 Support</span>
               </div>
             </div>
@@ -158,16 +150,18 @@ export default function Footer() {
 
           {/* Download Apps Section */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold mb-6">Download Our App</h3>
+            <h3 className="text-2xl font-bold mb-6 text-brand-primary">
+              Download Our App
+            </h3>
             <div className="flex flex-row gap-4">
               <Link
                 href="#"
                 className="block transition-transform hover:scale-105"
               >
                 <Image
-                  src="/images/appstore1.png" // Local path
+                  src="/images/GooglePlay.png" // Local path
                   alt=""
-                  width={130}
+                  width={140}
                   height={60}
                   className="rounded-lg"
                 />
@@ -177,7 +171,7 @@ export default function Footer() {
                 className="block transition-transform hover:scale-105"
               >
                 <Image
-                  src="/images/googleplay1.png" // Local path
+                  src="/images/AppStore.png" // Local path
                   alt=""
                   width={130}
                   height={60}
@@ -222,7 +216,7 @@ export default function Footer() {
           </div>
         </div>
         {/* Bottom Footer */}
-        <div className="mt-12 pt-8 border-t border-brand-light ">
+        <div className="mt-12 pt-8 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             {/* Social Media Links */}
             <div className="flex gap-4">
@@ -251,7 +245,7 @@ export default function Footer() {
                 <Link
                   key={social.name}
                   href="#"
-                  className="bg-brand-primary p-2 rounded-full hover:text-purple-200 transition-colors"
+                  className="bg-brand-light p-2 rounded-full text-white hover:bg-brand-primary hover: transition-colors"
                   aria-label={social.name}
                 >
                   <svg
@@ -269,12 +263,12 @@ export default function Footer() {
             <div className="flex flex-wrap justify-center md:justify-end gap-4 text-sm">
               <Link
                 href="/terms"
-                className="hover:text-purple-200 transition-colors"
+                className="hover:text-brand-primary transition-colors"
               >
                 Terms and Condition
               </Link>
               <span className="text-purple-400">|</span>
-              <p className="text-purple-200">
+              <p className="text-gray-600">
                 © {new Date().getFullYear()} Alromaih Cars. All rights reserved.
               </p>
             </div>
