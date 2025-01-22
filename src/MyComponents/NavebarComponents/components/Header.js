@@ -56,7 +56,7 @@ const Header = () => {
                 <span>Error: {error}</span>
               ) : logos.length > 0 ? (
                 <img
-                src={`https://xn--mgbml9eg4a.com${logos[0].image_url}`} // Make sure no double slashes
+                src={`http://xn--mgbml9eg4a.com${logos[0].image_url}`} // Make sure no double slashes
                 alt={logos[0]?.name || 'Default Logo'}
                
                 className="h-8 md:h-12 w-auto"

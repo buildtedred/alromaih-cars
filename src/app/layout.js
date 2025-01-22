@@ -3,6 +3,8 @@ import "./globals.css";
 import Header from "@/MyComponents/NavebarComponents/components/Header";
 import { Providers } from "./providers";
 import { LogoProvider } from "@/contexts/LogoContext";
+import Footer from '@/MyComponents/Footer/Footer';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,18 +24,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Providers>
-    <LogoProvider>
-
-        <Header/>
-        {children}
-    </LogoProvider>
-        </Providers>
-
-      </body>
-    </html>
+  <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <Providers>
+      <LogoProvider>
+        <Header />
+        {/* Make sure children is wrapping everything */}
+        <main>{children}</main>
+        <Footer />
+      </LogoProvider>
+    </Providers>
+  </body>
+</html>
   );
 }

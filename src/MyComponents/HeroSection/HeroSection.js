@@ -59,6 +59,7 @@ export const HeroSection = () => {
 
   return (
     <div className="relative mb-24">
+      {/* Banner Section */}
       <div className="relative h-[70vh] overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
