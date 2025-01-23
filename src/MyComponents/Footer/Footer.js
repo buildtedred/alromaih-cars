@@ -11,7 +11,7 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-white text-gray-800 shadow-lg shadow-gray-300">
+    <footer className="bg-white text-gray-800 shadow-lg shadow-gray-300 px-4 md:px-16 lg:px-[9rem]">
       <div className="container mx-auto px-4 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -31,8 +31,8 @@ export default function Footer() {
               <Image
                 src="/images/Vat.png" // local path
                 alt="VAT Certificate"
-                width={80}
-                height={80}
+                width={50}
+                height={50}
                 className="rounded-lg hover:scale-105 transition-transform"
               />
             </div>
@@ -40,7 +40,9 @@ export default function Footer() {
 
           {/* Contact Info Section */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold mb-6 text-brand-primary">Contact Us</h3>
+            <h3 className="text-2xl font-bold mb-6 text-brand-primary">
+              Contact Us
+            </h3>
             <div className="space-y-4">
               {/* Call Us */}
               <Link
@@ -114,32 +116,31 @@ export default function Footer() {
               </Link>
 
               <div className="flex items-center">
-  <MapPin className="h-5 text-brand-primary" />
+                <MapPin className="h-5 text-brand-primary" />
 
-  {/* ///////////////////////////////// */}
-  <Select className="border-0 ring-0 ring-offset-0 shadow-none">
-    <SelectTrigger className="w-[90px] left-0 hover:text-brand-primary transition-colors bg-transparent border-none outline-none cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none">
-      <SelectValue placeholder="Riyadh" />
-    </SelectTrigger>
-    <SelectContent className="w-12 hover:text-brand-primary transition-colors border-none outline-none cursor-pointer shadow-lg">
-      <SelectItem
-        value="Riyadh"
-        className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
-      >
-        Riyadh
-      </SelectItem>
-      <SelectItem
-        value="Ar Ar"
-        className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
-      >
-        Ar Ar
-      </SelectItem>
-    </SelectContent>
-  </Select>
+                {/* ///////////////////////////////// */}
+                <Select className="border-0 ring-0 ring-offset-0 shadow-none">
+                  <SelectTrigger className="w-[90px] left-0 hover:text-brand-primary transition-colors bg-transparent border-none outline-none cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none">
+                    <SelectValue placeholder="Riyadh" />
+                  </SelectTrigger>
+                  <SelectContent className="w-12 hover:text-brand-primary transition-colors border-none outline-none cursor-pointer shadow-lg">
+                    <SelectItem
+                      value="Riyadh"
+                      className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
+                    >
+                      Riyadh
+                    </SelectItem>
+                    <SelectItem
+                      value="Ar Ar"
+                      className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
+                    >
+                      Ar Ar
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
 
-  {/* ///////////////////////////////// */}
-</div>
-
+                {/* ///////////////////////////////// */}
+              </div>
 
               <div className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-brand-primary" />
