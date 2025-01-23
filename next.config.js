@@ -17,8 +17,13 @@ const nextConfig = {
         hostname: 'iili.io',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
     ],
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
