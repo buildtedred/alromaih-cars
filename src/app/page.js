@@ -5,9 +5,7 @@ import BrandShowcase from './../MyComponents/brandshowcase';
 import { FinancePartners } from './../MyComponents/FinancePartners';
 
 import { BrandsProvider } from "@/contexts/AllDataProvider";
-import { SlidesProvider } from "@/contexts/SliderContext";
-import CarCard from "@/MyComponents/CarCard/CarCar";
-import { HeroSection } from "@/MyComponents/HeroSection/HeroSection";
+
 
 export default function Home() {
   return (
