@@ -50,7 +50,7 @@ const Header = () => {
               /> */}
                 {loading ? (
                 <span>
-                  <Skeleton className="w-[100px] h-[40px] rounded-full"/>
+                  <Skeleton className="w-[100px] h-[40px]"/>
                 </span>
               ) : error ? (
                 <span>Error: {error}</span>
