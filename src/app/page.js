@@ -11,19 +11,19 @@ export default function Home() {
   return (
     <>
       <main>
-      <SlidesProvider>
+        <SlidesProvider>
 
-        <HeroSection />
-      </SlidesProvider>
+          <HeroSection />
+        </SlidesProvider>
         <main className="min-h-screen p-8 bg-gray-100">
- 
+
+          <BrandsProvider>
             <CarCard />
-            <BrandShowcase />
-            <FinancePartners />
-        <BrandsProvider>
-            <CarCard />
-        </BrandsProvider>
-          
+          </BrandsProvider>
+  
+          <BrandShowcase />
+          <FinancePartners />
+
         </main>
       </main>
     </>
