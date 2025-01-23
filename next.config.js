@@ -12,6 +12,11 @@ const nextConfig = {
         hostname: 'xn--mgbml9eg4a.com',
         pathname: '/web/content/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'iili.io',
+        pathname: '/**',
+      },
     ],
   },
 };
