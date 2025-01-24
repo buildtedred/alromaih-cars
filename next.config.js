@@ -16,6 +16,7 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '/photo-**',
+<<<<<<< HEAD
       },
       {
         protocol: 'https',
@@ -29,6 +30,16 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
         pathname: '/**',
       },
+=======
+      },
+      {
+        protocol: 'https',
+        hostname: 'iili.io', // Add this line for iili.io
+        pathname: '/**', // Match all paths under iili.io
+      
+      },
+
+>>>>>>> origin/ubaidbranch
     ],
   },
 };

@@ -7,9 +7,12 @@ import { FinancePartners } from './../MyComponents/FinancePartners';
 import { BrandsProvider } from "@/contexts/AllDataProvider";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 071443a1a1edf0e45e5c6d95bdeb4044c33c976c
+=======
+>>>>>>> origin/ubaidbranch
 
 export default function Home() {
   return (
@@ -25,7 +28,11 @@ export default function Home() {
             <BrandShowcase />
             <FinancePartners />
         <BrandsProvider>
+<<<<<<< HEAD
             <CarCard />
+=======
+            
+>>>>>>> origin/ubaidbranch
         </BrandsProvider>
           
         </main>

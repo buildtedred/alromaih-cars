@@ -19,7 +19,7 @@ const BrandShowcase = () => {
   return (
     <div className="bg-gray-100 w-full">
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-right mb-12" dir="rtl">
+        <h2 className="text-3xl font-bold mb-12" >
         موزع معتمد
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">

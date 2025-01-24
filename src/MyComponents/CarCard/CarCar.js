@@ -1,5 +1,8 @@
 "use client";
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/ubaidbranch
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -71,7 +74,11 @@ const CarCard = () => {
 
   return (
     <div className="container mx-auto px-4 sm:px-8 lg:px-[5rem]">
+<<<<<<< HEAD
       <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
+=======
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">
+>>>>>>> origin/ubaidbranch
         مجموعة سياراتنا
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-y-4 gap-x-4 items-stretch justify-items-center">
