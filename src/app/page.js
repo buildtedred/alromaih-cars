@@ -17,12 +17,12 @@ export default function Home() {
       </SlidesProvider>
         <main className="min-h-screen p-8 bg-gray-100">
  
-            <CarCard />
+        <BrandsProvider>
+        <CarCard />
+        </BrandsProvider>
             <BrandShowcase />
             <FinancePartners />
-        <BrandsProvider>
-            
-        </BrandsProvider>
+      
           
         </main>
       </main>
