@@ -6,7 +6,10 @@ import { FinancePartners } from './../MyComponents/FinancePartners';
 
 import { BrandsProvider } from "@/contexts/AllDataProvider";
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 071443a1a1edf0e45e5c6d95bdeb4044c33c976c
 
 export default function Home() {
   return (
