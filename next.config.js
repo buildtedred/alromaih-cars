@@ -14,9 +14,16 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'iili.io',
-        pathname: '/**',
+        hostname: 'images.unsplash.com',
+        pathname: '/photo-**',
       },
+      {
+        protocol: 'https',
+        hostname: 'iili.io', // Add this line for iili.io
+        pathname: '/**', // Match all paths under iili.io
+      
+      },
+
     ],
   },
 };
