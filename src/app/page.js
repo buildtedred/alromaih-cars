@@ -21,7 +21,7 @@ export default function Home() {
             <BrandShowcase />
             <FinancePartners />
         <BrandsProvider>
-            <CarCard />
+            
         </BrandsProvider>
           
         </main>

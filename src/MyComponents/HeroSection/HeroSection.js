@@ -58,7 +58,7 @@ export const HeroSection = () => {
   const baseURL = 'https://xn--mgbml9eg4a.com'; // Update with the actual base URL for your images
 
   return (
-    <div className="relative mb-24">
+    <div className="relative ">
       {/* Banner Section */}
       <div className="relative h-[70vh] overflow-hidden">
         <AnimatePresence mode="wait">
