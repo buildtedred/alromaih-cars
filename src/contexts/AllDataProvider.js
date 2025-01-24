@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 // Create a context for brands
-const BrandsContext = createContext();
+export const BrandsContext = createContext();
 
 // Provider component
 export const BrandsProvider = ({ children }) => {
