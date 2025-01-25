@@ -20,8 +20,8 @@ const Header = () => {
 
   const { logos, loading, error } = useLogoContext();
   
-  console.log("logo image ",logos[0]?.image_url)// Get logos from context
-
+  console.log("logo image ",logos[0].name?.ar)
+ 
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -36,6 +36,7 @@ const Header = () => {
 
   return (
     <header className="font-noto w-full shadow-sm relative">
+     {/* {logos[0].name?.} */}
       <div className="bg-white lg:px-[8.5rem]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -57,7 +58,7 @@ const Header = () => {
               ) : logos.length > 0 ? (
                 <img
                 src={`http://xn--mgbml9eg4a.com${logos[0].image_url}`} // Make sure no double slashes
-                alt={logos[0]?.name || 'Default Logo'}
+                alt={logos[0]?.name.en || 'Default Logo'}
                
                 className="h-8 md:h-12 w-auto"
               />

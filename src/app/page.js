@@ -4,7 +4,7 @@ import BrandShowcase from './../MyComponents/brandshowcase';
 import { FinancePartners } from './../MyComponents/FinancePartners';
 
 import { BrandsProvider } from "@/contexts/AllDataProvider";
-import  CarCard  from './../MyComponents/CarCard/CarCar';
+import CarCard from './../MyComponents/CarCard/CarCar';
 
 
 
@@ -18,15 +18,15 @@ export default function Home() {
         </SlidesProvider>
         <main className="min-h-screen p-8 bg-gray-100">
 
-        <BrandsProvider>
+          <BrandsProvider>
 
-<CarCard />
+            <CarCard />
 
-</BrandsProvider>
-            <BrandShowcase />
-            <FinancePartners />
-       
-          
+          <BrandShowcase />
+          </BrandsProvider>
+          <FinancePartners />
+
+
 
         </main>
       </main>

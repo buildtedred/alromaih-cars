@@ -1,13 +1,18 @@
 "use client";
+
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, Calendar, Droplet, ChevronLeft, Gift } from "lucide-react";
 import { useBrands } from "@/contexts/AllDataProvider";
+import "react-loading-skeleton/dist/skeleton.css";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CarCard = () => {
   const { brands, loading, error } = useBrands();
   const [favorites, setFavorites] = useState([]);
+
+  console.log('dddddddddobject', brands.data)
 
   const handleFavorite = (id) => {
     setFavorites((prev) =>
@@ -15,18 +20,47 @@ const CarCard = () => {
     );
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 sm:px-8 lg:px-[5rem]">
+        <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
+          مجموعة سياراتنا
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-4 items-stretch justify-items-center">
+          {Array(8).fill().map((_, index) => (
+            <div key={index} className="relative bg-white rounded-lg overflow-hidden shadow-lg max-w-sm">
+              <div className="p-1 rtl">
+                <div className="flex flex-col space-y-3">
+                  <Skeleton className="h-[125px] w-[250px]" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                    <div className="flex justify-between items-center">
+                    <Skeleton className="h-4 w-[150px]" />
+                      <Skeleton className="rounded-[100%] h-4 w-[20px]" />
+                      <Skeleton className="rounded-[100%] h-4 w-[20px]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="container mx-auto px-4 sm:px-8 lg:px-[5rem]">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">
+      <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
         مجموعة سياراتنا
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-4 items-stretch justify-items-center">
         {brands?.data?.map((brand, brandIndex) => (
           brand.car_models?.map((car, carIndex) => (
-            <Link key={car.id} href={`/car-details/${car.slug}`} className="block">
+            <Link key={car.id} href={`car-details/${car.slug}`} className="block">
               <div className="relative bg-white rounded-lg overflow-hidden shadow-lg max-w-sm hover:shadow-xl transition-shadow duration-300 group">
                 <div className="relative h-48 overflow-hidden">
                   <Image
@@ -48,9 +82,8 @@ const CarCard = () => {
                     }}
                   >
                     <Heart
-                      className={`w-5 h-5 ${
-                        favorites.includes(car.id) ? "text-red-500" : "text-gray-600"
-                      }`}
+                      className={`w-5 h-5 ${favorites.includes(car.id) ? "text-red-500" : "text-gray-600"
+                        }`}
                     />
                   </button>
                   {car.discount && (

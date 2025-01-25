@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Heart, Share2, X, Calculator, Check } from "lucide-react"
 import styles from "./CompactCarListing.module.css"
 import { FinanceCalculator } from './FinanceCalculator';
-
+import { Skeleton } from "@/components/ui/skeleton";
 
 const carDetails = {
   name: "سوزوكي سيار GLX 2023",
@@ -65,18 +65,48 @@ const carDetails = {
   },
 }
 
-const CompactCarListing = () => {
+const CompactCarListing = ({ car_Details }) => {
+
   const [activeImage, setActiveImage] = useState(0)
   const [activeTab, setActiveTab] = useState("الخارج")
   const [activePaymentTab, setActivePaymentTab] = useState("الدفع نقداً")
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false)
   const [visibleThumbnails, setVisibleThumbnails] = useState(6)
-
+       console.log("single image hhhhhh", activeImage); // Log the image data
   const handleLoadMore = () => {
-    setVisibleThumbnails(carDetails.images.length)
+    setVisibleThumbnails(car_Details?.additional_images?.length)
   }
 
-  const remainingCount = carDetails.images.length - visibleThumbnails
+  const remainingCount = car_Details?.additional_images.length - visibleThumbnails
+
+  console.log(' from get data one', car_Details)
+
+  if (!car_Details) {
+    return (
+      <div className="min-h-screen bg-white rtl">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-36 py-8">
+          <div className="mb-8 pb-6 border-b border-gray-200">
+            <Skeleton className="h-8 w-1/2 mb-2" />
+            <Skeleton className="h-4 w-1/4" />
+          </div>
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="w-full lg:w-[250px] space-y-3">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-48 w-full" />
+            </div>
+            <div className="flex-1 space-y-4">
+              <Skeleton className="h-96 w-full" />
+              <Skeleton className="h-8 w-1/3" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-4 w-1/4" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white rtl">
@@ -85,7 +115,7 @@ const CompactCarListing = () => {
         <div className="mb-8 pb-6 border-b border-gray-200">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-xl font-semibold mb-1">{carDetails.name}</h1>
+              <h1 className="text-xl font-semibold mb-1">{car_Details?.name}</h1>
               <div className="flex items-center gap-2 text-[#71308A]">
                 <span className="inline-block w-4 h-4">
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -115,7 +145,7 @@ const CompactCarListing = () => {
           <div className="w-full lg:w-[250px]">
             <div className="space-y-3">
               <div className="bg-gray-100 rounded-lg p-3">
-                <h2 className="text-2xl font-bold mb-1">{carDetails.price.toLocaleString()} ريال</h2>
+                <h2 className="text-2xl font-bold mb-1">{car_Details?.price?.toLocaleString()} ريال</h2>
                 <p className="text-xs text-gray-500">شامل الضريبة</p>
               </div>
 
@@ -123,17 +153,15 @@ const CompactCarListing = () => {
                 <div className="flex">
                   <button
                     onClick={() => setActivePaymentTab("التمويل")}
-                    className={`flex-1 py-2 text-sm font-medium ${
-                      activePaymentTab === "التمويل" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
-                    }`}
+                    className={`flex-1 py-2 text-sm font-medium ${activePaymentTab === "التمويل" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
+                      }`}
                   >
                     التمويل
                   </button>
                   <button
                     onClick={() => setActivePaymentTab("الدفع نقداً")}
-                    className={`flex-1 py-2 text-sm font-medium ${
-                      activePaymentTab === "الدفع نقداً" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
-                    }`}
+                    className={`flex-1 py-2 text-sm font-medium ${activePaymentTab === "الدفع نقداً" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
+                      }`}
                   >
                     الدفع نقداً
                   </button>
@@ -143,7 +171,7 @@ const CompactCarListing = () => {
                     <div className="space-y-4">
                       <div>
                         <h3 className="text-lg font-semibold mb-1 text-[#71308A]">السعر النقدي</h3>
-                        <p className="text-3xl font-bold text-gray-900">{carDetails.price.toLocaleString()} ريال</p>
+                        <p className="text-3xl font-bold text-gray-900">{car_Details?.price?.toLocaleString()} ريال</p>
                         <p className="text-sm text-gray-500">شامل الضريبة</p>
                       </div>
                       <button className="w-full py-3 text-sm text-white bg-[#71308A] rounded-lg font-medium hover:bg-[#5f2873] transition-colors">
@@ -179,22 +207,26 @@ const CompactCarListing = () => {
           {/* Right Column */}
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="w-full sm:w-1/5 h-auto sm:h-[400px]">
-                <div className={`${styles.thumbnailContainer} ${styles.customScrollbar}`}>
-                  {carDetails.images.slice(0, visibleThumbnails).map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setActiveImage(index)}
-                      className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
-                    >
-                      <Image
-                        src={image || "/placeholder.svg"}
-                        alt={`Car thumbnail ${index + 1}`}
-                        layout="fill"
-                        objectFit="cover"
-                      />
-                    </button>
-                  ))}
+              <div className="w-full sm:w-1/5 h-auto sm:h-[400px] ">
+                <div className={`${styles.thumbnailContainer} ${styles.customScrollbar} p-1`}>
+                  {car_Details?.additional_images?.slice(0, visibleThumbnails).map((image, index) => {
+                    // console.log("single image", index); // Log the image data
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setActiveImage(index)}
+                        className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
+                      >
+                        <Image
+                          // src={image || "/placeholder.svg"}
+                          src={`https://xn--mgbml9eg4a.com${image.image_url}`}
+                          alt={`Car thumbnail ${index + 1}`}
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      </button>
+                    );
+                  })}
                   {remainingCount > 0 && (
                     <button
                       onClick={handleLoadMore}
@@ -208,8 +240,8 @@ const CompactCarListing = () => {
               <div className="w-full sm:w-4/5">
                 <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
                   <Image
-                    src={carDetails.images[activeImage] || "/placeholder.svg"}
-                    alt="Car image"
+                    src={`https://xn--mgbml9eg4a.com${car_Details?.additional_images[activeImage]?.image_url || "/placeholder.svg"}`}
+                    alt={car_Details?.additional_images[activeImage]}
                     layout="fill"
                     className={`${styles.mainImage}`}
                   />
@@ -222,9 +254,8 @@ const CompactCarListing = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${
-                    activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
-                  }`}
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
+                    }`}
                 >
                   {tab}
                 </button>
@@ -258,7 +289,7 @@ const CompactCarListing = () => {
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <FinanceCalculator carPrice={carDetails.price} />
+            <FinanceCalculator carPrice={car_Details.price} />
           </div>
         </div>
       )}
