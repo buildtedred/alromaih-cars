@@ -20,7 +20,7 @@ const Header = () => {
 
   const { logos, loading, error } = useLogoContext();
   
-  console.log("logo image ",logos[0].name?.ar)
+  // console.log("logo image ",logos[0].name?.ar)
  
   useEffect(() => {
     setMounted(true);
