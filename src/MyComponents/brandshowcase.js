@@ -3,6 +3,7 @@
 import * as React from "react"
 import Slider from "react-slick"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useBrands } from "@/contexts/AllDataProvider"
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -21,7 +22,6 @@ function BrandShowcase() {
     speed: 500,
     rows: 2,
     slidesPerRow: 2,
-
     responsive: [
       {
         breakpoint: 1024,
@@ -51,21 +51,33 @@ function BrandShowcase() {
     <div className="bg-gray-100 w-full py-16">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-3xl font-bold mb-12 text-right">موزع معتمد</h2>
-        <Slider {...settings} className="slider-container">
-          {brands?.data?.map((brand, index) => (
-            <div key={index} className="p-2">
-              <Card className="h-auto">
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <Card key={index} className="h-auto">
                 <CardContent className="flex items-center justify-center p-4">
-                  <img
-                    src={`https://xn--mgbml9eg4a.com${brand?.image_url}`}
-                    alt={brand.name}
-                    className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
-                  />
+                  <Skeleton className="h-12 w-12" />
                 </CardContent>
               </Card>
-            </div>
-          ))}
-        </Slider>
+            ))}
+          </div>
+        ) : (
+          <Slider {...settings} className="slider-container">
+            {brands?.data?.map((brand, index) => (
+              <div key={index} className="p-2">
+                <Card className="h-auto">
+                  <CardContent className="flex items-center justify-center p-4">
+                    <img
+                      src={`https://xn--mgbml9eg4a.com${brand?.image_url}`}
+                      alt={brand.name}
+                      className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+          </Slider>
+        )}
       </div>
     </div>
   )
