@@ -35,8 +35,8 @@ export const HeroSection = () => {
 
   if (loading) {
     return (
-      <div className="relative mb-24">
-        <div className="relative h-[70vh] overflow-hidden">
+      <div className="relative">
+        <div className="relative aspect-[21/9] w-full">
           <Skeleton height="100%" />
         </div>
       </div>
@@ -51,7 +51,7 @@ export const HeroSection = () => {
 
   return (
     <div className="relative">
-      <div className="relative h-[70vh] overflow-hidden">
+      <div className="relative aspect-[25/9] w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -61,19 +61,17 @@ export const HeroSection = () => {
             transition={{ duration: 0.5 }}
             className="absolute inset-0"
           >
-            <div className="relative h-full">
-              <Image
-                src={`${baseURL}${slides[currentSlide].image_url}`}
-                alt={slides[currentSlide].title}
-                className="w-full h-full object-cover"
-                width={1920}
-                height={1080}
-              />
-            </div>
+            <Image
+              src={`${baseURL}${slides[currentSlide].image_url}`}
+              alt={slides[currentSlide].title}
+              className="w-full h-full object-cover"
+              fill
+              priority
+            />
           </motion.div>
         </AnimatePresence>
 
-        <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-20">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-20">
           <div className="flex items-center gap-4">
             {slides.map((_, index) => (
               <button
@@ -82,7 +80,9 @@ export const HeroSection = () => {
                   setCurrentSlide(index)
                   setProgress(0)
                 }}
-                className={`w-3 h-3 rounded-full transition-all ${currentSlide === index ? "bg-white w-8" : "bg-white/50"}`}
+                className={`w-3 h-3 rounded-full transition-all ${
+                  currentSlide === index ? "bg-white w-8" : "bg-white/50"
+                }`}
               />
             ))}
           </div>

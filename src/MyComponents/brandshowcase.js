@@ -21,24 +21,35 @@ function BrandShowcase() {
     slidesPerRow: 2,
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 1280, // For larger screens, like tablets or small laptops
         settings: {
-          slidesToShow: 6,
-          slidesToScroll: 6,
+          slidesToShow: 5,  // Show 5 items
+          slidesToScroll: 5,
+          centerPadding: "40px",  // Adjusting padding
         },
       },
       {
-        breakpoint: 768,
+        breakpoint: 1024, // For screens like tablets
         settings: {
-          slidesToShow: 4,
+          slidesToShow: 4,  // Show 4 items
           slidesToScroll: 4,
+          centerPadding: "30px",
         },
       },
       {
-        breakpoint: 640,
+        breakpoint: 768, // For mobile devices (smaller tablets)
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 3,  // Show 3 items
+          slidesToScroll: 3,
+          centerPadding: "20px",  // Adjust padding for smaller screens
+        },
+      },
+      {
+        breakpoint: 640, // For very small screens like phones
+        settings: {
+          slidesToShow: 2,  // Show 2 items
           slidesToScroll: 2,
+          centerPadding: "10px",
         },
       },
     ],
@@ -81,4 +92,3 @@ function BrandShowcase() {
 }
 
 export default BrandShowcase
-

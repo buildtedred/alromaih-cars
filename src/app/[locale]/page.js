@@ -10,21 +10,19 @@ export default function Home() {
     <>
       <main>
         <SlidesProvider>
-
+          {/* HeroSection should be wrapped inside the SlidesProvider */}
           <HeroSection />
-        </SlidesProvider >
+        </SlidesProvider>
+
         <main className="min-h-screen p-8 bg-gray-100">
-
+          {/* BrandsProvider is properly wrapping the components */}
           <BrandsProvider>
-
             <CarCard />
-
-          <BrandShowcase />
+            <BrandShowcase />
           </BrandsProvider>
+
+          {/* FinancePartners is outside the BrandsProvider */}
           <FinancePartners />
-
-
-
         </main>
       </main>
     </>
