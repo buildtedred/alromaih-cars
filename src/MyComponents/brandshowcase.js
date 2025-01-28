@@ -10,9 +10,6 @@ import "slick-carousel/slick/slick-theme.css";
 
 function BrandShowcase() {
   const { brands, loading, error } = useBrands();
-
-  console.log("objectcccccccccccc brandddd", brands?.data)
-
   const settings = {
     className: "center",
     centerMode: true,
