@@ -6,29 +6,20 @@ import { FinancePartners } from './../MyComponents/FinancePartners';
 import { BrandsProvider } from "@/contexts/AllDataProvider";
 import CarCard from './../MyComponents/CarCard/CarCar';
 
-
-
 export default function Home() {
   return (
     <>
-      <main>
-        <SlidesProvider>
+      {/* Main Page Wrapper */}
+      <SlidesProvider>
+        <HeroSection />
+      </SlidesProvider>
 
-          <HeroSection />
-        </SlidesProvider>
-        <main className="min-h-screen p-8 bg-gray-100">
-
-          <BrandsProvider>
-
-            <CarCard />
-
+      <main className="min-h-screen p-8 bg-gray-100">
+        <BrandsProvider>
+          <CarCard />
           <BrandShowcase />
-          </BrandsProvider>
-          <FinancePartners />
-
-
-
-        </main>
+        </BrandsProvider>
+        <FinancePartners />
       </main>
     </>
   );
