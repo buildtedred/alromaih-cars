@@ -8,6 +8,7 @@ import { Car, Shield, Users, CheckCircle, Building2, Star, Trophy } from "lucide
 import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
+import { useTranslations } from "next-intl"
 
 const sliderSettings = {
   dots: false,
@@ -35,6 +36,7 @@ const sliderSettings = {
 }
 
 export default function HomePage() {
+  const t  = useTranslations("aboutUsUheader");
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
@@ -49,16 +51,16 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative container mx-auto px-4 md:px-36 h-full flex items-center">
           <div className="max-w-2xl text-white">
-            <Badge className="bg-[#71308A] mb-4 text-white">Premium Cars</Badge>
+            <Badge className="bg-[#71308A] mb-4 text-white">{t('badgeText')}</Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              Leading Luxury Car Dealer in Saudi Arabia
+              {t("title")}
             </h1>
-            <p className="text-xl mb-8">Experience unparalleled luxury and service across the Kingdom</p>
+            <p className="text-xl mb-8">{t("description")}</p>
             <Link
               href="/inventory"
               className="inline-block bg-[#71308A] text-white px-8 py-3 rounded-md hover:bg-[#71308A]/90 transition-colors"
             >
-              Explore Our Collection
+              {t("buttonText")}
             </Link>
           </div>
         </div>

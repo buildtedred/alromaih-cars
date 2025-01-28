@@ -11,5 +11,52 @@
       "companies": "الشركات",
       "about": "من نحن",
       "contact": "اتصل بنا"
+    }, 
+    "aboutUsUheader": {
+      "badgeText": "سيارات فاخرة",
+      "title": "الوكيل الرائد في بيع السيارات الفاخرة في المملكة العربية السعودية",
+      "description": "اختبر الفخامة والخدمة التي لا مثيل لها في جميع أنحاء المملكة",
+      "buttonText": "اكتشف مجموعتنا"
+    },
+
+    "footer":{
+      "buyOnlineTitle": "اشترِ بثقة عبر الإنترنت",
+      "buyOnlineContent": "معتمد للجودة والموثوقية\nمسجل لضريبة القيمة المضافة للشفافية",
+      "contactUsTitle": "اتصل بنا",
+      "contactUs": {
+        "callUs": "+966 123 456 789",
+        "whatsApp": "+966 123 323",
+        "email": "alromaih@gmail.com"
+      },
+      "companyTitle": "الشركة",
+      "companyDetails": {
+        "aboutUs": "معلومات عنا",
+        "contactUs": "اتصل بنا",
+        "locations": "المواقع: الرياض، عرعر",
+        "supportHours": "الدعم على مدار الساعة"
+      },
+      "appDownloadTitle": "قم بتنزيل تطبيقنا",
+      "appDownload": {
+        "googlePlay": "متجر جوجل",
+        "appStore": "متجر التطبيقات"
+      },
+      "paymentMethodsTitle": "طرق الدفع",
+      "paymentMethods": "فيزا، مدى، ماستر كارد",
+      "followUsTitle": "تابعنا",
+      "followUs": {
+        "facebook": "فيسبوك",
+        "twitter": "تويتر",
+        "instagram": "إنستغرام"
+      },
+      "callUs": "اتصل بنا",
+      "phoneNumber": "789 456 123 966+",
+      "whatsApp": "واتساب",
+      "whatsAppNumber": "323 123 966+",
+      "emailAddress": "عنوان البريد الإلكتروني",
+      "email": "alromaih@gmail.com",
+
+      "bottomFooter": "الرميح. جميع الحقوق محفوظة.",
+      "termsAndCondition": "الشروط والأحكام"
     }
+    
   }

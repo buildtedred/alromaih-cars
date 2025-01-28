@@ -11,5 +11,55 @@
       "companies": "Companies",
       "about": "About Us",
       "contact": "Contact Us"
-    }
+    },
+    "aboutUsUheader": {
+    "badgeText": "Premium Cars",
+    "title": "Leading Luxury Car Dealer in Saudi Arabia",
+    "description": "Experience unparalleled luxury and service across the Kingdom",
+    "buttonText": "Explore Our Collection"
+  },
+
+
+  "footer" :{
+    "buyOnlineTitle": "Buy online with confidence",
+    "buyOnlineContent": "Certified for quality and reliability\nVAT registered for transparency",
+    "contactUsTitle": "Contact Us",
+    "contactUs": {
+      "callUs": "+966 123 456 789",
+      "whatsApp": "+966 123 323",
+      "email": "alromaih@gmail.com"
+    },
+    "companyTitle": "Company",
+    "companyDetails": {
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us",
+      "locations": "Locations: Riyadh, Ar Ar",
+      "supportHours": "24/7 Support"
+    },
+    "appDownloadTitle": "Download Our App",
+    "appDownload": {
+      "googlePlay": "Google Play",
+      "appStore": "App Store"
+    },
+    "paymentMethodsTitle": "Payment Methods",
+    "paymentMethods": "Visa, Mada, MasterCard",
+    "followUsTitle": "Follow Us",
+    "followUs": {
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "instagram": "Instagram"
+    },
+    
+      "callUs": "Call Us",
+      "phoneNumber": "+966 123 456 789",
+      "whatsApp": "WhatsApp",
+      "whatsAppNumber": "+966 123 323",
+      "emailAddress": "Email Address",
+      "email": "alromaih@gmail.com",
+    
+    "bottomFooter": "alromaih. All rights reserved.",
+    "termsAndCondition": "Terms and Condition"
+  }
+  
+    
   }

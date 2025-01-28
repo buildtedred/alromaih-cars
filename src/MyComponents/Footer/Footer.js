@@ -8,8 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 export default function Footer() {
+
+    const t  = useTranslations("footer");
   return (
     <footer className="bg-white text-gray-800 shadow-lg shadow-gray-300 px-4 md:px-16 lg:px-[9rem]">
       <div className="container mx-auto px-4 py-12">
@@ -18,7 +21,7 @@ export default function Footer() {
           {/* Buy Online Section */}
           <div className="space-y-4">
             <h3 className="text-2xl font-bold mb-6 text-brand-primary">
-              Buy online with confidence
+              {t("buyOnlineTitle")}
             </h3>
             <div className="flex gap-4">
               <Image
@@ -41,7 +44,7 @@ export default function Footer() {
           {/* Contact Info Section */}
           <div className="space-y-6">
             <h3 className="text-2xl font-bold mb-6 text-brand-primary">
-              Contact Us
+              {t("companyDetails.contactUs")}
             </h3>
             <div className="space-y-4">
               {/* Call Us */}
@@ -54,9 +57,9 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="font-medium w-fit-content text-black">
-                    Call Us
+                    {t("callUs")}
                   </p>
-                  <p className="text-black">+966 123 456 789</p>
+                  <p className="text-black">{t("phoneNumber")}</p>
                 </div>
               </Link>
 
@@ -75,8 +78,8 @@ export default function Footer() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-black">WhatsApp</p>
-                  <p className="text-black">+966 123 323</p>
+                  <p className="font-medium text-black">{t("whatsApp")}</p>
+                  <p className="text-black">{t("whatsAppNumber")}</p>
                 </div>
               </Link>
 
@@ -89,8 +92,8 @@ export default function Footer() {
                   <Mail className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-medium text-black">Email Address</p>
-                  <p className="text-black">alromaih@gmail.com</p>
+                  <p className="font-medium text-black">{t("emailAddress")}</p>
+                  <p className="text-black">{t("email")}</p>
                 </div>
               </Link>
             </div>
@@ -99,20 +102,20 @@ export default function Footer() {
           {/* Company Info Section */}
           <div className="space-y-6">
             <h3 className="text-2xl font-bold mb-6 text-brand-primary">
-              Company
+             {t("companyTitle")}
             </h3>
             <div className="space-y-4">
               <Link
                 href="/about"
                 className="block hover:text-brand-primary transition-colors w-fit-content"
               >
-                About Us
+               {t("companyDetails.aboutUs")}
               </Link>
               <Link
                 href="/contact"
                 className="block hover:text-brand-primary transition-colors w-fit-content"
               >
-                Contact Us
+                {t("companyDetails.contactUs")}
               </Link>
 
               <div className="flex items-center">
@@ -128,7 +131,7 @@ export default function Footer() {
                       value="Riyadh"
                       className="bg-white text-black hover:bg-brand-primary hover:text-white transition-colors"
                     >
-                      Riyadh
+                     {t("companyDetails.locations")}
                     </SelectItem>
                     <SelectItem
                       value="Ar Ar"
@@ -144,7 +147,7 @@ export default function Footer() {
 
               <div className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-brand-primary" />
-                <span>24/7 Support</span>
+                <span>{t("companyDetails.supportHours")}</span>
               </div>
             </div>
           </div>
@@ -152,7 +155,7 @@ export default function Footer() {
           {/* Download Apps Section */}
           <div className="space-y-6">
             <h3 className="text-2xl font-bold mb-6 text-brand-primary">
-              Download Our App
+              {t("appDownloadTitle")}
             </h3>
             <div className="flex flex-row gap-4">
               <Link
@@ -183,7 +186,7 @@ export default function Footer() {
 
             {/* Payment Methods */}
             <div className="mt-6">
-              <p className="font-medium mb-3">Payment Methods</p>
+              <p className="font-medium mb-3">{t('paymentMethodsTitle')}</p>
               <div className="flex gap-4 items-center">
                 <div className="w-16 h-10 flex justify-center items-center">
                   <Image
@@ -266,11 +269,11 @@ export default function Footer() {
                 href="/terms"
                 className="hover:text-brand-primary transition-colors"
               >
-                Terms and Condition
+                {t("termsAndCondition")}
               </Link>
               <span className="text-purple-400">|</span>
               <p className="text-gray-600">
-                © {new Date().getFullYear()} Alromaih Cars. All rights reserved.
+                © {new Date().getFullYear()} {t("bottomFooter")}.
               </p>
             </div>
           </div>
