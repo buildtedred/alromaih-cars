@@ -5,6 +5,7 @@ import { Heart, Share2, X, Calculator, Check } from "lucide-react"
 import styles from "./CompactCarListing.module.css"
 import { FinanceCalculator } from './FinanceCalculator';
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePathname } from "next/navigation"
 
 const carDetails = {
   name: "سوزوكي سيار GLX 2023",
@@ -79,7 +80,12 @@ const CompactCarListing = ({ car_Details }) => {
 
   const remainingCount = car_Details?.additional_images.length - visibleThumbnails
 
-  console.log(' from get data one', car_Details)
+  console.log(' from get data one', car_Details?.name)
+  // Determine the language of the car details
+  const pathname = usePathname();
+  const isEnglish = pathname.startsWith('/en');
+  console.log("isEnglish",isEnglish)
+
 
   if (!car_Details) {
     return (
@@ -115,7 +121,7 @@ const CompactCarListing = ({ car_Details }) => {
         <div className="mb-8 pb-6 border-b border-gray-200">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-xl font-semibold mb-1">{car_Details?.name}</h1>
+              <h1 className="text-xl font-semibold mb-1">{isEnglish ? car_Details?.name?.en?.name :car_Details?.name?.ar?.name}</h1>
               <div className="flex items-center gap-2 text-[#71308A]">
                 <span className="inline-block w-4 h-4">
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

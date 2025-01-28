@@ -19,7 +19,8 @@ export const BrandsProvider = ({ children }) => {
     try {
       const response = await axios.get('https://xn--mgbml9eg4a.com/api/brands');
       setBrands(response.data);
-
+      console.log('dddddddddobject brands', response?.data?.data?.car_models
+      )
     } catch (err) {
       setError(err.message || 'An error occurred');
     } finally {

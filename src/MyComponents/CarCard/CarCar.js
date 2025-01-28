@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import { Heart, Calendar, Droplet, ChevronLeft, Gift } from "lucide-react";
 import { useBrands } from "@/contexts/AllDataProvider";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Link } from '@/i18n/routing';
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const CarCard = () => {
+  const pathname = usePathname();
   const { brands, loading, error } = useBrands();
   const [favorites, setFavorites] = useState([]);
-
-  console.log('dddddddddobject', brands.data)
 
   const handleFavorite = (id) => {
     setFavorites((prev) =>
@@ -36,7 +36,7 @@ const CarCard = () => {
                     <Skeleton className="h-4 w-[250px]" />
                     <Skeleton className="h-4 w-[200px]" />
                     <div className="flex justify-between items-center">
-                    <Skeleton className="h-4 w-[150px]" />
+                      <Skeleton className="h-4 w-[150px]" />
                       <Skeleton className="rounded-[100%] h-4 w-[20px]" />
                       <Skeleton className="rounded-[100%] h-4 w-[20px]" />
                     </div>
@@ -52,6 +52,9 @@ const CarCard = () => {
 
   if (error) return <p>Error: {error}</p>;
 
+  const isEnglish = pathname.startsWith('/en');
+  console.log("isEnglish",isEnglish)
+
   return (
     <div className="container mx-auto px-4 sm:px-8 lg:px-[5rem]">
       <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
@@ -60,19 +63,21 @@ const CarCard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-4 items-stretch justify-items-center">
         {brands?.data?.map((brand, brandIndex) => (
           brand.car_models?.map((car, carIndex) => (
-            <Link key={car.id} href={`car-details/${car.slug}`} className="block">
+            <Link key={car.id}
+              href={`/car-details/${isEnglish ? car.name.en.slug : car.name.ar.slug}`}
+              className="block">
               <div className="relative bg-white rounded-lg overflow-hidden shadow-lg max-w-sm hover:shadow-xl transition-shadow duration-300 group">
                 <div className="relative h-48 overflow-hidden">
                   <Image
                     src={car.image_url ? `https://xn--mgbml9eg4a.com${car.image_url}` : "/default-car.jpg"}
-                    alt={car.name || "Car image"}
+                    alt={isEnglish ? car.name.en.name : car.name.ar.name}
                     fill
                     objectFit="cover"
                     className="transition-transform duration-300 ease-in-out group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
                   <span className="absolute top-4 right-4 bg-brand-primary text-white px-3 py-1 rounded-full text-sm">
-                    {car.condition}
+                    {isEnglish ? car.name.en.condition : car.name.ar.condition}
                   </span>
                   <button
                     className="absolute top-4 left-4 bg-white rounded-full p-2 shadow-md z-10 hover:bg-gray-100 transition-colors"
@@ -95,21 +100,21 @@ const CarCard = () => {
                 </div>
                 <div className="p-4 rtl">
                   <div className="flex justify-between items-start mb-1">
-                    <h2 className="text-xl font-semibold">{car.name}</h2>
+                    <h2 className="text-xl font-semibold">{isEnglish ? car.name.en.name : car.name.ar.name}</h2>
                     <div className="text-xl font-bold text-brand-primary">{car.price}</div>
                   </div>
                   <div className="text-sm text-gray-600 mb-4">{car.monthlyInstallment}</div>
                   <div className="flex justify-between items-center mb-4 text-sm text-brand-primary">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
-                      <span>{car.year}</span>
+                      <span>{car.year_of_manufacture}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="text-brand-primary">{car.condition}</span>
+                      <span className="text-brand-primary">{isEnglish ? car.name.en.condition : car.name.ar.condition}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Droplet className="w-4 h-4" />
-                      <span>{car.fuelType}</span>
+                      <span>{isEnglish ? car.name.en.fuel_consumption : car.name.ar.fuel_consumption}</span>
                     </div>
                   </div>
                   <div className="flex justify-between items-center pt-3 border-t">

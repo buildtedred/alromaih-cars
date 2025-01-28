@@ -8,10 +8,14 @@ import SearchModal from './search/SearchModal';
 import Image from 'next/image';
 import { useLogoContext } from '@/contexts/LogoContext';
 import { Skeleton } from '@/components/ui/skeleton';
+// import LanguageSwitcher from '@/MyComponents/enarbutton';
+import { useTranslations } from 'next-intl';
+import LanguageToggle from '@/MyComponents/LanguageToggle';
 
 
 const Header = () => {
   const { t, i18n } = useTranslation();
+  // const t = useTranslations('HomePage');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,6 +40,7 @@ const Header = () => {
 
   return (
     <header className="font-noto w-full shadow-sm relative">
+      
      {/* {logos[0].name?.} */}
       <div className="bg-white lg:px-[8.5rem]">
         <div className="container mx-auto px-4">
@@ -88,8 +93,8 @@ const Header = () => {
               >
                 <Search className="h-6 w-6 text-gray-700" />
               </button>
-
-              <button 
+              {/* <LanguageSwitcher/> */}
+              {/* <button 
                 onClick={() => {
                   const newLang = i18n.language === 'ar' ? 'en' : 'ar';
                   i18n.changeLanguage(newLang);
@@ -100,7 +105,9 @@ const Header = () => {
               >
                 <Languages className="h-4 w-4" />
                 <span className="text-sm font-medium">{t('menu.language')}</span>
-              </button>
+              </button> */}
+
+              <LanguageToggle/>
 
               <button className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 hover:text-brand-primary">
                 <Heart className="h-5 w-5" />

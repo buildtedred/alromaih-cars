@@ -1,12 +1,16 @@
 'use client';
 
 import navigationRoutes from '@/All-routes/All-routes';
-import Link from 'next/link';
-import { useTranslation } from 'react-i18next';
+import { useTranslations } from 'next-intl';
+import {Link} from '@/i18n/routing';
+import { usePathname, useRouter } from 'next/navigation';
 
 
 const Nav = ({ isMobile }) => {
-  const { t } = useTranslation();
+  const { locale } = useRouter();
+  const t = useTranslations();
+  
+
   const navItems = navigationRoutes(t)
 
   return (
