@@ -109,10 +109,10 @@ const Header = () => {
 
               <LanguageToggle/>
 
-              <button className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 hover:text-brand-primary">
+              {/* <button className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 hover:text-brand-primary">
                 <Heart className="h-5 w-5" />
                 <span>{t('menu.favorites')}</span>
-              </button>
+              </button> */}
 
               <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors">
                 <span className="font-semibold flex items-center gap-2" dir="ltr">
