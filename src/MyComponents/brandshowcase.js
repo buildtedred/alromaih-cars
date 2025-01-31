@@ -14,50 +14,60 @@ function BrandShowcase() {
     className: "center",
     centerMode: true,
     infinite: true,
-    centerPadding: "60px",
+    centerPadding: "0px",
     slidesToShow: 3,
     speed: 500,
     rows: 2,
     slidesPerRow: 2,
+    autoplay: true, // Enable auto sliding
+    autoplaySpeed: 3000, // Change slide every 2 seconds
     responsive: [
       {
         breakpoint: 1280, // For larger screens, like tablets or small laptops
         settings: {
-          slidesToShow: 5,  // Show 5 items
+          slidesToShow: 5,  
           slidesToScroll: 5,
-          centerPadding: "40px",  // Adjusting padding
+          centerPadding: "40px",
+          autoplay: true, // Ensure autoplay on this breakpoint
+          autoplaySpeed: 3000,
         },
       },
       {
         breakpoint: 1024, // For screens like tablets
         settings: {
-          slidesToShow: 4,  // Show 4 items
+          slidesToShow: 4,  
           slidesToScroll: 4,
           centerPadding: "30px",
+          autoplay: true,
+          autoplaySpeed: 3000,
         },
       },
       {
         breakpoint: 768, // For mobile devices (smaller tablets)
         settings: {
-          slidesToShow: 3,  // Show 3 items
+          slidesToShow: 3,  
           slidesToScroll: 3,
-          centerPadding: "20px",  // Adjust padding for smaller screens
+          centerPadding: "20px",
+          autoplay: true,
+          autoplaySpeed: 3000,
         },
       },
       {
         breakpoint: 640, // For very small screens like phones
         settings: {
-          slidesToShow: 2,  // Show 2 items
+          slidesToShow: 2,  
           slidesToScroll: 2,
           centerPadding: "10px",
+          autoplay: true,
+          autoplaySpeed: 3000,
         },
       },
     ],
-  };
+};
 
   return (
     <div className="bg-gray-100 w-full py-16">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold mb-12 text-right">موزع معتمد</h2>
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
