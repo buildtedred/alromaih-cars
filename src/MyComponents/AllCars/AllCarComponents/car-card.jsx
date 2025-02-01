@@ -3,6 +3,7 @@ import { Heart, Calendar, Droplet, ChevronLeft } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/routing"
+import { usePathname } from "next/navigation"
 
 
 export function CarCard({ car }) {
@@ -14,8 +15,10 @@ export function CarCard({ car }) {
     setIsLiked(!isLiked)
   }
 
-  console.log("from all car api",car?.name?.en?.slug)
-
+  // console.log("from all car api",car?.name?.en?.slug)
+    const pathname = usePathname()
+    const isEnglish = pathname.startsWith("/en")
+    console.log("isEnglish", isEnglish)
   return (
     <Link href={`/car-details/${car?.name?.en?.slug}`} className="block w-full">
       <div className="relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group h-full w-full">
@@ -50,7 +53,8 @@ export function CarCard({ car }) {
           {/* Title and Price */}
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-lg font-semibold truncate">
-              {car.brand_name.en} {car.name.en.name}
+              {/* {car.brand_name.en}  */}
+              {isEnglish?car.name.en.name:car.name.ar.name}
             </h2>
             <div className="text-lg font-bold text-[#71308A]">₹{car.price.toLocaleString()}</div>
           </div>
@@ -63,7 +67,7 @@ export function CarCard({ car }) {
             </div>
             <div className="flex items-center gap-1">
               <Droplet className="w-4 h-4" />
-              <span>{car.vehicle_fuel_types[0]?.fuel_type.en || "N/A"}</span>
+              <span>{isEnglish?car.vehicle_fuel_types[0]?.fuel_type.en || "N/A":car.vehicle_fuel_types[0]?.fuel_type.ar || "N/A"}</span>
             </div>
             <div className="flex items-center gap-1">
               <svg
