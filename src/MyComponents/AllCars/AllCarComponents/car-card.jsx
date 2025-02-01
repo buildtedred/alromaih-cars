@@ -35,7 +35,7 @@ export function CarCard({ car }) {
           {/* New Badge in Upper Corner */}
          
             <span className="absolute top-2 right-2 bg-[#71308A] text-white px-2 py-1 rounded-full text-xs font-semibold">
-             {isEnglish ? car.name.en.condition : car.name.ar.condition}
+            {isEnglish ? car.name.en.condition : car.name.ar.condition}
             </span>
           
 

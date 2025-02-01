@@ -57,7 +57,7 @@ const CarCard = () => {
 
 
   return (
-    <div className="max-w-[calc(100%-10rem)] mx-auto  py-8">
+    <div className="max-w-[calc(100%-0rem)] md:max-w-[calc(100%-10rem)] mx-auto  py-8">
       <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">مجموعة سياراتنا</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {brands?.data?.map((brand) =>
