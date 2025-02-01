@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState } from "react"
-import { Heart, Calendar, Droplet, ChevronLeft, Gift, Car } from "lucide-react"
+import { useState } from "react"
+import { Heart, Calendar, Droplet, ChevronLeft, Gift } from "lucide-react"
 import { useBrands } from "@/contexts/AllDataProvider"
 import "react-loading-skeleton/dist/skeleton.css"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -13,8 +13,10 @@ const CarCard = () => {
   const pathname = usePathname()
   const { brands, loading, error } = useBrands()
   const [favorites, setFavorites] = useState([])
-  console.log(brands)
-  const handleFavorite = (id) => {
+
+  const handleFavorite = (e, id) => {
+    e.preventDefault()
+    e.stopPropagation()
     setFavorites((prev) => (prev.includes(id) ? prev.filter((carId) => carId !== id) : [...prev, id]))
   }
 
@@ -23,44 +25,24 @@ const CarCard = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">مجموعة سياراتنا</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-4 items-stretch justify-items-center">
-          {Array(8)
+      <div className="max-w-[calc(100%-18rem)] mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">مجموعة سياراتنا</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array(6)
             .fill()
             .map((_, index) => (
-              <div key={index} className="relative bg-white rounded-lg overflow-hidden shadow-lg max-w-sm">
-                <div className="p-1 rtl">
-                  <div className="flex flex-col space-y-3">
-                    <Skeleton className="flex justify-center items-center">
-
-                      <div
-                        style={{
-                          filter: "blur(1px)",
-                          transform: isEnglish ? "scaleX(-1)" : "scaleX(1)",
-                        }}
-                        className="w-full h-64 relative"
-                      >
-                        <img
-                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgKLxb6yVRqygT9X5w-GzMeMC8LysESeY1XihDZN6G_MbHz4rimGQ_-cvhGOxWScVyBt0&usqp=CAU"
-                          alt=""
-                          className="opacity-15"
-                        />
-                        {/* <Car size={200} strokeWidth={0.1} color="#675f5f" /> */}
-                      </div>
-
-                    </Skeleton>
-
-                    <div className="space-y-2">
-
-                      <Skeleton className="h-4 w-[250px]" />
-                      <Skeleton className="h-4 w-[200px]" />
-                      <div className="flex justify-between items-center">
-                        <Skeleton className="h-4 w-[150px]" />
-                        <Skeleton className="rounded-[100%] h-4 w-[20px]" />
-                        <Skeleton className="rounded-[100%] h-4 w-[20px]" />
-                      </div>
-                    </div>
+              <div
+                key={index}
+                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+                <Skeleton className="h-48 w-full" />
+                <div className="p-4 space-y-3">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-4 w-1/4" />
                   </div>
                 </div>
               </div>
@@ -70,72 +52,75 @@ const CarCard = () => {
     )
   }
 
-  if (error) return <p>Error: {error}</p>
+  if (error) return <p className="text-center text-red-500 text-xl mt-8">Error: {error}</p>
 
 
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
-      <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">مجموعة سياراتنا</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-stretch justify-items-center">
+    <div className="max-w-[calc(100%-10rem)] mx-auto  py-8">
+      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">مجموعة سياراتنا</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {brands?.data?.map((brand) =>
           brand.car_models?.map((car) => (
             <Link
               key={car.id}
               href={`/car-details/${isEnglish ? car.name.en.slug : car.name.ar.slug}`}
-              className="block w-full max-w-[400px]"
+              className="block group"
             >
-              <div className="relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group h-full">
-                <div className="relative h-64 overflow-hidden">
+              <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-full">
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={car.image_url ? `https://xn--mgbml9eg4a.com${car.image_url}` : "/default-car.jpg"}
                     alt={car.name || "Car image"}
                     fill
                     objectFit="cover"
-                    className="transition-transform duration-300 ease-in-out group-hover:scale-110"
+                    className="transition-transform duration-300 ease-in-out group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                  <span className="absolute top-4 right-4 bg-brand-primary text-white px-3 py-1 rounded-full text-sm">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <span className="absolute top-2 right-2 bg-brand-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
                     {isEnglish ? car.name.en.condition : car.name.ar.condition}
                   </span>
                   <button
-                    className="absolute top-4 left-4 bg-white rounded-full p-2 shadow-md z-10 hover:bg-gray-100 transition-colors"
+                    className="absolute top-2 left-2 bg-white rounded-full p-2 shadow-md z-10 hover:bg-gray-100 transition-colors"
                     onClick={(e) => handleFavorite(e, car.id)}
                   >
                     <Heart
-                      className={`w-5 h-5 ${favorites.includes(car.id) ? "fill-red-500 text-red-500" : "text-gray-600"
-                        }`}
+                      className={`w-5 h-5 ${
+                        favorites.includes(car.id) ? "fill-purple-500 text-purple-500" : "text-gray-600"
+                      }`}
                     />
                   </button>
                   {car.discount && (
-                    <div className="absolute bottom-4 left-4 bg-red-500 text-white rounded-full p-2 shadow-md z-10 flex items-center justify-center">
-                      <Gift className="w-4 h-4" />
-                      <span className="text-xs font-bold ml-1">{car.name.en.discount}</span>
+                    <div className="absolute bottom-2 left-2 bg-red-500 text-white rounded-full px-3 py-1 shadow-md z-10 flex items-center justify-center">
+                      <Gift className="w-4 h-4 mr-1" />
+                      <span className="text-xs font-bold">{car.name.en.discount}</span>
                     </div>
                   )}
                 </div>
-                <div className="p-5 rtl">
+                <div className="p-4 rtl">
                   <div className="flex justify-between items-start mb-2">
-                    <h2 className="text-xl font-semibold">{isEnglish ? car.name.en.name : car.name.ar.name}</h2>
-                    <div className="text-xl font-bold text-brand-primary">{car.price}</div>
+                    <h2 className="text-lg font-semibold text-gray-800 truncate">
+                      {isEnglish ? car.name.en.name : car.name.ar.name}
+                    </h2>
+                    <div className="text-lg font-bold text-brand-primary">{car.price}</div>
                   </div>
-                  <div className="text-sm text-gray-600 mb-4">{car.monthlyInstallment}</div>
-                  <div className="flex justify-between items-center mb-4 text-sm text-brand-primary">
-                    <div className="flex items-center gap-2">
+                  <div className="text-sm text-gray-600 mb-3">{car.monthlyInstallment}</div>
+                  <div className="flex justify-between items-center mb-3 text-xs text-gray-500">
+                    <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
                       <span>{car.year_of_manufacture}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       <span className="text-brand-primary">{car.name.en.condition}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       <Droplet className="w-4 h-4" />
                       {car?.vehicle_fuel_types?.map((fuelType, index) => (
                         <span key={index}>{isEnglish ? fuelType.fuel_type.en : fuelType.fuel_type.ar}</span>
                       ))}
                     </div>
                   </div>
-                  <div className="flex justify-between items-center pt-3 border-t">
+                  <div className="flex justify-between items-center pt-3 border-t border-gray-200">
                     <button
                       className="text-brand-primary hover:text-brand-dark text-sm flex items-center gap-1 transition-colors duration-300"
                       onClick={(e) => e.preventDefault()}
@@ -143,8 +128,8 @@ const CarCard = () => {
                       <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
                       {isEnglish ? "View details" : "عرض التفاصيل"}
                     </button>
-                    <div className="text-sm text-brand-primary">
-                      {isEnglish ? `${car.interestedPeople} people are interested` : `${car.interestedPeople} شخص مهتم`}
+                    <div className="text-xs text-brand-primary">
+                      {isEnglish ? `${car.interestedPeople} interested` : `${car.interestedPeople} مهتم`}
                     </div>
                   </div>
                 </div>
