@@ -10,66 +10,59 @@ import "slick-carousel/slick/slick-theme.css";
 
 function BrandShowcase() {
   const { brands, loading, error } = useBrands();
-  console.log('object', brands)
+
   const settings = {
     className: "center",
     centerMode: true,
     infinite: true,
     centerPadding: "0px",
-    slidesToShow: 3,
+    slidesToShow: 6, // Default slides
+    slidesToScroll: 1,
     speed: 500,
-    rows: 2,
-    slidesPerRow: 2,
-    autoplay: true, // Enable auto sliding
-    autoplaySpeed: 3000, // Change slide every 2 seconds
+    autoplay: true,
+    autoplaySpeed: 3000,
     responsive: [
       {
-        breakpoint: 1280, // For larger screens, like tablets or small laptops
+        breakpoint: 1280, // Large screens
         settings: {
-          slidesToShow: 5,  
-          slidesToScroll: 5,
-          centerPadding: "40px",
-          autoplay: true, // Ensure autoplay on this breakpoint
-          autoplaySpeed: 3000,
-        },
-      },
-      {
-        breakpoint: 1024, // For screens like tablets
-        settings: {
-          slidesToShow: 4,  
-          slidesToScroll: 4,
-          centerPadding: "30px",
-          autoplay: true,
-          autoplaySpeed: 3000,
-        },
-      },
-      {
-        breakpoint: 768, // For mobile devices (smaller tablets)
-        settings: {
-          slidesToShow: 3,  
-          slidesToScroll: 3,
+          slidesToShow: 5,
+          slidesToScroll: 1,
           centerPadding: "20px",
-          autoplay: true,
-          autoplaySpeed: 3000,
         },
       },
       {
-        breakpoint: 640, // For very small screens like phones
+        breakpoint: 1024, // Medium screens
         settings: {
-          slidesToShow: 2,  
-          slidesToScroll: 2,
+          slidesToShow: 4,
+          slidesToScroll: 1,
+          centerPadding: "15px",
+        },
+      },
+      {
+        breakpoint: 768, // Tablets
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
           centerPadding: "10px",
-          autoplay: true,
-          autoplaySpeed: 3000,
+        },
+      },
+      {
+        breakpoint: 640, // Phones
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          centerPadding: "5px",
         },
       },
     ],
-};
+  };
 
   return (
-    <div className="bg-gray-100 w-full py-16">
+    <div className="bg-gray-100 w-full py-10">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold mb-12 text-right">موزع معتمد</h2>
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-8 text-right">
+          موزع معتمد
+        </h2>
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {Array.from({ length: 12 }).map((_, index) => (
@@ -83,15 +76,17 @@ function BrandShowcase() {
         ) : (
           <Slider {...settings} className="slider-container">
             {brands?.data?.map((brand, index) => (
-              <div key={index} className="p-2">
+              <div key={index} className="p-1 md:p-2 lg:p-3">
                 <Card className="h-auto pt-1">
-                  <CardContent className=" flex flex-col justify-between items-center">
+                  <CardContent className="flex flex-col items-center justify-center">
                     <img
                       src={`https://xn--mgbml9eg4a.com${brand?.image_url}`}
                       alt={brand.name}
                       className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
                     />
-                    <p className="text-center font-bold text-gray-500">{brand?.name?.en?.name}</p>
+                    <p className="text-center font-bold text-gray-500 text-sm md:text-base lg:text-lg whitespace-nowrap">
+                      {brand?.name?.en?.name}
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -100,7 +95,7 @@ function BrandShowcase() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default BrandShowcase
+export default BrandShowcase;

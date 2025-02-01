@@ -14,7 +14,7 @@ export default function Home() {
           <HeroSection />
         </SlidesProvider>
 
-        <main className="min-h-screen p-8 bg-gray-100">
+        <main className="min-h-screen m-auto p-8 bg-gray-100">
           {/* BrandsProvider is properly wrapping the components */}
           <BrandsProvider>
             <CarCard />
