@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Heart, Calendar, Droplet, ChevronLeft, Gift } from "lucide-react"
+import { Heart, Calendar, Droplet, ChevronLeft, Gift, Car } from "lucide-react"
 import { useBrands } from "@/contexts/AllDataProvider"
 import "react-loading-skeleton/dist/skeleton.css"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -13,10 +13,13 @@ const CarCard = () => {
   const pathname = usePathname()
   const { brands, loading, error } = useBrands()
   const [favorites, setFavorites] = useState([])
-
+  console.log(brands)
   const handleFavorite = (id) => {
     setFavorites((prev) => (prev.includes(id) ? prev.filter((carId) => carId !== id) : [...prev, id]))
   }
+
+  const isEnglish = pathname.startsWith("/en")
+  console.log("isEnglish", isEnglish)
 
   if (loading) {
     return (
@@ -29,8 +32,27 @@ const CarCard = () => {
               <div key={index} className="relative bg-white rounded-lg overflow-hidden shadow-lg max-w-sm">
                 <div className="p-1 rtl">
                   <div className="flex flex-col space-y-3">
-                    <Skeleton className="h-[125px] w-[250px]" />
+                    <Skeleton className="flex justify-center items-center">
+
+                      <div
+                        style={{
+                          filter: "blur(1px)",
+                          transform: isEnglish ? "scaleX(-1)" : "scaleX(1)",
+                        }}
+                        className="w-full h-64 relative"
+                      >
+                        <img
+                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgKLxb6yVRqygT9X5w-GzMeMC8LysESeY1XihDZN6G_MbHz4rimGQ_-cvhGOxWScVyBt0&usqp=CAU"
+                          alt=""
+                          className="opacity-15"
+                        />
+                        {/* <Car size={200} strokeWidth={0.1} color="#675f5f" /> */}
+                      </div>
+
+                    </Skeleton>
+
                     <div className="space-y-2">
+
                       <Skeleton className="h-4 w-[250px]" />
                       <Skeleton className="h-4 w-[200px]" />
                       <div className="flex justify-between items-center">
@@ -50,8 +72,7 @@ const CarCard = () => {
 
   if (error) return <p>Error: {error}</p>
 
-  const isEnglish = pathname.startsWith("/en")
-  console.log("isEnglish", isEnglish)
+
 
   return (
     <div className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
@@ -82,9 +103,8 @@ const CarCard = () => {
                     onClick={(e) => handleFavorite(e, car.id)}
                   >
                     <Heart
-                      className={`w-5 h-5 ${
-                        favorites.includes(car.id) ? "fill-red-500 text-red-500" : "text-gray-600"
-                      }`}
+                      className={`w-5 h-5 ${favorites.includes(car.id) ? "fill-red-500 text-red-500" : "text-gray-600"
+                        }`}
                     />
                   </button>
                   {car.discount && (
@@ -110,7 +130,9 @@ const CarCard = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Droplet className="w-4 h-4" />
-                      <span>{car.name.en.fuel_consumption}</span>
+                      {car?.vehicle_fuel_types?.map((fuelType, index) => (
+                        <span key={index}>{isEnglish ? fuelType.fuel_type.en : fuelType.fuel_type.ar}</span>
+                      ))}
                     </div>
                   </div>
                   <div className="flex justify-between items-center pt-3 border-t">

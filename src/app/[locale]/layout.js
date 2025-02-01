@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css"; 
 import Header from "@/MyComponents/NavebarComponents/components/Header";
 // import { Providers } from "./providers";
 import { LogoProvider } from "@/contexts/LogoContext";

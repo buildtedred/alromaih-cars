@@ -39,7 +39,7 @@ const Header = () => {
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
               {loading ? (
                 <span>
-                  <Skeleton className="w-[100px] h-[40px] rounded-full" />
+                  <Skeleton className="w-[100px] h-[40px] rounded-full"/>
                 </span>
               ) : error ? (
                 <span>Error: {error}</span>
