@@ -10,6 +10,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 function BrandShowcase() {
   const { brands, loading, error } = useBrands();
+  console.log('object', brands)
   const settings = {
     className: "center",
     centerMode: true,
@@ -83,13 +84,14 @@ function BrandShowcase() {
           <Slider {...settings} className="slider-container">
             {brands?.data?.map((brand, index) => (
               <div key={index} className="p-2">
-                <Card className="h-auto">
-                  <CardContent className="flex items-center justify-center p-4">
+                <Card className="h-auto pt-1">
+                  <CardContent className=" flex flex-col justify-between items-center">
                     <img
                       src={`https://xn--mgbml9eg4a.com${brand?.image_url}`}
                       alt={brand.name}
                       className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
                     />
+                    <p className="text-center font-bold text-gray-500">{brand?.name?.en?.name}</p>
                   </CardContent>
                 </Card>
               </div>

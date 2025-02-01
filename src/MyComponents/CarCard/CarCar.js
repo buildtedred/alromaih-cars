@@ -20,6 +20,9 @@ const CarCard = () => {
     setFavorites((prev) => (prev.includes(id) ? prev.filter((carId) => carId !== id) : [...prev, id]))
   }
 
+  const isEnglish = pathname.startsWith("/en")
+  console.log("isEnglish", isEnglish)
+
   if (loading) {
     return (
       <div className="max-w-[calc(100%-18rem)] mx-auto px-4 py-8">
@@ -51,7 +54,7 @@ const CarCard = () => {
 
   if (error) return <p className="text-center text-red-500 text-xl mt-8">Error: {error}</p>
 
-  const isEnglish = pathname.startsWith("/en")
+
 
   return (
     <div className="max-w-[calc(100%-10rem)] mx-auto  py-8">
@@ -112,7 +115,9 @@ const CarCard = () => {
                     </div>
                     <div className="flex items-center gap-1">
                       <Droplet className="w-4 h-4" />
-                      <span>{car.name.en.fuel_consumption}</span>
+                      {car?.vehicle_fuel_types?.map((fuelType, index) => (
+                        <span key={index}>{isEnglish ? fuelType.fuel_type.en : fuelType.fuel_type.ar}</span>
+                      ))}
                     </div>
                   </div>
                   <div className="flex justify-between items-center pt-3 border-t border-gray-200">
