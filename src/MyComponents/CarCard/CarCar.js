@@ -83,7 +83,7 @@ const CarCard = () => {
                   >
                     <Heart
                       className={`w-5 h-5 ${
-                        favorites.includes(car.id) ? "fill-red-500 text-red-500" : "text-gray-600"
+                        favorites.includes(car.id) ? "fill-purple-500 text-purple-500" : "text-gray-600"
                       }`}
                     />
                   </button>

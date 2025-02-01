@@ -2,7 +2,8 @@ import { useState } from "react"
 import { Heart, Calendar, Droplet, ChevronLeft } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
+
 
 export function CarCard({ car }) {
   const [isLiked, setIsLiked] = useState(false)
@@ -13,8 +14,10 @@ export function CarCard({ car }) {
     setIsLiked(!isLiked)
   }
 
+  console.log("from all car api",car?.name?.en?.slug)
+
   return (
-    <Link href={`/car-details/${car.id}`} className="block w-full">
+    <Link href={`/car-details/${car?.name?.en?.slug}`} className="block w-full">
       <div className="relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group h-full w-full">
         {/* Image Section */}
         <div className="relative h-48 overflow-hidden">

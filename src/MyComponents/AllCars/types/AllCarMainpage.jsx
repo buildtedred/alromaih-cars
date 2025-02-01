@@ -154,7 +154,7 @@ const AllCarMainpage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container px-4 py-4">
+      <div className="container m-auto md:px-[9rem] px-4 py-4">
         <div className="relative flex flex-col md:flex-row">
           <Button
             className="md:hidden mb-4 bg-[#71308A] hover:bg-[#71308A]/90 text-white"
