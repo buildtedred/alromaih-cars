@@ -33,11 +33,11 @@ export function CarCard({ car }) {
           <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
 
           {/* New Badge in Upper Corner */}
-          {car.name.en.condition === "new" && (
+         
             <span className="absolute top-2 right-2 bg-[#71308A] text-white px-2 py-1 rounded-full text-xs font-semibold">
-              New
+             {isEnglish ? car.name.en.condition : car.name.ar.condition}
             </span>
-          )}
+          
 
           {/* Like Button */}
           <button
