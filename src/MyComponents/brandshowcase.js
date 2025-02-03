@@ -7,9 +7,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useBrands } from "@/contexts/AllDataProvider"
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Link } from "@/i18n/routing"
 
 function BrandShowcase() {
   const { brands, loading, error } = useBrands();
+  console.log("object brands",brands)
 
   const settings = {
     className: "center",
@@ -77,6 +79,8 @@ function BrandShowcase() {
           <Slider {...settings} className="slider-container">
             {brands?.data?.map((brand, index) => (
               <div key={index} className="p-1 md:p-2 lg:p-3">
+                <Link href={`/brands/${brand?.name?.en?.slug}`}>
+              
                 <Card className="h-auto pt-1">
                   <CardContent className="flex flex-col items-center justify-center">
                     <img
@@ -89,6 +93,7 @@ function BrandShowcase() {
                     </p>
                   </CardContent>
                 </Card>
+                </Link>
               </div>
             ))}
           </Slider>
