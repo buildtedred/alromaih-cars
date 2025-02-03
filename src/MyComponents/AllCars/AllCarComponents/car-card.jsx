@@ -4,9 +4,10 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/routing"
 import { usePathname } from "next/navigation"
+import { Skeleton } from "@/components/ui/skeleton"
 
 
-export function CarCard({ car }) {
+export function CarCard({ car,loading }) {
   const [isLiked, setIsLiked] = useState(false)
 
   const handleLikeClick = (e) => {
@@ -19,6 +20,37 @@ export function CarCard({ car }) {
     const pathname = usePathname()
     const isEnglish = pathname.startsWith("/en")
     console.log("isEnglish", isEnglish)
+
+    if (loading) {
+      return (
+        <div className="max-w-[calc(100%-18rem)] mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+            {isEnglish ? "Our Car Collection" : "مجموعة سياراتنا"}
+          </h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array(6)
+              .fill()
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+                >
+                  <Skeleton className="h-48 w-full" />
+                  <div className="p-4 space-y-3">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="flex justify-between items-center">
+                      <Skeleton className="h-4 w-1/4" />
+                      <Skeleton className="h-4 w-1/4" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      );
+    }
   return (
     <Link href={`/car-details/${car?.name?.en?.slug}`} className="block w-full">
       <div className="relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group h-full w-full">
