@@ -8,6 +8,7 @@
 /* Global Styles */
 body {
   font-family: 'Cairo', sans-serif;
+  background: rgb(243 244 246 / var(--tw-bg-opacity, 1))
 }
 
 /* Custom Range Input Styles */

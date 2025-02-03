@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTranslation } from "react-i18next"
 import { useSlides } from "@/contexts/SliderContext"
@@ -35,12 +35,11 @@ export const HeroSection = () => {
 
   if (loading) {
     return (
-      <div className="relative">
-        <div className="relative aspect-[21/9] w-full">
-          <Skeleton height="100%" />
+      <div className="relative px-4 md:px-36">
+        <div className="relative aspect-[25/9] w-full">
+          <Skeleton height="100%" className="rounded-none md:rounded-[20px]" />
         </div>
       </div>
-      
     )
   }
 
@@ -51,8 +50,8 @@ export const HeroSection = () => {
   const baseURL = "https://xn--mgbml9eg4a.com"
 
   return (
-    <div className="relative">
-      <div className="relative aspect-[25/9] w-full">
+    <div className="relative py-6 md:px-36">
+      <div className="relative aspect-[25/9] w-full overflow-hidden md:rounded-[20px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
