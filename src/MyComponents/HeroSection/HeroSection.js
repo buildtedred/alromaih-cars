@@ -40,6 +40,7 @@ export const HeroSection = () => {
           <Skeleton height="100%" />
         </div>
       </div>
+      
     )
   }
 

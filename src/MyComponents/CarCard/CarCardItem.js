@@ -1,22 +1,20 @@
-"use client";
+"use client"
 
-import { Heart, Calendar, Droplet, ChevronLeft, Gift } from "lucide-react";
-import { Link } from "@/i18n/routing";
-import Image from "next/image";
+import { Heart, Calendar, Droplet, ChevronLeft, Gift } from "lucide-react"
+import { Link } from "@/i18n/routing"
+import Image from "next/image"
 
 const CarCardItem = ({ car, isEnglish, favorites, handleFavorite }) => {
   return (
-    <Link
-      href={`/car-details/${isEnglish ? car.name.en.slug : car.name.ar.slug}`}
-      className="block group"
-    >
+    <Link href={`/car-details/${isEnglish ? car.name.en.slug : car.name.ar.slug}`} className="block group">
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-full">
         {/* Car Image */}
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative w-full pt-[75%] overflow-hidden">
           <Image
             src={car.image_url ? `https://xn--mgbml9eg4a.com${car.image_url}` : "/default-car.jpg"}
             alt={isEnglish ? car.name.en.name : car.name.ar.name}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             style={{ objectFit: "cover" }}
             className="transition-transform duration-300 ease-in-out group-hover:scale-105"
           />
@@ -26,12 +24,13 @@ const CarCardItem = ({ car, isEnglish, favorites, handleFavorite }) => {
           </span>
           <button
             className="absolute top-2 left-2 bg-white rounded-full p-2 shadow-md z-10 hover:bg-gray-100 transition-colors"
-            onClick={(e) => handleFavorite(e, car.id)}
+            onClick={(e) => {
+              e.preventDefault()
+              handleFavorite(car.id)
+            }}
           >
             <Heart
-              className={`w-5 h-5 ${
-                favorites.includes(car.id) ? "fill-purple-500 text-purple-500" : "text-gray-600"
-              }`}
+              className={`w-5 h-5 ${favorites.includes(car.id) ? "fill-purple-500 text-purple-500" : "text-gray-600"}`}
             />
           </button>
           {car.discount && (
@@ -57,37 +56,32 @@ const CarCardItem = ({ car, isEnglish, favorites, handleFavorite }) => {
               <span>{car.year_of_manufacture}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-brand-primary">
-                {isEnglish ? car.name.en.condition : car.name.ar.condition}
-              </span>
+              <span className="text-brand-primary">{isEnglish ? car.name.en.condition : car.name.ar.condition}</span>
             </div>
             <div className="flex items-center gap-1">
               <Droplet className="w-4 h-4" />
               {car?.vehicle_fuel_types?.map((fuelType, index) => (
-                <span key={index}>
-                  {isEnglish ? fuelType.fuel_type.en : fuelType.fuel_type.ar}
-                </span>
+                <span key={index}>{isEnglish ? fuelType.fuel_type.en : fuelType.fuel_type.ar}</span>
               ))}
             </div>
           </div>
           <div className="flex justify-between items-center pt-3 border-t border-gray-200">
             <button
-              className="text-brand-primary hover:text-brand-dark text-sm flex items-center gap-1 transition-colors duration-300"
+              className="text-brand-primary hover:text-brand-dark text-xs sm:text-sm flex items-center gap-1 transition-colors duration-300 whitespace-nowrap"
               onClick={(e) => e.preventDefault()}
             >
-              <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
-              {isEnglish ? "View details" : "عرض التفاصيل"}
+              <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 rtl:rotate-180" />
+              <span className="truncate">{isEnglish ? "View details" : "عرض التفاصيل"}</span>
             </button>
-            <div className="text-xs text-brand-primary">
-              {isEnglish
-                ? `${car.interestedPeople} interested`
-                : `${car.interestedPeople} مهتم`}
+            <div className="text-xs text-brand-primary whitespace-nowrap ml-2">
+              {isEnglish ? `${car.interestedPeople} interested` : `${car.interestedPeople} مهتم`}
             </div>
           </div>
         </div>
       </div>
     </Link>
-  );
-};
+  )
+}
 
-export default CarCardItem;
+export default CarCardItem
+
