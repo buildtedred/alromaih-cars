@@ -1,12 +1,13 @@
+"use client"
+import Brands from '@/MyComponents/Brands/Brands'
 import React from 'react'
 
 const page = () => {
   return (
   <>
 
-  <h1> this is brand page</h1>
 
-
+  <Brands/>
 
   </>
   )

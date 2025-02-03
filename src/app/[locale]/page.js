@@ -1,4 +1,4 @@
-import { BrandsProvider } from "@/contexts/AllDataProvider";
+
 import { SlidesProvider } from "@/contexts/SliderContext";
 import BrandShowcase from "@/MyComponents/brandshowcase";
 import CarCard from "@/MyComponents/CarCard/CarCar";
@@ -16,10 +16,10 @@ export default function Home() {
 
         <main className="min-h-screen m-auto p-8 bg-gray-100">
           {/* BrandsProvider is properly wrapping the components */}
-          <BrandsProvider>
+  
             <CarCard />
             <BrandShowcase />
-          </BrandsProvider>
+    
 
           {/* FinancePartners is outside the BrandsProvider */}
           <FinancePartners />
