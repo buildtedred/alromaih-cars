@@ -1,20 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Phone, Menu, X } from "lucide-react"
+import { Phone, Menu, X } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Nav from "./Nav"
-import SearchModal from "./search/SearchModal"
 import { useLogoContext } from "@/contexts/LogoContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import LanguageToggle from "@/MyComponents/LanguageToggle"
 
 const Header = () => {
   const { t } = useTranslation()
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedFilters, setSelectedFilters] = useState({})
   const [mounted, setMounted] = useState(false)
 
   const { logos, loading, error } = useLogoContext()
@@ -23,7 +19,6 @@ const Header = () => {
     setMounted(true)
   }, [])
 
-  const toggleSearch = () => setIsSearchOpen(!isSearchOpen)
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
 
   if (!mounted) {
@@ -56,13 +51,6 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
-              <button
-                onClick={toggleSearch}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label={t("search")}
-              >
-                <Search className="h-6 w-6 text-gray-700" />
-              </button>
               <LanguageToggle />
               <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors">
                 <span className="font-semibold flex items-center gap-2" dir="ltr">
@@ -74,13 +62,6 @@ const Header = () => {
 
             {/* Mobile Navigation */}
             <div className="flex md:hidden items-center space-x-2 rtl:space-x-reverse">
-              <button
-                onClick={toggleSearch}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label={t("search")}
-              >
-                <Search className="h-6 w-6 text-gray-700" />
-              </button>
               <LanguageToggle />
               <button className="p-2 rounded-lg hover:bg-gray-100" onClick={toggleMobileMenu}>
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -106,27 +87,8 @@ const Header = () => {
           </button>
         </div>
       </div>
-
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={toggleSearch}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        selectedFilters={selectedFilters}
-        onClearFilters={() => setSelectedFilters({})}
-        onFilterChange={(section, filter, value) => {
-          setSelectedFilters((prev) => ({
-            ...prev,
-            [section]: {
-              ...prev[section],
-              [filter]: value,
-            },
-          }))
-        }}
-      />
     </header>
   )
 }
 
 export default Header
-
