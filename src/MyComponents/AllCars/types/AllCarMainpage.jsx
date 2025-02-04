@@ -6,6 +6,7 @@ import { CarGrid } from "../AllCarComponents/car-grid"
 import { PromoSlider } from "../AllCarComponents/promo-slider"
 import CarFilterSidebar from "./car-filter-sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
+import LoadingUi from "@/MyComponents/LoadingUi/LoadingUi"
 
 const AllCarMainpage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -142,34 +143,10 @@ const AllCarMainpage = () => {
   }, [filters, filteredCars])
 
   if (loading) {
-    return <div className="text-center mt-8">
-         <div className="max-w-[calc(100%-18rem)] mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-          {/* {isEnglish ? "Our Car Collection" : "مجموعة سياراتنا"} */}
-        </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array(6)
-            .fill()
-            .map((_, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
-              >
-                <Skeleton className="h-48 w-full" />
-                <div className="p-4 space-y-3">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-4 w-1/4" />
-                    <Skeleton className="h-4 w-1/4" />
-                    <Skeleton className="h-4 w-1/4" />
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-      </div>
-    </div>
+    return (
+      <LoadingUi/>
+    )
+
   }
 
   if (error) {

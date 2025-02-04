@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Link } from "@/i18n/routing"
 import { usePathname } from "next/navigation"
 import { Skeleton } from "@/components/ui/skeleton"
+import LoadingUi from "@/MyComponents/LoadingUi/LoadingUi"
 
 export function CarCard({ car, loading }) {
   const [isLiked, setIsLiked] = useState(false)
@@ -18,6 +19,7 @@ export function CarCard({ car, loading }) {
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 
+<<<<<<< HEAD
   if (loading) {
     return (
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -35,6 +37,13 @@ export function CarCard({ car, loading }) {
     )
   }
 
+=======
+    if (loading) {
+      return (
+        <LoadingUi/>
+      );
+    }
+>>>>>>> hamdbranch
   return (
     <Link href={`/car-details/${car?.name?.en?.slug}`} className="block w-full h-full">
       <div className="relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group h-full w-full flex flex-col">
@@ -126,6 +135,7 @@ export function CarCard({ car, loading }) {
               <span className="truncate">{car.seating_capacity || "N/A"} seats</span>
             </div>
           </div>
+          
 
           {/* Footer */}
           <div className="flex justify-between items-center pt-2 border-t mt-auto">
