@@ -73,7 +73,7 @@ const CompactCarListing = ({ car_Details }) => {
   const [activePaymentTab, setActivePaymentTab] = useState("الدفع نقداً")
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false)
   const [visibleThumbnails, setVisibleThumbnails] = useState(6)
-       console.log("single image hhhhhh", activeImage); // Log the image data
+  console.log("single image hhhhhh", car_Details); // Log the image data
   const handleLoadMore = () => {
     setVisibleThumbnails(car_Details?.additional_images?.length)
   }
@@ -84,7 +84,7 @@ const CompactCarListing = ({ car_Details }) => {
   // Determine the language of the car details
   const pathname = usePathname();
   const isEnglish = pathname.startsWith('/en');
-  console.log("isEnglish",isEnglish)
+  console.log("isEnglish", isEnglish)
 
 
   if (!car_Details) {
@@ -121,7 +121,7 @@ const CompactCarListing = ({ car_Details }) => {
         <div className="mb-8 pb-6 border-b border-gray-200">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-xl font-semibold mb-1">{isEnglish ? car_Details?.name?.en?.name :car_Details?.name?.ar?.name}</h1>
+              <h1 className="text-xl font-semibold mb-1">{isEnglish ? car_Details?.name?.en?.name : car_Details?.name?.ar?.name}</h1>
               <div className="flex items-center gap-2 text-[#71308A]">
                 <span className="inline-block w-4 h-4">
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -254,31 +254,43 @@ const CompactCarListing = ({ car_Details }) => {
                 </div>
               </div>
             </div>
-
             <div className="flex overflow-x-auto border-b mb-4 mt-6">
-              {Object.keys(carDetails.specifications).map((tab) => (
+              {car_Details?.specifications?.map((tab, index) => (
                 <button
-                  key={tab}
+                  key={index}
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
                     }`}
                 >
-                  {tab}
+                  {isEnglish ? tab?.en?.name : tab?.ar?.name}
+                  { console.log("spacifications data", tab) }
                 </button>
               ))}
             </div>
 
             <div>
-              <h3 className="text-base font-semibold mb-3">{`مواصفات ${activeTab}`}</h3>
+              <h3 className="text-base font-semibold mb-3">
+                {isEnglish?activeTab?.en?.name:activeTab?.ar?.name}
+                </h3>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                {carDetails.specifications[activeTab].map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
-                      <Check className="w-3 h-3 text-white" />
-                    </span>
-                    {item}
-                  </li>
-                ))}
+                {isEnglish
+                  ? activeTab?.en?.values?.map((item) => (
+                    <li key={item} className="flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </span>
+                      {item}
+                    </li>
+                  ))
+                  : activeTab?.ar?.values?.map((item) => ( // Assuming Arabic values exist in `activeTab?.ar?.values`
+                    <li key={item} className="flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+
               </ul>
             </div>
           </div>

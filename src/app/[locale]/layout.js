@@ -10,6 +10,8 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { getLangDir } from 'rtl-detect';
 import { BrandsProvider } from "@/contexts/AllDataProvider";
+import LanguageSwitcherContext from "@/contexts/LanguageSwitcherContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
 
 
 
@@ -36,6 +38,9 @@ export default async function RootLayout({ children, params }) {
     <html lang={locale} dir={direction} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider messages={messages}>
+          <LanguageSwitcherContext>
+          <FavoritesProvider>
+
           <BrandsProvider>
             {/* <Providers> */}
             <LogoProvider>
@@ -46,6 +51,8 @@ export default async function RootLayout({ children, params }) {
             </LogoProvider>
             {/* </Providers> */}
           </BrandsProvider>
+          </FavoritesProvider>
+          </LanguageSwitcherContext>
         </NextIntlClientProvider>
       </body>
     </html>

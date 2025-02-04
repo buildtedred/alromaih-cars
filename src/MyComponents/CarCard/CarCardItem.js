@@ -1,12 +1,24 @@
 "use client"
 
-import { Heart, Calendar, Droplet, ChevronLeft, Gift } from "lucide-react"
+import { Heart, Calendar, Droplet, ChevronLeft, Gift, Users, Fuel, Zap, Cog } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import Image from "next/image"
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { useLanguageContext } from "@/contexts/LanguageSwitcherContext"
 
-const CarCardItem = ({ car, isEnglish, favorites, handleFavorite }) => {
+const CarCardItem = ({ car, favorites, handleFavorite }) => {
+  const { isEnglish } = useLanguageContext()
+  const [isLiked, setIsLiked] = useState(false)
+
+
+  const handleLikeClick = (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+    setIsLiked(!isLiked)
+  }
   return (
-    <Link href={`/car-details/${isEnglish ? car.name.en.slug : car.name.ar.slug}`} className="block group">
+    <Link href={`/car-details/${car?.name?.en?.slug}`} className="block group">
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-full">
         {/* Car Image */}
         <div className="relative w-full pt-[75%] overflow-hidden">
@@ -22,16 +34,12 @@ const CarCardItem = ({ car, isEnglish, favorites, handleFavorite }) => {
           <span className="absolute top-2 right-2 bg-brand-primary text-white px-3 py-1 rounded-full text-xs font-semibold">
             {isEnglish ? car.name.en.condition : car.name.ar.condition}
           </span>
+          {/* Like Button */}
           <button
-            className="absolute top-2 left-2 bg-white rounded-full p-2 shadow-md z-10 hover:bg-gray-100 transition-colors"
-            onClick={(e) => {
-              e.preventDefault()
-              handleFavorite(car.id)
-            }}
+            onClick={handleLikeClick}
+            className="absolute top-2 left-2 bg-white rounded-full p-1.5 shadow-md z-10 hover:bg-gray-100 transition-colors"
           >
-            <Heart
-              className={`w-5 h-5 ${favorites.includes(car.id) ? "fill-purple-500 text-purple-500" : "text-gray-600"}`}
-            />
+            <Heart className={cn("w-4 h-4", isLiked ? "fill-purple-500 text-purple-500" : "text-gray-600")} />
           </button>
           {car.discount && (
             <div className="absolute bottom-2 left-2 bg-red-500 text-white rounded-full px-3 py-1 shadow-md z-10 flex items-center justify-center">
@@ -43,6 +51,9 @@ const CarCardItem = ({ car, isEnglish, favorites, handleFavorite }) => {
 
         {/* Car Details */}
         <div className="p-4 rtl">
+
+
+          {/*           
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-lg font-semibold text-gray-800 truncate">
               {isEnglish ? car.name.en.name : car.name.ar.name}
@@ -64,7 +75,65 @@ const CarCardItem = ({ car, isEnglish, favorites, handleFavorite }) => {
                 <span key={index}>{isEnglish ? fuelType.fuel_type.en : fuelType.fuel_type.ar}</span>
               ))}
             </div>
+          </div> */}
+
+
+          <div className="rounded-lg flex">
+            <h2 className="text-2xl font-bold mb-1 "> {isEnglish ? car?.name?.en?.name : car?.name?.ar?.name}</h2>
+            <p className=" mb-1 text-sm text-gray-600"> {car?.price}</p>
           </div>
+          <div className="grid  grid-cols-3 gap-2 text-sm text-gray-600 mb-3 col-start-2  justify-self-between align-self-center">
+            {/* Year of Manufacture */}
+            <div className="flex items-center gap-1">
+              <Calendar className="w-4 h-4" />
+              <span>{car.year_of_manufacture || "N/A"}</span>
+            </div>
+
+            {/* Fuel Type */}
+            <div className="flex items-center gap-1">
+              <Droplet className="w-4 h-4" />
+              <span>
+                {isEnglish
+                  ? car.vehicle_fuel_types[0]?.fuel_type.en || "N/A"
+                  : car.vehicle_fuel_types[0]?.fuel_type.ar || "N/A"}
+              </span>
+            </div>
+
+            {/* Transmission */}
+            <div className="flex items-center gap-1">
+              <Cog className="w-4 h-4" />
+              <span>{car.name.en.transmission || "N/A"}</span>
+            </div>
+
+            {/* Seating Capacity */}
+            <div className="flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              <span>{car.seating_capacity || "N/A"} seats</span>
+            </div>
+
+            {/* Fuel Tank Capacity */}
+            <div className="flex items-center gap-1">
+              <Fuel className="w-4 h-4" />
+              <span>
+                {isEnglish
+                  ? car.name.en.fuel_tank_capacity || "N/A"
+                  : car.name.ar.fuel_tank_capacity || "N/A"}
+              </span>
+            </div>
+
+            {/* Power */}
+            <div className="flex items-center gap-1">
+              <Zap className="w-4 h-4" />
+              <span>
+                {isEnglish ? car.name.en.power || "N/A" : car.name.ar.power || "N/A"}
+              </span>
+            </div>
+          </div>
+
+
+
+
+
           <div className="flex justify-between items-center pt-3 border-t border-gray-200">
             <button
               className="text-brand-primary hover:text-brand-dark text-xs sm:text-sm flex items-center gap-1 transition-colors duration-300 whitespace-nowrap"
