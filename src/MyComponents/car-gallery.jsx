@@ -1,91 +1,30 @@
 "use client"
-import React, { useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { Heart, Share2, X, Calculator, Check } from "lucide-react"
 import styles from "./CompactCarListing.module.css"
-import { FinanceCalculator } from './FinanceCalculator';
-import { Skeleton } from "@/components/ui/skeleton";
+import { FinanceCalculator } from "./FinanceCalculator"
+import { Skeleton } from "@/components/ui/skeleton"
 import { usePathname } from "next/navigation"
 
-const carDetails = {
-  name: "سوزوكي سيار GLX 2023",
-  price: 61000,
-  images: [
-    "https://images.unsplash.com/photo-1621688285733-07fad23b81c7?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1486496572940-2bb2341fdbdf?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1507242032263-5986fb156d3d?q=80&w=2045&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1617163165492-26031fba265f?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1617060167916-3fcdf453e203?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1621688285384-92e5019db2d4?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1674110997072-41f11b7d4ae7?q=80&w=1924&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1618846042668-eda9c8261189?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "/placeholder.svg?height=300&width=400",
-    "/placeholder.svg?height=300&width=400",
-  ],
-  specifications: {
-    الخارج: [
-      "مصابيح LED أمامية",
-      "جنوط المنيوم مقاس 18 إنش",
-      "مرايا كهربائية",
-      "حساسات خلفية",
-      "فتحة سقف بانورامية",
-      "مصابيح ضباب أمامية",
-    ],
-    الداخل: [
-      "مقاعد جلد",
-      "تكييف أوتوماتيكي",
-      "شاشة لمس 8 إنش",
-      "نظام صوتي فاخر",
-      "عجلة قيادة متعددة الوظائف",
-      "زر تشغيل المحرك",
-    ],
-    المحرك: [
-      "محرك 4 سلندر سعة 2.0 لتر",
-      "قوة 170 حصان",
-      "ناقل حركة أوتوماتيكي 8 سرعات",
-      "نظام دفع أمامي",
-      "استهلاك وقود اقتصادي",
-      "أداء عالي وسريع الاستجابة",
-    ],
-    الإطارات: [
-      "إطارات مقاس 235/60 R18",
-      "نظام مراقبة ضغط الإطارات",
-      "جنوط المنيوم خفيفة الوزن",
-      "إطار احتياطي كامل الحجم",
-      "نظام الثبات الإلكتروني",
-      "نظام التحكم في الجر",
-    ],
-    المميزات: [
-      "نظام تثبيت السرعة",
-      "كاميرا خلفية",
-      "نظام المساعدة في ركن السيارة",
-      "نظام تشغيل بدون مفتاح",
-      "وسائد هوائية متعددة",
-      "نظام الملاحة GPS",
-    ],
-  },
-}
-
 const CompactCarListing = ({ car_Details }) => {
-
   const [activeImage, setActiveImage] = useState(0)
-  const [activeTab, setActiveTab] = useState("الخارج")
+  const [activeTab, setActiveTab] = useState(car_Details?.specifications?.[0] || "الخارج")
   const [activePaymentTab, setActivePaymentTab] = useState("الدفع نقداً")
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false)
   const [visibleThumbnails, setVisibleThumbnails] = useState(6)
-  console.log("single image hhhhhh", car_Details); // Log the image data
+  console.log("single image hhhhhh", car_Details) // Log the image data
   const handleLoadMore = () => {
     setVisibleThumbnails(car_Details?.additional_images?.length)
   }
 
   const remainingCount = car_Details?.additional_images.length - visibleThumbnails
 
-  console.log(' from get data one', car_Details?.name)
+  console.log(" from get data one", car_Details?.name)
   // Determine the language of the car details
-  const pathname = usePathname();
-  const isEnglish = pathname.startsWith('/en');
+  const pathname = usePathname()
+  const isEnglish = pathname.startsWith("/en")
   console.log("isEnglish", isEnglish)
-
 
   if (!car_Details) {
     return (
@@ -111,7 +50,7 @@ const CompactCarListing = ({ car_Details }) => {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -121,7 +60,9 @@ const CompactCarListing = ({ car_Details }) => {
         <div className="mb-8 pb-6 border-b border-gray-200">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-xl font-semibold mb-1">{isEnglish ? car_Details?.name?.en?.name : car_Details?.name?.ar?.name}</h1>
+              <h1 className="text-xl font-semibold mb-1">
+                {isEnglish ? car_Details?.name?.en?.name : car_Details?.name?.ar?.name}
+              </h1>
               <div className="flex items-center gap-2 text-[#71308A]">
                 <span className="inline-block w-4 h-4">
                   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -159,15 +100,17 @@ const CompactCarListing = ({ car_Details }) => {
                 <div className="flex">
                   <button
                     onClick={() => setActivePaymentTab("التمويل")}
-                    className={`flex-1 py-2 text-sm font-medium ${activePaymentTab === "التمويل" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
-                      }`}
+                    className={`flex-1 py-2 text-sm font-medium ${
+                      activePaymentTab === "التمويل" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
+                    }`}
                   >
                     التمويل
                   </button>
                   <button
                     onClick={() => setActivePaymentTab("الدفع نقداً")}
-                    className={`flex-1 py-2 text-sm font-medium ${activePaymentTab === "الدفع نقداً" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
-                      }`}
+                    className={`flex-1 py-2 text-sm font-medium ${
+                      activePaymentTab === "الدفع نقداً" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
+                    }`}
                   >
                     الدفع نقداً
                   </button>
@@ -231,7 +174,7 @@ const CompactCarListing = ({ car_Details }) => {
                           objectFit="cover"
                         />
                       </button>
-                    );
+                    )
                   })}
                   {remainingCount > 0 && (
                     <button
@@ -259,38 +202,40 @@ const CompactCarListing = ({ car_Details }) => {
                 <button
                   key={index}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
-                    }`}
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${
+                    activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
+                  }`}
                 >
                   {isEnglish ? tab?.en?.name : tab?.ar?.name}
-                  { console.log("spacifications data", tab) }
+                  {console.log("spacifications data", tab)}
                 </button>
               ))}
             </div>
 
             <div>
-              <h3 className="text-base font-semibold mb-3">
-                {isEnglish?activeTab?.en?.name:activeTab?.ar?.name}
-                </h3>
+              <h3 className="text-base font-semibold mb-3">{isEnglish ? activeTab?.en?.name : activeTab?.ar?.name}</h3>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 {isEnglish
                   ? activeTab?.en?.values?.map((item) => (
-                    <li key={item} className="flex items-center gap-2">
-                      <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </span>
-                      {item}
-                    </li>
-                  ))
-                  : activeTab?.ar?.values?.map((item) => ( // Assuming Arabic values exist in `activeTab?.ar?.values`
-                    <li key={item} className="flex items-center gap-2">
-                      <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </span>
-                      {item}
-                    </li>
-                  ))}
-
+                      <li key={item} className="flex items-center gap-2">
+                        <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </span>
+                        {item}
+                      </li>
+                    ))
+                  : activeTab?.ar?.values?.map(
+                      (
+                        item, // Assuming Arabic values exist in `activeTab?.ar?.values`
+                      ) => (
+                        <li key={item} className="flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </span>
+                          {item}
+                        </li>
+                      ),
+                    )}
               </ul>
             </div>
           </div>
