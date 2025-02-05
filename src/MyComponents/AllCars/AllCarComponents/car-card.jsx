@@ -19,31 +19,11 @@ export function CarCard({ car, loading }) {
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 
-<<<<<<< HEAD
-  if (loading) {
-    return (
-      <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-        <Skeleton className="h-48 w-full" />
-        <div className="p-4 space-y-3">
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-          <div className="flex justify-between items-center">
-            <Skeleton className="h-4 w-1/4" />
-            <Skeleton className="h-4 w-1/4" />
-            <Skeleton className="h-4 w-1/4" />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-=======
     if (loading) {
       return (
         <LoadingUi/>
       );
     }
->>>>>>> hamdbranch
   return (
     <Link href={`/car-details/${car?.name?.en?.slug}`} className="block w-full h-full">
       <div className="relative bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group h-full w-full flex flex-col">

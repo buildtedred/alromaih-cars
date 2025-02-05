@@ -11,12 +11,17 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
   const { isEnglish } = useLanguageContext()
   const [isLiked, setIsLiked] = useState(false)
 
-
   const handleLikeClick = (e) => {
     e.stopPropagation()
     e.preventDefault()
     setIsLiked(!isLiked)
   }
+
+  const truncateName = (name, maxLength = 20) => {
+    if (name.length <= maxLength) return name
+    return name.slice(0, maxLength) + "..."
+  }
+
   return (
     <Link href={`/car-details/${car?.name?.en?.slug}`} className="block group">
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-full">
@@ -50,39 +55,15 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
         </div>
 
         {/* Car Details */}
-        <div className="p-4 rtl">
-
-
-          {/*           
+        <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-lg font-semibold text-gray-800 truncate">
-              {isEnglish ? car.name.en.name : car.name.ar.name}
+              {truncateName(isEnglish ? car.name.en.name : car.name.ar.name)}
             </h2>
             <div className="text-lg font-bold text-brand-primary">{car.price}</div>
           </div>
-          <div className="text-sm text-gray-600 mb-3">{car.monthlyInstallment}</div>
-          <div className="flex justify-between items-center mb-3 text-xs text-gray-500">
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>{car.year_of_manufacture}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-brand-primary">{isEnglish ? car.name.en.condition : car.name.ar.condition}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Droplet className="w-4 h-4" />
-              {car?.vehicle_fuel_types?.map((fuelType, index) => (
-                <span key={index}>{isEnglish ? fuelType.fuel_type.en : fuelType.fuel_type.ar}</span>
-              ))}
-            </div>
-          </div> */}
 
-
-          <div className="rounded-lg flex">
-            <h2 className="text-2xl font-bold mb-1 "> {isEnglish ? car?.name?.en?.name : car?.name?.ar?.name}</h2>
-            <p className=" mb-1 text-sm text-gray-600"> {car?.price}</p>
-          </div>
-          <div className="grid  grid-cols-3 gap-2 text-sm text-gray-600 mb-3 col-start-2  justify-self-between align-self-center">
+          <div className="grid grid-cols-3 gap-2 text-xs text-gray-600 mb-3">
             {/* Year of Manufacture */}
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
@@ -115,24 +96,16 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
             <div className="flex items-center gap-1">
               <Fuel className="w-4 h-4" />
               <span>
-                {isEnglish
-                  ? car.name.en.fuel_tank_capacity || "N/A"
-                  : car.name.ar.fuel_tank_capacity || "N/A"}
+                {isEnglish ? car.name.en.fuel_tank_capacity || "N/A" : car.name.ar.fuel_tank_capacity || "N/A"}
               </span>
             </div>
 
             {/* Power */}
             <div className="flex items-center gap-1">
               <Zap className="w-4 h-4" />
-              <span>
-                {isEnglish ? car.name.en.power || "N/A" : car.name.ar.power || "N/A"}
-              </span>
+              <span>{isEnglish ? car.name.en.power || "N/A" : car.name.ar.power || "N/A"}</span>
             </div>
           </div>
-
-
-
-
 
           <div className="flex justify-between items-center pt-3 border-t border-gray-200">
             <button

@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import React from 'react'
+import skeleton from "../../../public/images/car-skeleton.png"
 
 const LoadingUi = () => {
   return (
@@ -13,7 +14,9 @@ const LoadingUi = () => {
                 key={index}
                 className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
               >
-                <Skeleton className="h-48 w-full" />
+                <Skeleton className="h-48 w-full">
+                <img src={skeleton}/>
+                </Skeleton>
                 <div className="p-4 space-y-3">
                   <Skeleton className="h-6 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
