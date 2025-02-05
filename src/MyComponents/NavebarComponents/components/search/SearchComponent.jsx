@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
+import { Link } from "@/i18n/routing"
 
 export default function SearchComponent({ isVisible, onClose }) {
   const [searchQuery, setSearchQuery] = useState("")
@@ -19,6 +20,7 @@ export default function SearchComponent({ isVisible, onClose }) {
   const [expandedBrands, setExpandedBrands] = useState([])
   const [isMobile, setIsMobile] = useState(false)
   const [showCarDetails, setShowCarDetails] = useState(false)
+  const [issVisible, setIssVisible] = useState(true);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -175,7 +177,12 @@ export default function SearchComponent({ isVisible, onClose }) {
           <p className="text-xs text-gray-600">No reviews yet.</p>
         </TabsContent>
       </Tabs>
-      <Button className="w-full bg-brand-primary hover:bg-brand-dark text-white text-sm">Book Now</Button>
+        <Link href={`/car-details/${car.name.en.slug}`}>
+        <Button onClick={() => onClose()} className="border-4 w-full bg-brand-primary hover:bg-brand-dark text-white text-sm">
+        Show Details
+        </Button>
+        </Link>
+     
     </div>
   )
 

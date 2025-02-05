@@ -2,6 +2,7 @@ import Image from "next/image"
 import { Users, Fuel } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Link } from "@/i18n/routing"
 
 export default function CarList({ cars }) {
   if (cars.length === 0) {
@@ -11,7 +12,7 @@ export default function CarList({ cars }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {cars.map((car) => (
-        <div key={car.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+        <Link key={car.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
           <div className="relative h-48">
             <Image
               src={`https://xn--mgbml9eg4a.com${car.image_url}`}
@@ -44,10 +45,10 @@ export default function CarList({ cars }) {
               </div>
             </div>
             <Button size="sm" variant="outline" className="w-full mt-3">
-              Book Now
+              Show Details
             </Button>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   )
