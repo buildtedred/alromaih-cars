@@ -1,16 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Phone, Menu, X } from "lucide-react"
+import { Phone, Menu, X, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Nav from "./Nav"
 import { useLogoContext } from "@/contexts/LogoContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import LanguageToggle from "@/MyComponents/LanguageToggle"
+import SearchComponent from './search/SearchComponent';
 
 const Header = () => {
   const { t } = useTranslation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   const { logos, loading, error } = useLogoContext()
@@ -20,6 +22,7 @@ const Header = () => {
   }, [])
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
+  const toggleSearch = () => setIsSearchVisible(!isSearchVisible)
 
   if (!mounted) {
     return null
@@ -34,7 +37,7 @@ const Header = () => {
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
               {loading ? (
                 <span>
-                  <Skeleton className="w-[100px] h-[40px] rounded-full"/>
+                  <Skeleton className="w-[100px] h-[40px] rounded-full" />
                 </span>
               ) : error ? (
                 <span>Error: {error}</span>
@@ -51,6 +54,13 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
+              <button
+                onClick={toggleSearch}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label={t("search")}
+              >
+                <Search className="h-5 w-5 text-gray-700" />
+              </button>
               <LanguageToggle />
               <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors">
                 <span className="font-semibold flex items-center gap-2" dir="ltr">
@@ -62,6 +72,13 @@ const Header = () => {
 
             {/* Mobile Navigation */}
             <div className="flex md:hidden items-center space-x-2 rtl:space-x-reverse">
+              <button
+                onClick={toggleSearch}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label={t("search")}
+              >
+                <Search className="h-5 w-5 text-gray-700" />
+              </button>
               <LanguageToggle />
               <button className="p-2 rounded-lg hover:bg-gray-100" onClick={toggleMobileMenu}>
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -70,6 +87,9 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      {/* Search Component */}
+      {isSearchVisible && <SearchComponent isVisible={isSearchVisible} onClose={toggleSearch} />}
 
       {/* Navigation for desktop */}
       <Nav isMobile={false} />
@@ -92,3 +112,4 @@ const Header = () => {
 }
 
 export default Header
+
