@@ -1,30 +1,28 @@
 "use client"
 import { useState } from "react"
 import Image from "next/image"
-import { Heart, Share2, X, Calculator, Check } from "lucide-react"
+import { Heart, Share2, X, Calculator, Check, FileText } from 'lucide-react'
 import styles from "./CompactCarListing.module.css"
 import { FinanceCalculator } from "./FinanceCalculator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { usePathname } from "next/navigation"
+import CarOverview from "./car-overview"
 
 const CompactCarListing = ({ car_Details }) => {
+  const pathname = usePathname()
+  const isEnglish = pathname.startsWith("/en")
+
   const [activeImage, setActiveImage] = useState(0)
   const [activeTab, setActiveTab] = useState(car_Details?.specifications?.[0] || "الخارج")
   const [activePaymentTab, setActivePaymentTab] = useState("الدفع نقداً")
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false)
   const [visibleThumbnails, setVisibleThumbnails] = useState(6)
-  console.log("single image hhhhhh", car_Details) // Log the image data
+
   const handleLoadMore = () => {
     setVisibleThumbnails(car_Details?.additional_images?.length)
   }
 
-  const remainingCount = car_Details?.additional_images.length - visibleThumbnails
-
-  console.log(" from get data one", car_Details?.name)
-  // Determine the language of the car details
-  const pathname = usePathname()
-  const isEnglish = pathname.startsWith("/en")
-  console.log("isEnglish", isEnglish)
+  const remainingCount = car_Details?.additional_images?.length - visibleThumbnails || 0
 
   if (!car_Details) {
     return (
@@ -76,6 +74,12 @@ const CompactCarListing = ({ car_Details }) => {
               </div>
             </div>
             <div className="flex gap-2">
+              <button
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300"
+                title={isEnglish ? "Download PDF" : "تحميل PDF"}
+              >
+                <FileText className="h-4 w-4 text-gray-600" />
+              </button>
               <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300">
                 <Share2 className="h-4 w-4 text-gray-600" />
               </button>
@@ -146,6 +150,9 @@ const CompactCarListing = ({ car_Details }) => {
                         <Calculator className="w-4 h-4 mr-2" />
                         حاسبة التمويل
                       </button>
+                      <button className="w-full py-3 text-sm text-[#71308A] bg-white border border-[#71308A] rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                        تقدم بطلب تمويل
+                      </button>
                     </div>
                   )}
                 </div>
@@ -158,24 +165,20 @@ const CompactCarListing = ({ car_Details }) => {
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="w-full sm:w-1/5 h-auto sm:h-[400px] ">
                 <div className={`${styles.thumbnailContainer} ${styles.customScrollbar} p-1`}>
-                  {car_Details?.additional_images?.slice(0, visibleThumbnails).map((image, index) => {
-                    // console.log("single image", index); // Log the image data
-                    return (
-                      <button
-                        key={index}
-                        onClick={() => setActiveImage(index)}
-                        className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
-                      >
-                        <Image
-                          // src={image || "/placeholder.svg"}
-                          src={`https://xn--mgbml9eg4a.com${image.image_url}`}
-                          alt={`Car thumbnail ${index + 1}`}
-                          layout="fill"
-                          objectFit="cover"
-                        />
-                      </button>
-                    )
-                  })}
+                  {car_Details?.additional_images?.slice(0, visibleThumbnails).map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveImage(index)}
+                      className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
+                    >
+                      <Image
+                        src={`https://xn--mgbml9eg4a.com${image.image_url}`}
+                        alt={`Car thumbnail ${index + 1}`}
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                    </button>
+                  ))}
                   {remainingCount > 0 && (
                     <button
                       onClick={handleLoadMore}
@@ -197,46 +200,56 @@ const CompactCarListing = ({ car_Details }) => {
                 </div>
               </div>
             </div>
-            <div className="flex overflow-x-auto border-b mb-4 mt-6">
-              {car_Details?.specifications?.map((tab, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${
-                    activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
-                  }`}
-                >
-                  {isEnglish ? tab?.en?.name : tab?.ar?.name}
-                  {console.log("spacifications data", tab)}
-                </button>
-              ))}
+            <div className="mb-6">
+              <CarOverview
+                carDetails={{
+                  ...car_Details,
+                  vehicle_fuel_types:
+                    car_Details.vehicle_fuel_types && car_Details.vehicle_fuel_types.length > 0
+                      ? car_Details.vehicle_fuel_types
+                      : [{ fuel_type: { en: "N/A", ar: "غير متوفر" } }],
+                }}
+              />
             </div>
+            <div className="mt-6">
+              <div className="flex overflow-x-auto border-b mb-4">
+                {car_Details?.specifications?.map((tab, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${
+                      activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
+                    }`}
+                  >
+                    {isEnglish ? tab?.en?.name : tab?.ar?.name}
+                  </button>
+                ))}
+              </div>
 
-            <div>
-              <h3 className="text-base font-semibold mb-3">{isEnglish ? activeTab?.en?.name : activeTab?.ar?.name}</h3>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                {isEnglish
-                  ? activeTab?.en?.values?.map((item) => (
-                      <li key={item} className="flex items-center gap-2">
-                        <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </span>
-                        {item}
-                      </li>
-                    ))
-                  : activeTab?.ar?.values?.map(
-                      (
-                        item, // Assuming Arabic values exist in `activeTab?.ar?.values`
-                      ) => (
+              <div>
+                <h3 className="text-base font-semibold mb-3">
+                  {isEnglish ? activeTab?.en?.name : activeTab?.ar?.name}
+                </h3>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  {isEnglish
+                    ? activeTab?.en?.values?.map((item) => (
                         <li key={item} className="flex items-center gap-2">
                           <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
                             <Check className="w-3 h-3 text-white" />
                           </span>
                           {item}
                         </li>
-                      ),
-                    )}
-              </ul>
+                      ))
+                    : activeTab?.ar?.values?.map((item) => (
+                        <li key={item} className="flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </span>
+                          {item}
+                        </li>
+                      ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -261,4 +274,3 @@ const CompactCarListing = ({ car_Details }) => {
 }
 
 export default CompactCarListing
-
