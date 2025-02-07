@@ -30,7 +30,7 @@ const Header = () => {
 
   return (
     <header className="font-noto w-full shadow-sm relative">
-      <div className="bg-white lg:px-[8.5rem]">
+      <div className="bg-white lg:px-[7rem]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}

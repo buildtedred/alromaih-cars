@@ -21,7 +21,14 @@ const CarCar = () => {
   }
 
   if (loading) {
-    return <LoadingUi />
+    return(
+     
+
+       <LoadingUi />
+
+  
+
+      )
   }
 
   if (error) {
