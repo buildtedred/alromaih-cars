@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card"
 import { usePathname } from "next/navigation"
 
 const CarOverview = ({ carDetails }) => {
+  console.log("first log",carDetails)
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 
@@ -21,8 +22,8 @@ const CarOverview = ({ carDetails }) => {
     {
       label: isEnglish ? "Fuel Type" : "نوع الوقود",
       value: isEnglish
-        ? carDetails?.vehicle_fuel_types?.[0]?.fuel_type?.en
-        : carDetails?.vehicle_fuel_types?.[0]?.fuel_type?.ar,
+        ? carDetails?.vehicle_fuel_type?.fuel_type?.en
+        : carDetails?.vehicle_fuel_type?.fuel_type?.ar,
     },
     {
       label: isEnglish ? "Seating Capacity" : "عدد المقاعد",

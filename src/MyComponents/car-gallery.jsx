@@ -10,6 +10,7 @@ import CarOverview from "./car-overview"
 import { PDFDownloadLink } from "@react-pdf/renderer"
 import CarDetailsPDF from "./car-details-pdf"
 import { fetchImageAsBase64 } from "./fetch-image"
+import { MultiStepPopup } from "./MultiStepPopup"
 
 const CompactCarListing = ({ car_Details, brand_Details }) => {
   const pathname = usePathname()
@@ -24,6 +25,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
   const [imageUrls, setImageUrls] = useState({})
   const [isLoading, setIsLoading] = useState(true)
   const [isPdfLoading, setIsPdfLoading] = useState(true)
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
 
   const handleLoadMore = () => {
     setVisibleThumbnails(car_Details?.images?.length)
@@ -51,6 +53,8 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
       return "/placeholder.svg"
     }
   }, [])
+
+  console.log("dddddddddddddddddddddd image from")
 
   const preparePdfCarDetails = useCallback(async () => {
     if (!car_Details) return null
@@ -154,6 +158,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
             src={
               imageUrls[car_Details?.additional_images[activeImage]?.image_url] ||
               imageUrls[car_Details?.image_url] ||
+              "/placeholder.svg" ||
               "/placeholder.svg" ||
               "/placeholder.svg"
             }
@@ -265,7 +270,10 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                             </p>
                             <p className="text-sm text-gray-500">شامل الضريبة</p>
                           </div>
-                          <button className="w-full py-3 text-sm text-white bg-[#71308A] rounded-lg font-medium hover:bg-[#5f2873] transition-colors">
+                          <button
+                            onClick={() => setIsPopupOpen(true)}
+                            className="w-full py-3 text-sm text-white bg-[#71308A] rounded-lg font-medium hover:bg-[#5f2873] transition-colors"
+                          >
                             طلب شراء
                           </button>
                         </div>
@@ -406,6 +414,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
           </div>
         </div>
       )}
+      <MultiStepPopup car_Details={car_Details} isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
     </div>
   )
 }

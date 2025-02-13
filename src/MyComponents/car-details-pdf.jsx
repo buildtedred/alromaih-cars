@@ -183,8 +183,8 @@ const CarDetailsPDF = ({ carDetails, brandDetails, locale = "ar" }) => {
     return feature || "-"
   }
 
-  console.log("PDF Component Image URL:", carDetails.image_url)
-  console.log("Rendering PDF with image URL:", carDetails.image_url)
+  // console.log("PDF Component Image URL:", carDetails.image_url)
+  // console.log("Rendering PDF with image URL:", carDetails.image_url)
 
   return (
     <Document>
@@ -227,7 +227,7 @@ const CarDetailsPDF = ({ carDetails, brandDetails, locale = "ar" }) => {
               <SpecificationRow label={t.seatingCapacity} value={carDetails?.seating_capacity} styles={styles} />
               <SpecificationRow
                 label={t.fuelType}
-                value={carDetails?.vehicle_fuel_types?.[0]?.fuel_type?.[locale]}
+                value={carDetails?.vehicle_fuel_type?.fuel_type?.[locale]}
                 styles={styles}
               />
             </View>
