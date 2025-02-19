@@ -12,6 +12,7 @@ import { getLangDir } from 'rtl-detect';
 import { BrandsProvider } from "@/contexts/AllDataProvider";
 import LanguageSwitcherContext from "@/contexts/LanguageSwitcherContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { OdooProvider } from "@/contexts/OdooContext";
 
 
 
@@ -38,6 +39,8 @@ export default async function RootLayout({ children, params }) {
     <html lang={locale} dir={direction} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider messages={messages}>
+          <OdooProvider>
+
           <LanguageSwitcherContext>
           <FavoritesProvider>
 
@@ -53,6 +56,7 @@ export default async function RootLayout({ children, params }) {
           </BrandsProvider>
           </FavoritesProvider>
           </LanguageSwitcherContext>
+          </OdooProvider>
         </NextIntlClientProvider>
       </body>
     </html>
