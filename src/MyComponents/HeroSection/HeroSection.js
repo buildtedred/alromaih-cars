@@ -50,8 +50,8 @@ export const HeroSection = () => {
   const baseURL = "https://xn--mgbml9eg4a.com"
 
   return (
-    <div className="relative py-6 md:px-36">
-      <div className="relative aspect-[25/9] w-full overflow-hidden md:rounded-[20px]">
+    <div className="relative py-6 px-4 md:px-28">
+      <div className="relative aspect-[25/9] w-full overflow-hidden rounded-[10px] md:rounded-[20px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}

@@ -231,8 +231,8 @@ export default function SearchComponent({ isVisible, onClose }) {
                   placeholder="Search brands or models..."
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="pl-9 pr-9 w-full bg-gray-100 border-transparent focus:border-brand-primary focus:ring-brand-primary text-sm"
-                  autoFocus
+                  className="pl-9 pr-9 w-full bg-gray-100 border-transparent focus:ring-brand-primary focus:ring-0 text-sm"
+
                 />
                 {searchQuery && (
                   <button

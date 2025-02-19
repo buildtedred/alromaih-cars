@@ -25,9 +25,16 @@ const CarCar = () => {
     setFavorites((prev) => (prev.includes(id) ? prev.filter((carId) => carId !== id) : [...prev, id]))
   }
 
-  // if (loading) {
-  //   return <LoadingUi />
-  // }
+  if (loading) {
+    return(
+     
+
+       <LoadingUi />
+
+  
+
+      )
+  }
 
   // if (error) {
   //   return <p className="text-center text-red-500 text-xl mt-8">Error: {error}</p>
