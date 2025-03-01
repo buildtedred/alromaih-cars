@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { useLanguageContext } from "@/contexts/LanguageSwitcherContext"
 
 const CarCardItem = ({ car, favorites, handleFavorite }) => {
-  console.log("car", car)
+  // console.log("car", car)
   const { isEnglish } = useLanguageContext()
   const [isLiked, setIsLiked] = useState(false)
 
@@ -25,7 +25,7 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
 
   return (
   
-    <Link href={`/car-details/${car?.name}`} className="block group">
+    <Link href={`/car-details/${car?.slug}`} className="block group">
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-full">
         {/* Car Image */}
         <div className="relative w-full pt-[75%] overflow-hidden">
@@ -73,35 +73,59 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
             {/* Year of Manufacture */}
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              <span>{car.year_ids[0]?.name || "N/A"}</span>
+              {/* <span>{car.year_ids[0]?.name && car.year_ids[0]?.name || "N/A"}</span> */}
+             {
+                car?.specification_ids
+                ?.filter((spec) => spec.display_name.includes("Year"))
+                ?.map((spec) => spec.name)
+             }
             </div>
 
             {/* Fuel Type */}
             <div className="flex items-center gap-1">
               <Droplet className="w-4 h-4" />
-              {/* <span>
-                {isEnglish
-                  ? car.vehicle_fuel_types[0]?.fuel_type.en || "N/A"
-                  : car.vehicle_fuel_types[0]?.fuel_type.ar || "N/A"}
-              </span> */}
+              <span>
+              {
+  car?.specification_ids
+    ?.filter((spec) => spec.display_name.includes("Fuel Type"))
+    ?.map((spec) => spec.name)
+}
+               
+              {/* {car.product_variant_ids[0]?.attribute_line_ids[0]?.display_name || "N/A"} */}
+              </span>
             </div>
 
             {/* Transmission */}
             <div className="flex items-center gap-1">
               <Cog className="w-4 h-4" />
               {/* <span>{car.name.en.transmission || "N/A"}</span> */}
+              {
+                car?.specification_ids
+                ?.filter((spec) => spec.display_name.includes("Transmission"))
+                ?.map((spec) => spec.name)
+             }
             </div>
 
             {/* Seating Capacity */}
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
               {/* <span>{car.seating_capacity || "N/A"} seats</span> */}
+              {
+                car?.specification_ids
+                ?.filter((spec) => spec.display_name.includes("Seats"))
+                ?.map((spec) => spec.name)
+             }
             </div>
 
             {/* Fuel Tank Capacity */}
             <div className="flex items-center gap-1">
               <Fuel className="w-4 h-4" />
               <span>
+              {
+  car?.specification_ids
+    ?.filter((spec) => spec.display_name.includes("Fuel Type"))
+    ?.map((spec) => spec.name)
+}
                 {/* {isEnglish ? car.name.en.fuel_tank_capacity || "N/A" : car.name.ar.fuel_tank_capacity || "N/A"} */}
               </span>
             </div>

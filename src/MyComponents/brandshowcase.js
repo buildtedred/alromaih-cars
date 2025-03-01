@@ -1,17 +1,21 @@
 "use client"
 
 import * as React from "react"
+import * as motion from "motion/react-client"
 import Slider from "react-slick"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useBrands } from "@/contexts/AllDataProvider"
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "@/i18n/routing"
+import { useOdoo } from "@/contexts/OdooContext"
+import Image from "next/image"
+import { useLanguageContext } from "@/contexts/LanguageSwitcherContext"
 
 function BrandShowcase() {
-  const { brands, loading, error } = useBrands();
-  console.log("object brands",brands)
+  const { isEnglish } = useLanguageContext()
+  const { brand, loadingBrand, } = useOdoo();
+  console.log("object brands", brand)
 
   const settings = {
     className: "center",
@@ -65,41 +69,53 @@ function BrandShowcase() {
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-8 text-right">
           موزع معتمد
         </h2>
-        {loading ? (
+        {loadingBrand ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {Array.from({ length: 12 }).map((_, index) => (
+            {Array.from({ length: 6 }).map((_, index) => (
               <Card key={index} className="h-auto">
                 <CardContent className="flex items-center justify-center p-4">
+                  <div>
                   <Skeleton className="h-12 w-12" />
+                  <Skeleton className="h-2 w-[100%] mt-2" />
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
           <Slider {...settings} className="slider-container">
-            {brands?.data?.map((brand, index) => (
-              <div key={index} className="p-1 md:p-2 lg:p-3">
+            {
+
+            }
+            {(isEnglish ? brand?.en_US : brand?.ar_001)?.map((brand, index) => (
+              <motion.div
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.8 }}
+                key={index}
+                className="p-1 md:p-2 lg:p-3" >
                 <Link href={`/brands/${brand?.name?.en?.slug}`}>
-              
-                <Card className="h-auto pt-1">
-                  <CardContent className="flex flex-col items-center justify-center">
-                    <img
-                      src={`https://xn--mgbml9eg4a.com${brand?.image_url}`}
-                      alt={brand.name}
-                      className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
-                    />
-                    <p className="text-center font-bold text-gray-500 text-sm md:text-base lg:text-lg whitespace-nowrap">
-                      {brand?.name?.en?.name}
-                    </p>
-                  </CardContent>
-                </Card>
+
+                  <Card className="h-auto pt-1">
+                    <CardContent className="flex flex-col items-center justify-center">
+                      <Image
+                        src={`data:image/png;base64,${brand?.logo}`}
+                        width={20}
+                        height={20}
+                        alt={brand.name}
+                        className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
+                      />
+                      <p className="text-center font-bold text-gray-500 text-sm md:text-base lg:text-lg whitespace-nowrap">
+                        {brand?.name}
+                      </p>
+                    </CardContent>
+                  </Card>
                 </Link>
-              </div>
+              </motion.div>
             ))}
           </Slider>
         )}
       </div>
-    </div>
+    </div >
   );
 }
 

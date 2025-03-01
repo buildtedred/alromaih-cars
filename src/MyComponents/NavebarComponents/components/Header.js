@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Phone, Menu, X, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
@@ -8,14 +7,18 @@ import { useLogoContext } from "@/contexts/LogoContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import LanguageToggle from "@/MyComponents/LanguageToggle"
 import SearchComponent from './search/SearchComponent';
+import { useOdoo } from "@/contexts/OdooContext"
 
 const Header = () => {
   const { t } = useTranslation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const { logo, loading } = useOdoo();
 
-  const { logos, loading, error } = useLogoContext()
+  // console.log('object', logo)
+
+  // const { logos, loading, error } = useLogoContext()
 
   useEffect(() => {
     setMounted(true)
@@ -35,21 +38,20 @@ const Header = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
-              {loading ? (
+           {loading?
+
                 <span>
                   <Skeleton className="w-[100px] h-[40px] rounded-full" />
                 </span>
-              ) : error ? (
-                <span>Error: {error}</span>
-              ) : logos.length > 0 ? (
+            
+              :
                 <img
-                  src={`http://xn--mgbml9eg4a.com${logos[0].image_url}`}
-                  alt={logos[0]?.name.en || "Default Logo"}
+                  src={`data:image/png;base64,${logo[0]?.logo}`}
+                  alt={"Logo"}
                   className="h-8 md:h-12 w-auto"
                 />
-              ) : (
-                <span>No logo available</span>
-              )}
+           }
+              
             </div>
 
             {/* Desktop Navigation */}

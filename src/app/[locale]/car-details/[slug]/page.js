@@ -1,4 +1,5 @@
 import React from 'react'
+import axios from 'axios';
 import CarGallery from '@/MyComponents/car-gallery';
 import { NextIntlClientProvider } from 'next-intl'
 
@@ -17,6 +18,47 @@ const fetchCarDetails = async (slug) => {
     return null;
   }
 };
+
+////////////////////////////////////////////////////////////////
+
+let data = JSON.stringify({
+  query: `query GetProductBySlug {
+  ProductProduct(slug: "jetour-t2-luxury-2025") {
+    id
+    slug
+    name
+    standard_price
+    is_car_product
+    list_price
+    total_value
+    qty_available
+  }
+}`,
+  variables: {}
+});
+
+let config = {
+  method: 'post',
+  maxBodyLength: Infinity,
+  url: 'https://xn--mgbml9eg4a.com/odooapi',
+  headers: { 
+    'x-api-key': 'xuOvE2VqKlMRKXgUYXAMgOzp4go6sSYf', 
+    'Content-Type': 'application/json', 
+  },
+  data : data
+};
+
+axios.request(config)
+.then((response) => {
+  // console.log("hhhhhhhhh",JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});
+
+////////////////////////////////////////////////////////////////
+
+
 
 const page = async ({ params }) => {
 

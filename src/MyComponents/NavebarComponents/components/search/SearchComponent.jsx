@@ -199,8 +199,9 @@ export default function SearchComponent({ isVisible, onClose }) {
           <motion.div
             initial={{ scale: 0.95, y: 10 }}
             animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.95, y: 10 }}
-            transition={{ type: "spring", damping: 25, stiffness: 400 }}
+            exit={{ scale: 0, y: 10 }}
+            
+            transition={ { type: "spring", damping: 25, stiffness: 400 }}
             className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] md:max-h-[80vh] flex flex-col overflow-hidden"
           >
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">

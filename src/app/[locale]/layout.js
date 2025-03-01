@@ -13,6 +13,8 @@ import { BrandsProvider } from "@/contexts/AllDataProvider";
 import LanguageSwitcherContext from "@/contexts/LanguageSwitcherContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { OdooProvider } from "@/contexts/OdooContext";
+import ProgressBar from "@/MyComponents/Progressbar/ProgressBar";
+import * as motion from "motion/react-client"
 
 
 
@@ -38,7 +40,9 @@ export default async function RootLayout({ children, params }) {
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
       <body>
+
         <NextIntlClientProvider messages={messages}>
+          <ProgressBar/>
           <OdooProvider>
 
           <LanguageSwitcherContext>

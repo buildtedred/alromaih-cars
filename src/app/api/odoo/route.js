@@ -3,36 +3,50 @@ import { NextResponse } from "next/server";
 
 // API Configurations
 const GRAPHQL_API_URL = "https://xn--mgbml9eg4a.com/odooapi";
-const API_KEY = "xuOvE2VqKlMRKXgUYXAMgOzp4go6sSYf";  // Replace with actual API Key
+const API_KEY = "xuOvE2VqKlMRKXgUYXAMgOzp4go6sSYf"; // Replace with actual API Key
 
 export async function GET() {
   try {
     const query = `
-      query MyQuery($offset: Int, $limit: Int, $order: String) {
-        ProductTemplate(
-          offset: $offset
-          limit: $limit
-          order: $order
+      query MyQuery {
+        ProductTemplate (
+          context: { langs: ["ar_001", "en_US"] }
         ) {
           id
           name
+          display_name
           image_1920
           list_price
-          year_ids {
+          color
+          model_id{
             name
           }
-          product_variant_ids {
+          year_ids{
             name
           }
+             product_variant_ids {
+      id
+      name
+      image_1920
+      slug
+        year_ids {
+        id
+        name
+      }
+          specification_ids {
+        id
+        name
+        display_name
+      }
+    }
         }
       }
     `;
 
-    const variables = { offset: 0, limit: 6, order: "name,id desc" };
 
     const response = await axios.post(
       GRAPHQL_API_URL,
-      { query, variables },
+      { query },
       {
         headers: {
           "x-api-key": API_KEY,
