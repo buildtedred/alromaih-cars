@@ -46,6 +46,8 @@ import { useState, useEffect } from 'react';
 import { Languages } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+import * as motion from "motion/react-client"
+
 export default function LanguageToggle() {
   const router = useRouter();
   const [lang, setLang] = useState('en');
@@ -75,15 +77,24 @@ export default function LanguageToggle() {
   };
 
   return (
+    <motion.div
+         animate={lang === "ar"? { rotate: 0 }:{ rotate: 360 }}
+         transition={{ duration: 1 }}
+     >
     <button
       onClick={toggleLanguage}
-      className="flex items-center gap-2 px-3 py-1.5 rounded-full border-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white transition-colors"
+      className="flex items-center gap-2 px-3 py-1.5 rounded-full  border-brand-primary text-brand-primary   transition-colors"
     >
-      <Languages className="h-4 w-4" />
-      <span className="text-sm font-medium">
-        {lang === 'ar' ? 'English' : 'العربية'}
-      </span>
+      {lang === "ar" ?
+        <img src="/arbic.svg" width={25} height={25} alt="Arbic svg" />  :
+        <img src="/english.svg" width={25} height={25} alt="English svg" />  
+
+      }
+      {/* <span className="text-sm font-medium">
+        {lang === "ar" ? "English" : "العربية"}
+      </span> */}
     </button>
+      </motion.div>
   );
 }
 

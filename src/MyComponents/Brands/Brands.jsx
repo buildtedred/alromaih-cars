@@ -3,9 +3,12 @@ import { Link } from "@/i18n/routing"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
+import { useOdoo } from "@/contexts/OdooContext"
+import Image from "next/image"
+import LoadingUi from "../LoadingUi/LoadingUi"
 
 const Brands = () => {
-  const { brands, loading, error } = useBrands()
+  const { brand, loadingBrand, } = useOdoo();
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 
@@ -27,15 +30,15 @@ const Brands = () => {
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-10 text-[#71308A]">
           {isEnglish ? "Our Exclusive Brands" : "علاماتنا التجارية الحصرية"}
         </h1>
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <div className="text-center py-10 text-red-500">Error: {error.message}</div>
+        {loadingBrand ? (
+          <LoadingUi />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {brands?.data?.map((brand, index) => (
-              <BrandCard key={index} brand={brand} isEnglish={isEnglish} />
-            ))}
+            {
+              (isEnglish ? brand?.en_US : brand?.ar_001).map((brand, index) => (
+                <BrandCard key={index} brand={brand} isEnglish={isEnglish} />
+              ))
+            }
           </div>
         )}
       </div>
@@ -56,15 +59,16 @@ const BrandCard = ({ brand, isEnglish }) => {
       >
         <div className="p-4 flex flex-col items-center h-full">
           <div className="w-full h-24 flex items-center justify-center mb-3">
-            <img
-              src={`https://xn--mgbml9eg4a.com${brand?.image_url}`}
-              alt={brand.name?.en?.name}
-              className="max-h-full max-w-full object-contain transition-all duration-300"
-              style={{ filter: isHovered ? "grayscale(0)" : "grayscale(100%)" }}
+            <Image
+              src={`data:image/png;base64,${brand?.logo}`}
+              width={20}
+              height={20}
+              alt={brand.name}
+              className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
             />
           </div>
           <h3 className="text-center font-semibold text-sm text-[#71308A] mb-2 truncate w-full">
-            {isEnglish ? brand?.name?.en?.name : brand?.name?.ar?.name}
+            {brand?.name}
           </h3>
           <motion.p
             className="text-center text-xs text-gray-600 line-clamp-2 overflow-hidden"

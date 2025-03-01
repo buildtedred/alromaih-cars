@@ -8,11 +8,16 @@ import LoadingUi from "../LoadingUi/LoadingUi"
 import { useLanguageContext } from "@/contexts/LanguageSwitcherContext"
 import { Button } from "@/components/ui/button"
 import { Link } from '@/i18n/routing';
+import { useOdoo } from "@/contexts/OdooContext"
 
 const CarCar = () => {
+  const { products, loadingProducts } = useOdoo();
   const { isEnglish } = useLanguageContext()
-  const { brands, loading, error } = useBrands()
+  const { brands, error } = useBrands()
   const [favorites, setFavorites] = useState([])
+
+  console.log('object', products)
+
 
   const handleFavorite = (e, id) => {
     e.preventDefault()
@@ -20,25 +25,25 @@ const CarCar = () => {
     setFavorites((prev) => (prev.includes(id) ? prev.filter((carId) => carId !== id) : [...prev, id]))
   }
 
-  if (loading) {
-    return(
-     
+  if (loadingProducts) {
+    return (
 
-       <LoadingUi />
 
-  
+      <LoadingUi />
 
-      )
+
+
+    )
   }
 
-  if (error) {
-    return <p className="text-center text-red-500 text-xl mt-8">Error: {error}</p>
-  }
+  // if (error) {
+  //   return <p className="text-center text-red-500 text-xl mt-8">Error: {error}</p>
+  // }
 
   // Limit the number of cars shown initially
-  const carsToShow = 8
-  const allCars = brands?.data?.flatMap((brand) => brand.car_models || [])
-  const displayedCars = allCars?.slice(0, carsToShow)
+  // const carsToShow = 8
+  // const allCars = brands?.data?.flatMap((brand) => brand.car_models || [])
+  // const displayedCars = allCars?.slice(0, carsToShow)
 
   return (
     <div className="max-w-[calc(100%-0rem)] md:max-w-[calc(100%-10rem)] mx-auto py-8">
@@ -46,17 +51,34 @@ const CarCar = () => {
         {isEnglish ? "Our Car Collection" : "مجموعة سياراتنا"}
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {displayedCars?.map((car) => (
-          <CarCardItem
-            key={car.id}
-            car={car}
-            isEnglish={isEnglish}
-            favorites={favorites}
-            handleFavorite={handleFavorite}
-          />
-        ))}
+        {isEnglish ? (
+          products?.en_US?.map((car) => (
+            car.product_variant_ids.map((car) => (
+              <CarCardItem
+                key={car.id}
+                car={car}
+                isEnglish={isEnglish}
+                favorites={favorites}
+                handleFavorite={handleFavorite}
+              />
+            ))
+          ))
+        ) : (
+          products?.ar_001?.map((car) => (
+            car.product_variant_ids.map((car) => (
+              <CarCardItem
+                key={car.id}
+                car={car}
+                isEnglish={isEnglish}
+                favorites={favorites}
+                handleFavorite={handleFavorite}
+              />
+            ))
+          ))
+        )}
+
       </div>
-      {allCars?.length > carsToShow && (
+      {/* {allCars?.length > carsToShow && (
         <div className="mt-8 text-center">
           <Link href="/all-cars">
             <Button variant="outline" size="lg">
@@ -64,7 +86,7 @@ const CarCar = () => {
             </Button>
           </Link>
         </div>
-      )}
+      )} */}
     </div>
   )
 }
