@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import {
   Select,
@@ -9,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing"
 
 export default function Footer() {
 
@@ -106,13 +106,13 @@ export default function Footer() {
             </h3>
             <div className="space-y-4">
               <Link
-                href="/about"
+                href="/about-us"
                 className="block hover:text-brand-primary transition-colors w-fit-content"
               >
                {t("companyDetails.aboutUs")}
               </Link>
               <Link
-                href="/contact"
+                href="/contact-us"
                 className="block hover:text-brand-primary transition-colors w-fit-content"
               >
                 {t("companyDetails.contactUs")}

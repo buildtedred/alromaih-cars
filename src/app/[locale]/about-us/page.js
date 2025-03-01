@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/routing"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Car, Shield, Users, CheckCircle, Building2, Star, Trophy } from "lucide-react"
@@ -285,7 +285,7 @@ export default function HomePage() {
           </p>
           <div className="flex gap-4 justify-center">
             <Link
-              href="/contact"
+              href="/contact-us"
               className="inline-block bg-[#71308A] text-white px-8 py-3 rounded-md hover:bg-[#71308A]/90 transition-colors"
             >
               Contact Us

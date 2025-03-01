@@ -21,6 +21,7 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
     if (name.length <= maxLength) return name
     return name.slice(0, maxLength) + "..."
   }
+  console.log("data from api",car)
 
   return (
     <Link href={`/car-details/${car?.name?.en?.slug}`} className="block group">
