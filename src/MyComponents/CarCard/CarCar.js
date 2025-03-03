@@ -11,12 +11,12 @@ import { Link } from '@/i18n/routing';
 import { useOdoo } from "@/contexts/OdooContext"
 
 const CarCar = () => {
-  const { products, loadingProducts } = useOdoo();
+  const { testData, loadingtestData, } = useOdoo();
   const { isEnglish } = useLanguageContext()
   const { brands, error } = useBrands()
   const [favorites, setFavorites] = useState([])
 
-  console.log('object', products)
+  // console.log('object', testData)
 
 
   const handleFavorite = (e, id) => {
@@ -25,7 +25,7 @@ const CarCar = () => {
     setFavorites((prev) => (prev.includes(id) ? prev.filter((carId) => carId !== id) : [...prev, id]))
   }
 
-  if (loadingProducts) {
+  if (loadingtestData) {
     return (
 
 
@@ -51,30 +51,16 @@ const CarCar = () => {
         {isEnglish ? "Our Car Collection" : "مجموعة سياراتنا"}
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {isEnglish ? (
-          products?.en_US?.map((car) => (
-            car.product_variant_ids.map((car) => (
-              <CarCardItem
-                key={car.id}
-                car={car}
-                isEnglish={isEnglish}
-                favorites={favorites}
-                handleFavorite={handleFavorite}
-              />
-            ))
-          ))
-        ) : (
-          products?.ar_001?.map((car) => (
-            car.product_variant_ids.map((car) => (
-              <CarCardItem
-                key={car.id}
-                car={car}
-                isEnglish={isEnglish}
-                favorites={favorites}
-                handleFavorite={handleFavorite}
-              />
-            ))
-          ))
+        {(isEnglish ? testData?.en_US : testData?.ar_001)?.map(car =>
+          
+            <CarCardItem
+              key={car.id}
+              car={car}
+              isEnglish={isEnglish}
+              favorites={favorites}
+              handleFavorite={handleFavorite}
+            />
+          
         )}
 
       </div>

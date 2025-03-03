@@ -66,6 +66,52 @@ export function OdooProvider({ children }) {
   useEffect(() => {
     fetchBrand();
   }, [fetchBrand]);
+  ////////////////////////////// test data api start//////////////////////////
+
+  /////////////////// all data start//////////////////////
+  const [testData, settestData] = useState([]);
+  const [loadingtestData, setLoadingtestData] = useState(true);
+  // console.log("testData data:", testData);
+
+  const fetchtestData = useCallback(async () => {
+    setLoadingtestData(true);
+    try {
+      const response = await axios.get("/api/testdata");
+      settestData(response.data);
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+    } finally {
+      setLoadingtestData(false);
+    }
+  }, []);
+  
+  useEffect(() => {
+    fetchtestData();
+  }, [fetchtestData]);
+  /////////////////// all data end//////////////////////
+
+    /////////////////// slider data start//////////////////////
+    const [sliderData, setsliderData] = useState([]);
+    const [loadingsliderData, setLoadingsliderData] = useState(true);
+    // console.log("sliderData data:", sliderData);
+  
+    const fetchsliderData = useCallback(async () => {
+      setLoadingsliderData(true);
+      try {
+        const response = await axios.get("/api/slider");
+        setsliderData(response.data.en_US);
+      } catch (error) {
+        console.error("Error fetching brands:", error);
+      } finally {
+        setLoadingsliderData(false);
+      }
+    }, []);
+    
+    useEffect(() => {
+      fetchsliderData();
+    }, [fetchsliderData]);
+    /////////////////// slider data end//////////////////////
+  ////////////////////////////// test data api end//////////////////////////
 
   //////////////////////// Memoized Context Value //////////////////////////
   const contextValue = useMemo(() => ({
@@ -75,7 +121,25 @@ export function OdooProvider({ children }) {
     loadingLogo,
     brand,
     loadingBrand,
-  }), [products, loadingProducts, logo, loadingLogo, brand, loadingBrand]);
+
+    testData,
+    loadingtestData,
+
+    sliderData,
+    loadingsliderData,
+  }), [products,
+    loadingProducts,
+    logo,
+    loadingLogo,
+    brand,
+    loadingBrand,
+
+    testData,
+    loadingtestData,
+
+    sliderData,
+    loadingsliderData, 
+  ]);
 
   return (
     <OdooContext.Provider value={contextValue}>

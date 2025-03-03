@@ -31,8 +31,8 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
         <div className="relative w-full pt-[75%] overflow-hidden">
           <Image
             src={
-              car.image_1920
-                ? `data:image/png;base64,${car.image_1920}` // Base64 Image
+              car.avatar
+                ? `data:image/png;base64,${car.avatar}` // Base64 Image
                 : "/default-car.jpg"
             }
             alt={isEnglish ? car.name : car.name}
@@ -64,41 +64,36 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-lg font-semibold text-gray-800 truncate">
-              {isEnglish ? car?.name : car.name}
+              { car?.name}
             </h2>
-            <div className="text-lg font-bold text-brand-primary">{car.list_price}</div>
+            <div className="text-lg font-bold text-brand-primary">{car.current_market_value}</div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-xs text-gray-600 mb-3">
             {/* Year of Manufacture */}
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              {/* <span>{car.year_ids[0]?.name && car.year_ids[0]?.name || "N/A"}</span> */}
-             {
+              <span>{car.mfg_year || "N/A"}</span>
+             {/* {
                 car?.specification_ids
                 ?.filter((spec) => spec.display_name.includes("Year"))
                 ?.map((spec) => spec.name)
-             }
+             } */}
             </div>
 
             {/* Fuel Type */}
             <div className="flex items-center gap-1">
               <Droplet className="w-4 h-4" />
               <span>
-              {
-  car?.specification_ids
-    ?.filter((spec) => spec.display_name.includes("Fuel Type"))
-    ?.map((spec) => spec.name)
-}
                
-              {/* {car.product_variant_ids[0]?.attribute_line_ids[0]?.display_name || "N/A"} */}
+              {car?.vehicle_fuel_type_id?.name || "N/A"}
               </span>
             </div>
 
             {/* Transmission */}
             <div className="flex items-center gap-1">
               <Cog className="w-4 h-4" />
-              {/* <span>{car.name.en.transmission || "N/A"}</span> */}
+              <span>{car?.transmission || "N/A"}</span>
               {
                 car?.specification_ids
                 ?.filter((spec) => spec.display_name.includes("Transmission"))
@@ -109,31 +104,22 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
             {/* Seating Capacity */}
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
-              {/* <span>{car.seating_capacity || "N/A"} seats</span> */}
-              {
-                car?.specification_ids
-                ?.filter((spec) => spec.display_name.includes("Seats"))
-                ?.map((spec) => spec.name)
-             }
+              <span>{car?.seat_capacity || "N/A"} seats</span>
             </div>
 
             {/* Fuel Tank Capacity */}
             <div className="flex items-center gap-1">
               <Fuel className="w-4 h-4" />
               <span>
-              {
-  car?.specification_ids
-    ?.filter((spec) => spec.display_name.includes("Fuel Type"))
-    ?.map((spec) => spec.name)
-}
-                {/* {isEnglish ? car.name.en.fuel_tank_capacity || "N/A" : car.name.ar.fuel_tank_capacity || "N/A"} */}
+
+                {car?.fuel_tank_capacity || "N/A"}
               </span>
             </div>
 
             {/* Power */}
             <div className="flex items-center gap-1">
               <Zap className="w-4 h-4" />
-              {/* <span>{isEnglish ? car.name.en.power || "N/A" : car.name.ar.power || "N/A"}</span> */}
+              <span>(HP){car?.power || "N/A"}</span>
             </div>
           </div>
 

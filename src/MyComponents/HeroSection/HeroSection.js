@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 import { useSlides } from "@/contexts/SliderContext"
 import Image from "next/image"
 import Skeleton from "react-loading-skeleton"
+import { useOdoo } from "@/contexts/OdooContext"
 
 const SLIDE_DURATION = 5000 // 5 seconds per slide
 
@@ -13,13 +14,15 @@ export const HeroSection = () => {
   const { t } = useTranslation()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [progress, setProgress] = useState(0)
-  const { slides, loading, error } = useSlides()
+  // const { slides, loading, error } = useSlides()
+    const {   sliderData, loadingsliderData } = useOdoo();
+    // console.log("object ssssssssss", sliderData)
 
   useEffect(() => {
-    if (slides.length === 0) return
+    if (sliderData.length === 0) return
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length)
+      setCurrentSlide((prev) => (prev + 1) % sliderData.length)
       setProgress(0)
     }, SLIDE_DURATION)
 
@@ -31,9 +34,9 @@ export const HeroSection = () => {
       clearInterval(interval)
       clearInterval(progressInterval)
     }
-  }, [slides.length])
+  }, [sliderData.length])
 
-  if (loading) {
+  if (loadingsliderData) {
     return (
       <div className="relative px-4 md:px-36">
         <div className="relative aspect-[25/9] w-full">
@@ -43,9 +46,9 @@ export const HeroSection = () => {
     )
   }
 
-  if (error) {
-    return <div>Error: {error}</div>
-  }
+  // if (error) {
+  //   return <div>Error: {error}</div>
+  // }
 
   const baseURL = "https://xn--mgbml9eg4a.com"
 
@@ -62,8 +65,12 @@ export const HeroSection = () => {
             className="absolute inset-0"
           >
             <Image
-              src={`${baseURL}${slides[currentSlide].image_url}`}
-              alt={slides[currentSlide].title}
+                src={
+                  sliderData[currentSlide]?.image
+                    ? `data:image/png;base64,${sliderData[currentSlide]?.image}`
+                    : "/fallback-image.jpg" // Default image if Base64 is missing
+                }
+              alt={sliderData[currentSlide]?.name}
               className="w-full h-full object-cover"
               fill
               priority
@@ -73,7 +80,7 @@ export const HeroSection = () => {
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-20">
           <div className="flex items-center gap-4">
-            {slides.map((_, index) => (
+            {sliderData?.map((_, index) => (
               <button
                 key={index}
                 onClick={() => {
