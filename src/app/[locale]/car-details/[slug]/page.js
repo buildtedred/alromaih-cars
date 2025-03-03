@@ -62,7 +62,7 @@ import { NextIntlClientProvider } from 'next-intl'
 // Fetch car details
 const fetchCarDetails = async (slug) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/testdata/${slug}`);
+    const response = await fetch(`${process.env.LOCAL_HOST}/api/testdata/${slug}`);
     // console.log(" slug hhhhhhhhhh", response)
     if (!response.ok) {
       throw new Error(`Failed to fetch car details: ${response.statusText}`);

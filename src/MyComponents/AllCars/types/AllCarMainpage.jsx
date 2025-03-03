@@ -147,7 +147,7 @@ const AllCarMainpage = () => {
           </Button>
           <div className={`md:w-80 md:mr-8 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
             <div className="sticky top-20 max-h-[calc(100vh-.2rem)] ">
-              {/* <CarFilterSidebar onFilterChange={handleFilterChange} carModels={cars} filters={filters} /> */}
+              <CarFilterSidebar onFilterChange={handleFilterChange} carModels={cars} filters={filters} />
             </div>
           </div>
           <div className="flex-1 " >
