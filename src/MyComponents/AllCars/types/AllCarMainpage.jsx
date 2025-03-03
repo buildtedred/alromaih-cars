@@ -1,25 +1,22 @@
 "use client"
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
 import { CarGrid } from "../AllCarComponents/car-grid"
 import { PromoSlider } from "../AllCarComponents/promo-slider"
 import CarFilterSidebar from "./car-filter-sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
 import LoadingUi from "@/MyComponents/LoadingUi/LoadingUi"
 import { useOdoo } from "@/contexts/OdooContext"
 import { useLanguageContext } from "@/contexts/LanguageSwitcherContext"
 
 const AllCarMainpage = () => {
-  const { testData, loadingtestData, } = useOdoo();
+  const { testData, loadingtestData } = useOdoo();
   const { isEnglish } = useLanguageContext()
   const getAllData = testData
-  ? isEnglish
-    ? testData.en_US // English data
-    : testData.ar_001 // Arabic data
-  : null;
+    ? isEnglish
+      ? testData.en_US // English data
+      : testData.ar_001 // Arabic data
+    : null;
 
-  console.log(getAllData)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [filters, setFilters] = useState({
     priceRange: [0, 5000000],
@@ -76,35 +73,59 @@ const AllCarMainpage = () => {
 
   const filteredCars = useMemo(() => {  
     return cars.filter((car) => {
+      // Price range filter
       if (
         car.current_market_value < filters.priceRange[0] ||
         car.current_market_value > filters.priceRange[1]
       )
         return false;
       
+      // Year filter
       if (filters.year && car.mfg_year.toString() !== filters.year.toString())
         return false;
       
+      // Fuel type filter
       if (
         filters.fuelTypes.length > 0 &&
         !filters.fuelTypes.includes(car.vehicle_fuel_type_id?.name)
       )
         return false;
       
-      const transmission = car.vehicle_specification_ids.find(
-        (spec) => spec.display_name === "Transmission Type"
-      )?.used;
+      // Transmission filter
+      if (filters.transmission.length > 0) {
+        // First check direct transmission property
+        if (car.transmission && filters.transmission.includes(car.transmission)) {
+          return true;
+        }
+        
+        // Then check in specifications
+        const transmissionSpec = car.vehicle_specification_ids?.find(
+          spec => spec.display_name === "Transmission Type"
+        );
+        
+        if (!transmissionSpec || !filters.transmission.includes(transmissionSpec.used)) {
+          return false;
+        }
+      }
       
-      if (filters.transmission.length > 0 && !filters.transmission.includes(transmission))
-        return false;
+      // Seats filter
+      if (filters.seats.length > 0) {
+        // First check direct seat_capacity property
+        if (car.seat_capacity && filters.seats.includes(car.seat_capacity.toString())) {
+          return true;
+        }
+        
+        // Then check in specifications
+        const seatingSpec = car.vehicle_specification_ids?.find(
+          spec => spec.display_name === "Seating Capacity"
+        );
+        
+        if (!seatingSpec || !filters.seats.includes(seatingSpec.used)) {
+          return false;
+        }
+      }
       
-      const seatingCapacity = car.vehicle_specification_ids.find(
-        (spec) => spec.display_name === "Seating Capacity"
-      )?.used;
-      
-      if (filters.seats.length > 0 && !filters.seats.includes(seatingCapacity))
-        return false;
-      
+      // Brand and model filter
       if (Object.keys(filters.brands).length > 0) {
         const carBrand = car.vehicle_brand_id?.name.toLowerCase();
         const selectedBrand = Object.keys(filters.brands).find(
@@ -119,12 +140,10 @@ const AllCarMainpage = () => {
       
       return true;
     });
-  }, [cars, filters, isEnglish]);
+  }, [cars, filters]);
 
-  if (loading) {
-    return (
-      <LoadingUi/>
-    )
+  if (loading || loadingtestData) {
+    return <LoadingUi/>
   }
 
   if (error) {
@@ -147,7 +166,12 @@ const AllCarMainpage = () => {
           </Button>
           <div className={`md:w-80 md:mr-8 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
             <div className="sticky top-20 max-h-[calc(100vh-.2rem)] ">
-              {/* <CarFilterSidebar onFilterChange={handleFilterChange} carModels={cars} filters={filters} /> */}
+              <CarFilterSidebar 
+                onFilterChange={handleFilterChange} 
+                carModels={cars} 
+                filters={filters} 
+                language={isEnglish ? "en" : "ar"} 
+              />
             </div>
           </div>
           <div className="flex-1 " >

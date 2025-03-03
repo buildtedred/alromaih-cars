@@ -90,15 +90,15 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
       setLocalFilters((prev) => {
         const updatedBrands = { ...prev.brands }
         if (checked) {
-          const brand = brandsData.find((b) => b.name[language] === brandName)
-          updatedBrands[brandName] = brand ? brand.models.map((model) => model.name[language].name) : []
+          const brand = brandsData.find((b) => b.name === brandName)
+          updatedBrands[brandName] = brand ? brand.models.map((model) => model.name) : []
         } else {
           delete updatedBrands[brandName]
         }
         return { ...prev, brands: updatedBrands }
       })
     },
-    [language],
+    [], // Removed brandsData dependency
   )
 
   const handleModelCheck = useCallback((brandName, modelName, checked) => {
@@ -167,36 +167,69 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
     return () => clearTimeout(timer)
   }, [localFilters, filters, onFilterChange])
 
+  // Extract unique years from car models
   const years = useMemo(() => {
-    return [...new Set(carModels.map((car) => car.year_of_manufacture))].sort((a, b) => b - a)
+    if (!carModels || carModels.length === 0) return []
+    return [...new Set(carModels.map((car) => car.mfg_year))].sort((a, b) => b - a)
   }, [carModels])
 
+  // Extract unique fuel types from car models
   const fuelTypes = useMemo(() => {
-    return [...new Set(carModels.flatMap((car) => car.vehicle_fuel_types.map((fuel) => fuel.fuel_type[language])))]
-  }, [carModels, language])
-
-  const transmissions = useMemo(() => {
-    return [...new Set(carModels.map((car) => car.name[language].transmission).filter(Boolean))]
-  }, [carModels, language])
-
-  const seats = useMemo(() => {
-    return [...new Set(carModels.map((car) => car.seating_capacity))].sort((a, b) => a - b)
+    if (!carModels || carModels.length === 0) return []
+    return [...new Set(carModels.map((car) => car.vehicle_fuel_type_id?.name).filter(Boolean))]
   }, [carModels])
 
+  // Extract unique transmissions from car models - only from direct transmission property
+  const transmissions = useMemo(() => {
+    if (!carModels || carModels.length === 0) return []
+    return [...new Set(carModels.map((car) => car.transmission).filter(Boolean))]
+  }, [carModels])
+
+  // Extract unique seat capacities from car models
+  const seats = useMemo(() => {
+    if (!carModels || carModels.length === 0) return []
+
+    // Get seat capacities from both direct property and specifications
+    const allSeats = carModels.flatMap((car) => {
+      const directSeats = car.seat_capacity?.toString()
+      const specSeats = car.vehicle_specification_ids?.find((spec) => spec.display_name === "Seating Capacity")?.used
+
+      return [directSeats, specSeats].filter(Boolean)
+    })
+
+    return [...new Set(allSeats)].sort()
+  }, [carModels])
+
+  // Group cars by brand and model
   const brandsData = useMemo(() => {
+    if (!carModels || carModels.length === 0) return []
+
     const brands = {}
     carModels.forEach((car) => {
-      if (!brands[car.brand_name[language]]) {
-        brands[car.brand_name[language]] = {
-          id: car.brand_id,
-          name: car.brand_name,
+      const brandName = car.vehicle_brand_id?.name
+      if (!brandName) return
+
+      if (!brands[brandName]) {
+        brands[brandName] = {
+          id: car.vehicle_brand_id.id,
+          name: brandName,
           models: [],
         }
       }
-      brands[car.brand_name[language]].models.push(car)
+
+      // Check if this model is already added
+      const modelExists = brands[brandName].models.some((model) => model.id === car.id)
+      if (!modelExists) {
+        brands[brandName].models.push({
+          id: car.id,
+          name: car.name,
+          slug: car.slug,
+        })
+      }
     })
+
     return Object.values(brands)
-  }, [carModels, language])
+  }, [carModels])
 
   const isBrandChecked = useCallback(
     (brandName) => {
@@ -227,10 +260,10 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
     return brandsData
       .map((brand) => {
         const filteredModels = brand.models.filter((model) =>
-          model.name[language].name.toLowerCase().includes(searchTerm.toLowerCase()),
+          model.name.toLowerCase().includes(searchTerm.toLowerCase()),
         )
 
-        if (brand.name[language].toLowerCase().includes(searchTerm.toLowerCase()) || filteredModels.length > 0) {
+        if (brand.name.toLowerCase().includes(searchTerm.toLowerCase()) || filteredModels.length > 0) {
           return {
             ...brand,
             models: filteredModels,
@@ -240,11 +273,17 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
         return null
       })
       .filter(Boolean)
-  }, [brandsData, searchTerm, language])
+  }, [brandsData, searchTerm])
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }))
   }
+
+  // Find max price for range slider
+  const maxPrice = useMemo(() => {
+    if (!carModels || carModels.length === 0) return 1000000
+    return Math.max(...carModels.map((car) => car.current_market_value || 0)) + 100000
+  }, [carModels])
 
   return (
     <div className={`bg-white rounded-lg shadow flex flex-col h-screen ${isRTL ? "rtl" : "ltr"}`}>
@@ -253,7 +292,7 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
         <h2 className="text-xl font-bold text-[#71308A]">{t.filters}</h2>
       </div>
       <div className="flex-1 overflow-hidden relative">
-        <div className="custom-scrollbar-container h-full overflow-y-auto pr-2" >
+        <div className="custom-scrollbar-container h-full overflow-y-auto pr-2">
           <div className="p-4 space-y-6">
             {/* Price Range Section */}
             <Collapsible open={openSections.priceRange} onOpenChange={() => toggleSection("priceRange")}>
@@ -266,7 +305,7 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
               <CollapsibleContent className="pt-4">
                 <RangeSlider
                   min={0}
-                  max={1000000}
+                  max={maxPrice}
                   value={localFilters.priceRange}
                   onValueChange={handlePriceRangeChange}
                   onValueCommit={handlePriceRangeChange}
@@ -305,32 +344,30 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
                       <div className="flex items-center justify-between w-full p-2 hover:bg-[#71308A]/10 rounded">
                         <div className="flex items-center gap-3">
                           <Checkbox
-                            checked={isBrandChecked(brand.name[language])}
-                            onCheckedChange={(checked) => handleBrandCheck(brand.name[language], checked)}
+                            checked={isBrandChecked(brand.name)}
+                            onCheckedChange={(checked) => handleBrandCheck(brand.name, checked)}
                             className="rounded border-[#71308A] text-[#71308A] focus:ring-[#71308A] data-[state=checked]:bg-[#71308A] data-[state=checked]:text-white checkbox-icon"
                           />
-                          <span className="text-sm">{brand.name[language]}</span>
+                          <span className="text-sm">{brand.name}</span>
                         </div>
-                        <button onClick={() => toggleBrand(brand.name[language])}>
+                        <button onClick={() => toggleBrand(brand.name)}>
                           <ChevronDown
                             className={`w-4 h-4 transition-transform text-[#71308A] ${
-                              expandedBrands.includes(brand.name[language]) ? "rotate-180" : ""
+                              expandedBrands.includes(brand.name) ? "rotate-180" : ""
                             }`}
                           />
                         </button>
                       </div>
-                      {(expandedBrands.includes(brand.name[language]) || searchTerm) && (
+                      {(expandedBrands.includes(brand.name) || searchTerm) && (
                         <div className="ml-16 mt-2 space-y-2">
                           {brand.models.map((model) => (
                             <div key={model.id} className="flex items-center gap-2">
                               <Checkbox
-                                checked={isModelChecked(brand.name[language], model.name[language].name)}
-                                onCheckedChange={(checked) =>
-                                  handleModelCheck(brand.name[language], model.name[language].name, checked)
-                                }
+                                checked={isModelChecked(brand.name, model.name)}
+                                onCheckedChange={(checked) => handleModelCheck(brand.name, model.name, checked)}
                                 className="rounded border-[#71308A] text-[#71308A] focus:ring-[#71308A] data-[state=checked]:bg-[#71308A] data-[state=checked]:text-white checkbox-icon"
                               />
-                              <span className="text-sm">{model.name[language].name}</span>
+                              <span className="text-sm">{model.name}</span>
                             </div>
                           ))}
                         </div>
@@ -451,12 +488,11 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
           </div>
         </div>
       </div>
-      {/* Add sticky positioning to keep the button always visible */}
-      {/* <div className="sticky bottom-0 p-4 border-t bg-white">
+      <div className="sticky bottom-0 p-4 border-t bg-white">
         <Button
           onClick={() => {
             const clearedFilters = {
-              priceRange: [0, 1000000],
+              priceRange: [0, maxPrice],
               brands: {},
               year: "",
               fuelTypes: [],
@@ -471,7 +507,7 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
         >
           {t.clearAllFilters}
         </Button>
-      </div> */}
+      </div>
     </div>
   )
 }
