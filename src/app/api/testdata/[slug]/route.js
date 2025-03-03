@@ -31,6 +31,7 @@ export async function GET(req, { params }) {
     power
     current_market_value
     condition
+    vehicle_color
     date_of_registration
     
     

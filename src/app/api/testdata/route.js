@@ -22,6 +22,7 @@ export async function GET() {
     seat_capacity
     fuel_tank_capacity
     power
+    vehicle_color
     current_market_value
       vehicle_brand_id {
       id
