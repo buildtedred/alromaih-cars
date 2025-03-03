@@ -15,7 +15,7 @@ import { useLanguageContext } from "@/contexts/LanguageSwitcherContext"
 function BrandShowcase() {
   const { isEnglish } = useLanguageContext()
   const { brand, loadingBrand, } = useOdoo();
-  console.log("object brands", brand)
+  // console.log("object brands", brand)
 
   const settings = {
     className: "center",

@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { usePathname } from "next/navigation"
 
 const CarOverview = ({ carDetails }) => {
-  console.log("first log",carDetails)
+  // console.log("first log",carDetails)
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 
@@ -13,35 +13,33 @@ const CarOverview = ({ carDetails }) => {
   const overviewData = [
     {
       label: isEnglish ? "Make Year" : "سنة الصنع",
-      value: carDetails?.year_of_manufacture || "-",
+      value: carDetails?.mfg_year || "-",
     },
     {
       label: isEnglish ? "Registration Year" : "سنة التسجيل",
-      value: carDetails?.year_of_manufacture || "-",
+      value: carDetails?.date_of_registration || "-",
     },
     {
       label: isEnglish ? "Fuel Type" : "نوع الوقود",
-      value: isEnglish
-        ? carDetails?.vehicle_fuel_type?.fuel_type?.en
-        : carDetails?.vehicle_fuel_type?.fuel_type?.ar,
+      value:  carDetails?.vehicle_fuel_type_id?.name
     },
     {
       label: isEnglish ? "Seating Capacity" : "عدد المقاعد",
-      value: carDetails?.seating_capacity || "-",
+      value: carDetails?.seat_capacity || "-",
     },
     {
       label: isEnglish ? "Transmission" : "ناقل الحركة",
-      value: isEnglish ? carDetails?.name?.en?.transmission : carDetails?.name?.ar?.transmission,
+      value: carDetails?.transmission,
     },
     {
       label: isEnglish ? "Condition" : "الحالة",
-      value: isEnglish ? carDetails?.name?.en?.condition : carDetails?.name?.ar?.condition,
+      value:  carDetails?.condition,
     },
   ]
 
   return (
     <Card className="p-6">
-      <h2 className="text-xl font-semibold mb-6">{isEnglish ? "Car Overview" : "نظرة عامة على السيارة"}</h2>
+      <h2 className="text-xl font-semibold mb-6">{isEnglish ? " Car Overview" : "نظرة عامة على السيارة"}</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {overviewData.map((item, index) => (
           <div key={index} className="space-y-1">

@@ -5,9 +5,65 @@ import { NextIntlClientProvider } from 'next-intl'
 
 
 // Fetch car details
+// const fetchCarDetails = async (slug) => {
+//   try {
+//     const response = await fetch(`https://xn--mgbml9eg4a.com/api/car_models/${slug}`);
+//     if (!response.ok) {
+//       throw new Error(`Failed to fetch car details: ${response.statusText}`);
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error("Error fetching car details:", error.message);
+//     return null;
+//   }
+// };
+
+////////////////////////////////////////////////////////////////
+
+// let data = JSON.stringify({
+//   query: `query GetProductBySlug {
+//   ProductProduct(slug: "jetour-t2-luxury-2025") {
+//     id
+//     slug
+//     name
+//     standard_price
+//     is_car_product
+//     list_price
+//     total_value
+//     qty_available
+//   }
+// }`,
+//   variables: {}
+// });
+
+// let config = {
+//   method: 'post',
+//   maxBodyLength: Infinity,
+//   url: 'https://xn--mgbml9eg4a.com/odooapi',
+//   headers: { 
+//     'x-api-key': 'xuOvE2VqKlMRKXgUYXAMgOzp4go6sSYf', 
+//     'Content-Type': 'application/json', 
+//   },
+//   data : data
+// };
+
+// axios.request(config)
+// .then((response) => {
+//   console.log("hhhhhhhhh",JSON.stringify(response.data));
+// })
+// .catch((error) => {
+//   console.log(error);
+// });
+
+////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////  vehcal information test data start //////////////////
+// Fetch car details
 const fetchCarDetails = async (slug) => {
   try {
-    const response = await fetch(`https://xn--mgbml9eg4a.com/api/car_models/${slug}`);
+    const response = await fetch(`http://localhost:3000/api/testdata/${slug}`);
+    // console.log(" slug hhhhhhhhhh", response)
     if (!response.ok) {
       throw new Error(`Failed to fetch car details: ${response.statusText}`);
     }
@@ -18,62 +74,19 @@ const fetchCarDetails = async (slug) => {
     return null;
   }
 };
-
-////////////////////////////////////////////////////////////////
-
-let data = JSON.stringify({
-  query: `query GetProductBySlug {
-  ProductProduct(slug: "jetour-t2-luxury-2025") {
-    id
-    slug
-    name
-    standard_price
-    is_car_product
-    list_price
-    total_value
-    qty_available
-  }
-}`,
-  variables: {}
-});
-
-let config = {
-  method: 'post',
-  maxBodyLength: Infinity,
-  url: 'https://xn--mgbml9eg4a.com/odooapi',
-  headers: { 
-    'x-api-key': 'xuOvE2VqKlMRKXgUYXAMgOzp4go6sSYf', 
-    'Content-Type': 'application/json', 
-  },
-  data : data
-};
-
-axios.request(config)
-.then((response) => {
-  // console.log("hhhhhhhhh",JSON.stringify(response.data));
-})
-.catch((error) => {
-  console.log(error);
-});
-
-////////////////////////////////////////////////////////////////
-
-
+////////////////////////////////////////  vehcal information test data end //////////////////
 
 const page = async ({ params }) => {
-
-  
-
   const slug = (await params).slug
-  console.log(" slug", slug)
-
+  
   const carDetails = await fetchCarDetails(slug);
+  
   const  locale  = (await params).locale;
 
   return (
     <div>
       <NextIntlClientProvider locale={locale}>
-      <CarGallery car_Details={carDetails.data}/>
+      <CarGallery car_Details={carDetails}/>
       </NextIntlClientProvider>
     </div>
   )

@@ -452,7 +452,7 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
         </div>
       </div>
       {/* Add sticky positioning to keep the button always visible */}
-      <div className="sticky bottom-0 p-4 border-t bg-white">
+      {/* <div className="sticky bottom-0 p-4 border-t bg-white">
         <Button
           onClick={() => {
             const clearedFilters = {
@@ -471,7 +471,7 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
         >
           {t.clearAllFilters}
         </Button>
-      </div>
+      </div> */}
     </div>
   )
 }

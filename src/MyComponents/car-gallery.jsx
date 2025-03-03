@@ -13,8 +13,24 @@ import { fetchImageAsBase64 } from "./fetch-image"
 import { MultiStepPopup } from "./MultiStepPopup"
 
 const CompactCarListing = ({ car_Details, brand_Details }) => {
-  const pathname = usePathname()
-  const isEnglish = pathname.startsWith("/en")
+
+  const pathname = usePathname();
+  const isEnglish = pathname.startsWith("/en");
+
+  const [singleData, setsingleData] = useState(null);
+  // console.log(" sigle data", singleData)
+
+  const getsingledata = Array.isArray(car_Details?.en_US) && Array.isArray(car_Details?.ar_001)
+    ? isEnglish
+      ? car_Details.en_US // English data
+      : car_Details.ar_001 // Arabic data
+    : [];
+
+  useEffect(() => {
+    if (getsingledata.length > 0) {
+      setsingleData(getsingledata[0]); // Sirf pehla item set karein
+    }
+  }, [getsingledata]); // Jab `getsingledata` update ho tabhi chale
 
   const [activeImage, setActiveImage] = useState(0)
   const [activeTab, setActiveTab] = useState(car_Details?.specifications?.[0] || "الخارج")
@@ -26,6 +42,8 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isPdfLoading, setIsPdfLoading] = useState(true)
   const [isPopupOpen, setIsPopupOpen] = useState(false)
+
+  // console.log("active image",activeImage)
 
   const handleLoadMore = () => {
     setVisibleThumbnails(car_Details?.images?.length)
@@ -54,7 +72,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
     }
   }, [])
 
-  console.log("dddddddddddddddddddddd image from")
+  // console.log("dddddddddddddddddddddd image from")
 
   const preparePdfCarDetails = useCallback(async () => {
     if (!car_Details) return null
@@ -128,25 +146,27 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
       <div className={`${styles.thumbnailContainer} ${styles.customScrollbar} p-1`}>
         {isLoading
           ? Array(6)
-              .fill(0)
-              .map((_, index) => <Skeleton key={index} className="w-full aspect-square rounded-lg mb-2" />)
-          : car_Details?.additional_images?.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveImage(index)}
-                className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
-              >
-                <Image
-                  src={imageUrls[image.image_url] || "/placeholder.svg"}
-                  alt={`Car thumbnail ${index + 1}`}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </button>
-            ))}
+            .fill(0)
+            .map((_, index) => <Skeleton key={index} className="w-full aspect-square rounded-lg mb-2" />)
+          : singleData?.vehicle_image_ids?.map((image, index) => (
+            <button
+              key={index}
+              onClick={() => setActiveImage(index)} // ✅ Set Active Image
+              className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
+            >
+              <Image
+                src={image?.vehicle_image ? `data:image/png;base64,${image.vehicle_image}` : "/placeholder.svg"}
+                alt={`Car thumbnail ${index + 1}`}
+                width={80} // ✅ Set width for better layout
+                height={80} // ✅ Set height for better layout
+                objectFit="cover"
+                className="rounded-md"
+              />
+            </button>
+          ))}
       </div>
     </div>
-  )
+  );
 
   const renderMainCarGallery = () => (
     <div className="w-full sm:w-4/5">
@@ -156,23 +176,24 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
         ) : (
           <Image
             src={
-              imageUrls[car_Details?.additional_images[activeImage]?.image_url] ||
-              imageUrls[car_Details?.image_url] ||
-              "/placeholder.svg" ||
-              "/placeholder.svg" ||
-              "/placeholder.svg"
+              singleData?.vehicle_image_ids?.[activeImage]?.vehicle_image
+                ? `data:image/png;base64,${singleData.vehicle_image_ids[activeImage].vehicle_image}`
+                : "/placeholder.svg"
             }
             alt={`Car image ${activeImage + 1}`}
-            layout="fill"
+            width={800} // ✅ Fixed width
+            height={450} // ✅ Fixed height
             objectFit="cover"
-            className={`${styles.mainImage}`}
+            className={styles.mainImage}
           />
         )}
       </div>
     </div>
-  )
+  );
+
 
   return (
+
     <div className="min-h-screen bg-white rtl">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-36 py-8">
         {/* Header */}
@@ -187,7 +208,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
               ) : (
                 <>
                   <h1 className="text-xl font-semibold mb-1">
-                    {isEnglish ? car_Details?.name?.en?.name : car_Details?.name?.ar?.name}
+                    {singleData?.name}
                   </h1>
                   <div className="flex items-center gap-2 text-[#71308A]">
                     <span className="inline-block w-4 h-4">
@@ -237,7 +258,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
               ) : (
                 <>
                   <div className="bg-gray-100 rounded-lg p-3">
-                    <h2 className="text-2xl font-bold mb-1">{car_Details?.price?.toLocaleString()} ريال</h2>
+                    <h2 className="text-2xl font-bold mb-1">{singleData?.current_market_value?.toLocaleString()} ريال</h2>
                     <p className="text-xs text-gray-500">شامل الضريبة</p>
                   </div>
 
@@ -245,17 +266,15 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                     <div className="flex">
                       <button
                         onClick={() => setActivePaymentTab("التمويل")}
-                        className={`flex-1 py-2 text-sm font-medium ${
-                          activePaymentTab === "التمويل" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
-                        }`}
+                        className={`flex-1 py-2 text-sm font-medium ${activePaymentTab === "التمويل" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
+                          }`}
                       >
                         التمويل
                       </button>
                       <button
                         onClick={() => setActivePaymentTab("الدفع نقداً")}
-                        className={`flex-1 py-2 text-sm font-medium ${
-                          activePaymentTab === "الدفع نقداً" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
-                        }`}
+                        className={`flex-1 py-2 text-sm font-medium ${activePaymentTab === "الدفع نقداً" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
+                          }`}
                       >
                         الدفع نقداً
                       </button>
@@ -324,13 +343,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                 </div>
               ) : (
                 <CarOverview
-                  carDetails={{
-                    ...car_Details,
-                    vehicle_fuel_types:
-                      car_Details.vehicle_fuel_types && car_Details.vehicle_fuel_types.length > 0
-                        ? car_Details.vehicle_fuel_types
-                        : [{ fuel_type: { en: "N/A", ar: "غير متوفر" } }],
-                  }}
+                  carDetails={singleData}
                 />
               )}
             </div>
@@ -360,9 +373,8 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                       <button
                         key={index}
                         onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${
-                          activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
-                        }`}
+                        className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
+                          }`}
                       >
                         {isEnglish ? tab?.en?.name : tab?.ar?.name}
                       </button>
@@ -376,21 +388,21 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                       {isEnglish
                         ? activeTab?.en?.values?.map((item) => (
-                            <li key={item} className="flex items-center gap-2">
-                              <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
-                                <Check className="w-3 h-3 text-white" />
-                              </span>
-                              {item}
-                            </li>
-                          ))
+                          <li key={item} className="flex items-center gap-2">
+                            <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </span>
+                            {item}
+                          </li>
+                        ))
                         : activeTab?.ar?.values?.map((item) => (
-                            <li key={item} className="flex items-center gap-2">
-                              <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
-                                <Check className="w-3 h-3 text-white" />
-                              </span>
-                              {item}
-                            </li>
-                          ))}
+                          <li key={item} className="flex items-center gap-2">
+                            <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </span>
+                            {item}
+                          </li>
+                        ))}
                     </ul>
                   </div>
                 </>
