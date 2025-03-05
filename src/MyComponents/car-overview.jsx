@@ -13,19 +13,19 @@ const CarOverview = ({ carDetails }) => {
   const overviewData = [
     {
       label: isEnglish ? "Make Year" : "سنة الصنع",
-      value: carDetails?.mfg_year || "-",
+      value: carDetails?.manufacture || "-",
     },
     {
       label: isEnglish ? "Registration Year" : "سنة التسجيل",
-      value: carDetails?.date_of_registration || "-",
+      value: carDetails?.manufacture || "-",
     },
     {
       label: isEnglish ? "Fuel Type" : "نوع الوقود",
-      value:  carDetails?.vehicle_fuel_type_id?.name
+      value:  carDetails?.specifications?.fuel_type
     },
     {
       label: isEnglish ? "Seating Capacity" : "عدد المقاعد",
-      value: carDetails?.seat_capacity || "-",
+      value: carDetails?.seat || "-",
     },
     {
       label: isEnglish ? "Transmission" : "ناقل الحركة",

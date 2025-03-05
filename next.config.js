@@ -27,6 +27,18 @@ const nextConfig = {
         pathname: '/**', // Match all paths under iili.io
       
       },
+      {
+        protocol: 'https',
+        hostname: 'alromaihcars.com', 
+        pathname: '/**',
+      
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.prod.website-files.com', 
+        pathname: '/**',
+      
+      },
 
     ],
   },

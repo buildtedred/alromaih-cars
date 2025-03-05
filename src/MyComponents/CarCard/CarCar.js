@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useBrands } from "@/contexts/AllDataProvider"
 import "react-loading-skeleton/dist/skeleton.css"
 import CarCardItem from "./CarCardItem"
@@ -9,6 +9,7 @@ import { useLanguageContext } from "@/contexts/LanguageSwitcherContext"
 import { Button } from "@/components/ui/button"
 import { Link } from '@/i18n/routing';
 import { useOdoo } from "@/contexts/OdooContext"
+import axios from "axios"
 
 const CarCar = () => {
   const { testData, loadingtestData, } = useOdoo();
@@ -24,8 +25,32 @@ const CarCar = () => {
     e.stopPropagation()
     setFavorites((prev) => (prev.includes(id) ? prev.filter((carId) => carId !== id) : [...prev, id]))
   }
+//////////////////////////////////////////// mode data for testing /////////////////////////////
 
-  if (loadingtestData) {
+const [mocData, setmocData] = useState([]);
+const [loadingmocData, setloadingmocData] = useState(true);
+
+console.log("mocData data:", mocData);
+
+const fetchsliderData = useCallback(async () => {
+  setloadingmocData(true); // Fix: Correct state setter
+  try {
+    const response = await axios.get("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/profile/");
+    setmocData(response.data); // Fix: Access response.data
+  } catch (error) {
+    console.error("Error fetching brands:", error);
+  } finally {
+    setloadingmocData(false);
+  }
+}, []);
+
+useEffect(() => {
+  fetchsliderData();
+}, [fetchsliderData]);
+
+//////////////////////////////////////////// mode data for testing end /////////////////////////////
+
+  if (loadingmocData) {
     return (
 
 
@@ -51,7 +76,7 @@ const CarCar = () => {
         {isEnglish ? "Our Car Collection" : "مجموعة سياراتنا"}
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {(isEnglish ? testData?.en_US : testData?.ar_001)?.map(car =>
+        {mocData?.map(car =>
           
             <CarCardItem
               key={car.id}

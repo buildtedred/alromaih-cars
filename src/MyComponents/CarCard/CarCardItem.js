@@ -25,17 +25,17 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
 
   return (
   
-    <Link href={`/car-details/${car?.slug}`} className="block group">
+    <Link href={`/car-details/${car?.id}`} className="block group">
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-full">
         {/* Car Image */}
         <div className="relative w-full pt-[75%] overflow-hidden">
           <Image
             src={
-              car.avatar
-                ? `data:image/png;base64,${car.avatar}` // Base64 Image
+              car.image
+                ? `${car.image}` // Base64 Image
                 : "/default-car.jpg"
             }
-            alt={isEnglish ? car.name : car.name}
+            alt="car"
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             style={{ objectFit: "cover" }}
@@ -64,16 +64,16 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-lg font-semibold text-gray-800 truncate">
-              { car?.name}
+              { car?.model}
             </h2>
-            <div className="text-lg font-bold text-brand-primary">{car.current_market_value}</div>
+            <div className="text-lg font-bold text-brand-primary">{car.price}</div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-xs text-gray-600 mb-3">
             {/* Year of Manufacture */}
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              <span>{car.mfg_year || "N/A"}</span>
+              <span>{car.manufacture || "N/A"}</span>
              {/* {
                 car?.specification_ids
                 ?.filter((spec) => spec.display_name.includes("Year"))
@@ -86,7 +86,7 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
               <Droplet className="w-4 h-4" />
               <span>
                
-              {car?.vehicle_fuel_type_id?.name || "N/A"}
+              {car?.fuelType || "N/A"}
               </span>
             </div>
 
@@ -104,7 +104,7 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
             {/* Seating Capacity */}
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
-              <span>{car?.seat_capacity || "N/A"} seats</span>
+              <span>{car?.seat || "N/A"} seats</span>
             </div>
 
             {/* Fuel Tank Capacity */}
@@ -119,7 +119,7 @@ const CarCardItem = ({ car, favorites, handleFavorite }) => {
             {/* Power */}
             <div className="flex items-center gap-1">
               <Zap className="w-4 h-4" />
-              <span>(HP){car?.power || "N/A"}</span>
+              <span>{car?.power || "N/A"}</span>
             </div>
           </div>
 

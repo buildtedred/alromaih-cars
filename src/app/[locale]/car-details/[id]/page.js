@@ -60,12 +60,12 @@ import { NextIntlClientProvider } from 'next-intl'
 
 ////////////////////////////////////////  vehcal information test data start //////////////////
 // Fetch car details
-const fetchCarDetails = async (slug) => {
+const fetchCarDetails = async (id) => {
   try {
-    const response = await fetch(`${process.env.LOCAL_HOST}/api/testdata/${slug}`);
-    // console.log(" slug hhhhhhhhhh", response)
+    const response = await fetch(`https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/profile/${id}`);
+    console.log(" slug hhhhhhhhhh", response)
     if (!response.ok) {
-      throw new Error(`Failed to fetch car details: ${response.statusText}`);
+      throw new Error(`Failed to fetch car details: ${response.data}`);
     }
     const data = await response.json();
     return data;
@@ -77,10 +77,11 @@ const fetchCarDetails = async (slug) => {
 ////////////////////////////////////////  vehcal information test data end //////////////////
 
 const page = async ({ params }) => {
-  const slug = (await params).slug
+  const id = (await params).id
+  console.log("idddd",params)
   
-  const carDetails = await fetchCarDetails(slug);
-  
+  const carDetails = await fetchCarDetails(id);
+
   const  locale  = (await params).locale;
 
   return (

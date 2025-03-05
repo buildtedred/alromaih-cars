@@ -148,14 +148,14 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
           ? Array(6)
             .fill(0)
             .map((_, index) => <Skeleton key={index} className="w-full aspect-square rounded-lg mb-2" />)
-          : singleData?.vehicle_image_ids?.map((image, index) => (
+          : car_Details?.additional_images?.map((image, index) => (
             <button
               key={index}
               onClick={() => setActiveImage(index)} // ✅ Set Active Image
               className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
             >
               <Image
-                src={image?.vehicle_image ? `data:image/png;base64,${image.vehicle_image}` : "/placeholder.svg"}
+                src={image}
                 alt={`Car thumbnail ${index + 1}`}
                 width={80} // ✅ Set width for better layout
                 height={80} // ✅ Set height for better layout
@@ -175,17 +175,18 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
           <Skeleton className="w-full h-full" />
         ) : (
           <Image
-            src={
-              singleData?.vehicle_image_ids?.[activeImage]?.vehicle_image
-                ? `data:image/png;base64,${singleData.vehicle_image_ids[activeImage].vehicle_image}`
-                : "/placeholder.svg"
-            }
-            alt={`Car image ${activeImage + 1}`}
-            width={800} // ✅ Fixed width
-            height={450} // ✅ Fixed height
-            objectFit="cover"
-            className={styles.mainImage}
-          />
+          src={
+            car_Details?.additional_images?.[activeImage]
+              ? car_Details.additional_images[activeImage]
+              : "/placeholder.svg"
+          }
+          alt={`Car image ${activeImage + 1}`}
+          width={800} // ✅ Fixed width
+          height={450} // ✅ Fixed height
+          objectFit="cover"
+          className={styles.mainImage}
+        />
+        
         )}
       </div>
     </div>
@@ -208,7 +209,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
               ) : (
                 <>
                   <h1 className="text-xl font-semibold mb-1">
-                    {singleData?.name}
+                    {car_Details?.model}
                   </h1>
                   <div className="flex items-center gap-2 text-[#71308A]">
                     <span className="inline-block w-4 h-4">
@@ -258,7 +259,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
               ) : (
                 <>
                   <div className="bg-gray-100 rounded-lg p-3">
-                    <h2 className="text-2xl font-bold mb-1">{singleData?.current_market_value?.toLocaleString()} ريال</h2>
+                    <h2 className="text-2xl font-bold mb-1">{car_Details?.price?.toLocaleString()} ريال</h2>
                     <p className="text-xs text-gray-500">شامل الضريبة</p>
                   </div>
 
@@ -343,7 +344,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                 </div>
               ) : (
                 <CarOverview
-                  carDetails={singleData}
+                  carDetails={car_Details}
                 />
               )}
             </div>
@@ -369,7 +370,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
               ) : (
                 <>
                   <div className="flex overflow-x-auto border-b mb-4">
-                    {car_Details?.specifications?.map((tab, index) => (
+                    {/* {car_Details?.specifications?.map((tab, index) => (
                       <button
                         key={index}
                         onClick={() => setActiveTab(tab)}
@@ -378,7 +379,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                       >
                         {isEnglish ? tab?.en?.name : tab?.ar?.name}
                       </button>
-                    ))}
+                    ))} */}
                   </div>
 
                   <div>
