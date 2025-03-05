@@ -27,6 +27,7 @@ export async function GET() {
       vehicle_brand_id {
       id
       name
+      avatar
     }
     
     vehicle_fuel_type_id {
