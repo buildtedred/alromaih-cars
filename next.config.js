@@ -31,6 +31,7 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'alromaihcars.com', 
         pathname: '/**',
+        pathname: '/**',
       
       },
       {
@@ -41,7 +42,31 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'ford.com', 
+        hostname: 'hebbkx1anhila5yf.public.blob.vercel-storage.com', 
+        pathname: '/**',
+      
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com', 
+        pathname: '/**',
+      
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org', 
+        pathname: '/**',
+      
+      },
+      {
+        protocol: 'https',
+        hostname: 'ibb.co', 
+        pathname: '/**',
+      
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.postimg.cc', 
         pathname: '/**',
       
       },

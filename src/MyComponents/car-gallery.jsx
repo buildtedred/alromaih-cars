@@ -1,96 +1,60 @@
 "use client"
 import { useState, useCallback, useEffect } from "react"
 import Image from "next/image"
-import { Heart, Share2, X, Calculator, Check, FileText } from "lucide-react"
+import { X } from "lucide-react"
 import styles from "./CompactCarListing.module.css"
 import { FinanceCalculator } from "./FinanceCalculator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { usePathname } from "next/navigation"
 import CarOverview from "./car-overview"
-import { PDFDownloadLink } from "@react-pdf/renderer"
-import CarDetailsPDF from "./car-details-pdf"
-import { fetchImageAsBase64 } from "./fetch-image"
 import { MultiStepPopup } from "./MultiStepPopup"
+import PriceCardSimple from "./PriceCard"
 
 const CompactCarListing = ({ car_Details, brand_Details }) => {
-
-  const pathname = usePathname();
-  const isEnglish = pathname.startsWith("/en");
-
-  const [singleData, setsingleData] = useState(null);
-  // console.log(" sigle data", singleData)
-
-  const getsingledata = Array.isArray(car_Details?.en_US) && Array.isArray(car_Details?.ar_001)
-    ? isEnglish
-      ? car_Details.en_US // English data
-      : car_Details.ar_001 // Arabic data
-    : [];
-
-  useEffect(() => {
-    if (getsingledata.length > 0) {
-      setsingleData(getsingledata[0]); // Sirf pehla item set karein
-    }
-  }, [getsingledata]); // Jab `getsingledata` update ho tabhi chale
+  const pathname = usePathname()
+  const isEnglish = pathname.startsWith("/en")
 
   const [activeImage, setActiveImage] = useState(0)
-  const [activeTab, setActiveTab] = useState(car_Details?.specifications?.[0] || "الخارج")
-  const [activePaymentTab, setActivePaymentTab] = useState("الدفع نقداً")
+  const [activePaymentTab, setActivePaymentTab] = useState("cash")
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false)
-  const [visibleThumbnails, setVisibleThumbnails] = useState(6)
   const [pdfCarDetails, setPdfCarDetails] = useState(null)
-  const [imageUrls, setImageUrls] = useState({})
   const [isLoading, setIsLoading] = useState(true)
   const [isPdfLoading, setIsPdfLoading] = useState(true)
   const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [currentMainImage, setCurrentMainImage] = useState(car_Details?.image || "")
 
-  // console.log("active image",activeImage)
+  // Process gallery images
+  const galleryImages = car_Details?.gallery || []
+  const additionalImages = car_Details?.additional_images || []
 
-  const handleLoadMore = () => {
-    setVisibleThumbnails(car_Details?.images?.length)
-  }
+  // Combine gallery and additional_images
+  const allImages = [...(currentMainImage ? [currentMainImage] : []), ...additionalImages]
 
-  const remainingCount = car_Details?.images?.length - visibleThumbnails || 0
+  useEffect(() => {
+    // Simulate loading for demo purposes
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+      setIsPdfLoading(false)
+    }, 1000)
 
-  const getFuelType = () => {
-    if (car_Details?.vehicle_fuel_types && car_Details.vehicle_fuel_types.length > 0) {
-      return car_Details.vehicle_fuel_types[0].fuel_type
+    return () => clearTimeout(timer)
+  }, [car_Details])
+
+  // Handle color change
+  const handleColorChange = (imageUrl) => {
+    if (imageUrl) {
+      setCurrentMainImage(imageUrl)
+      setActiveImage(0) // Reset to first image which will be the new color image
     }
-    return { en: "N/A", ar: "غير متوفر" }
   }
-
-  const getImageUrl = useCallback(async (imageUrl) => {
-    if (!imageUrl) return "/placeholder.svg"
-    const cleanPath = imageUrl.replace(/^\//, "")
-    const fullUrl = cleanPath.startsWith("http") ? cleanPath : `https://xn--mgbml9eg4a.com/${cleanPath}`
-
-    try {
-      const base64Image = await fetchImageAsBase64(fullUrl)
-      return base64Image || "/placeholder.svg"
-    } catch (error) {
-      console.error("Error converting image:", error)
-      return "/placeholder.svg"
-    }
-  }, [])
-
-  // console.log("dddddddddddddddddddddd image from")
 
   const preparePdfCarDetails = useCallback(async () => {
     if (!car_Details) return null
-
-    const mainImageUrl = car_Details?.additional_images?.[0]?.image_url || car_Details?.image_url
-    const base64MainImage = await getImageUrl(mainImageUrl)
-
     return {
       ...car_Details,
-      image_url: base64MainImage,
-      additional_images: await Promise.all(
-        (car_Details?.additional_images || []).map(async (img) => ({
-          ...img,
-          image_url: await getImageUrl(img.image_url),
-        })),
-      ),
+      // Add any additional processing for PDF if needed
     }
-  }, [car_Details, getImageUrl])
+  }, [car_Details])
 
   useEffect(() => {
     preparePdfCarDetails().then((details) => {
@@ -99,74 +63,31 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
     })
   }, [preparePdfCarDetails])
 
-  useEffect(() => {
-    const loadImages = async () => {
-      setIsLoading(true)
-      const urls = {}
-      for (const image of car_Details?.additional_images || []) {
-        urls[image.image_url] = await getImageUrl(image.image_url)
-      }
-      setImageUrls(urls)
-      setIsLoading(false)
-    }
-    loadImages()
-  }, [car_Details, getImageUrl])
-
-  const renderPdfIcon = () => (
-    <div className="mb-4">
-      {isPdfLoading ? (
-        <Skeleton className="w-8 h-8 rounded-full" />
-      ) : pdfCarDetails ? (
-        <PDFDownloadLink
-          document={
-            <CarDetailsPDF carDetails={pdfCarDetails} brandDetails={brand_Details} locale={isEnglish ? "en" : "ar"} />
-          }
-          fileName={`${car_Details?.name?.en?.name || "car-details"}.pdf`}
-        >
-          {({ blob, url, loading, error }) => (
-            <button
-              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300"
-              title={isEnglish ? "Download PDF" : "تحميل PDF"}
-              disabled={loading}
-            >
-              {loading ? <span className="animate-spin">⌛</span> : <FileText className="h-4 w-4 text-gray-600" />}
-            </button>
-          )}
-        </PDFDownloadLink>
-      ) : (
-        <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300" disabled>
-          <span className="animate-spin">⌛</span>
-        </button>
-      )}
-    </div>
-  )
-
   const renderThumbnails = () => (
     <div className="w-full sm:w-1/5 h-auto sm:h-[400px] mb-4">
       <div className={`${styles.thumbnailContainer} ${styles.customScrollbar} p-1`}>
         {isLoading
           ? Array(6)
-            .fill(0)
-            .map((_, index) => <Skeleton key={index} className="w-full aspect-square rounded-lg mb-2" />)
-          : car_Details?.additional_images?.map((image, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveImage(index)} // ✅ Set Active Image
-              className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
-            >
-              <Image
-                src={image}
-                alt={`Car thumbnail ${index + 1}`}
-                width={80} // ✅ Set width for better layout
-                height={80} // ✅ Set height for better layout
-                objectFit="cover"
-                className="rounded-md"
-              />
-            </button>
-          ))}
+              .fill(0)
+              .map((_, index) => <Skeleton key={index} className="w-full aspect-square rounded-lg mb-2" />)
+          : allImages.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveImage(index)}
+                className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-[#71308A]" : ""}`}
+              >
+                <Image
+                  src={image || "/placeholder.svg?height=80&width=80"}
+                  alt={`${getBrandName()} ${getModelName()} thumbnail ${index + 1}`}
+                  width={80}
+                  height={80}
+                  className="rounded-md object-cover"
+                />
+              </button>
+            ))}
       </div>
     </div>
-  );
+  )
 
   const renderMainCarGallery = () => (
     <div className="w-full sm:w-4/5">
@@ -175,81 +96,167 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
           <Skeleton className="w-full h-full" />
         ) : (
           <Image
-          src={
-            car_Details?.additional_images?.[activeImage]
-              ? car_Details.additional_images[activeImage]
-              : "/placeholder.svg"
-          }
-          alt={`Car image ${activeImage + 1}`}
-          width={800} // ✅ Fixed width
-          height={450} // ✅ Fixed height
-          objectFit="cover"
-          className={styles.mainImage}
-        />
-        
+            src={allImages[activeImage] || "/placeholder.svg?height=450&width=800"}
+            alt={`${getBrandName()} ${getModelName()} - ${activeImage === 0 ? "Main view" : `View ${activeImage + 1}`}`}
+            width={800}
+            height={450}
+            className={`${styles.mainImage} object-cover`}
+          />
         )}
       </div>
     </div>
-  );
+  )
 
+  // Get model name
+  const getModelName = () => {
+    if (car_Details?.model?.name) {
+      return car_Details.model.name
+    }
+    return car_Details?.model || "N/A"
+  }
 
-  return (
+  // Get brand name
+  const getBrandName = () => {
+    if (car_Details?.brand?.name) {
+      return car_Details.brand.name
+    }
+    return car_Details?.brand || ""
+  }
 
-    <div className="min-h-screen bg-white rtl">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-36 py-8">
-        {/* Header */}
-        <div className="mb-8 pb-6 border-b border-gray-200">
-          <div className="flex items-start justify-between">
-            <div>
-              {isLoading ? (
-                <>
-                  <Skeleton className="h-8 w-64 mb-2" />
-                  <Skeleton className="h-4 w-48" />
-                </>
-              ) : (
-                <>
-                  <h1 className="text-xl font-semibold mb-1">
-                    {car_Details?.model}
-                  </h1>
-                  <div className="flex items-center gap-2 text-[#71308A]">
-                    <span className="inline-block w-4 h-4">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </span>
-                    <span className="text-sm">فحص شامل 200 نقطة</span>
+  // Format price
+  const formatPrice = (price) => {
+    if (!price) return "N/A"
+    // Just format the number without currency symbol
+    return new Intl.NumberFormat(isEnglish ? "en-US" : "ar-SA", {
+      maximumFractionDigits: 0,
+    }).format(price)
+  }
+
+  const renderPaymentCard = () => {
+    if (isLoading) {
+      return <Skeleton className="h-64 w-full rounded-lg" />
+    }
+
+    return (
+      <div className="space-y-3">
+        <div className="border-2 border-[#71308A] rounded-[10px] overflow-hidden bg-white">
+          <div className="text-sm text-center p-2 text-[#71308A] border-b border-[#71308A]">
+            {isEnglish ? "Choose the best payment method" : "اختر الطريقة المناسبة لشراء هذه السيارة؟"}
+          </div>
+          <div className="flex border-b border-[#71308A]">
+            <button
+              onClick={() => setActivePaymentTab("finance")}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                activePaymentTab === "finance"
+                  ? "bg-[#71308A] text-white"
+                  : "bg-white text-[#71308A] hover:bg-purple-50"
+              }`}
+            >
+              {isEnglish ? "Finance" : "التمويل"}
+            </button>
+            <button
+              onClick={() => setActivePaymentTab("cash")}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                activePaymentTab === "cash" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A] hover:bg-purple-50"
+              }`}
+            >
+              {isEnglish ? "Cash" : "كاش"}
+            </button>
+          </div>
+
+          <div className="p-4">
+            {activePaymentTab === "cash" ? (
+              <div className="space-y-4">
+                <div className="text-left">
+                  <p className="text-[#71308A] font-medium mb-2">{isEnglish ? "Cash Price" : "سعر الكاش"}</p>
+                  <p className="text-3xl font-bold text-[#71308A] mb-1 flex items-center gap-1">
+                    <RiyalIcon />
+                    <span>{formatPrice(car_Details?.pricing?.base_price || 146000)}</span>
+                  </p>
+                  <p className="text-sm text-[#71308A]/70">
+                    {isEnglish ? "Including tax and plates" : "شامل الضريبة واللوحات"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsPopupOpen(true)}
+                  className="w-full py-3 text-sm text-white bg-[#71308A] rounded-[5px]  font-medium hover:bg-[#5f2873] transition-colors"
+                >
+                  {isEnglish ? "Request Purchase" : "طلب شراء"}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="text-left">
+                  <p className="text-[#71308A] font-medium mb-2">{isEnglish ? "Monthly Payment" : "يبدأ القسط من"}</p>
+                  <p className="text-3xl font-bold text-[#71308A] mb-1 flex items-center gap-1">
+                    <RiyalIcon />
+                    <span>{formatPrice(car_Details?.pricing?.monthly_installment || 1940)}</span>
+                  </p>
+                  <p className="text-sm text-[#71308A]/70">
+                    {isEnglish ? "Insurance rate not included" : "غير شامل نسبة التأمين"}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-2 rounded bg-purple-50">
+                    <p className="text-xs text-[#71308A] mb-1">{isEnglish ? "Monthly" : "القسط"}</p>
+                    <p className="text-sm font-medium text-[#71308A] flex items-center gap-1">
+                      <RiyalIcon />
+                      <span>1,940</span>
+                    </p>
                   </div>
-                </>
-              )}
-            </div>
-            <div className="flex gap-2">
-              {renderPdfIcon()}
-              {isLoading ? (
-                <>
-                  <Skeleton className="w-8 h-8 rounded-full" />
-                  <Skeleton className="w-8 h-8 rounded-full" />
-                </>
-              ) : (
-                <>
-                  <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300">
-                    <Share2 className="h-4 w-4 text-gray-600" />
-                  </button>
-                  <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300">
-                    <Heart className="h-4 w-4 text-gray-600" />
-                  </button>
-                </>
-              )}
-            </div>
+                  <div className="p-2 rounded bg-purple-50">
+                    <p className="text-xs text-[#71308A] mb-1">{isEnglish ? "Down Payment" : "الدفعة الأولى"}</p>
+                    <p className="text-sm font-medium text-[#71308A] flex items-center gap-1">
+                      <RiyalIcon />
+                      <span>0</span>
+                    </p>
+                  </div>
+                  <div className="p-2 rounded bg-purple-50">
+                    <p className="text-xs text-[#71308A] mb-1">{isEnglish ? "Period" : "مدة القسط"}</p>
+                    <p className="text-sm font-medium text-[#71308A]">5 {isEnglish ? "years" : "سنوات"}</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsPopupOpen(true)}
+                  className="w-full py-3 text-sm text-white bg-[#71308A] rounded-[5px] font-medium hover:bg-[#5f2873] transition-colors"
+                >
+                  {isEnglish ? "Request Purchase" : "طلب شراء"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
+      </div>
+    )
+  }
 
+  const RiyalIcon = () => (
+    <svg
+      width="16"
+      height="18"
+      viewBox="0 0 23 26"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="inline-block"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M2.02881 14.04L8.01881 12.77V2.07C8.53881 1.31 9.67881 0.47 10.4288 0V12.24L13.3188 11.65V3.32C13.8088 2.63 15.0088 1.74 15.7388 1.3V11.13L22.5588 9.7C22.5888 10.78 22.3888 11.75 21.8388 12.55L15.7388 13.81V16.53L22.6088 15.12C22.6388 16.2 22.4388 17.17 21.8888 17.97L13.3288 19.73V14.33L10.4288 14.9V18.46C9.99881 19.48 9.13881 20.5 8.55881 21.27C8.39881 21.48 8.41881 21.56 8.15881 21.62L0.00881353 23.34C-0.0411865 22.6 0.108814 21.62 0.788814 20.51L8.00881 19.01V15.46L1.23881 16.88C1.18881 16.14 1.33881 15.16 2.01881 14.05L2.02881 14.04ZM14.1488 22.23L22.6188 20.52C22.6488 21.6 22.3188 22.56 21.8988 23.37L13.3288 25.13C13.3688 24.25 13.6288 23.29 14.1588 22.22L14.1488 22.23Z"
+        fill="#46194F"
+      />
+    </svg>
+  )
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-36 py-8">
         {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Column */}
-          <div className="w-full lg:w-[250px]">
+          <div className="w-full lg:w-[350px]">
             <div className="space-y-3">
               {isLoading ? (
                 <>
@@ -258,71 +265,15 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                 </>
               ) : (
                 <>
-                  <div className="bg-gray-100 rounded-lg p-3">
-                    <h2 className="text-2xl font-bold mb-1">{car_Details?.price?.toLocaleString()} ريال</h2>
-                    <p className="text-xs text-gray-500">شامل الضريبة</p>
-                  </div>
-
-                  <div className="border border-[#71308A] rounded-lg overflow-hidden">
-                    <div className="flex">
-                      <button
-                        onClick={() => setActivePaymentTab("التمويل")}
-                        className={`flex-1 py-2 text-sm font-medium ${activePaymentTab === "التمويل" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
-                          }`}
-                      >
-                        التمويل
-                      </button>
-                      <button
-                        onClick={() => setActivePaymentTab("الدفع نقداً")}
-                        className={`flex-1 py-2 text-sm font-medium ${activePaymentTab === "الدفع نقداً" ? "bg-[#71308A] text-white" : "bg-white text-[#71308A]"
-                          }`}
-                      >
-                        الدفع نقداً
-                      </button>
-                    </div>
-                    <div className="p-4 bg-white">
-                      {activePaymentTab === "الدفع نقداً" ? (
-                        <div className="space-y-4">
-                          <div>
-                            <h3 className="text-lg font-semibold mb-1 text-[#71308A]">السعر النقدي</h3>
-                            <p className="text-3xl font-bold text-gray-900">
-                              {car_Details?.price?.toLocaleString()} ريال
-                            </p>
-                            <p className="text-sm text-gray-500">شامل الضريبة</p>
-                          </div>
-                          <button
-                            onClick={() => setIsPopupOpen(true)}
-                            className="w-full py-3 text-sm text-white bg-[#71308A] rounded-lg font-medium hover:bg-[#5f2873] transition-colors"
-                          >
-                            طلب شراء
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <div>
-                            <h3 className="text-lg font-semibold mb-1 text-[#71308A]">التمويل</h3>
-                            <p className="text-sm text-gray-500">القسط الشهري يبدأ من</p>
-                            <p className="text-3xl font-bold text-gray-900">١٬٢٩٩ ريال</p>
-                          </div>
-                          <div className="bg-gray-100 p-3 rounded-lg">
-                            <p className="text-sm font-medium text-gray-700">
-                              الدفعة الأولى: <span className="text-[#71308A]">20%</span>
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => setIsCalculatorOpen(true)}
-                            className="w-full py-3 text-sm text-white bg-[#71308A] rounded-lg font-medium hover:bg-[#5f2873] transition-colors flex items-center justify-center"
-                          >
-                            <Calculator className="w-4 h-4 mr-2" />
-                            حاسبة التمويل
-                          </button>
-                          <button className="w-full py-3 text-sm text-[#71308A] bg-white border border-[#71308A] rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                            تقدم بطلب تمويل
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <PriceCardSimple
+                    car_Details={car_Details}
+                    isEnglish={isEnglish}
+                    onColorChange={handleColorChange}
+                    pdfCarDetails={pdfCarDetails}
+                    isPdfLoading={isPdfLoading}
+                    brandDetails={brand_Details}
+                  />
+                  {renderPaymentCard()}
                 </>
               )}
             </div>
@@ -343,9 +294,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                   <Skeleton className="h-4 w-2/3" />
                 </div>
               ) : (
-                <CarOverview
-                  carDetails={car_Details}
-                />
+                <CarOverview carDetails={car_Details} />
               )}
             </div>
             <div className="mt-6">
@@ -368,45 +317,7 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
                   </div>
                 </div>
               ) : (
-                <>
-                  <div className="flex overflow-x-auto border-b mb-4">
-                    {/* {car_Details?.specifications?.map((tab, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-2 text-sm font-medium whitespace-nowrap ${activeTab === tab ? "text-[#71308A] border-b-2 border-[#71308A]" : "text-gray-500"
-                          }`}
-                      >
-                        {isEnglish ? tab?.en?.name : tab?.ar?.name}
-                      </button>
-                    ))} */}
-                  </div>
-
-                  <div>
-                    <h3 className="text-base font-semibold mb-3">
-                      {isEnglish ? activeTab?.en?.name : activeTab?.ar?.name}
-                    </h3>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                      {isEnglish
-                        ? activeTab?.en?.values?.map((item) => (
-                          <li key={item} className="flex items-center gap-2">
-                            <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
-                              <Check className="w-3 h-3 text-white" />
-                            </span>
-                            {item}
-                          </li>
-                        ))
-                        : activeTab?.ar?.values?.map((item) => (
-                          <li key={item} className="flex items-center gap-2">
-                            <span className="w-4 h-4 rounded-full bg-[#71308A] flex items-center justify-center">
-                              <Check className="w-3 h-3 text-white" />
-                            </span>
-                            {item}
-                          </li>
-                        ))}
-                    </ul>
-                  </div>
-                </>
+                <></>
               )}
             </div>
           </div>
@@ -418,12 +329,12 @@ const CompactCarListing = ({ car_Details, brand_Details }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 sm:p-6 rounded-lg w-full max-w-md mx-4 sm:mx-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">حاسبة التمويل</h2>
+              <h2 className="text-xl font-bold">{isEnglish ? "Finance Calculator" : "حاسبة التمويل"}</h2>
               <button onClick={() => setIsCalculatorOpen(false)} className="text-gray-500 hover:text-gray-700">
                 <X className="h-6 w-6" />
               </button>
             </div>
-            <FinanceCalculator carPrice={car_Details.price} />
+            <FinanceCalculator carPrice={car_Details?.pricing?.base_price || car_Details?.price} />
           </div>
         </div>
       )}

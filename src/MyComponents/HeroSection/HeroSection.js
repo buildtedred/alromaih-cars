@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect,useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTranslation } from "react-i18next"
 import { useSlides } from "@/contexts/SliderContext"
 import Image from "next/image"
 import Skeleton from "react-loading-skeleton"
 import { useOdoo } from "@/contexts/OdooContext"
+import  axios  from 'axios';
 
 const SLIDE_DURATION = 5000 // 5 seconds per slide
 
@@ -16,13 +17,39 @@ export const HeroSection = () => {
   const [progress, setProgress] = useState(0)
   // const { slides, loading, error } = useSlides()
     const {   sliderData, loadingsliderData } = useOdoo();
-    // console.log("object ssssssssss", sliderData)
+    
+    //////////////////////////////////////////// mode data for testing /////////////////////////////
+    
+    const [mocData, setmocData] = useState([]);
+    const [loadingmocData, setloadingmocData] = useState(true);
+    console.log("object ssssssssss", mocData)
+
+console.log("mocData data:", mocData);
+
+const fetchsliderData = useCallback(async () => {
+  setloadingmocData(true); // Fix: Correct state setter
+  try {
+    const response = await axios.get("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/alromaihCarousel ");
+
+    setmocData(response.data); // Fix: Access response.data
+  } catch (error) {
+    console.error("Error fetching brands:", error);
+  } finally {
+    setloadingmocData(false);
+  }
+}, []);
+
+useEffect(() => {
+  fetchsliderData();
+}, [fetchsliderData]);
+
+//////////////////////////////////////////// mode data for testing end /////////////////////////////
 
   useEffect(() => {
-    if (sliderData.length === 0) return
+    if (mocData.length === 0) return
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % sliderData.length)
+      setCurrentSlide((prev) => (prev + 1) % mocData.length)
       setProgress(0)
     }, SLIDE_DURATION)
 
@@ -34,9 +61,9 @@ export const HeroSection = () => {
       clearInterval(interval)
       clearInterval(progressInterval)
     }
-  }, [sliderData.length])
+  }, [mocData.length])
 
-  if (loadingsliderData) {
+  if (loadingmocData) {
     return (
       <div className="relative px-4 md:px-36">
         <div className="relative aspect-[25/9] w-full">
@@ -66,11 +93,11 @@ export const HeroSection = () => {
           >
             <Image
                 src={
-                  sliderData[currentSlide]?.image
-                    ? `data:image/png;base64,${sliderData[currentSlide]?.image}`
+                  mocData[currentSlide]?.avatar
+                    ? `${mocData[currentSlide]?.avatar}`
                     : "/fallback-image.jpg" // Default image if Base64 is missing
                 }
-              alt={sliderData[currentSlide]?.name}
+              alt={mocData[currentSlide]?.name}
               className="w-full h-full object-cover"
               fill
               priority
@@ -80,7 +107,7 @@ export const HeroSection = () => {
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-20">
           <div className="flex items-center gap-4">
-            {sliderData?.map((_, index) => (
+            {mocData?.map((_, index) => (
               <button
                 key={index}
                 onClick={() => {

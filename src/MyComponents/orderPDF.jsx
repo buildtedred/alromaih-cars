@@ -94,6 +94,33 @@ const styles = StyleSheet.create({
 })
 
 export const OrderPDF = ({ formData, car_Details }) => {
+  // Get model name
+  const getModelName = () => {
+    if (car_Details?.model?.name) {
+      return car_Details.model.name
+    }
+    return car_Details?.model || "N/A"
+  }
+
+  // Get brand name
+  const getBrandName = () => {
+    if (car_Details?.brand?.name) {
+      return car_Details.brand.name
+    }
+    return car_Details?.brand || ""
+  }
+
+  // Format price
+  const formatPrice = (price) => {
+    if (!price) return "N/A"
+    const currency = car_Details?.pricing?.currency || "USD"
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+      maximumFractionDigits: 0,
+    }).format(price)
+  }
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -103,14 +130,22 @@ export const OrderPDF = ({ formData, car_Details }) => {
         </View>
 
         <View style={styles.carInfo}>
-          {car_Details?.image_url && <Image src={car_Details.image_url || "/placeholder.svg"} style={styles.image} />}
+          <Image src={car_Details?.image || "/placeholder.svg?height=150&width=200"} style={styles.image} />
           <View style={styles.carDetails}>
-            <Text style={styles.carName}>{car_Details?.name?.en?.name || "N/A"}</Text>
-            <Text style={styles.infoContent}>Year: {car_Details?.year_of_manufacture || "N/A"}</Text>
-            <Text style={styles.infoContent}>
-              Fuel Type: {car_Details?.vehicle_fuel_type?.fuel_type?.en || "N/A"}
+            <Text style={styles.carName}>
+              {getBrandName()} {getModelName()}
             </Text>
-            <Text style={styles.infoContent}>Seating Capacity: {car_Details?.seating_capacity || "N/A"}</Text>
+            <Text style={styles.infoContent}>Year: {car_Details?.year || car_Details?.manufacture || "N/A"}</Text>
+            <Text style={styles.infoContent}>
+              Fuel Type: {car_Details?.fuelType || car_Details?.specifications?.fuel_type || "N/A"}
+            </Text>
+            <Text style={styles.infoContent}>Seating Capacity: {car_Details?.seat || "N/A"}</Text>
+            <Text style={styles.infoContent}>
+              Price:{" "}
+              {car_Details?.pricing?.base_price
+                ? formatPrice(car_Details.pricing.base_price)
+                : formatPrice(car_Details?.price)}
+            </Text>
           </View>
         </View>
 
