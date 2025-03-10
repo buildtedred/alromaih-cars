@@ -62,7 +62,7 @@ import { NextIntlClientProvider } from 'next-intl'
 // Fetch car details
 const fetchCarDetails = async (id) => {
   try {
-    const response = await fetch(`https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/profile/${id}`);
+    const response = await fetch(`https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/alromaih/${id}`);
     console.log(" slug hhhhhhhhhh", response)
     if (!response.ok) {
       throw new Error(`Failed to fetch car details: ${response.data}`);

@@ -39,6 +39,12 @@ const nextConfig = {
         pathname: '/**',
       
       },
+      {
+        protocol: 'https',
+        hostname: 'ford.com', 
+        pathname: '/**',
+      
+      },
 
     ],
   },

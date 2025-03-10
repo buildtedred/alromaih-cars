@@ -1,65 +1,57 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
-import Header from "@/MyComponents/NavebarComponents/components/Header";
-// import { Providers } from "./providers";
-import { LogoProvider } from "@/contexts/LogoContext";
-import Footer from '@/MyComponents/Footer/Footer';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { routing } from '@/i18n/routing';
-import { getLangDir } from 'rtl-detect';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound, redirect } from "next/navigation";
+import { routing } from "@/i18n/routing";
+import { getLangDir } from "rtl-detect";
 import { BrandsProvider } from "@/contexts/AllDataProvider";
 import LanguageSwitcherContext from "@/contexts/LanguageSwitcherContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { OdooProvider } from "@/contexts/OdooContext";
 import ProgressBar from "@/MyComponents/Progressbar/ProgressBar";
-import * as motion from "motion/react-client"
-
-
+import Header from "@/MyComponents/NavebarComponents/components/Header";
+import Footer from "@/MyComponents/Footer/Footer";
+import { LogoProvider } from "@/contexts/LogoContext";
+import Cookies from "js-cookie";
 
 export const metadata = {
-  title: 'الرميح للسيارات - موقع بيع وشراء السيارات',
-  description: 'موقع الرميح للسيارات - أكبر موقع لبيع وشراء السيارات في المملكة العربية السعودية',
+  title: "الرميح للسيارات - موقع بيع وشراء السيارات",
+  description: "موقع الرميح للسيارات - أكبر موقع لبيع وشراء السيارات في المملكة العربية السعودية",
 };
 
 export default async function RootLayout({ children, params }) {
-
-  const locale = (await params).locale;
-  // Ensure that the incoming `locale` is valid
+  const locale = params.locale;
+  
+  // ✅ Ensure valid locale
   if (!routing.locales.includes(locale)) {
     notFound();
   }
 
-  // Providing all messages to the client
-  // side is the easiest way to get started
+  // ✅ Get messages for localization
   const messages = await getMessages();
-  // const direction = locale === 'ar' ? 'rtl' : 'ltr';
   const direction = getLangDir(locale);
+   // ✅ Ensure authentication is handled correctly
+  // ✅ Debugging: Check authentication
+
+
 
   return (
     <html lang={locale} dir={direction} suppressHydrationWarning>
       <body>
-
         <NextIntlClientProvider messages={messages}>
-          <ProgressBar/>
+          <ProgressBar />
           <OdooProvider>
-
-          <LanguageSwitcherContext>
-          <FavoritesProvider>
-
-          <BrandsProvider>
-            {/* <Providers> */}
-            <LogoProvider>
-              <Header />
-              {/* Make sure children is wrapping everything */}
-              <main>{children}</main>
-              <Footer />
-            </LogoProvider>
-            {/* </Providers> */}
-          </BrandsProvider>
-          </FavoritesProvider>
-          </LanguageSwitcherContext>
+            <LanguageSwitcherContext>
+              <FavoritesProvider>
+                <BrandsProvider>
+                  <LogoProvider>
+                    <Header />
+                    <main>{children}</main>
+                    <Footer />
+                  </LogoProvider>
+                </BrandsProvider>
+              </FavoritesProvider>
+            </LanguageSwitcherContext>
           </OdooProvider>
         </NextIntlClientProvider>
       </body>
