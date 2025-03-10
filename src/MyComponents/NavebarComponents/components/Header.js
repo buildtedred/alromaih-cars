@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect,useCallback } from "react"
 import { Phone, Menu, X, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Nav from "./Nav"
@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import LanguageToggle from "@/MyComponents/LanguageToggle"
 import SearchComponent from './search/SearchComponent';
 import { useOdoo } from "@/contexts/OdooContext"
+import  axios  from 'axios';
 
 const Header = () => {
   const { t } = useTranslation()
@@ -20,16 +21,42 @@ const Header = () => {
 
   // const { logos, loading, error } = useLogoContext()
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  //////////////////////////////////////////// mode data for testing /////////////////////////////
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
-  const toggleSearch = () => setIsSearchVisible(!isSearchVisible)
+const [mocData, setmocData] = useState([]);
+const [loadingmocData, setloadingmocData] = useState(true);
 
-  if (!mounted) {
-    return null
+console.log("logo api moc api:", mocData);
+
+const fetchsliderData = useCallback(async () => {
+  setloadingmocData(true); // Fix: Correct state setter
+  try {
+    const response = await axios.get("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/logo");
+
+    setmocData(response.data); // Fix: Access response.data
+  } catch (error) {
+    console.error("Error fetching brands:", error);
+  } finally {
+    setloadingmocData(false);
   }
+}, []);
+
+useEffect(() => {
+  fetchsliderData();
+}, [fetchsliderData]);
+
+useEffect(() => {
+  setMounted(true)
+}, [])
+
+const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
+const toggleSearch = () => setIsSearchVisible(!isSearchVisible)
+
+if (!mounted) {
+  return null
+}
+
+//////////////////////////////////////////// mode data for testing end /////////////////////////////
 
   return (
     <header className="font-noto w-full shadow-sm relative">
@@ -46,7 +73,7 @@ const Header = () => {
             
               :
                 <img
-                  src={`data:image/png;base64,${logo[0]?.logo}`}
+                  src={`${mocData[0]?.avatar}`}
                   alt={"Logo"}
                   className="h-8 md:h-12 w-auto"
                 />

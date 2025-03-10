@@ -138,6 +138,21 @@ const translations = {
     fuelType: "Fuel Type",
     transmission: "Transmission",
     condition: "Condition",
+    engine: "Engine",
+    horsepower: "Horsepower",
+    torque: "Torque",
+    drivetrain: "Drivetrain",
+    topSpeed: "Top Speed",
+    acceleration: "Acceleration",
+    fuelEfficiency: "Fuel Efficiency",
+    fuelTankCapacity: "Fuel Tank Capacity",
+    dimensions: "Dimensions",
+    weight: "Weight",
+    cargoCapacity: "Cargo Capacity",
+    exterior: "Exterior Features",
+    interior: "Interior Features",
+    safety: "Safety Features",
+    technology: "Technology Features",
   },
   ar: {
     date: "التاريخ",
@@ -154,6 +169,21 @@ const translations = {
     fuelType: "نوع الوقود",
     transmission: "ناقل الحركة",
     condition: "الحالة",
+    engine: "المحرك",
+    horsepower: "القوة الحصانية",
+    torque: "العزم",
+    drivetrain: "نظام الدفع",
+    topSpeed: "السرعة القصوى",
+    acceleration: "التسارع",
+    fuelEfficiency: "كفاءة الوقود",
+    fuelTankCapacity: "سعة خزان الوقود",
+    dimensions: "الأبعاد",
+    weight: "الوزن",
+    cargoCapacity: "سعة الحمولة",
+    exterior: "المميزات الخارجية",
+    interior: "المميزات الداخلية",
+    safety: "ميزات الأمان",
+    technology: "المميزات التكنولوجية",
   },
 }
 
@@ -169,12 +199,14 @@ const CarDetailsPDF = ({ carDetails, brandDetails, locale = "ar" }) => {
   const styles = createStyles(isRTL)
   const t = translations[locale]
 
-  const formatDate = (date) => {
+  const formatDate = () => {
     return new Date().toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")
   }
 
   const formatPrice = (price) => {
-    return price ? `${price.toLocaleString(locale === "ar" ? "ar-SA" : "en-US")} ${t.sar}` : "-"
+    if (!price) return "-"
+    const currency = carDetails?.pricing?.currency || "USD"
+    return `${Number(price).toLocaleString(locale === "ar" ? "ar-SA" : "en-US")} ${currency === "USD" ? t.sar : currency}`
   }
 
   const getFeatureValue = (feature) => {
@@ -183,8 +215,35 @@ const CarDetailsPDF = ({ carDetails, brandDetails, locale = "ar" }) => {
     return feature || "-"
   }
 
-  // console.log("PDF Component Image URL:", carDetails.image_url)
-  // console.log("Rendering PDF with image URL:", carDetails.image_url)
+  // Get model name
+  const getModelName = () => {
+    if (carDetails?.model?.name) {
+      return carDetails.model.name
+    }
+    return carDetails?.model || "N/A"
+  }
+
+  // Get brand name
+  const getBrandName = () => {
+    if (carDetails?.brand?.name) {
+      return carDetails.brand.name
+    }
+    return carDetails?.brand || ""
+  }
+
+  // Get price
+  const getPrice = () => {
+    if (carDetails?.pricing?.base_price) {
+      return carDetails.pricing.base_price
+    }
+    return carDetails?.price || 0
+  }
+
+  // Get price after VAT
+  const getPriceAfterVAT = () => {
+    const basePrice = getPrice()
+    return basePrice * 1.15 // Assuming 15% VAT
+  }
 
   return (
     <Document>
@@ -192,69 +251,133 @@ const CarDetailsPDF = ({ carDetails, brandDetails, locale = "ar" }) => {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logoSection}>
-            <Image src={{ uri: "/logo.png" || "/placeholder.svg" }} style={styles.logo} />
+            <Image src="/placeholder.svg?height=50&width=150" style={styles.logo} />
           </View>
           <View style={styles.dateQR}>
             <Text>
-              {t.date}: {formatDate(new Date())}
+              {t.date}: {formatDate()}
             </Text>
           </View>
         </View>
 
         {/* Car Image */}
         <View style={styles.carImageSection}>
-          {carDetails.image_url && <Image src={carDetails.image_url || "/placeholder.svg"} style={styles.carImage} />}
+          <Image src={carDetails.image || "/placeholder.svg?height=250&width=400"} style={styles.carImage} />
         </View>
 
         {/* Car Info */}
         <View style={styles.carInfo}>
-          <Text style={styles.carName}>{carDetails?.name?.[locale]?.name || "-"}</Text>
-          <Text style={styles.brandName}>{brandDetails?.name?.[locale]?.name || "-"}</Text>
+          <Text style={styles.carName}>{getModelName()}</Text>
+          <Text style={styles.brandName}>{getBrandName()}</Text>
           <Text style={styles.priceInfo}>
-            {t.price}: {formatPrice(carDetails?.price)}
+            {t.price}: {formatPrice(getPrice())}
           </Text>
           <Text style={styles.priceInfo}>
-            {t.priceAfterVAT}: {formatPrice(carDetails?.price * 1.15)}
+            {t.priceAfterVAT}: {formatPrice(getPriceAfterVAT())}
           </Text>
         </View>
 
-        {/* Specifications */}
+        {/* Basic Specifications */}
         <View>
           <Text style={styles.sectionTitle}>{t.specifications}</Text>
           <View style={styles.specificationGrid}>
             <View style={styles.specColumn}>
-              <SpecificationRow label={t.yearOfManufacture} value={carDetails?.year_of_manufacture} styles={styles} />
-              <SpecificationRow label={t.seatingCapacity} value={carDetails?.seating_capacity} styles={styles} />
+              <SpecificationRow
+                label={t.yearOfManufacture}
+                value={carDetails?.year || carDetails?.manufacture}
+                styles={styles}
+              />
+              <SpecificationRow label={t.seatingCapacity} value={carDetails?.seat} styles={styles} />
               <SpecificationRow
                 label={t.fuelType}
-                value={carDetails?.vehicle_fuel_type?.fuel_type?.[locale]}
+                value={carDetails?.fuelType || carDetails?.specifications?.fuel_type}
                 styles={styles}
               />
+              <SpecificationRow label={t.transmission} value={carDetails?.transmission} styles={styles} />
+              <SpecificationRow label={t.condition} value={carDetails?.condition} styles={styles} />
             </View>
             <View style={styles.specColumn}>
+              <SpecificationRow label={t.engine} value={carDetails?.specifications?.engine} styles={styles} />
+              <SpecificationRow label={t.horsepower} value={carDetails?.specifications?.horsepower} styles={styles} />
+              <SpecificationRow label={t.torque} value={carDetails?.specifications?.torque} styles={styles} />
               <SpecificationRow
-                label={t.transmission}
-                value={carDetails?.name?.[locale]?.transmission}
+                label={t.fuelTankCapacity}
+                value={
+                  carDetails?.specifications?.fuel_tank_capacity
+                    ? `${carDetails.specifications.fuel_tank_capacity}L`
+                    : "-"
+                }
                 styles={styles}
               />
-              <SpecificationRow label={t.condition} value={carDetails?.name?.[locale]?.condition} styles={styles} />
+              <SpecificationRow
+                label={t.drivetrain}
+                value={carDetails?.specifications?.drivetrain || carDetails?.drive_type}
+                styles={styles}
+              />
             </View>
           </View>
         </View>
 
-        {/* Additional Specifications */}
-        {carDetails?.specifications?.map((spec, index) => (
-          <View key={index}>
-            <Text style={styles.sectionTitle}>{spec[locale]?.name}</Text>
-            <View style={styles.specificationGrid}>
-              {spec[locale]?.values?.map((value, valueIndex) => (
-                <View key={valueIndex} style={styles.specColumn}>
-                  <SpecificationRow label={value} value={t.available} styles={styles} />
+        {/* Features */}
+        {carDetails?.features && (
+          <>
+            {/* Exterior Features */}
+            {carDetails.features.exterior && carDetails.features.exterior.length > 0 && (
+              <View>
+                <Text style={styles.sectionTitle}>{t.exterior}</Text>
+                <View style={styles.specificationGrid}>
+                  {carDetails.features.exterior.map((feature, index) => (
+                    <View key={index} style={styles.specColumn}>
+                      <SpecificationRow label={feature} value={t.available} styles={styles} />
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </View>
-          </View>
-        ))}
+              </View>
+            )}
+
+            {/* Interior Features */}
+            {carDetails.features.interior && carDetails.features.interior.length > 0 && (
+              <View>
+                <Text style={styles.sectionTitle}>{t.interior}</Text>
+                <View style={styles.specificationGrid}>
+                  {carDetails.features.interior.map((feature, index) => (
+                    <View key={index} style={styles.specColumn}>
+                      <SpecificationRow label={feature} value={t.available} styles={styles} />
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Safety Features */}
+            {carDetails.features.safety && carDetails.features.safety.length > 0 && (
+              <View>
+                <Text style={styles.sectionTitle}>{t.safety}</Text>
+                <View style={styles.specificationGrid}>
+                  {carDetails.features.safety.map((feature, index) => (
+                    <View key={index} style={styles.specColumn}>
+                      <SpecificationRow label={feature} value={t.available} styles={styles} />
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Technology Features */}
+            {carDetails.features.technology && carDetails.features.technology.length > 0 && (
+              <View>
+                <Text style={styles.sectionTitle}>{t.technology}</Text>
+                <View style={styles.specificationGrid}>
+                  {carDetails.features.technology.map((feature, index) => (
+                    <View key={index} style={styles.specColumn}>
+                      <SpecificationRow label={feature} value={t.available} styles={styles} />
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </>
+        )}
 
         {/* Footer */}
         <View style={styles.footer}>

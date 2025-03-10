@@ -35,7 +35,8 @@ console.log("mocData data:", mocData);
 const fetchsliderData = useCallback(async () => {
   setloadingmocData(true); // Fix: Correct state setter
   try {
-    const response = await axios.get("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/profile/");
+    const response = await axios.get("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/alromaih");
+
     setmocData(response.data); // Fix: Access response.data
   } catch (error) {
     console.error("Error fetching brands:", error);
