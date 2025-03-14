@@ -12,7 +12,6 @@ import ProgressBar from "@/MyComponents/Progressbar/ProgressBar";
 import Header from "@/MyComponents/NavebarComponents/components/Header";
 import Footer from "@/MyComponents/Footer/Footer";
 import { LogoProvider } from "@/contexts/LogoContext";
-import Cookies from "js-cookie";
 
 export const metadata = {
   title: "الرميح للسيارات - موقع بيع وشراء السيارات",
