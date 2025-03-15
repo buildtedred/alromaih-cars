@@ -9,48 +9,42 @@ export default function TermsPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Hero Section with Purple Background */}
-      <div className="bg-[#F8F2F8] pt-20 pb-16">
-        <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
-            {/* Illustration - Now on left for English, right for Arabic */}
-            <div className={`w-full md:w-1/3 ${locale === "ar" ? "md:order-1" : "md:order-1"}`}>
-              <div className={locale === "ar" ? "scale-x-[-1]" : ""}>
-                <Image
-                  src="/images/Terms.svg"
-                  alt="Terms and Conditions illustration"
-                  width={400}
-                  height={400}
-                  className="w-full max-w-[300px] mx-auto"
-                />
-              </div>
-            </div>
-
-            {/* Text Content - Now on right for English, left for Arabic */}
-            <div
-              className={`text-center md:text-${locale === "ar" ? "right" : "left"} flex-1 ${locale === "ar" ? "md:order-2" : "md:order-2"}`}
-            >
-              <h1
-                className={`text-4xl sm:text-5xl md:text-6xl font-bold text-brand-primary mb-6 ${locale === "ar" ? "font-noto" : ""}`}
-              >
-                {locale === "ar" ? "الشروط والأحكام" : "Terms & Conditions"}
-              </h1>
-              <p
-                className={`text-sm sm:text-base text-gray-600 max-w-2xl ${locale === "ar" ? "font-noto mr-auto md:ml-auto" : "ml-auto md:mr-auto"}`}
-              >
-                {locale === "ar"
-                  ? "مرحبا بكم في الرميح للسيارات! تحكم شروط الخدمة هذه وصولك إلى واستخدام موقع شركة الرميح للسيارات ومنتجاتها وخدماتها. باستخدام خدماتنا، فإنك توافق على الالتزام بهذه الشروط. يرجى قراءتها بعناية."
-                  : "Welcome to Al Rumaih Cars! These Terms of Service govern your access to and use of Al Rumaih Cars website, products, and services. By using our services, you agree to be bound by these terms. Please read them carefully."}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Terms Content */}
-      <div className="py-16">
+      {/* Hero Section with White Background */}
+      <div className="bg-white pt-20 pb-16">
         <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto">
           <div className={`space-y-12 ${locale === "ar" ? "rtl" : ""}`}>
+            {/* Hero Section - Now styled like other sections */}
+            <section className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+                {/* Illustration - Now with conditional SVG based on locale */}
+                <div className={`w-full md:w-1/3 ${locale === "ar" ? "md:order-2" : "md:order-2"}`}>
+                  <Image
+                    src={locale === "ar" ? "/images/Arabic-Terms.svg" : "/images/English-Terms.svg"}
+                    alt="Terms and Conditions illustration"
+                    width={400}
+                    height={400}
+                    className="w-full max-w-[300px] mx-auto"
+                  />
+                </div>
+
+                {/* Text Content - Now on left for both English and Arabic */}
+                <div
+                  className={`text-${locale === "ar" ? "right" : "left"} flex-1 ${locale === "ar" ? "md:order-1" : "md:order-1"}`}
+                >
+                  <h1
+                    className={`text-4xl sm:text-5xl md:text-6xl font-bold text-brand-primary mb-6 ${locale === "ar" ? "font-noto" : ""}`}
+                  >
+                    {locale === "ar" ? "الشروط والأحكام" : "Terms & Conditions"}
+                  </h1>
+                  <p className={`text-sm sm:text-base text-gray-600 max-w-2xl ${locale === "ar" ? "font-noto" : ""}`}>
+                    {locale === "ar"
+                      ? "مرحبا بكم في الرميح للسيارات! تحكم شروط الخدمة هذه وصولك إلى واستخدام موقع شركة الرميح للسيارات ومنتجاتها وخدماتها. باستخدام خدماتنا، فإنك توافق على الالتزام بهذه الشروط. يرجى قراءتها بعناية."
+                      : "Welcome to Al Rumaih Cars! These Terms of Service govern your access to and use of Al Rumaih Cars website, products, and services. By using our services, you agree to be bound by these terms. Please read them carefully."}
+                  </p>
+                </div>
+              </div>
+            </section>
+
             {/* Section 1: Acceptance of Terms */}
             <section className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
               <h2 className={`text-2xl font-bold text-brand-primary mb-4 ${locale === "ar" ? "font-noto" : ""}`}>

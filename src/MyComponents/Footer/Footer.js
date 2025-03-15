@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { useParams } from "next/navigation"
-import { Link } from "@/i18n/routing"
+import Link from "next/link"
 
 export default function Footer() {
   // Get locale from URL params
@@ -19,12 +19,14 @@ export default function Footer() {
         <div className={`max-w-[1300px] mx-auto px-4 sm:pl-4 sm:pr-[76px] py-8 ${locale === "ar" ? "rtl" : ""}`}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-0">
             {/* Company Info - Right side for Arabic, Left for English */}
-            <div className="col-span-full lg:col-span-5 order-1">
+            <div className={`col-span-full lg:col-span-5 order-1 ${locale === "ar" ? "text-right" : ""}`}>
               <div className="flex justify-center lg:justify-start mb-6">
                 <Image src="/images/logo.PNG" alt="Alromaih Cars" width={180} height={60} className="h-auto" />
               </div>
               <p
-                className={`text-gray-600 text-sm ${locale === "ar" ? "text-right" : "text-left"} mb-4 leading-relaxed text-center lg:text-left`}
+                className={`text-gray-600 text-sm ${
+                  locale === "ar" ? "text-right font-noto rtl" : "text-left"
+                } mb-4 leading-relaxed ${locale === "ar" ? "lg:text-right" : "lg:text-left"}`}
               >
                 {locale === "ar"
                   ? "الرميح للسيارات منذ 1996 نقدم أفضل خدمات بيع السيارات الجديدة والخادمة بأسعار تنافسية. نحرص على توفير تجربة شراء مميزة تشمل تسهيلات تمويلية خيارات متنوعة خدمة ما بعد البيع لدينا فروع متعددة ونعمل باستمرار على التوسع والتطوير لضمان رضا عملائنا تواصل معنا اليوم!"
@@ -53,28 +55,40 @@ export default function Footer() {
             {/* Links - Left side for Arabic, Right for English */}
             <div className="col-span-full lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-8 order-2">
               {/* Cars Column */}
-              <div className="text-center sm:text-left">
-                <h3 className={`text-brand-primary text-xl font-medium mb-4`}>
+              <div className={`text-center sm:${locale === "ar" ? "text-right" : "text-left"}`}>
+                <h3 className={`text-brand-primary text-xl font-medium mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "السيارات" : "Cars"}
                 </h3>
                 <ul className="space-y-3">
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "كاش" : "Cash"}
                     </Link>
                   </li>
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "تمويل" : "Financing"}
                     </Link>
                   </li>
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "شركات" : "Companies"}
                     </Link>
                   </li>
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "افراد" : "Individuals"}
                     </Link>
                   </li>
@@ -82,23 +96,32 @@ export default function Footer() {
               </div>
 
               {/* Resources Column */}
-              <div className="text-center sm:text-left">
-                <h3 className={`text-brand-primary text-xl font-medium mb-4`}>
+              <div className={`text-center sm:${locale === "ar" ? "text-right" : "text-left"}`}>
+                <h3 className={`text-brand-primary text-xl font-medium mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "الموارد" : "Resources"}
                 </h3>
                 <ul className="space-y-3">
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "المدونة" : "Blog"}
                     </Link>
                   </li>
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "الأسئلة الشائعة" : "FAQ"}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/terms-and-conditions" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href={`/${locale}/terms-and-conditions`}
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "الشروط والأحكام" : "Terms & Conditions"}
                     </Link>
                   </li>
@@ -106,23 +129,32 @@ export default function Footer() {
               </div>
 
               {/* Company Column */}
-              <div className="text-center sm:text-left">
-                <h3 className={`text-brand-primary text-xl font-medium mb-4`}>
+              <div className={`text-center sm:${locale === "ar" ? "text-right" : "text-left"}`}>
+                <h3 className={`text-brand-primary text-xl font-medium mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "الشركة" : "Company"}
                 </h3>
                 <ul className="space-y-3">
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "الوظائف" : "Careers"}
                     </Link>
                   </li>
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "عن الرميح" : "About Alromaih"}
                     </Link>
                   </li>
                   <li>
-                    <Link href="#" className={`text-gray-600 hover:text-brand-primary transition-colors`}>
+                    <Link
+                      href="#"
+                      className={`text-gray-600 hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                    >
                       {locale === "ar" ? "تواصل معنا" : "Contact Us"}
                     </Link>
                   </li>
@@ -136,7 +168,7 @@ export default function Footer() {
       {/* Purple Section with Contact Info */}
       <div className="bg-brand-primary">
         <div className="max-w-[1300px] mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className={`flex flex-col md:flex-row justify-between items-center ${locale === "ar" ? "rtl" : ""}`}>
             {/* Phone and Email in one parent div */}
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-[15px] mb-6 md:mb-0 w-full md:w-auto">
               {/* Phone */}
@@ -162,7 +194,7 @@ export default function Footer() {
             <div
               className={`flex flex-col items-center md:${locale === "ar" ? "items-end" : "items-start"} w-full md:w-auto`}
             >
-              <p className={`text-white mb-3 text-center md:${locale === "ar" ? "text-right" : "text-left"}`}>
+              <p className={`text-white mb-3 text-center md:${locale === "ar" ? "text-right font-noto" : "text-left"}`}>
                 {locale === "ar"
                   ? "استمتع بتجربة فريدة مع تطبيق الرميح"
                   : "Enjoy a unique experience with the Alromaih app"}
@@ -183,7 +215,9 @@ export default function Footer() {
       {/* White Section with Payment Methods */}
       <div className="bg-white">
         <div className="max-w-[1300px] mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4">
+          <div
+            className={`flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4 ${locale === "ar" ? "rtl" : ""}`}
+          >
             {/* Payment Methods */}
             <div className="flex gap-6 items-center order-2 md:order-1">
               <Image src="/images/Visa.PNG" alt="Visa" width={45} height={30} className="object-contain" />
@@ -193,11 +227,16 @@ export default function Footer() {
 
             {/* Terms and Copyright */}
             <div className="flex items-center gap-2 text-gray-600 text-sm order-1 md:order-2 text-center">
-              <Link href="/terms-and-conditions" className={`hover:text-brand-primary transition-colors`}>
+              <Link
+                href={`/${locale}/terms-and-conditions`}
+                className={`hover:text-brand-primary transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+              >
                 {locale === "ar" ? "الشروط والأحكام" : "Terms & Conditions"}
               </Link>
               <span>|</span>
-              <p>{locale === "ar" ? "© 2025 الرميح. جميع الحقوق محفوظة" : "© 2025 Alromaih. All rights reserved"}</p>
+              <p className={locale === "ar" ? "font-noto" : ""}>
+                {locale === "ar" ? "© 2025 الرميح. جميع الحقوق محفوظة" : "© 2025 Alromaih. All rights reserved"}
+              </p>
             </div>
 
             {/* Certificates */}
