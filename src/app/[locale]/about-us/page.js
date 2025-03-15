@@ -1,333 +1,396 @@
 "use client"
-
 import Image from "next/image"
-import { Link } from "@/i18n/routing"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Car, Shield, Users, CheckCircle, Building2, Star, Trophy } from "lucide-react"
-import Slider from "react-slick"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import { useTranslations } from "next-intl"
+import { useParams } from "next/navigation"
 
-const sliderSettings = {
-  dots: false,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  autoplay: true,
-  autoplaySpeed: 3000,
-  arrows: true,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 2,
-      },
-    },
-    {
-      breakpoint: 640,
-      settings: {
-        slidesToShow: 1,
-      },
-    },
-  ],
-}
+export default function Home() {
+  // Get locale from URL params
+  const params = useParams()
+  const locale = params?.locale || "ar" // Default to Arabic if locale not found
 
-export default function HomePage() {
-  const t  = useTranslations("aboutUsUheader");
   return (
-    <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[80vh] overflow-hidden">
+    <main className="min-h-screen bg-gray-100">
+      {/* Hero Image */}
+      <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px]">
         <Image
-          src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop"
-          alt="Luxury Car Showcase"
+          src="/images/about-main-image.JPG"
+          alt="Car image"
           fill
-          className="object-cover brightness-75"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative container mx-auto px-4 md:px-36 h-full flex items-center">
-          <div className="max-w-2xl text-white">
-            <Badge className="bg-[#71308A] mb-4 text-white">{t('badgeText')}</Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              {t("title")}
-            </h1>
-            <p className="text-xl mb-8">{t("description")}</p>
-            <Link
-              href="/inventory"
-              className="inline-block bg-[#71308A] text-white px-8 py-3 rounded-md hover:bg-[#71308A]/90 transition-colors"
+      </div>
+
+      {/* Content Section - Now positioned below the image */}
+      <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto p-4 sm:p-6 bg-white mt-8 rounded-xl shadow-md">
+        <h1
+          className={`text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-brand-primary ${locale === "ar" ? "rtl font-noto" : ""}`}
+        >
+          {locale === "ar" ? "تعرف على الرميح للسيارات" : "About Al Rumaih Cars"}
+        </h1>
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+          {/* 1996 Location */}
+          <div className="flex flex-col items-center">
+            <Image
+              src="/images/LocationPin.svg"
+              alt="Location pin"
+              width={144}
+              height={144}
+              className="w-24 sm:w-28 md:w-32 lg:w-36 h-24 sm:h-28 md:h-32 lg:h-36"
+            />
+            <div className="bg-brand-light/30 px-4 sm:px-6 py-2 rounded-[5px] text-center mt-2">
+              <div className="font-bold text-lg sm:text-xl font-noto">1996</div>
+              <div className="text-xs sm:text-sm font-noto">{locale === "ar" ? "عرعر" : "Arar"}</div>
+            </div>
+          </div>
+
+          {/* Center Content */}
+          <div className={`flex-1 max-w-xl px-2 sm:px-4 ${locale === "ar" ? "rtl" : ""}`}>
+            <p
+              className={`text-sm sm:text-base text-gray-700 leading-relaxed mb-4 sm:mb-6 text-center ${locale === "ar" ? "font-noto" : ""}`}
             >
-              {t("buttonText")}
-            </Link>
+              {locale === "ar"
+                ? "منذ عام 1996م انطلقنا في رحلة في مدينة عرعر شمال المملكة العربية السعودية. انطلاقاً من مبدأ خدمة العملاء وتقديم أفضل المنتجات، أصبحنا اليوم من أكبر معارض السيارات في المملكة العربية السعودية. ونسعى دائماً في تقديم أفضل الخدمات للعملاء لتلبية رغباتهم وتطلعاتهم."
+                : "Since 1996, we embarked on a journey in the city of Arar in northern Saudi Arabia. Based on the principle of customer service and providing the best products, we have become one of the largest car showrooms in the Kingdom of Saudi Arabia. We always strive to provide the best services to customers to meet their desires and aspirations."}
+            </p>
+
+            {/* Car SVG */}
+            <div className="flex justify-center my-2 sm:my-4">
+              <Image
+                src="/images/Car.svg"
+                alt="Car illustration"
+                width={271}
+                height={69}
+                className="w-[180px] sm:w-[220px] md:w-[271px] h-auto"
+              />
+            </div>
+          </div>
+
+          {/* 2023 Location */}
+          <div className="flex flex-col items-center">
+            <Image
+              src="/images/LocationPin.svg"
+              alt="Location pin"
+              width={144}
+              height={144}
+              className="w-24 sm:w-28 md:w-32 lg:w-36 h-24 sm:h-28 md:h-32 lg:h-36"
+            />
+            <div className="bg-brand-light/30 px-4 sm:px-6 py-2 rounded-[5px] text-center mt-2">
+              <div className="font-bold text-lg sm:text-xl font-noto">2023</div>
+              <div className="text-xs sm:text-sm font-noto">{locale === "ar" ? "الرياض" : "Riyadh"}</div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Cities Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4 md:px-36">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Presence in Saudi Arabia</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[
-              {
-                city: "Riyadh",
-                image: "https://images.unsplash.com/photo-1586724237569-f3d0c1dee8c6?q=80&w=2070&auto=format&fit=crop",
-                description:
-                  "Our flagship showroom in the heart of Riyadh showcases the finest luxury vehicles. Located in the prestigious Olaya District, this state-of-the-art facility spans over 5000 square meters.",
-                locations: "3 Showrooms",
-              },
-              {
-                city: "AR AR",
-                image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                description:
-                  "Experience luxury car shopping at its finest in our AR AR showroom. Our modern facility offers a wide selection of premium vehicles and exceptional customer service.",
-                locations: "2 Showrooms",
-              },
-            ].map((location, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-xl transition-all duration-300">
-                <div className="relative h-64">
-                  <Image
-                    src={location.image || "/placeholder.svg"}
-                    alt={`${location.city} Showroom`}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
-                    <div className="absolute bottom-0 p-4">
-                      <h3 className="text-2xl font-bold text-white mb-1">{location.city}</h3>
-                      <Badge className="bg-[#71308A]">{location.locations}</Badge>
-                    </div>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <p className="text-gray-600 leading-relaxed">{location.description}</p>
-                  <div className="mt-4">
-                    <Link
-                      href={`/locations/${location.city.toLowerCase()}`}
-                      className="inline-flex items-center text-[#71308A] hover:underline"
-                    >
-                      View Showrooms
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 ml-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* What's Important to Us */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 md:px-36">
-          <h2 className="text-3xl font-bold text-center mb-12">What's Important to Us</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Shield className="w-8 h-8 text-[#71308A]" />,
-                title: "Quality",
-                description:
-                  "We maintain the highest standards in our vehicle selection and service delivery, ensuring every customer receives excellence.",
-              },
-              {
-                icon: <CheckCircle className="w-8 h-8 text-[#71308A]" />,
-                title: "Transparency & Accountability",
-                description:
-                  "Our commitment to honest dealings and clear communication builds lasting trust with our valued customers.",
-              },
-              {
-                icon: <Users className="w-8 h-8 text-[#71308A]" />,
-                title: "Personalized Experience",
-                description:
-                  "We tailor our services to meet individual preferences, ensuring a unique and satisfying journey for each client.",
-              },
-            ].map((value, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6 text-center">
-                  <div className="mb-4 flex justify-center">{value.icon}</div>
-                  <h3 className="text-xl font-semibold text-[#71308A] mb-4">{value.title}</h3>
-                  <p className="text-gray-600">{value.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Our Backers */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4 md:px-36">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Backers</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-            {[
-              {
-                name: "Tiger Global",
-                logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=2073&auto=format&fit=crop",
-              },
-              {
-                name: "FJ Labs",
-                logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=2073&auto=format&fit=crop",
-              },
-              {
-                name: "ARENA",
-                logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=2073&auto=format&fit=crop",
-              },
-              {
-                name: "Think Investments",
-                logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=2073&auto=format&fit=crop",
-              },
-            ].map((backer, index) => (
-              <div key={index} className="p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+      {/* Features Section */}
+      <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto p-3 sm:p-4 mt-6 sm:mt-8 rounded-xl mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-[90%] mx-auto">
+          {/* Map Location Card */}
+          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
+            <div
+              className={`flex ${locale === "ar" ? "justify-between" : "flex-row-reverse justify-between"} items-center h-full`}
+            >
+              <div>
                 <Image
-                  src={backer.logo || "/placeholder.svg"}
-                  alt={backer.name}
-                  width={200}
-                  height={80}
-                  className="object-contain w-full h-20"
+                  src="/images/MobileMap.svg"
+                  alt="Mobile Map"
+                  width={80}
+                  height={120}
+                  className="w-[60px] sm:w-[70px] md:w-[80px] h-auto"
                 />
               </div>
-            ))}
+              <div className={locale === "ar" ? "text-right" : "text-left"}>
+                <h3
+                  className={`text-sm sm:text-base font-bold text-brand-primary mb-1 ${locale === "ar" ? "font-noto" : ""}`}
+                >
+                  {locale === "ar" ? "إنشاء كيان عملاق" : "Creating a Giant Entity"}
+                </h3>
+                <p className={`text-xs sm:text-sm text-brand-primary ${locale === "ar" ? "font-noto" : ""}`}>
+                  {locale === "ar" ? "متعدد الفروع" : "With Multiple Branches"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Handshake Card */}
+          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden">
+            <div className="flex flex-col h-full justify-between pb-2 sm:pb-4">
+              <div className="pt-8 sm:pt-10 md:pt-12 text-center px-3 sm:px-4">
+                <h3
+                  className={`text-sm sm:text-base font-bold text-brand-primary mb-1 ${locale === "ar" ? "font-noto" : ""}`}
+                >
+                  {locale === "ar"
+                    ? "توطيد علاقتنا مع العملاء وتقديم خدمة"
+                    : "Strengthening our relationship with customers"}
+                </h3>
+                <p className={`text-xs text-gray-600 ${locale === "ar" ? "font-noto" : ""}`}>
+                  {locale === "ar" ? "احترافية بأسعار تنافسية" : "Professional service at competitive prices"}
+                </p>
+              </div>
+              <div className="px-0">
+                <Image
+                  src="/images/Handshake.svg"
+                  alt="Handshake icon"
+                  width={240}
+                  height={120}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Title Card */}
+          <div className="bg-transparent rounded-xl h-[180px] sm:h-[200px] md:h-[220px] flex items-center justify-center p-2 sm:p-3">
+            <div className="text-center w-full h-full flex flex-col justify-center">
+              {locale === "ar" ? (
+                <>
+                  <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] font-bold text-brand-primary font-noto mb-1 sm:mb-2 leading-none">
+                    ما نسعى
+                  </h2>
+                  <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] font-bold text-brand-primary font-noto leading-none">
+                    لتحقيقه
+                  </h2>
+                </>
+              ) : (
+                <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-[5rem] font-bold text-brand-primary leading-none">
+                  Our Goals
+                </h2>
+              )}
+            </div>
+          </div>
+
+          {/* Steering Wheel Card */}
+          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden">
+            <div className="flex flex-col h-full">
+              <div className="pt-8 sm:pt-10 md:pt-12 text-center px-3 sm:px-4 mb-2 sm:mb-4">
+                <h3
+                  className={`text-sm sm:text-base font-bold text-brand-primary mb-1 ${locale === "ar" ? "font-noto" : ""}`}
+                >
+                  {locale === "ar" ? "إتاحة سيارات متنوعة في مكان واحد" : "Providing diverse cars in one place"}
+                </h3>
+              </div>
+              <div className="mt-auto">
+                <Image
+                  src="/images/SteeringWheel.svg"
+                  alt="Steering wheel icon"
+                  width={240}
+                  height={160}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Scale and Coins Card */}
+          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
+            <div
+              className={`flex ${locale === "ar" ? "justify-between" : "flex-row-reverse justify-between"} items-center h-full`}
+            >
+              <div>
+                <Image
+                  src="/images/Coin.svg"
+                  alt="Coin icon"
+                  width={80}
+                  height={80}
+                  className="w-[60px] sm:w-[70px] md:w-[80px] h-auto"
+                />
+              </div>
+              <div className={locale === "ar" ? "text-right" : "text-left"}>
+                <h3
+                  className={`text-sm sm:text-base font-bold text-brand-primary mb-1 ${locale === "ar" ? "font-noto" : ""}`}
+                >
+                  {locale === "ar" ? "تسهيل عملية البيع من خلال مجموعة" : "Facilitating the sales process through"}
+                </h3>
+                <p className={`text-xs text-gray-600 ${locale === "ar" ? "font-noto" : ""}`}>
+                  {locale === "ar" ? "متنوعة من مصادر التمويل" : "various financing sources"}
+                </p>
+                <p className={`text-xs text-gray-600 ${locale === "ar" ? "font-noto" : ""}`}>
+                  {locale === "ar" ? "(النقد - البنوك - شركات التمويل)" : "(Cash - Banks - Finance Companies)"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Wrench Card */}
+          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
+            <div
+              className={`flex ${locale === "ar" ? "justify-between" : "flex-row-reverse justify-between"} items-center h-full`}
+            >
+              <div>
+                <Image
+                  src="/images/Wrench.svg"
+                  alt="Wrench icon"
+                  width={80}
+                  height={80}
+                  className="w-[60px] sm:w-[70px] md:w-[80px] h-auto"
+                />
+              </div>
+              <div className={locale === "ar" ? "text-right" : "text-left"}>
+                <h3
+                  className={`text-sm sm:text-base font-bold text-brand-primary mb-1 ${locale === "ar" ? "font-noto" : ""}`}
+                >
+                  {locale === "ar" ? "توفير خدمة ما بعد البيع" : "Providing after-sales service"}
+                </h3>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Media Coverage */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 md:px-36">
-          <h2 className="text-3xl font-bold text-center mb-12">Media Coverage</h2>
-          <Slider {...sliderSettings} className="media-coverage-slider">
-            {[
-              {
-                source: "Economic Times",
-                title: "Young Saudi drives demand for luxury cars",
-                image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop",
-                link: "#",
-              },
-              {
-                source: "Arab News",
-                title: "Alromaih's largest automobile experiential hub in Riyadh",
-                image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=2070&auto=format&fit=crop",
-                link: "#",
-              },
-              {
-                source: "Saudi Gazette",
-                title: "Full-stack concept explained with benefits",
-                image: "https://images.unsplash.com/photo-1536766820879-059fec98ec0a?q=80&w=2070&auto=format&fit=crop",
-                link: "#",
-              },
-              {
-                source: "Gulf Business",
-                title: "Women continue to drive the demand for luxury cars",
-                image: "https://images.unsplash.com/photo-1562911791-c7a97b729ec5?q=80&w=2070&auto=format&fit=crop",
-                link: "#",
-              },
-            ].map((article, index) => (
-              <div key={index} className="px-2">
-                <Link href={article.link} className="block group">
-                  <div className="relative h-[200px] rounded-lg overflow-hidden">
+      {/* Vision Section */}
+      <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto pt-6 sm:pt-8 pb-8 sm:pb-12 pr-0 sm:pr-6 bg-white mt-8 rounded-xl shadow-md mb-8 overflow-hidden relative min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
+        <div className="flex flex-col lg:flex-row items-start justify-between h-full">
+          {/* Text Content - Always on the right side */}
+          <div className="w-full lg:w-2/3 p-4 sm:p-6 flex flex-col justify-center h-full lg:ml-auto">
+            {locale === "ar" ? (
+              <div className="rtl text-right">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-brand-primary mb-4 sm:mb-6 font-noto">
+                  رؤيتنا
+                </h2>
+                <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-noto">
+                  بنظرة مستقبلية ثاقبة، تعتمد إدارتنا على رؤية تطويرية منذ عام 2023 تهدف إلى توسيع نطاق العمل ليشمل
+                  إنشاء فروع جديدة للمعرض خارج مدينة عرعر وانطلاقاً من خطواتنا المميزة، بدأنا في تنفيذ هذه الرؤية وأنشأنا
+                  مركزاً جديداً في صالات عرض في القادسية في مدينة الرياض. وفي عام 2024 عزمنا على تجديد الفرع الرئيسي
+                  وإضافة لمسة متطورة إليه وصل بعمارته جهدنا طالباً لافتتاح مدينة سكاكا هذا العام وها نحن نستمر في سعينا
+                  الدؤوب لتوفير افضل خدمة تليق بهذا الصعيد.
+                </p>
+              </div>
+            ) : (
+              <div className="text-left">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-brand-primary mb-4 sm:mb-6">
+                  Our Vision
+                </h2>
+                <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                  With a forward-looking vision, our management has been working on an expansionary plan since 2023
+                  aimed at extending our operations to include new showroom branches outside the city of Arar. Building
+                  on our distinguished steps, we have begun implementing this vision by establishing a new center in Al
+                  Qadisiyah showrooms in Riyadh. In 2024, we are determined to renovate our main branch and add a modern
+                  touch to it. Our efforts have reached the stage of planning for the opening in Sakaka this year, and
+                  we continue our diligent pursuit to provide the best service worthy of this level.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Arrow Image - Mobile and Tablet */}
+          <div className="lg:hidden w-full flex justify-start mt-6">
+            <Image
+              src="/images/VisionArrow.svg"
+              alt="Vision arrow"
+              width={400}
+              height={400}
+              className="w-[250px] sm:w-[300px] md:w-[350px] h-auto object-contain"
+            />
+          </div>
+
+          {/* Arrow Image - Desktop */}
+          <div className="hidden lg:block absolute bottom-0 left-0">
+            <Image
+              src="/images/VisionArrow.svg"
+              alt="Vision arrow"
+              width={400}
+              height={400}
+              className="w-[300px] lg:w-[350px] xl:w-[400px] h-auto object-contain"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Map Section */}
+      <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto mt-8 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 justify-center items-center max-w-[90%] mx-auto">
+          {/* Arar Location */}
+          <div className="relative w-full md:w-1/2 h-[314px] rounded-xl overflow-hidden">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d108307.91028644626!2d41.0183413!3d30.9753425!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x156b5a951e777917%3A0x44feb4d2d0b8e7d3!2sArar%20Saudi%20Arabia!5e0!3m2!1sen!2sus!4v1710196238161!5m2!1sen!2sus&disableDefaultUI=true"
+              width="547"
+              height="314"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Arar Location"
+              className="w-full h-full"
+            ></iframe>
+
+            {/* Location Card Overlay */}
+            <div className="absolute bottom-[3.5em] left-4 md:left-8 lg:left-12 xl:left-16 w-[calc(100%-3rem)] max-w-[320px] h-[86px]">
+              <div
+                className={`bg-brand-primary text-white text-sm px-3 py-1 rounded-full w-fit mb-2 ${locale === "ar" ? "font-noto ml-auto" : "mr-auto"}`}
+              >
+                {locale === "ar" ? "عرعر" : "Arar"}
+              </div>
+              <div className="bg-[#EDE8EE]/90 backdrop-blur-sm rounded-lg overflow-hidden h-[86px]">
+                <div className={`flex ${locale === "ar" ? "flex-row-reverse" : "flex-row"} items-center gap-3 h-full`}>
+                  <div className={`w-24 h-16 relative ${locale === "ar" ? "mr-3" : "ml-3"}`}>
                     <Image
-                      src={article.image || "/placeholder.svg"}
-                      alt={article.title}
+                      src="/images/location-Area.JPG"
+                      alt="Arar store front"
                       fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="object-cover rounded-[5px]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent">
-                      <div className="absolute bottom-0 p-4 text-white">
-                        <Badge className="mb-2 bg-[#71308A]">{article.source}</Badge>
-                        <h3 className="text-lg font-semibold line-clamp-2">{article.title}</h3>
-                      </div>
-                    </div>
                   </div>
-                </Link>
+                  <div className={`flex-1 p-3 ${locale === "ar" ? "text-right" : "text-left"}`}>
+                    <h3 className={`text-brand-primary text-sm ${locale === "ar" ? "font-noto" : ""}`}>
+                      {locale === "ar" ? "معرض الرميح للسيارات" : "Al Rumaih Cars Showroom"}
+                    </h3>
+                    <p className={`text-xs text-gray-600 ${locale === "ar" ? "font-noto" : ""} mt-1`}>
+                      2W2R+2PQ, Car Gallery, Arar 73313, Saudi Arabia
+                    </p>
+                  </div>
+                </div>
               </div>
-            ))}
-          </Slider>
-        </div>
-      </section>
+            </div>
+          </div>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-[#71308A] text-white">
-        <div className="container mx-auto px-4 md:px-36">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: <Car className="w-8 h-8" />, number: "1000+", text: "Premium Vehicles" },
-              { icon: <Star className="w-8 h-8" />, number: "4.8/5", text: "Customer Rating" },
-              { icon: <Trophy className="w-8 h-8" />, number: "15+", text: "Industry Awards" },
-              { icon: <Building2 className="w-8 h-8" />, number: "10+", text: "Showrooms" },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="flex justify-center mb-4">{stat.icon}</div>
-                <h3 className="text-3xl font-bold mb-2">{stat.number}</h3>
-                <p className="text-gray-200">{stat.text}</p>
+          {/* Riyadh Location */}
+          <div className="relative w-full md:w-1/2 h-[314px] rounded-xl overflow-hidden">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3624.6752757528395!2d46.71373!3d24.7468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2f03890d489399%3A0x5b5b0344b2b7ea58!2sAl%20Qadisiyah%2C%20Riyadh%20Saudi%20Arabia!5e0!3m2!1sen!2sus!4v1710196238161!5m2!1sen!2sus&disableDefaultUI=true"
+              width="547"
+              height="314"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Riyadh Location"
+              className="w-full h-full"
+            ></iframe>
+
+            {/* Location Card Overlay */}
+            <div className="absolute bottom-[3.5em] left-4 md:left-8 lg:left-12 xl:left-16 w-[calc(100%-3rem)] max-w-[320px] h-[86px]">
+              <div
+                className={`bg-brand-primary text-white text-sm px-3 py-1 rounded-full w-fit mb-2 ${locale === "ar" ? "font-noto ml-auto" : "mr-auto"}`}
+              >
+                {locale === "ar" ? "الرياض" : "Riyadh"}
               </div>
-            ))}
+              <div className="bg-[#EDE8EE]/90 backdrop-blur-sm rounded-lg overflow-hidden h-[86px]">
+                <div className={`flex ${locale === "ar" ? "flex-row-reverse" : "flex-row"} items-center gap-3 h-full`}>
+                  <div className={`w-24 h-16 relative ${locale === "ar" ? "mr-3" : "ml-3"}`}>
+                    <Image
+                      src="/images/location-Area.JPG"
+                      alt="Riyadh store front"
+                      fill
+                      className="object-cover rounded-[5px]"
+                    />
+                  </div>
+                  <div className={`flex-1 p-3 ${locale === "ar" ? "text-right" : "text-left"}`}>
+                    <h3 className={`text-brand-primary text-sm ${locale === "ar" ? "font-noto" : ""}`}>
+                      {locale === "ar" ? "معرض الرميح للسيارات" : "Al Rumaih Cars Showroom"}
+                    </h3>
+                    <p className={`text-xs text-gray-600 ${locale === "ar" ? "font-noto" : ""} mt-1`}>
+                      {locale === "ar"
+                        ? "وادي الغيل, Al Qadisiyyah, Riyadh 13261, Saudi Arabia"
+                        : "Wadi Al-Ghail, Al Qadisiyyah, Riyadh 13261, Saudi Arabia"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 md:px-36 text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Experience Luxury?</h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto text-gray-600">
-            Visit our nearest showroom or contact us for a personalized consultation
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Link
-              href="/contact-us"
-              className="inline-block bg-[#71308A] text-white px-8 py-3 rounded-md hover:bg-[#71308A]/90 transition-colors"
-            >
-              Contact Us
-            </Link>
-            <Link
-              href="/locations"
-              className="inline-block border-2 border-[#71308A] text-[#71308A] px-8 py-3 rounded-md hover:bg-[#71308A]/10 transition-colors"
-            >
-              Find Showroom
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <style jsx>{`
-  .media-coverage-slider :global(.slick-prev),
-  .media-coverage-slider :global(.slick-next) {
-    width: 40px;
-    height: 40px;
-    background: rgba(113, 48, 138, 0.8);
-    border-radius: 50%;
-    z-index: 1;
-  }
-
-  .media-coverage-slider :global(.slick-prev) {
-    left: -20px;
-  }
-
-  .media-coverage-slider :global(.slick-next) {
-    right: -20px;
-  }
-
-  .media-coverage-slider :global(.slick-prev:hover),
-  .media-coverage-slider :global(.slick-next:hover) {
-    background: rgb(113, 48, 138);
-  }
-
-  .media-coverage-slider :global(.slick-prev:before),
-  .media-coverage-slider :global(.slick-next:before) {
-    font-size: 24px;
-  }
-`}</style>
+      </div>
     </main>
   )
 }

@@ -49,9 +49,9 @@ export default {
 			foreground: "hsl(var(--card-foreground))",
 		  },
 		  brand: {
-			primary: "#71308A",
-			light: "#8B44A5",
-			dark: "#5A2670",
+			primary: "#46194F",
+			light: "#EDE8EE",
+			dark: "#C6AECC",
 			DEFAULT: "#71308A", // Added for compatibility with car-buying-interface
 		  },
 		  sidebar: {
