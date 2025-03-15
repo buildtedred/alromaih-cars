@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { SlidesProvider } from "@/contexts/SliderContext"
 import BrandShowcase from "@/MyComponents/brandshowcase"
@@ -7,7 +7,9 @@ import { FinancePartners } from "@/MyComponents/FinancePartners"
 import { HeroSection } from "@/MyComponents/HeroSection/HeroSection"
 import CarBuyingInterface from "../../MyComponents/car-buying/car-buying-interface.jsx"
 
-export default function Home() {
+
+export default async  function Home() {
+
   return (
     <main className="min-h-screen m-auto p-8">
       <SlidesProvider>

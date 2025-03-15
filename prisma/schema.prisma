@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+        
+
+model CarBrand {
+  id     String   @id @default(uuid())
+  name   String   @unique
+  slug   String   @unique // Slug field added
+  image  String
+  cars   AllCar[]
+}
+model AllCar {
+  id       String   @id @default(uuid())
+  model    String
+  year     Int
+  image    String   // Store image URL
+  brandId  String
+  brand    CarBrand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+// model AllCar {
+//   id                String   @id @default(uuid())
+//   model             String
+//   year              Int
+//   image             String   // Store image URL
+//   brandId           String
+//   brand             CarBrand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+//   price             Float    // Car price
+//   mileage           Int      // Mileage in km
+//   fuelType          String   // Petrol, Diesel, Electric, Hybrid, etc.
+//   fuelTankCapacity  String   // Fuel tank capacity (liters)
+//   transmission      String   // Manual or Automatic
+//   color             String   // Car color
+//   manufactured      String   // Manufacturing country or location
+//   condition         String   // New, Used, Certified Pre-Owned, etc.
+//   seats            Int      // Number of seats
+//   doors            Int      // Number of doors (2, 4, etc.)
+//   engineSize       Float?   // Engine capacity in liters (optional)
+//   horsepower       Int?     // Horsepower of the car (optional)
+//   torque           Int?     // Torque in Nm (optional)
+//   wheelDrive       String   // FWD, RWD, AWD, 4WD
+//   bodyType         String   // Sedan, SUV, Hatchback, Coupe, Convertible, etc.
+//   safetyRating     String?  // Safety rating (e.g., 5-star, IIHS Top Safety Pick)
+//   topSpeed         Int?     // Top speed in km/h
+//   acceleration     Float?   // 0-100 km/h time in seconds
+//   fuelEconomy      Float?   // Fuel economy (km per liter or miles per gallon)
+//   infotainment     String?  // Infotainment system details (e.g., Apple CarPlay, Android Auto)
+//   warranty         String?  // Manufacturer warranty details
+//   registration     String?  // Registration details
+//   ownerCount       Int?     // Number of previous owners (if used)
+//   insuranceStatus  String?  // Insured, Not Insured
+//   taxValidity      DateTime? // Road tax validity date
+//   gps              Boolean  // Whether GPS navigation is included
+//   sunroof          Boolean  // Whether the car has a sunroof
+//   parkingSensors   Boolean  // Whether the car has parking sensors
+//   cruiseControl    Boolean  // Whether the car has cruise control
+//   createdAt        DateTime @default(now())
+//   updatedAt        DateTime @updatedAt
+// }
+
+

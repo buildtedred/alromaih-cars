@@ -70,6 +70,12 @@ const nextConfig = {
         pathname: '/**',
       
       },
+      {
+        protocol: 'https',
+        hostname: 'lrwhopvhunjxwihtiwxn.supabase.co', 
+        pathname: '/**',
+      
+      },
 
     ],
   },
