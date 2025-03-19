@@ -19,6 +19,7 @@ export default function AllCarsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState(null);
 
+
   useEffect(() => {
     fetchCars();
   }, []);
@@ -157,14 +158,13 @@ export default function AllCarsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCars.map((car) => {
             const imageUrl = car.image ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${car.image}` : "/placeholder.svg";
-
             return (
               <Card key={car.id} className="overflow-hidden">
                 <CardHeader className="p-0">
                   <div className="relative h-40 bg-muted">
                     <img
-                      src={car?.image}
-                      alt={car.model}
+                      src={car?.images[0] || "/placeholder.svg"}
+                      alt={car?.model}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.target.onerror = null;
@@ -200,7 +200,7 @@ export default function AllCarsPage() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  <p className="text-muted-foreground mt-2">Brand: {car.brand?.name || "Unknown"}</p>
+                  <p className="text-muted-foreground mt-2">Brand: {car?.brand?.name || "Unknown"}</p>
                 </CardContent>
               </Card>
             );

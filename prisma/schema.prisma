@@ -13,22 +13,35 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-        
 
 model CarBrand {
-  id     String   @id @default(uuid())
-  name   String   @unique
-  slug   String   @unique // Slug field added
-  image  String
-  cars   AllCar[]
+  id    String   @id @default(uuid())
+  name  String   @unique
+  slug  String   @unique // Slug field added
+  image String
+  cars  AllCar[]
 }
+
 model AllCar {
-  id       String   @id @default(uuid())
-  model    String
-  year     Int
-  image    String   // Store image URL
-  brandId  String
-  brand    CarBrand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  id            String      @id @default(uuid())
+  model         String
+  year          Int
+  images        String[] // Store additional image URLs
+  spacification Json // ✅ Dynamic Specifications Field
+  brandId       String
+  brand         CarBrand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  variations    Variation[] // ✅ Relation with Variations
+}
+
+model Variation {
+  id        String   @id @default(uuid())
+  carId     String   @default(uuid()) // ✅ Ensure it's UUID
+  car       AllCar   @relation(fields: [carId], references: [id], onDelete: Cascade)
+  name      String // ✅ Variation Name (e.g., "Red Variant")
+  colorName String // ✅ Color Name (e.g., "Red")
+  colorHex  String // ✅ Color HEX Code (e.g., "#FF0000")
+  images    String[] // ✅ Store multiple images
+  price     Float // ✅ Price for this variation
 }
 
 // model AllCar {
@@ -70,5 +83,3 @@ model AllCar {
 //   createdAt        DateTime @default(now())
 //   updatedAt        DateTime @updatedAt
 // }
-
-
