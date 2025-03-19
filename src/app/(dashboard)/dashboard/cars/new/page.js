@@ -2,19 +2,41 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Upload, XCircle } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import MultipleImages from "./multipleImages/MultipleImages";
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+import { Plus, Trash2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import AddSpecifications from "./AddSpecifications/AddSpecifications";
+import AddVariations from "./AddVariations/AddVariations";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function AddCarForm() {
   const router = useRouter();
@@ -22,12 +44,14 @@ export default function AddCarForm() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
   const [brandId, setBrandId] = useState("");
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
   const [brands, setBrands] = useState([]);
+  const [images, setImages] = useState([]); // Multiple images
+  const [specifications, setSpecifications] = useState([]); // ✅ Dynamic specifications
+  const [variations, setVariations] = useState([]); // ✅ Store variations
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(null);
+  const [loadingIndex, setLoadingIndex] = useState(null);
 
   useEffect(() => {
     async function fetchBrands() {
@@ -41,39 +65,189 @@ export default function AddCarForm() {
     fetchBrands();
   }, []);
 
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setLoading(true);
-      const { data, error } = await supabase.storage.from("Alromaih").upload(`cars/${Date.now()}_${file.name}`, file);
-      if (error) {
-        console.error("Upload error:", error);
-        setLoading(false);
-        return;
-      }
-      const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${data.path}`;
-      setImage(imageUrl);
-      setPreview(imageUrl);
+  // Handle multiple image change
+  const handleMultipleImageChange = (e) => {
+    const files = Array.from(e.target.files).map((file) => ({
+      file,
+      url: URL.createObjectURL(file), // Show preview instantly
+      name: null,
+    }));
+    setImages((prev) => [...prev, ...files]);
+  };
+
+  // Upload multiple images
+  const uploadImage = async (image, index) => {
+    setLoadingIndex(index);
+    const fileName = `${Date.now()}-${image.file.name}`;
+    const { error } = await supabase.storage
+      .from("Alromaih")
+      .upload(fileName, image.file);
+
+    if (error) {
+      console.error("Upload error:", error.message);
+      alert("Failed to upload image");
+    } else {
+      const { data: publicUrl } = supabase.storage
+        .from("Alromaih")
+        .getPublicUrl(fileName);
+      setImages((prev) => {
+        const newImages = [...prev];
+        newImages[index] = {
+          ...image,
+          url: publicUrl.publicUrl,
+          name: fileName,
+        };
+        return newImages;
+      });
+    }
+    setLoadingIndex(null);
+  };
+
+  // Delete image
+  const deleteImage = async (fileName, index) => {
+    setLoadingIndex(index);
+    const { error } = await supabase.storage
+      .from("Alromaih")
+      .remove([fileName]);
+
+    if (error) {
+      console.error("Delete error:", error.message);
+      alert("Failed to delete image");
+    } else {
+      setImages((prev) => prev.filter((_, i) => i !== index));
+      alert("Image deleted successfully");
+    }
+    setLoadingIndex(null);
+  };
+
+  const removePreview = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  /////////////////////////////////////////////////////// spacifications /////////////////////////
+  // ✅ Add New Specification Category
+  const addSpecification = () => {
+    setSpecifications([...specifications, { title: "", details: [] }]);
+  };
+
+  // ✅ Remove a Specification Category
+  const removeSpecification = (index) => {
+    setSpecifications(specifications.filter((_, i) => i !== index));
+  };
+
+  // ✅ Change Specification Title
+  const handleSpecTitleChange = (index, value) => {
+    const updatedSpecs = [...specifications];
+    updatedSpecs[index].title = value;
+    setSpecifications(updatedSpecs);
+  };
+
+  // ✅ Add New Detail to a Category
+  const addSpecDetail = (index) => {
+    const updatedSpecs = [...specifications];
+    updatedSpecs[index].details.push({ label: "", value: "" });
+    setSpecifications(updatedSpecs);
+  };
+
+  // ✅ Change Specification Detail
+  const handleSpecDetailChange = (specIndex, detailIndex, field, value) => {
+    const updatedSpecs = [...specifications];
+    updatedSpecs[specIndex].details[detailIndex][field] = value;
+    setSpecifications(updatedSpecs);
+  };
+
+  // ✅ Remove a Specific Detail
+  const removeSpecDetail = (specIndex, detailIndex) => {
+    const updatedSpecs = [...specifications];
+    updatedSpecs[specIndex].details = updatedSpecs[specIndex].details.filter(
+      (_, i) => i !== detailIndex
+    );
+    setSpecifications(updatedSpecs);
+  };
+
+  /////////////////////////////////////////////////////// spacifications end/////////////////////////
+  ////////////////////////////////////////////////// variation section start //////////////////
+  // ✅ Add a new variation
+  const addVariation = () => {
+    setVariations([
+      ...variations,
+      { name: "", colorName: "", colorHex: "", images: [], price: "" },
+    ]);
+  };
+
+  // ✅ Handle Variation Change
+  const handleVariationChange = (index, field, value) => {
+    const updatedVariations = [...variations];
+    updatedVariations[index][field] = value;
+    setVariations(updatedVariations);
+  };
+
+  // ✅ Upload Image to Supabase
+  const uploadvariationImage = async (variationIndex, file) => {
+    if (!file) return;
+
+    setLoading(true);
+    const fileName = `cars/${Date.now()}_${file.name}`;
+    const { error } = await supabase.storage
+      .from("Alromaih")
+      .upload(fileName, file);
+
+    if (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload image");
       setLoading(false);
+      return;
     }
+
+    const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${fileName}`;
+    const updatedVariations = [...variations];
+    updatedVariations[variationIndex].images.push({
+      url: imageUrl,
+      name: fileName,
+    });
+    setVariations(updatedVariations);
+    setLoading(false);
   };
 
-  const handleRemoveImage = async () => {
-    if (image) {
-      const fileName = image.split('/').pop();
-      await supabase.storage.from("Alromaih").remove([`cars/${fileName}`]);
-      setImage(null);
-      setPreview(null);
+  // ✅ Remove Image from Supabase & State
+  const removeImage = async (variationIndex, imageIndex, fileName) => {
+    setLoading(true);
+    const { error } = await supabase.storage
+      .from("Alromaih")
+      .remove([fileName]);
+
+    if (error) {
+      console.error("Delete error:", error);
+      alert("Failed to delete image");
+    } else {
+      const updatedVariations = [...variations];
+      updatedVariations[variationIndex].images = updatedVariations[
+        variationIndex
+      ].images.filter((_, i) => i !== imageIndex);
+      setVariations(updatedVariations);
     }
+    setLoading(false);
   };
 
+  // ✅ Remove a Variation
+  const removeVariation = (index) => {
+    setVariations(variations.filter((_, i) => i !== index));
+  };
+
+  ////////////////////////////////////////////////// variation section end //////////////////
+  // Handle form submission
   async function handleSubmit(e) {
     e.preventDefault();
+    // ✅ Check if any image URL is still a blob (not uploaded yet)
+    if (images.some((img) => img.url.includes("blob"))) {
+      alert("Please upload all images before submitting");
+      return;
+    }
     setError(null);
     setUploadStatus(null);
     setLoading(true);
 
-    if (!model || !year || !brandId || !image) {
+    if (!model || !year || !brandId || images.length === 0) {
       setError("All fields are required");
       setLoading(false);
       return;
@@ -84,7 +258,15 @@ export default function AddCarForm() {
         model,
         year,
         brandId,
-        image
+        images: images.map((img) => img.url), // Corrected mapping syntax
+        specifications, // ✅ Send Dynamic Specifications
+        variations: variations.map((v) => ({
+          name: v.name,
+          colorName: v.colorName,
+          colorHex: v.colorHex,
+          images: v.images.map((img) => img.url),
+          price: v.price,
+        })),
       });
 
       if (response.status !== 201) {
@@ -103,7 +285,6 @@ export default function AddCarForm() {
       setLoading(false);
     }
   }
-
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-6">
@@ -115,19 +296,51 @@ export default function AddCarForm() {
         <h1 className="text-2xl font-bold tracking-tight">Add New Car</h1>
       </div>
 
-      {error && <Alert variant="destructive"><AlertTitle>Error</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
-      {uploadStatus && <Alert><AlertTitle>Status</AlertTitle><AlertDescription>{uploadStatus}</AlertDescription></Alert>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      {uploadStatus && (
+        <Alert>
+          <AlertTitle>Status</AlertTitle>
+          <AlertDescription>{uploadStatus}</AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Multiple Image Preview & Upload */}
+          <MultipleImages
+            handleSpecTitleChange={handleSpecTitleChange}
+            uploadImage={uploadImage}
+            removePreview={removePreview}
+            loadingIndex={loadingIndex}
+            images={images}
+            handleMultipleImageChange={handleMultipleImageChange}
+            deleteImage={deleteImage}
+          />
+          {/* Multiple Image Preview & Upload */}
+
           <CardHeader>
             <CardTitle>Add Car Details</CardTitle>
           </CardHeader>
+
           <CardContent>
             <Label>Model</Label>
-            <Input value={model} onChange={(e) => setModel(e.target.value)} required />
+            <Input
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              required
+            />
             <Label>Year</Label>
-            <Input type="number" value={year} onChange={(e) => setYear(e.target.value)} required />
+            <Input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              required
+            />
             <Label>Select Brand</Label>
             <Select onValueChange={setBrandId} value={brandId}>
               <SelectTrigger>
@@ -135,27 +348,42 @@ export default function AddCarForm() {
               </SelectTrigger>
               <SelectContent>
                 {brands.map((brand) => (
-                  <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>
+                  <SelectItem key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
+              {/* ////////////////////////////// spacification start /////////////// */}
+              {/* Specifications Section */}
+
+              <AddSpecifications
+                specifications={specifications}
+                addSpecDetail={addSpecDetail}
+                handleSpecDetailChange={handleSpecDetailChange}
+                removeSpecDetail={removeSpecDetail}
+                handleSpecTitleChange={handleSpecTitleChange}
+                addSpecification={addSpecification}
+                removeSpecification={removeSpecification}
+              />
+              {/* ////////////////////////////// spacification end /////////////// */}
             </Select>
-            <input id="image" type="file" accept="image/*" className="hidden"onChange={handleImageChange} />
-            <Label htmlFor="image" className="cursor-pointer flex flex-col items-center">
-                  {preview ? (
-                    <div className="relative w-full h-40 mb-4">
-                      <img src={preview || "/placeholder.svg"} alt="Preview" className="w-full h-full object-contain" />
-                    </div>
-                  ) : (
-                    <Upload className="h-12 w-12 text-muted-foreground mb-2" />
-                  )}
-                  <span className="text-sm font-medium">
-                    {preview ? "Change image" : "Click to upload or drag and drop"}
-                  </span>
-                  <span className="text-xs text-muted-foreground mt-1">SVG, PNG, JPG or GIF (max. 2MB)</span>
-                </Label>
+            {/* ///////////////////////////////////// variation section start ////////////////// */}
+
+            <AddVariations
+              variations={variations}
+              handleVariationChange={handleVariationChange}
+              addVariation={addVariation}
+              removeVariation={removeVariation}
+              uploadvariationImage={uploadvariationImage}
+              removeImage={removeImage}
+            />
+            {/* ///////////////////////////////////// variation section end ////////////////// */}
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={loading}>{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Add Car</Button>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Add
+              Car
+            </Button>
           </CardFooter>
         </form>
       </Card>
