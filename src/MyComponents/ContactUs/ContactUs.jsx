@@ -67,7 +67,7 @@ export default function ContactPage() {
               {/* Phone Card */}
               <div className="bg-brand-dark rounded-xl p-6 text-center shadow-lg border border-gray-100">
                 <div className="w-24 h-16 mx-auto mb-4 flex items-center justify-center gap-3">
-                  <Image src="/images/WhatsApp.svg" alt="WhatsApp icon" width={32} height={32} />
+                  <Image src="/images/Whatsapp.svg" alt="WhatsApp icon" width={32} height={32} />
                   <Image src="/images/Call.svg" alt="Call icon" width={32} height={32} />
                 </div>
                 <h3 className={`text-lg font-bold text-brand-primary mb-3 ${locale === "ar" ? "font-noto" : ""}`}>
