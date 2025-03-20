@@ -155,13 +155,13 @@ export default function AboutUs() {
             {[
               {
                 city: locale === "ar" ? t.riyadh : t.riyadh,
-                image: "/images/location-Area.JPG",
+                image: "/images/location-Area.jpg",
                 description: locale === "ar" ? t.riyadhDesc : t.riyadhDesc,
                 locations: locale === "ar" ? t.riyadhLocations : t.riyadhLocations,
               },
               {
                 city: locale === "ar" ? t.arar : t.arar,
-                image: "/images/location-Area.JPG",
+                image: "/images/location-Area.jpg",
                 description: locale === "ar" ? t.ararDesc : t.ararDesc,
                 locations: locale === "ar" ? t.ararLocations : t.ararLocations,
               },
@@ -293,25 +293,25 @@ export default function AboutUs() {
               {
                 source: "Economic Times",
                 title: "Young Saudi drives demand for luxury cars",
-                image: "/images/about-main-image.JPG",
+                image: "/images/about-main-image.jpg",
                 link: "#",
               },
               {
                 source: "Arab News",
                 title: "Alromaih's largest automobile experiential hub in Riyadh",
-                image: "/images/about-main-image.JPG",
+                image: "/images/about-main-image.jpg",
                 link: "#",
               },
               {
                 source: "Saudi Gazette",
                 title: "Full-stack concept explained with benefits",
-                image: "/images/about-main-image.JPG",
+                image: "/images/about-main-image.jpg",
                 link: "#",
               },
               {
                 source: "Gulf Business",
                 title: "Women continue to drive the demand for luxury cars",
-                image: "/images/about-main-image.JPG",
+                image: "/images/about-main-image.jpg",
                 link: "#",
               },
             ].map((article, index) => (
