@@ -28,7 +28,7 @@ export default function Footer() {
               <div
                 className={`flex ${locale === "ar" ? "justify-center lg:justify-start" : "justify-center lg:justify-start"} mb-6`}
               >
-                <Image src="/images/logo.PNG" alt="Alromaih Cars" width={180} height={60} className="h-auto" />
+                <Image src="/images/logo.png" alt="Alromaih Cars" width={180} height={60} className="h-auto" />
               </div>
               <p
                 className={`text-gray-600 text-sm ${
@@ -222,10 +222,10 @@ export default function Footer() {
               </p>
               <div className="flex gap-3">
                 <Link href="#" className="transition-transform hover:scale-105">
-                  <Image src="/images/GooglePlay.PNG" alt="Google Play" width={135} height={40} className="h-auto" />
+                  <Image src="/images/GooglePlay.png" alt="Google Play" width={135} height={40} className="h-auto" />
                 </Link>
                 <Link href="#" className="transition-transform hover:scale-105">
-                  <Image src="/images/AppStore.PNG" alt="App Store" width={135} height={40} className="h-auto" />
+                  <Image src="/images/AppStore.png" alt="App Store" width={135} height={40} className="h-auto" />
                 </Link>
               </div>
             </div>
@@ -241,9 +241,9 @@ export default function Footer() {
           >
             {/* Payment Methods */}
             <div className="flex gap-6 items-center order-2 md:order-1">
-              <Image src="/images/Visa.PNG" alt="Visa" width={45} height={30} className="object-contain" />
-              <Image src="/images/MasterCard.PNG" alt="MasterCard" width={45} height={30} className="object-contain" />
-              <Image src="/images/Mada.PNG" alt="Mada" width={45} height={30} className="object-contain" />
+              <Image src="/images/Visa.png" alt="Visa" width={45} height={30} className="object-contain" />
+              <Image src="/images/MasterCard.png" alt="MasterCard" width={45} height={30} className="object-contain" />
+              <Image src="/images/Mada.png" alt="Mada" width={45} height={30} className="object-contain" />
             </div>
 
             {/* Terms and Copyright */}
@@ -269,8 +269,8 @@ export default function Footer() {
 
             {/* Certificates */}
             <div className="flex gap-4 order-3">
-              <Image src="/images/Maroof.PNG" alt="Maroof" width={35} height={35} className="object-contain" />
-              <Image src="/images/Vat.PNG" alt="VAT" width={35} height={35} className="object-contain" />
+              <Image src="/images/Maroof.png" alt="Maroof" width={35} height={35} className="object-contain" />
+              <Image src="/images/Vat.png" alt="VAT" width={35} height={35} className="object-contain" />
             </div>
           </div>
         </div>
