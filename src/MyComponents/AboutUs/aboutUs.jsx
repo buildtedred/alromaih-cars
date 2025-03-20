@@ -42,7 +42,7 @@ export default function AboutUs () {
       {/* Hero Section */}
       <section className="relative h-[80vh] overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop"
+          src="/images/main-car.jpg"
           alt="Luxury Car Showcase"
           fill
           className="object-cover brightness-75"

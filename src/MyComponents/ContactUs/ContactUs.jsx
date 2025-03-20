@@ -165,7 +165,7 @@ export default function ContactPage() {
 
       {/* Car Image */}
       <div className="w-full h-[547px] relative">
-        <Image src="/images/about-main-image.JPG" alt="Car showcase" fill className="object-cover object-center" />
+        <Image src="/images/main-car.jpg" alt="Car showcase" fill className="object-cover object-center" />
       </div>
     </main>
   )
