@@ -1,6 +1,20 @@
 "use client"
 
-import { Car, Settings, LayoutDashboard, ChevronDown, Users } from "lucide-react"
+import {
+  Car,
+  Settings,
+  LayoutDashboard,
+  ChevronDown,
+  Users,
+  Wrench,
+  Database,
+  BarChart,
+  Truck,
+  Gauge,
+  HelpCircle,
+  FileCode,
+  Sliders,
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -16,6 +30,9 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -27,6 +44,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import LogoutButton from "./logoutbutton/Logout"
 
 export function AppSidebar() {
@@ -34,6 +52,10 @@ export function AppSidebar() {
 
   const isActive = (path) => {
     return pathname === path
+  }
+
+  const isChildActive = (paths) => {
+    return paths.some((path) => pathname === path)
   }
 
   return (
@@ -60,6 +82,14 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive("/dashboard/analytics")}>
+                  <Link href="/dashboard/analytics">
+                    <BarChart className="h-4 w-4" />
+                    <span>Analytics</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -70,19 +100,192 @@ export function AppSidebar() {
           <SidebarGroupLabel>Car Management</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <Collapsible defaultOpen className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      isActive={isChildActive([
+                        "/dashboard/brands",
+                        "/dashboard/brands/new",
+                        "/dashboard/brands/popular",
+                      ])}
+                    >
+                      <Car className="h-4 w-4" />
+                      <span>Car Brands</span>
+                      <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/brands")}>
+                          <Link href="/dashboard/brands">All Brands</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        {/* <SidebarMenuSubButton asChild isActive={isActive("/dashboard/brands/new")}>
+                          <Link href="/dashboard/brands/new">Add New Brand</Link>
+                        </SidebarMenuSubButton> */}
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        {/* <SidebarMenuSubButton asChild isActive={isActive("/dashboard/brands/popular")}>
+                          <Link href="/dashboard/brands/popular">Popular Brands</Link>
+                        </SidebarMenuSubButton> */}
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              <Collapsible defaultOpen className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      isActive={isChildActive([
+                        "/dashboard/cars",
+                        "/dashboard/car-variations",
+                        // "/dashboard/cars/featured",
+                        // "/dashboard/cars/inventory",
+                      ])}
+                    >
+                      <Truck className="h-4 w-4" />
+                      <span>All Cars</span>
+                      <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/cars")}>
+                          <Link href="/dashboard/cars">Car Listings</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/car-variations")}>
+                          <Link href="/dashboard/car-variations">All Cars Variations</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        {/* <SidebarMenuSubButton asChild isActive={isActive("/dashboard/cars/featured")}>
+                          <Link href="/dashboard/cars/featured">Featured Cars</Link>
+                        </SidebarMenuSubButton> */}
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        {/* <SidebarMenuSubButton asChild isActive={isActive("/dashboard/cars/inventory")}>
+                          <Link href="/dashboard/cars/inventory">Inventory</Link>
+                        </SidebarMenuSubButton> */}
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActive("/dashboard/brands")}>
-                  <Link href="/dashboard/brands">
-                    <Car className="h-4 w-4" />
-                    <span>Car Brands</span>
+                <SidebarMenuButton asChild isActive={isActive("/dashboard/maintenance")}>
+                  <Link href="/dashboard/maintenance">
+                    <Wrench className="h-4 w-4" />
+                    <span>Maintenance</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActive("/dashboard/cars")}>
-                  <Link href="/dashboard/cars">
-                    <Car className="h-4 w-4" />
-                    <span>All Cars</span>
+                <SidebarMenuButton asChild isActive={isActive("/dashboard/parts")}>
+                  <Link href="/dashboard/parts">
+                    <Gauge className="h-4 w-4" />
+                    <span>Parts & Accessories</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Configuration</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <Collapsible className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      isActive={isChildActive([
+                        "/dashboard/config/general",
+                        "/dashboard/config/appearance",
+                        "/dashboard/config/notifications",
+                      ])}
+                    >
+                      <Sliders className="h-4 w-4" />
+                      <span>System Settings</span>
+                      <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/config/general")}>
+                          <Link href="/dashboard/config/general">General</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/config/appearance")}>
+                          <Link href="/dashboard/config/appearance">Appearance</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/config/notifications")}>
+                          <Link href="/dashboard/config/notifications">Notifications</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              <Collapsible className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      isActive={isChildActive([
+                        "/dashboard/config/database",
+                        "/dashboard/config/backups",
+                        "/dashboard/config/logs",
+                      ])}
+                    >
+                      <Database className="h-4 w-4" />
+                      <span>Data Management</span>
+                      <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/config/database")}>
+                          <Link href="/dashboard/config/database">Database</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/config/backups")}>
+                          <Link href="/dashboard/config/backups">Backups</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/config/logs")}>
+                          <Link href="/dashboard/config/logs">System Logs</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive("/dashboard/config/api")}>
+                  <Link href="/dashboard/config/api">
+                    <FileCode className="h-4 w-4" />
+                    <span>API Settings</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -115,6 +318,24 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Help & Support</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive("/dashboard/help")}>
+                  <Link href="/dashboard/help">
+                    <HelpCircle className="h-4 w-4" />
+                    <span>Documentation</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="p-4">
@@ -138,10 +359,8 @@ export function AppSidebar() {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              
-              <LogoutButton/>
-              
-              </DropdownMenuItem>
+              <LogoutButton />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarFooter>

@@ -10,12 +10,15 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export async function GET(request, { params }) {
   try {
     const { id } = params;
-    console.log("🔍 Fetching car with ID:", id);
+    // console.log("🔍 Fetching car with ID:", id);
 
     const car = await prisma.allCar.findUnique({
       where: { id: id },
-      include: { brand: true }, // Include related brand details
-      include: { variations: true }, // ✅ Include variations
+      include: {
+        brand: true, // ✅ Include brand details
+        // variations: true, // ✅ Include variations
+        otherVariations: true, // ✅ Include variations
+      }
     });
 
     if (!car) {
