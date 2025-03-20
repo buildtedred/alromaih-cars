@@ -28,7 +28,7 @@ export default function Footer() {
               <div
                 className={`flex ${locale === "ar" ? "justify-center lg:justify-start" : "justify-center lg:justify-start"} mb-6`}
               >
-                <Image src="/images/logo.png" alt="Alromaih Cars" width={180} height={60} className="h-auto" />
+                <Image src="/images/Logo.png" alt="Alromaih Cars" width={180} height={60} className="h-auto" />
               </div>
               <p
                 className={`text-gray-600 text-sm ${
