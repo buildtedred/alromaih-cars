@@ -495,7 +495,7 @@ export default function CarDetail({ id }) {
                           </Button>
                           <Button variant="outline" size="sm" asChild>
                             <Link
-                              href={`/dashboard/cars/new/EditVariationForm?id=${variation.id}`}
+                              href={`/dashboard/cars/new/EditVariationForm?id${variation.id}`}
                             >
                              Edit
                             </Link>
