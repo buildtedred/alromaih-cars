@@ -52,7 +52,7 @@ export default {
 			primary: "#46194F",
 			light: "#EDE8EE",
 			dark: "#C6AECC",
-			DEFAULT: "#71308A", // Added for compatibility with car-buying-interface
+			DEFAULT: "#46194F", // Added for compatibility with car-buying-interface
 		  },
 		  sidebar: {
 			DEFAULT: "hsl(var(--sidebar-background))",

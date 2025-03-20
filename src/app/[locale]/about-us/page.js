@@ -87,7 +87,7 @@ export default function Home() {
       <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto p-3 sm:p-4 mt-6 sm:mt-8 rounded-xl mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-[90%] mx-auto">
           {/* Map Location Card */}
-          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
+          <div className="bg-brand-light rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
             <div
               className={`flex ${locale === "ar" ? "justify-between" : "flex-row-reverse justify-between"} items-center h-full`}
             >
@@ -114,7 +114,7 @@ export default function Home() {
           </div>
 
           {/* Handshake Card */}
-          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden">
+          <div className="bg-brand-light rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden">
             <div className="flex flex-col h-full justify-between pb-2 sm:pb-4">
               <div className="pt-8 sm:pt-10 md:pt-12 text-center px-3 sm:px-4">
                 <h3
@@ -161,7 +161,7 @@ export default function Home() {
           </div>
 
           {/* Steering Wheel Card */}
-          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden">
+          <div className="bg-brand-light rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden">
             <div className="flex flex-col h-full">
               <div className="pt-8 sm:pt-10 md:pt-12 text-center px-3 sm:px-4 mb-2 sm:mb-4">
                 <h3
@@ -183,7 +183,7 @@ export default function Home() {
           </div>
 
           {/* Scale and Coins Card */}
-          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
+          <div className="bg-brand-light rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
             <div
               className={`flex ${locale === "ar" ? "justify-between" : "flex-row-reverse justify-between"} items-center h-full`}
             >
@@ -213,7 +213,7 @@ export default function Home() {
           </div>
 
           {/* Wrench Card */}
-          <div className="bg-[#EDE8EE] rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
+          <div className="bg-brand-light rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
             <div
               className={`flex ${locale === "ar" ? "justify-between" : "flex-row-reverse justify-between"} items-center h-full`}
             >
@@ -321,7 +321,7 @@ export default function Home() {
               >
                 {locale === "ar" ? "عرعر" : "Arar"}
               </div>
-              <div className="bg-[#EDE8EE]/90 backdrop-blur-sm rounded-lg overflow-hidden h-[86px]">
+              <div className="bg-brand-light/90 backdrop-blur-sm rounded-lg overflow-hidden h-[86px]">
                 <div className={`flex ${locale === "ar" ? "flex-row-reverse" : "flex-row"} items-center gap-3 h-full`}>
                   <div className={`w-24 h-16 relative ${locale === "ar" ? "mr-3" : "ml-3"}`}>
                     <Image
@@ -365,7 +365,7 @@ export default function Home() {
               >
                 {locale === "ar" ? "الرياض" : "Riyadh"}
               </div>
-              <div className="bg-[#EDE8EE]/90 backdrop-blur-sm rounded-lg overflow-hidden h-[86px]">
+              <div className="bg-brand-light/90 backdrop-blur-sm rounded-lg overflow-hidden h-[86px]">
                 <div className={`flex ${locale === "ar" ? "flex-row-reverse" : "flex-row"} items-center gap-3 h-full`}>
                   <div className={`w-24 h-16 relative ${locale === "ar" ? "mr-3" : "ml-3"}`}>
                     <Image
