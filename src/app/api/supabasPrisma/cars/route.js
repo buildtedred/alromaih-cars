@@ -12,7 +12,8 @@ export async function GET() {
     const cars = await prisma.allCar.findMany({
       include: {
         brand: true, // ✅ Include brand details
-        variations: true, // ✅ Include variations
+        // variations: true, // ✅ Include variations
+        otherVariations: true, // ✅ Include variations
       },
     });
 
@@ -32,30 +33,22 @@ export async function POST(request) {
   try {
     console.log("🔹 API HIT: Received POST request");
 
-    const { model, year, brandId, images, specifications, variations } =
+    const { model, year, brandId, images, specifications } =
       await request.json();
-      console.log("data received from variation", variations);
+
     if (
       !model ||
       !year ||
       !brandId ||
       !images ||
-      !specifications ||
-      !variations
+      !specifications
     ) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
       );
     }
-        // ✅ Ensure variations are correctly formatted
-        const formattedVariations = variations.map((v) => ({
-          name: v.name || "Default Name",
-          colorName: v.colorName || "Unknown",
-          colorHex: v.colorHex || "#000000",
-          images: v.images || [],
-          price: parseFloat(v.price) || 0,
-        }));
+
 
     const newCar = await prisma.allCar.create({
       data: {
@@ -64,9 +57,6 @@ export async function POST(request) {
         brandId,
         images,
         spacification: specifications, // ✅ Storing Specifications as JSON
-        variations: {
-          create: formattedVariations, // ✅ Properly create related variations
-        },
       },
     });
 

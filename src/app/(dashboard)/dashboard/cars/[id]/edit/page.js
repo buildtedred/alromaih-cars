@@ -198,60 +198,60 @@ export default function EditCarPage() {
   /////////////////////////////////// save the specifications/////////////////////
   ///////////////////////////////////////// save the VARIATION STRAT/////////////////////
   // ✅ Handle Adding a New Variation
-  const addVariation = () => {
-    setVariations([
-      ...variations,
-      { name: "", colorName: "", colorHex: "", images: [], price: "" },
-    ]);
-  };
+  // const addVariation = () => {
+  //   setVariations([
+  //     ...variations,
+  //     { name: "", colorName: "", colorHex: "", images: [], price: "" },
+  //   ]);
+  // };
 
-  // ✅ Handle Updating a Variation Field
-  const updateVariation = (index, field, value) => {
-    const updatedVariations = [...variations];
-    updatedVariations[index][field] = value;
-    setVariations(updatedVariations);
-  };
+  // // ✅ Handle Updating a Variation Field
+  // const updateVariation = (index, field, value) => {
+  //   const updatedVariations = [...variations];
+  //   updatedVariations[index][field] = value;
+  //   setVariations(updatedVariations);
+  // };
 
-  // ✅ Handle Image Upload for Variation
-  const uploadVariationImage = async (variationIndex, file) => {
-    if (!file) return;
+  // // ✅ Handle Image Upload for Variation
+  // const uploadVariationImage = async (variationIndex, file) => {
+  //   if (!file) return;
 
-    const fileName = `cars/${Date.now()}-${file.name}`;
-    const { data, error } = await supabase.storage
-      .from("Alromaih")
-      .upload(fileName, file);
+  //   const fileName = `cars/${Date.now()}-${file.name}`;
+  //   const { data, error } = await supabase.storage
+  //     .from("Alromaih")
+  //     .upload(fileName, file);
 
-    if (error) {
-      console.error("Upload error:", error.message);
-      alert("Failed to upload image");
-      return;
-    }
+  //   if (error) {
+  //     console.error("Upload error:", error.message);
+  //     alert("Failed to upload image");
+  //     return;
+  //   }
 
-    const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${fileName}`;
-    const updatedVariations = [...variations];
-    updatedVariations[variationIndex].images = [
-      ...updatedVariations[variationIndex].images,
-      imageUrl,
-    ];
-    setVariations(updatedVariations);
-  };
+  //   const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${fileName}`;
+  //   const updatedVariations = [...variations];
+  //   updatedVariations[variationIndex].images = [
+  //     ...updatedVariations[variationIndex].images,
+  //     imageUrl,
+  //   ];
+  //   setVariations(updatedVariations);
+  // };
 
-  // ✅ Handle Removing a Variation Image
-  const removeVariationImage = async (variationIndex, imageIndex) => {
-    const updatedVariations = [...variations];
-    const fileName = updatedVariations[variationIndex].images[imageIndex]
-      .split("/")
-      .pop();
+  // // ✅ Handle Removing a Variation Image
+  // const removeVariationImage = async (variationIndex, imageIndex) => {
+  //   const updatedVariations = [...variations];
+  //   const fileName = updatedVariations[variationIndex].images[imageIndex]
+  //     .split("/")
+  //     .pop();
 
-    await supabase.storage.from("Alromaih").remove([fileName]);
-    updatedVariations[variationIndex].images.splice(imageIndex, 1);
-    setVariations(updatedVariations);
-  };
+  //   await supabase.storage.from("Alromaih").remove([fileName]);
+  //   updatedVariations[variationIndex].images.splice(imageIndex, 1);
+  //   setVariations(updatedVariations);
+  // };
 
-  // ✅ Handle Removing a Variation
-  const removeVariation = (index) => {
-    setVariations(variations.filter((_, i) => i !== index));
-  };
+  // // ✅ Handle Removing a Variation
+  // const removeVariation = (index) => {
+  //   setVariations(variations.filter((_, i) => i !== index));
+  // };
 
   ///////////////////////////////////////// save the VARIATION end/////////////////////
   // Handle form submission
@@ -314,7 +314,7 @@ export default function EditCarPage() {
       setTimeout(() => {
         router.push("/dashboard/cars");
         router.refresh();
-      }, 1000);
+      }, 0);
     } catch (error) {
       console.error("❌ Error updating car:", error);
       setError(error.response?.data?.error || "Failed to update car");
@@ -409,14 +409,14 @@ export default function EditCarPage() {
             {/* //////////////////////////////////  spacification end ////////////////// */}
 
             {/* //////////////////////////////////  variation start ////////////////// */}
-            <EditVariations
+            {/* <EditVariations
               variations={variations}
               updateVariation={updateVariation}
               addVariation={addVariation}
               removeVariation={removeVariation}
               uploadVariationImage={uploadVariationImage}
               removeVariationImage={removeVariationImage}
-            />
+            /> */}
             {/* //////////////////////////////////  variation end ////////////////// */}
           </CardContent>
 

@@ -99,6 +99,7 @@ export default function MultipleImages({
                             <>
                               <Button
                                 size="icon"
+                                type="button"
                                 variant="outline"
                                 className="h-8 w-8 rounded-full"
                                 onClick={() => uploadImage(img, index)}
@@ -108,6 +109,7 @@ export default function MultipleImages({
                                 <span className="sr-only">Upload</span>
                               </Button>
                               <Button
+                                type="button"
                                 size="icon"
                                 variant="outline"
                                 className="h-8 w-8 rounded-full"

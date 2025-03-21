@@ -47,7 +47,6 @@ export default function AddCarForm() {
   const [brands, setBrands] = useState([]);
   const [images, setImages] = useState([]); // Multiple images
   const [specifications, setSpecifications] = useState([]); // ✅ Dynamic specifications
-  const [variations, setVariations] = useState([]); // ✅ Store variations
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(null);
@@ -167,72 +166,72 @@ export default function AddCarForm() {
 
   /////////////////////////////////////////////////////// spacifications end/////////////////////////
   ////////////////////////////////////////////////// variation section start //////////////////
-  // ✅ Add a new variation
-  const addVariation = () => {
-    setVariations([
-      ...variations,
-      { name: "", colorName: "", colorHex: "", images: [], price: "" },
-    ]);
-  };
+  // // ✅ Add a new variation
+  // const addVariation = () => {
+  //   setVariations([
+  //     ...variations,
+  //     { name: "", colorName: "", colorHex: "", images: [], price: "" },
+  //   ]);
+  // };
 
-  // ✅ Handle Variation Change
-  const handleVariationChange = (index, field, value) => {
-    const updatedVariations = [...variations];
-    updatedVariations[index][field] = value;
-    setVariations(updatedVariations);
-  };
+  // // ✅ Handle Variation Change
+  // const handleVariationChange = (index, field, value) => {
+  //   const updatedVariations = [...variations];
+  //   updatedVariations[index][field] = value;
+  //   setVariations(updatedVariations);
+  // };
 
-  // ✅ Upload Image to Supabase
-  const uploadvariationImage = async (variationIndex, file) => {
-    if (!file) return;
+  // // ✅ Upload Image to Supabase
+  // const uploadvariationImage = async (variationIndex, file) => {
+  //   if (!file) return;
 
-    setLoading(true);
-    const fileName = `cars/${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage
-      .from("Alromaih")
-      .upload(fileName, file);
+  //   setLoading(true);
+  //   const fileName = `cars/${Date.now()}_${file.name}`;
+  //   const { error } = await supabase.storage
+  //     .from("Alromaih")
+  //     .upload(fileName, file);
 
-    if (error) {
-      console.error("Upload error:", error);
-      alert("Failed to upload image");
-      setLoading(false);
-      return;
-    }
+  //   if (error) {
+  //     console.error("Upload error:", error);
+  //     alert("Failed to upload image");
+  //     setLoading(false);
+  //     return;
+  //   }
 
-    const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${fileName}`;
-    const updatedVariations = [...variations];
-    updatedVariations[variationIndex].images.push({
-      url: imageUrl,
-      name: fileName,
-    });
-    setVariations(updatedVariations);
-    setLoading(false);
-  };
+  //   const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${fileName}`;
+  //   const updatedVariations = [...variations];
+  //   updatedVariations[variationIndex].images.push({
+  //     url: imageUrl,
+  //     name: fileName,
+  //   });
+  //   setVariations(updatedVariations);
+  //   setLoading(false);
+  // };
 
-  // ✅ Remove Image from Supabase & State
-  const removeImage = async (variationIndex, imageIndex, fileName) => {
-    setLoading(true);
-    const { error } = await supabase.storage
-      .from("Alromaih")
-      .remove([fileName]);
+  // // ✅ Remove Image from Supabase & State
+  // const removeImage = async (variationIndex, imageIndex, fileName) => {
+  //   setLoading(true);
+  //   const { error } = await supabase.storage
+  //     .from("Alromaih")
+  //     .remove([fileName]);
 
-    if (error) {
-      console.error("Delete error:", error);
-      alert("Failed to delete image");
-    } else {
-      const updatedVariations = [...variations];
-      updatedVariations[variationIndex].images = updatedVariations[
-        variationIndex
-      ].images.filter((_, i) => i !== imageIndex);
-      setVariations(updatedVariations);
-    }
-    setLoading(false);
-  };
+  //   if (error) {
+  //     console.error("Delete error:", error);
+  //     alert("Failed to delete image");
+  //   } else {
+  //     const updatedVariations = [...variations];
+  //     updatedVariations[variationIndex].images = updatedVariations[
+  //       variationIndex
+  //     ].images.filter((_, i) => i !== imageIndex);
+  //     setVariations(updatedVariations);
+  //   }
+  //   setLoading(false);
+  // };
 
-  // ✅ Remove a Variation
-  const removeVariation = (index) => {
-    setVariations(variations.filter((_, i) => i !== index));
-  };
+  // // ✅ Remove a Variation
+  // const removeVariation = (index) => {
+  //   setVariations(variations.filter((_, i) => i !== index));
+  // };
 
   ////////////////////////////////////////////////// variation section end //////////////////
   // Handle form submission
@@ -260,13 +259,7 @@ export default function AddCarForm() {
         brandId,
         images: images.map((img) => img.url), // Corrected mapping syntax
         specifications, // ✅ Send Dynamic Specifications
-        variations: variations.map((v) => ({
-          name: v.name,
-          colorName: v.colorName,
-          colorHex: v.colorHex,
-          images: v.images.map((img) => img.url),
-          price: v.price,
-        })),
+      
       });
 
       if (response.status !== 201) {
@@ -369,14 +362,14 @@ export default function AddCarForm() {
             </Select>
             {/* ///////////////////////////////////// variation section start ////////////////// */}
 
-            <AddVariations
+            {/* <AddVariations
               variations={variations}
               handleVariationChange={handleVariationChange}
               addVariation={addVariation}
               removeVariation={removeVariation}
               uploadvariationImage={uploadvariationImage}
               removeImage={removeImage}
-            />
+            /> */}
             {/* ///////////////////////////////////// variation section end ////////////////// */}
           </CardContent>
           <CardFooter>

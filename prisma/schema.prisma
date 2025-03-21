@@ -31,6 +31,7 @@ model AllCar {
   brandId       String
   brand         CarBrand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
   variations    Variation[] // ✅ Relation with Variations
+  otherVariations OtherVariation[] // ✅ Relation with Other Variations
 }
 
 model Variation {
@@ -42,6 +43,17 @@ model Variation {
   colorHex  String // ✅ Color HEX Code (e.g., "#FF0000")
   images    String[] // ✅ Store multiple images
   price     Float // ✅ Price for this variation
+}
+
+model OtherVariation {
+  id        String   @id @default(uuid())
+  carId     String   
+  car       AllCar   @relation(fields: [carId], references: [id], onDelete: Cascade)
+  name      String   
+  colorName String   
+  colorHex  String   
+  images    String[] 
+  price     Float    
 }
 
 // model AllCar {
