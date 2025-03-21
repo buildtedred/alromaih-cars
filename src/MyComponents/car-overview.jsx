@@ -28,11 +28,11 @@ const scrollbarStyles = `
     border-radius: 10px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #71308a;
+    background: var(--primary);
     border-radius: 10px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #5f2873;
+    background: var(--primary-dark);
   }
 
   /* Custom dialog styles */
@@ -65,19 +65,19 @@ const CarOverview = ({ carDetails }) => {
   const overviewData = [
     [
       {
-        icon: <Calendar className="w-5 h-5 text-[#71308A]" />,
+        icon: <Calendar className="w-5 h-5 text-brand-primary" />,
         label: "Manufacturing Year",
         labelAr: "سنة الصنع",
         value: "2025",
       },
       {
-        icon: <GaugeCircle className="w-5 h-5 text-[#71308A]" />,
+        icon: <GaugeCircle className="w-5 h-5 text-brand-primary" />,
         label: "Torque",
         labelAr: "عزم الدوران",
         value: "390 newton",
       },
       {
-        icon: <Gauge className="w-5 h-5 text-[#71308A]" />,
+        icon: <Gauge className="w-5 h-5 text-brand-primary" />,
         label: "Power",
         labelAr: "القوة",
         value: "251 hp",
@@ -85,19 +85,19 @@ const CarOverview = ({ carDetails }) => {
     ],
     [
       {
-        icon: <Fuel className="w-5 h-5 text-[#71308A]" />,
+        icon: <Fuel className="w-5 h-5 text-brand-primary" />,
         label: "Fuel Tank Capacity",
         labelAr: "سعة خزان الوقود",
         value: "60 liters",
       },
       {
-        icon: <Car className="w-5 h-5 text-[#71308A]" />,
+        icon: <Car className="w-5 h-5 text-brand-primary" />,
         label: "Manufactured",
         labelAr: "الشركة المصنعة",
         value: "Jetour",
       },
       {
-        icon: <Gauge className="w-5 h-5 text-[#71308A]" />,
+        icon: <Gauge className="w-5 h-5 text-brand-primary" />,
         label: "Power",
         labelAr: "القوة",
         value: "251 hp",
@@ -105,19 +105,19 @@ const CarOverview = ({ carDetails }) => {
     ],
     [
       {
-        icon: <Settings className="w-5 h-5 text-[#71308A]" />,
+        icon: <Settings className="w-5 h-5 text-brand-primary" />,
         label: "Engine Type",
         labelAr: "نوع المحرك",
         value: "Benzene",
       },
       {
-        icon: <Wrench className="w-5 h-5 text-[#71308A]" />,
+        icon: <Wrench className="w-5 h-5 text-brand-primary" />,
         label: "Transmission",
         labelAr: "ناقل الحركة",
         value: "Automatic",
       },
       {
-        icon: <Users className="w-5 h-5 text-[#71308A]" />,
+        icon: <Users className="w-5 h-5 text-brand-primary" />,
         label: "Seating Capacity",
         labelAr: "سعة المقاعد",
         value: "5",
@@ -125,13 +125,13 @@ const CarOverview = ({ carDetails }) => {
     ],
     [
       {
-        icon: <Shield className="w-5 h-5 text-[#71308A]" />,
+        icon: <Shield className="w-5 h-5 text-brand-primary" />,
         label: "Condition",
         labelAr: "الحالة",
         value: "New",
       },
       {
-        icon: <Fuel className="w-5 h-5 text-[#71308A]" />,
+        icon: <Fuel className="w-5 h-5 text-brand-primary" />,
         label: "Fuel Consumption",
         labelAr: "استهلاك الوقود",
         value: "14.8 km/l",
@@ -290,7 +290,7 @@ const CarOverview = ({ carDetails }) => {
         },
         {
           label: "Seat Material",
-          labelAr: "مادة المق��عد",
+          labelAr: "مادة المقاعد",
           value: "Premium leather",
           valueAr: "جلد فاخر",
         },
@@ -364,7 +364,7 @@ const CarOverview = ({ carDetails }) => {
       {/* Car Information Section */}
       <div className="bg-white rounded-[20px] border border-gray-200 overflow-hidden">
         <div className="p-4">
-          <h2 className="text-xl font-semibold text-[#71308A] mb-4">
+          <h2 className={`text-xl font-semibold text-brand-primary mb-4 ${!isEnglish ? "text-right" : ""}`}>
             {isEnglish ? "Car Information" : "معلومات السيارة"}
           </h2>
           <div className="divide-y divide-gray-200">
@@ -373,9 +373,11 @@ const CarOverview = ({ carDetails }) => {
                 {row.map((item, index) => (
                   <div key={index} className="flex items-center gap-3 justify-start">
                     <div className="flex-shrink-0">{item.icon}</div>
-                    <div className="text-left">
+                    <div className={`${!isEnglish ? "text-right" : "text-left"}`}>
                       <div className="text-sm text-gray-500">{isEnglish ? item.label : item.labelAr}</div>
-                      <div className="font-semibold text-[#71308A]">{item.value}</div>
+                      <div className="font-semibold text-brand-primary">
+                        {isEnglish ? item.value : item.valueAr || item.value}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -388,7 +390,7 @@ const CarOverview = ({ carDetails }) => {
       {/* Car Specifications Section */}
       <div className="bg-white rounded-[20px] border border-gray-200 overflow-hidden">
         <div className="p-4">
-          <h2 className="text-xl font-semibold text-[#71308A] mb-4">
+          <h2 className={`text-xl font-semibold text-brand-primary mb-4 ${!isEnglish ? "text-right" : ""}`}>
             {isEnglish ? "Car Specifications" : "صفات السيارة"}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -397,12 +399,14 @@ const CarOverview = ({ carDetails }) => {
                 key={category.id}
                 onClick={() => handleCategoryClick(category)}
                 className={`flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                  selectedCategory?.id === category.id && showSpecDialog ? "bg-purple-50" : ""
+                  selectedCategory?.id === category.id && showSpecDialog ? "bg-brand-light" : ""
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-[#71308A]">{category.icon}</span>
-                  <span className="font-medium">{isEnglish ? category.title : category.titleAr}</span>
+                  <span className="text-brand-primary">{category.icon}</span>
+                  <span className={`font-medium ${!isEnglish ? "text-right" : ""}`}>
+                    {isEnglish ? category.title : category.titleAr}
+                  </span>
                 </div>
                 {isEnglish ? (
                   <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -431,7 +435,7 @@ const CarOverview = ({ carDetails }) => {
                 {/* Left side - Categories Menu */}
                 <div className="w-1/3 border-r flex flex-col h-[70vh]">
                   <div className="p-4 bg-white border-b">
-                    <h3 className="text-lg font-semibold text-[#71308A] pr-8">
+                    <h3 className={`text-lg font-semibold text-brand-primary pr-8 ${!isEnglish ? "text-right" : ""}`}>
                       {isEnglish ? "Car Specifications" : "صفات السيارة"}
                     </h3>
                   </div>
@@ -440,21 +444,21 @@ const CarOverview = ({ carDetails }) => {
                       <button
                         key={category.id}
                         onMouseEnter={() => setSelectedCategory(category)}
-                        className={`w-full flex items-center gap-2 p-4 text-left hover:bg-gray-50 transition-colors ${
-                          selectedCategory?.id === category.id ? "bg-purple-100" : ""
+                        className={`w-full flex items-center gap-2 p-4 hover:bg-gray-50 transition-colors ${
+                          selectedCategory?.id === category.id ? "bg-brand-light" : ""
                         }`}
                       >
-                        <span className="text-[#71308A]">{category.icon}</span>
-                        <span className="flex-1 text-sm font-medium">
+                        <span className="text-brand-primary">{category.icon}</span>
+                        <span className={`flex-1 text-sm font-medium ${!isEnglish ? "text-right" : "text-left"}`}>
                           {isEnglish ? category.title : category.titleAr}
                         </span>
                         {isEnglish ? (
                           <ChevronRight
-                            className={`w-4 h-4 text-gray-400 ${selectedCategory?.id === category.id ? "text-[#71308A]" : ""}`}
+                            className={`w-4 h-4 text-gray-400 ${selectedCategory?.id === category.id ? "text-brand-primary" : ""}`}
                           />
                         ) : (
                           <ChevronLeft
-                            className={`w-4 h-4 text-gray-400 ${selectedCategory?.id === category.id ? "text-[#71308A]" : ""}`}
+                            className={`w-4 h-4 text-gray-400 ${selectedCategory?.id === category.id ? "text-brand-primary" : ""}`}
                           />
                         )}
                       </button>
@@ -466,9 +470,11 @@ const CarOverview = ({ carDetails }) => {
                 <div className="flex-1 p-6 h-[70vh] overflow-y-auto custom-scrollbar">
                   {selectedCategory && (
                     <>
-                      <h3 className="text-lg font-semibold text-[#71308A] mb-6 flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-brand-primary mb-6 flex items-center gap-2">
                         {selectedCategory.icon}
-                        <span>{isEnglish ? selectedCategory.title : selectedCategory.titleAr}</span>
+                        <span className={`${!isEnglish ? "text-right" : ""}`}>
+                          {isEnglish ? selectedCategory.title : selectedCategory.titleAr}
+                        </span>
                       </h3>
                       <div className="space-y-4">
                         {selectedCategory.details.map((detail, index) => (
@@ -477,7 +483,7 @@ const CarOverview = ({ carDetails }) => {
                               <span className="text-gray-600 max-w-[45%]">
                                 {isEnglish ? detail.label : detail.labelAr}
                               </span>
-                              <span className="font-medium text-[#71308A] text-right max-w-[45%] break-words">
+                              <span className="font-medium text-brand-primary text-right max-w-[45%] break-words">
                                 {isEnglish ? detail.value : detail.valueAr}
                               </span>
                             </div>
