@@ -36,78 +36,79 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     const { id } = params;
-    const { model, year, brandId, images, specifications, variations } =
-      await request.json();
+    const body = await request.json();
+    console.log("🔹 API HIT: Received PUT request", body);
 
-    // ✅ Validate required fields
-    if (
-      !model ||
-      !year ||
-      !brandId ||
-      !images ||
-      !specifications ||
-      !variations
-    ) {
+    // Validate required fields
+    if (!body.model || !body.brandId) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Model and Brand ID are required" },
         { status: 400 }
       );
     }
 
-    // ✅ Convert `year` to integer
-    const parsedYear = parseInt(year, 10);
-    if (isNaN(parsedYear)) {
-      return NextResponse.json(
-        { error: "Year must be a valid number" },
-        { status: 400 }
-      );
-    }
-
-    // ✅ Check if the car exists
+    // Check if the car exists
     const existingCar = await prisma.allCar.findUnique({ where: { id } });
-    if (!existingCar)
+    if (!existingCar) {
       return NextResponse.json({ error: "Car not found" }, { status: 404 });
+    }
 
-        // ✅ Format Variations Properly
-        const formattedVariations = variations.map((v) => ({
-          id: v.id || undefined, // ✅ Preserve existing ID if available
-          name: v.name || "Default Name",
-          colorName: v.colorName || "Unknown",
-          colorHex: v.colorHex || "#000000",
-          images: v.images || [],
-          price: parseFloat(v.price) || 0,
-          carId: id, // ✅ Ensure each variation is linked to the car
-        }));
-    // ✅ Update Car Data
+    // Update Car Data
     const updatedCar = await prisma.allCar.update({
       where: { id },
       data: {
-        model,
-        year: parsedYear,
-        brandId,
-        images,
-        spacification: specifications,
+        model: body.model,
+        year: body.year ? parseInt(body.year) : null,
+        brandId: body.brandId,
+        description: body.description || null,
+        price: body.price ? parseFloat(body.price) : null,
+        color: body.color || null,
+        condition: body.condition || null,
+        bodyType: body.bodyType || null,
+        mileage: body.mileage ? parseInt(body.mileage) : null,
+        fuelType: body.fuelType || null,
+        fuelTankCapacity: body.fuelTankCapacity || null,
+        transmission: body.transmission || null,
+        engineSize: body.engineSize ? parseFloat(body.engineSize) : null,
+        horsepower: body.horsepower ? parseInt(body.horsepower) : null,
+        torque: body.torque ? parseInt(body.torque) : null,
+        wheelDrive: body.wheelDrive || null,
+        topSpeed: body.topSpeed ? parseInt(body.topSpeed) : null,
+        acceleration: body.acceleration ? parseFloat(body.acceleration) : null,
+        fuelEconomy: body.fuelEconomy ? parseFloat(body.fuelEconomy) : null,
+        seats: body.seats ? parseInt(body.seats) : null,
+        doors: body.doors ? parseInt(body.doors) : null,
+        infotainment: body.infotainment || null,
+        gps: body.gps || null,
+        sunroof: body.sunroof || null,
+        parkingSensors: body.parkingSensors || null,
+        cruiseControl: body.cruiseControl || null,
+        leatherSeats: body.leatherSeats || null,
+        heatedSeats: body.heatedSeats || null,
+        bluetooth: body.bluetooth || null,
+        climateControl: body.climateControl || null,
+        keylessEntry: body.keylessEntry || null,
+        rearCamera: body.rearCamera || null,
+        manufactured: body.manufactured || null,
+        safetyRating: body.safetyRating || null,
+        warranty: body.warranty || null,
+        registration: body.registration || null,
+        ownerCount: body.ownerCount ? parseInt(body.ownerCount) : null,
+        insuranceStatus: body.insuranceStatus || null,
+        taxValidity: body.taxValidity && !isNaN(new Date(body.taxValidity).getTime()) ? new Date(body.taxValidity) : null,
+        images: body.images || [],
+        spacification: body.specifications || {},
       },
     });
-
-    // ✅ Update Variations Using Transactions
-        // ✅ Update Variations Using Transactions
-        await prisma.$transaction(
-          formattedVariations.map((v) =>
-            prisma.variation.upsert({
-              where: { id: v.id || "" }, // ✅ Update if exists, else create new
-              update: { name: v.name, colorName: v.colorName, colorHex: v.colorHex, images: v.images, price: v.price },
-              create: v,
-            })
-          )
-        );
 
     return NextResponse.json(
       { message: "Car updated successfully", updatedCar },
       { status: 200 }
     );
   } catch (error) {
-    console.error("❌ Error updating car:", error);
+    console.error("❌ Error updating car:", {
+      message: error.message,
+    });
     return NextResponse.json(
       { error: "Failed to update car", details: error.message },
       { status: 500 }

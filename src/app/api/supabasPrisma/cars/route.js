@@ -29,43 +29,76 @@ export async function GET() {
 
 
 // ✅ **POST: Add a New Car**
+
+
+
 export async function POST(request) {
   try {
-    console.log("🔹 API HIT: Received POST request");
+    const body = await request.json();
+    console.log("🔹 API HIT: Received POST request", body);
 
-    const { model, year, brandId, images, specifications } =
-      await request.json();
-
-    if (
-      !model ||
-      !year ||
-      !brandId ||
-      !images ||
-      !specifications
-    ) {
+    // Validate required fields
+    if (!body.model || !body.brandId) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Model and Brand ID are required" },
         { status: 400 }
       );
     }
 
-
+    // Create a new car entry in the database
     const newCar = await prisma.allCar.create({
       data: {
-        model,
-        year: parseInt(year),
-        brandId,
-        images,
-        spacification: specifications, // ✅ Storing Specifications as JSON
+        model: body.model,
+        year: body.year ? parseInt(body.year) : null,
+        brandId: body.brandId,
+        description: body.description || null,
+        price: body.price ? parseFloat(body.price) : null,
+        color: body.color || null,
+        condition: body.condition || null,
+        bodyType: body.bodyType || null,
+        mileage: body.mileage ? parseInt(body.mileage) : null,
+        fuelType: body.fuelType || null,
+        fuelTankCapacity: body.fuelTankCapacity || null,
+        transmission: body.transmission || null,
+        engineSize: body.engineSize ? parseFloat(body.engineSize) : null,
+        horsepower: body.horsepower ? parseInt(body.horsepower) : null,
+        torque: body.torque ? parseInt(body.torque) : null,
+        wheelDrive: body.wheelDrive || null,
+        topSpeed: body.topSpeed ? parseInt(body.topSpeed) : null,
+        acceleration: body.acceleration ? parseFloat(body.acceleration) : null,
+        fuelEconomy: body.fuelEconomy ? parseFloat(body.fuelEconomy) : null,
+        seats: body.seats ? parseInt(body.seats) : null,
+        doors: body.doors ? parseInt(body.doors) : null,
+        infotainment: body.infotainment || null,
+        gps: body.gps || null,
+        sunroof: body.sunroof || null,
+        parkingSensors: body.parkingSensors || null,
+        cruiseControl: body.cruiseControl || null,
+        leatherSeats: body.leatherSeats || null,
+        heatedSeats: body.heatedSeats || null,
+        bluetooth: body.bluetooth || null,
+        climateControl: body.climateControl || null,
+        keylessEntry: body.keylessEntry || null,
+        rearCamera: body.rearCamera || null,
+        manufactured: body.manufactured || null,
+        safetyRating: body.safetyRating || null,
+        warranty: body.warranty || null,
+        registration: body.registration || null,
+        ownerCount: body.ownerCount ? parseInt(body.ownerCount) : null,
+        insuranceStatus: body.insuranceStatus || null,
+        taxValidity: body.taxValidity && !isNaN(new Date(body.taxValidity).getTime()) ? new Date(body.taxValidity) : null,
+        images: body.images || [],
+        spacification: body.specifications || {},
       },
     });
 
-  
     return NextResponse.json(newCar, { status: 201 });
   } catch (error) {
-    console.error("❌ Error creating car:", error);
+    console.error("❌ Error creating car:", {
+      message: error.message,
+    });
     return NextResponse.json(
-      { error: "Failed to create car" },
+      { error: "Failed to create car", details: error.message },
       { status: 500 }
     );
   }

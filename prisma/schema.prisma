@@ -23,15 +23,51 @@ model CarBrand {
 }
 
 model AllCar {
-  id            String      @id @default(uuid())
-  model         String
-  year          Int
-  images        String[] // Store additional image URLs
-  spacification Json // ✅ Dynamic Specifications Field
-  brandId       String
-  brand         CarBrand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  variations    Variation[] // ✅ Relation with Variations
-  otherVariations OtherVariation[] // ✅ Relation with Other Variations
+  id               String           @id @default(uuid())
+  model            String
+  year             Int?
+  brandId          String
+  description      String?
+  price            Float?
+  color            String?
+  condition        String?
+  bodyType         String?
+  mileage          Int?
+  fuelType         String?
+  fuelTankCapacity String?
+  transmission     String?
+  engineSize       Float?
+  horsepower       Int?
+  torque           Int?
+  wheelDrive       String?
+  topSpeed         Int?
+  acceleration     Float?
+  fuelEconomy      Float?
+  seats            Int?
+  doors            Int?
+  infotainment     String?
+  gps              Boolean?
+  sunroof          Boolean?
+  parkingSensors   Boolean?
+  cruiseControl    Boolean?
+  leatherSeats     Boolean?
+  heatedSeats      Boolean?
+  bluetooth        Boolean?
+  climateControl   Boolean?
+  keylessEntry     Boolean?
+  rearCamera       Boolean?
+  manufactured     String?
+  safetyRating     String?
+  warranty         String?
+  registration     String?
+  ownerCount       Int?
+  insuranceStatus  String?
+  taxValidity      DateTime?
+  images           String[]         // Array of image URLs
+  spacification    Json?            // Dynamic specifications
+  brand            CarBrand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  variations       Variation[]      // Relation with Variations
+  otherVariations  OtherVariation[] // Relation with Other Variations
 }
 
 model Variation {
@@ -47,13 +83,13 @@ model Variation {
 
 model OtherVariation {
   id        String   @id @default(uuid())
-  carId     String   
+  carId     String
   car       AllCar   @relation(fields: [carId], references: [id], onDelete: Cascade)
-  name      String   
-  colorName String   
-  colorHex  String   
-  images    String[] 
-  price     Float    
+  name      String
+  colorName String
+  colorHex  String
+  images    String[]
+  price     Float
 }
 
 // model AllCar {
