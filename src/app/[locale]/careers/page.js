@@ -9,6 +9,8 @@ export default function CareersPage() {
 
   // Set to null to track which category is selected for the form
   const [activeCategory, setActiveCategory] = useState(null)
+  // Track which button is clicked for visual styling
+  const [clickedCategory, setClickedCategory] = useState(null)
 
   const [selectedFile, setSelectedFile] = useState(null)
   const fileInputRef = useRef(null)
@@ -30,8 +32,17 @@ export default function CareersPage() {
     marketing: locale === "ar" ? "مصمم جرافيك" : "Graphic Designer",
   }
 
+  // Active styles for each category
+  const categoryActiveStyles = {
+    marketing: "bg-brand-primary text-white",
+    sales: "bg-[#71308A] text-white",
+    accounting: "bg-[#5A2670] text-white",
+    other: "bg-[#8B44A5] text-white",
+  }
+
   const handleCategoryClick = (category) => {
     setActiveCategory(category)
+    setClickedCategory(category)
   }
 
   const handleInputChange = (e) => {
@@ -121,6 +132,66 @@ export default function CareersPage() {
       setIsSubmitting(false)
     }
   }
+
+  // Team members data with both Arabic and English support
+  const teamMembers = [
+    {
+      id: 1,
+      nameAr: "أحمد الرميح",
+      nameEn: "Ahmed Al Rumaih",
+      titleAr: "الرئيس مجلس الإدارة",
+      titleEn: "Chairman of the Board",
+      image: "/images/main-car.jpg",
+    },
+    {
+      id: 2,
+      nameAr: "سيد يحي",
+      nameEn: "Sayed Yahya",
+      titleAr: "الرئيس",
+      titleEn: "President",
+      image: "/images/team-member.jpg",
+    },
+    {
+      id: 3,
+      nameAr: "أحمد الرميح",
+      nameEn: "Ahmed Al Rumaih",
+      titleAr: "الرئيس مجلس الإدارة",
+      titleEn: "Chairman of the Board",
+      image: "/images/main-car.jpg",
+    },
+    {
+      id: 4,
+      nameAr: "أحمد الرميح",
+      nameEn: "Ahmed Al Rumaih",
+      titleAr: "الرئيس مجلس الإدارة",
+      titleEn: "Chairman of the Board",
+      image: "/images/main-car.jpg",
+    },
+    {
+      id: 5,
+      nameAr: "أحمد الرميح",
+      nameEn: "Ahmed Al Rumaih",
+      titleAr: "الرئيس مجلس الإدارة",
+      titleEn: "Chairman of the Board",
+      image: "/images/main-car.jpg",
+    },
+    {
+      id: 6,
+      nameAr: "أحمد الرميح",
+      nameEn: "Ahmed Al Rumaih",
+      titleAr: "الرئيس مجلس الإدارة",
+      titleEn: "Chairman of the Board",
+      image: "/images/main-car.jpg",
+    },
+    {
+      id: 7,
+      nameAr: "أحمد الرميح",
+      nameEn: "Ahmed Al Rumaih",
+      titleAr: "الرئيس مجلس الإدارة",
+      titleEn: "Chairman of the Board",
+      image: "/images/main-car.jpg",
+    },
+  ]
 
   return (
     <main className="min-h-screen bg-white">
@@ -313,32 +384,38 @@ export default function CareersPage() {
 
             {/* Job Categories */}
             <div className="flex flex-wrap justify-center gap-4 mb-8">
-              {Object.keys(jobTitles).map((category) => (
-                <button
-                  key={category}
-                  onClick={() => handleCategoryClick(category)}
-                  className={`px-8 py-3 rounded-[5px] font-medium ${
-                    activeCategory === category
-                      ? "bg-brand-primary text-white"
-                      : "bg-white text-brand-primary border border-brand-primary"
-                  } ${locale === "ar" ? "font-noto" : ""}`}
-                >
-                  {locale === "ar"
-                    ? {
-                        other: "أخرى",
-                        sales: "المبيعات",
-                        accounting: "المحاسبة",
-                        marketing: "التسويق",
-                      }[category]
-                    : category.charAt(0).toUpperCase() + category.slice(1)}
-                </button>
-              ))}
+              {Object.keys(jobTitles).map((category) => {
+                // All buttons use their active styles by default
+                // If a button is clicked, only that button stays active
+                const buttonStyle =
+                  clickedCategory === null || clickedCategory === category
+                    ? categoryActiveStyles[category]
+                    : "bg-white text-brand-primary border border-brand-primary"
+
+                return (
+                  <button
+                    key={category}
+                    onClick={() => handleCategoryClick(category)}
+                    className={`px-8 py-3 rounded-[5px] font-medium ${buttonStyle} ${locale === "ar" ? "font-noto" : ""} transition-all duration-200 hover:shadow-md`}
+                  >
+                    {locale === "ar"
+                      ? {
+                          other: "أخرى",
+                          sales: "المبيعات",
+                          accounting: "المحاسبة",
+                          marketing: "التسويق",
+                        }[category]
+                      : category.charAt(0).toUpperCase() + category.slice(1)}
+                  </button>
+                )
+              })}
             </div>
 
-            {/* Job Application Form */}
-            <div className="bg-[#F0E6F3] rounded-[10px] p-8 max-w-4xl mx-auto">
-              <div className={`flex flex-col ${locale === "ar" ? "items-end" : "items-start"} mb-6`}>
-                <h3 className={`text-2xl font-bold text-brand-primary mb-1 ${locale === "ar" ? "font-noto" : ""}`}>
+            {/* Job Application Form - Enhanced Premium Design */}
+            <div className="bg-white rounded-[15px] p-8 max-w-4xl mx-auto shadow-xl border border-brand-primary/10">
+              {/* Update the job selection header section to ensure proper right alignment */}
+              <div className={`w-full ${locale === "ar" ? "text-right" : "text-left"} mb-8`}>
+                <h3 className={`text-2xl font-bold text-brand-primary mb-2 ${locale === "ar" ? "font-noto" : ""}`}>
                   {activeCategory ? jobTitles[activeCategory] : locale === "ar" ? "اختر وظيفة" : "Select a job"}
                 </h3>
                 <p className={`text-gray-600 ${locale === "ar" ? "font-noto" : ""}`}>
@@ -359,130 +436,75 @@ export default function CareersPage() {
 
               {/* Success Message */}
               {submitSuccess && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-[5px] mb-4 relative">
-                  <span className={`block sm:inline ${locale === "ar" ? "font-noto text-right" : ""}`}>
-                    {locale === "ar"
-                      ? "تم تقديم طلبك بنجاح! سنتواصل معك قريبًا."
-                      : "Your application has been submitted successfully! We will contact you soon."}
-                  </span>
+                <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-md mb-6 relative">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className={`text-sm ${locale === "ar" ? "font-noto text-right" : ""}`}>
+                        {locale === "ar"
+                          ? "تم تقديم طلبك بنجاح! سنتواصل معك قريبًا."
+                          : "Your application has been submitted successfully! We will contact you soon."}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
               {/* Error Message */}
               {submitError && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-[5px] mb-4 relative">
-                  <span className={`block sm:inline ${locale === "ar" ? "font-noto text-right" : ""}`}>
-                    {submitError}
-                  </span>
+                <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6 relative">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className={`text-sm ${locale === "ar" ? "font-noto text-right" : ""}`}>{submitError}</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              <form className="space-y-4" onSubmit={handleSubmit}>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Update the input fields to add more space between icons and text */}
                 {/* Name Field */}
-                <div className="flex items-center bg-brand-dark rounded-[5px] p-3">
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder={locale === "ar" ? "الاسم" : "Name"}
-                    className={`bg-transparent border-none outline-none w-full placeholder-brand-primary/70 text-brand-primary ${
-                      locale === "ar" ? "text-right font-noto placeholder:font-noto" : ""
-                    }`}
-                    style={{
-                      WebkitBoxShadow: "0 0 0 1000px var(--brand-dark) inset",
-                      WebkitTextFillColor: "var(--brand-primary)",
-                    }}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-brand-primary"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                <div className="relative">
+                  <label
+                    className={`block text-sm font-medium text-brand-primary mb-1 ${locale === "ar" ? "font-noto text-right" : ""}`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                </div>
-
-                {/* Phone Field */}
-                <div className="flex items-center bg-brand-dark rounded-[5px] p-3">
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder={locale === "ar" ? "رقم الهاتف" : "Phone Number"}
-                    className={`bg-transparent border-none outline-none w-full placeholder-brand-primary/70 text-brand-primary ${
-                      locale === "ar" ? "text-right font-noto placeholder:font-noto" : ""
-                    }`}
-                    style={{
-                      WebkitBoxShadow: "0 0 0 1000px var(--brand-dark) inset",
-                      WebkitTextFillColor: "var(--brand-primary)",
-                    }}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-brand-primary"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    {locale === "ar" ? "الاسم" : "Name"}
+                  </label>
+                  <div
+                    className={`flex ${locale === "ar" ? "flex-row-reverse" : ""} items-center bg-brand-light/50 rounded-[5px] p-3 border border-brand-primary/20 focus-within:border-brand-primary focus-within:ring-1 focus-within:ring-brand-primary transition-all duration-200`}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder={locale === "ar" ? "أدخل اسمك الكامل" : "Enter your full name"}
+                      className={`bg-transparent border-none outline-none w-full placeholder-gray-500 text-gray-700 ${
+                        locale === "ar"
+                          ? "text-right font-noto placeholder:text-right placeholder:font-noto pr-0 pl-4"
+                          : "pr-4"
+                      }`}
                     />
-                  </svg>
-                </div>
-
-                {/* Email Field */}
-                <div className="flex items-center bg-brand-dark rounded-[5px] p-3">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder={locale === "ar" ? "بريد الكتروني" : "Email"}
-                    className={`bg-transparent border-none outline-none w-full placeholder-brand-primary/70 text-brand-primary ${
-                      locale === "ar" ? "text-right font-noto placeholder:font-noto" : ""
-                    }`}
-                    style={{
-                      WebkitBoxShadow: "0 0 0 1000px var(--brand-dark) inset",
-                      WebkitTextFillColor: "var(--brand-primary)",
-                    }}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-brand-primary"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-
-                {/* Resume Upload */}
-                <div
-                  className="flex items-center justify-between bg-brand-dark rounded-[5px] p-3 cursor-pointer"
-                  onClick={handleUploadClick}
-                >
-                  <div className={`flex items-center gap-2 ${locale === "ar" ? "order-2" : "order-1"}`}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 text-brand-primary"
+                      className={`h-5 w-5 text-brand-primary ${locale === "ar" ? "ml-2" : "mr-2"}`}
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -491,38 +513,176 @@ export default function CareersPage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                       />
                     </svg>
-                    <span className={`text-sm text-brand-primary ${locale === "ar" ? "font-noto" : ""}`}>
-                      {selectedFile ? selectedFile.name : locale === "ar" ? "تحميل السيرة الذاتية" : "Upload Resume"}
-                    </span>
-                    {!selectedFile && <span className="text-xs text-gray-500">DOC, DOCX, PDF (5MB)</span>}
                   </div>
-                  <span
-                    className={`text-brand-primary font-medium ${locale === "ar" ? "order-1 font-noto" : "order-2"}`}
+                </div>
+
+                {/* Phone Field */}
+                <div className="relative">
+                  <label
+                    className={`block text-sm font-medium text-brand-primary mb-1 ${locale === "ar" ? "font-noto text-right" : ""}`}
+                  >
+                    {locale === "ar" ? "رقم الهاتف" : "Phone Number"}
+                  </label>
+                  <div
+                    className={`flex ${locale === "ar" ? "flex-row-reverse" : ""} items-center bg-brand-light/50 rounded-[5px] p-3 border border-brand-primary/20 focus-within:border-brand-primary focus-within:ring-1 focus-within:ring-brand-primary transition-all duration-200`}
+                  >
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder={locale === "ar" ? "أدخل رقم هاتفك" : "Enter your phone number"}
+                      className={`bg-transparent border-none outline-none w-full placeholder-gray-500 text-gray-700 ${
+                        locale === "ar"
+                          ? "text-right font-noto placeholder:text-right placeholder:font-noto pr-0 pl-4"
+                          : "pr-4"
+                      }`}
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`h-5 w-5 text-brand-primary ${locale === "ar" ? "ml-2" : "mr-2"}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Email Field */}
+                <div className="relative">
+                  <label
+                    className={`block text-sm font-medium text-brand-primary mb-1 ${locale === "ar" ? "font-noto text-right" : ""}`}
+                  >
+                    {locale === "ar" ? "البريد الإلكتروني" : "Email"}
+                  </label>
+                  <div
+                    className={`flex ${locale === "ar" ? "flex-row-reverse" : ""} items-center bg-brand-light/50 rounded-[5px] p-3 border border-brand-primary/20 focus-within:border-brand-primary focus-within:ring-1 focus-within:ring-brand-primary transition-all duration-200`}
+                  >
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder={locale === "ar" ? "أدخل بريدك الإلكتروني" : "Enter your email address"}
+                      className={`bg-transparent border-none outline-none w-full placeholder-gray-500 text-gray-700 ${
+                        locale === "ar"
+                          ? "text-right font-noto placeholder:text-right placeholder:font-noto pr-0 pl-4"
+                          : "pr-4"
+                      }`}
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`h-5 w-5 text-brand-primary ${locale === "ar" ? "ml-2" : "mr-2"}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                      \
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Resume Upload */}
+                <div className="relative">
+                  <label
+                    className={`block text-sm font-medium text-brand-primary mb-1 ${locale === "ar" ? "font-noto text-right" : ""}`}
                   >
                     {locale === "ar" ? "السيرة الذاتية" : "Resume"}
-                  </span>
+                  </label>
+                  <div
+                    className={`flex ${locale === "ar" ? "flex-row-reverse" : ""} items-center justify-between bg-brand-light/50 rounded-[5px] p-3 border border-brand-primary/20 hover:border-brand-primary cursor-pointer transition-all duration-200`}
+                    onClick={handleUploadClick}
+                  >
+                    <div className={`flex items-center gap-3 ${locale === "ar" ? "flex-row-reverse" : ""}`}>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-brand-primary"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                        />
+                      </svg>
+                      <span className={`text-sm text-gray-700 ${locale === "ar" ? "font-noto text-right" : ""}`}>
+                        {selectedFile ? selectedFile.name : locale === "ar" ? "تحميل السيرة الذاتية" : "Upload Resume"}
+                      </span>
+                      {!selectedFile && <span className="text-xs text-gray-500">DOC, DOCX, PDF (5MB)</span>}
+                    </div>
+                    <span className={`text-brand-primary font-medium ${locale === "ar" ? "font-noto" : ""}`}>
+                      {selectedFile ? (
+                        <span
+                          className={`text-green-600 flex items-center ${locale === "ar" ? "flex-row-reverse" : ""}`}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-5 w-5 ${locale === "ar" ? "ml-2" : "mr-2"}`}
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          {locale === "ar" ? "تم التحميل" : "Uploaded"}
+                        </span>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </span>
 
-                  {/* Hidden file input */}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".doc,.docx,.pdf"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
+                    {/* Hidden file input */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".doc,.docx,.pdf"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                  </div>
                 </div>
 
                 {/* Submit Button */}
-                <div className={`flex ${locale === "ar" ? "justify-end" : "justify-start"} mt-6`}>
+                <div className={`flex ${locale === "ar" ? "justify-end" : "justify-start"} mt-8`}>
                   <button
                     type="submit"
                     disabled={isSubmitting || !activeCategory}
-                    className={`bg-brand-primary text-white px-8 py-3 rounded-[5px] hover:bg-brand-primary transition-colors relative ${
+                    className={`bg-brand-primary text-white px-8 py-3 rounded-[5px] hover:bg-brand-dark transition-colors relative shadow-lg ${
                       locale === "ar" ? "font-noto" : ""
-                    } ${isSubmitting || !activeCategory ? "opacity-80 cursor-not-allowed" : ""}`}
+                    } ${isSubmitting || !activeCategory ? "opacity-70 cursor-not-allowed" : "hover:shadow-xl"}`}
                   >
                     {isSubmitting ? (
                       <>
@@ -563,15 +723,333 @@ export default function CareersPage() {
         </div>
       </div>
 
-      {/* Add this style to override autofill background */}
+      {/* Team Section - Updated to match the exact design with centered content */}
+      <div className="bg-white py-16">
+        <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto">
+          <div className={`${locale === "ar" ? "rtl" : ""}`}>
+            {/* Section Title */}
+            <div className={`text-${locale === "ar" ? "right" : "left"} mb-8`}>
+              <h2
+                className={`text-4xl sm:text-5xl font-bold text-brand-primary mb-4 ${locale === "ar" ? "font-noto" : ""}`}
+              >
+                {locale === "ar" ? "الوظائف الشاغرة" : "Vacant Jobs"}
+              </h2>
+              <p className={`text-gray-600 ${locale === "ar" ? "font-noto" : ""}`}>
+                {locale === "ar"
+                  ? "استكشف فرص العمل المتاحة وانضم إلى فريقنا اليوم"
+                  : "Explore available job opportunities and join our team today"}
+              </p>
+            </div>
+
+            {/* Team Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {locale === "ar" ? (
+                // Arabic layout - About Us card on the right (fourth position in RTL)
+                <>
+                  {/* Team Member Cards - First 3 */}
+                  {teamMembers.slice(0, 3).map((member) => (
+                    <div key={member.id} className="flex flex-col items-center">
+                      <div className="bg-gray-100 rounded-xl w-full aspect-square relative mb-2 overflow-hidden">
+                        <Image
+                          src={member.image || "/placeholder.svg"}
+                          alt={member.nameAr}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <button className="bg-white border border-gray-300 rounded-full px-8 py-2 text-brand-primary font-noto">
+                          {member.nameAr}
+                        </button>
+                        <p className="text-sm text-gray-600 font-noto mt-1">{member.titleAr}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* About Us Card - Purple with social icons */}
+                  <div className="bg-brand-primary rounded-xl p-6 text-white flex flex-col justify-between">
+                    <div className="flex justify-center gap-4 mb-6">
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                        </svg>
+                      </a>
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                      </a>
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <path d="M15 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 0v3m-7 4h14m-7-7v7"></path>
+                        </svg>
+                      </a>
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path>
+                          <path d="m10 15 5-3-5-3z"></path>
+                        </svg>
+                      </a>
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                      </a>
+                    </div>
+
+                    <div className="text-center">
+                      <p className="text-sm font-noto leading-relaxed mb-8">
+                        نحن شركة متميزة نقدم خدمة متميزة لعملائنا. تأسسنا في الرياض وبدأنا العمل في عام 2024 ولدينا
+                        الاستعداد للتطوير المستمر. نسعى دائماً لتقديم أفضل خدمة ترضي عملائنا.
+                      </p>
+                    </div>
+
+                    {/* About Us Button */}
+                    <div className="flex justify-center">
+                      <button className="bg-white text-brand-primary px-8 py-2 rounded-full text-sm font-medium font-noto">
+                        من نحن
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Remaining team members */}
+                  {teamMembers.slice(3, 7).map((member) => (
+                    <div key={member.id} className="flex flex-col items-center">
+                      <div className="bg-gray-100 rounded-xl w-full aspect-square relative mb-2 overflow-hidden">
+                        <Image
+                          src={member.image || "/placeholder.svg"}
+                          alt={member.nameAr}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <button className="bg-white border border-gray-300 rounded-full px-8 py-2 text-brand-primary font-noto">
+                          {member.nameAr}
+                        </button>
+                        <p className="text-sm text-gray-600 font-noto mt-1">{member.titleAr}</p>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                // English layout - About Us card on the left (first in LTR)
+                <>
+                  {/* About Us Card - Purple with social icons */}
+                  <div className="bg-brand-primary rounded-xl p-6 text-white flex flex-col justify-between">
+                    <div className="flex justify-center gap-4 mb-6">
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                        </svg>
+                      </a>
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                      </a>
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <path d="M15 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 0v3m-7 4h14m-7-7v7"></path>
+                        </svg>
+                      </a>
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path>
+                          <path d="m10 15 5-3-5-3z"></path>
+                        </svg>
+                      </a>
+                      <a href="#" className="text-white hover:text-gray-200 transition-colors">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-5 h-5"
+                        >
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                      </a>
+                    </div>
+
+                    <div className="text-center">
+                      <p className="text-sm leading-relaxed mb-8">
+                        We are a distinguished company providing excellent service to our customers. Founded in Riyadh,
+                        we started operations in 2024 and are committed to continuous development. We always strive to
+                        provide the best service that satisfies our customers.
+                      </p>
+                    </div>
+
+                    {/* About Us Button */}
+                    <div className="flex justify-center">
+                      <button className="bg-white text-brand-primary px-8 py-2 rounded-full text-sm font-medium">
+                        About Us
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* First 3 team members */}
+                  {teamMembers.slice(0, 3).map((member) => (
+                    <div key={member.id} className="flex flex-col items-center">
+                      <div className="bg-gray-100 rounded-xl w-full aspect-square relative mb-2 overflow-hidden">
+                        <Image
+                          src={member.image || "/placeholder.svg"}
+                          alt={member.nameEn}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <button className="bg-white border border-gray-300 rounded-full px-8 py-2 text-brand-primary">
+                          {member.nameEn}
+                        </button>
+                        <p className="text-sm text-gray-600 mt-1">{member.titleEn}</p>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Remaining team members */}
+                  {teamMembers.slice(3, 7).map((member) => (
+                    <div key={member.id} className="flex flex-col items-center">
+                      <div className="bg-gray-100 rounded-xl w-full aspect-square relative mb-2 overflow-hidden">
+                        <Image
+                          src={member.image || "/placeholder.svg"}
+                          alt={member.nameEn}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <button className="bg-white border border-gray-300 rounded-full px-8 py-2 text-brand-primary">
+                          {member.nameEn}
+                        </button>
+                        <p className="text-sm text-gray-600 mt-1">{member.titleEn}</p>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Remove the WebkitBoxShadow style to fix the input background issue */}
       <style jsx global>{`
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus,
         input:-webkit-autofill:active {
-          -webkit-box-shadow: 0 0 0 1000px var(--brand-dark) inset !important;
-          -webkit-text-fill-color: var(--brand-primary) !important;
           transition: background-color 5000s ease-in-out 0s;
+          -webkit-text-fill-color: #333 !important;
         }
       `}</style>
     </main>

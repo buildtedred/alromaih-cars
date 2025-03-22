@@ -12,7 +12,7 @@ export default function ContactPage() {
       {/* Split Background Container */}
       <div className="relative">
         {/* Top Purple Background */}
-        <div className="bg-brand-light h-[400px]">
+        <div className="bg-[#F8F2F8] h-[400px]">
           <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto pt-20 sm:pt-24 md:pt-28">
             <div className="text-center mb-12">
               <h1
@@ -35,8 +35,8 @@ export default function ContactPage() {
         <div className="absolute left-0 right-0 top-[320px]">
           <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto px-4">
-              {/* Working Hours Card */}
-              <div className="bg-brand-light rounded-xl p-6 text-center shadow-lg border border-gray-100">
+              {/* Working Hours Card - Changed to white background with primary shadow */}
+              <div className="bg-white rounded-xl p-6 text-center shadow-lg border border-gray-100 transition-all duration-300 hover:bg-brand-light/50">
                 <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <Image src="/images/Clock.svg" alt="Clock icon" width={32} height={32} />
                 </div>
@@ -48,8 +48,8 @@ export default function ContactPage() {
                 </p>
               </div>
 
-              {/* Email Card */}
-              <div className="bg-brand-light rounded-xl p-6 text-center shadow-lg border border-gray-100">
+              {/* Email Card - Changed to white background with primary shadow */}
+              <div className="bg-white rounded-xl p-6 text-center shadow-lg border border-gray-100 transition-all duration-300 hover:bg-brand-light/50">
                 <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <Image src="/images/Email.svg" alt="Email icon" width={32} height={32} />
                 </div>
@@ -64,10 +64,10 @@ export default function ContactPage() {
                 </a>
               </div>
 
-              {/* Phone Card */}
-              <div className="bg-brand-dark rounded-xl p-6 text-center shadow-lg border border-gray-100">
+              {/* Phone Card - Changed to white background with primary shadow */}
+              <div className="bg-white rounded-xl p-6 text-center shadow-lg border border-gray-100 transition-all duration-300 hover:bg-brand-light/50">
                 <div className="w-24 h-16 mx-auto mb-4 flex items-center justify-center gap-3">
-                  <Image src="/images/Whatsapp.svg" alt="WhatsApp icon" width={32} height={32} />
+                  <Image src="/images/WhatsApp.svg" alt="WhatsApp icon" width={32} height={32} />
                   <Image src="/images/Call.svg" alt="Call icon" width={32} height={32} />
                 </div>
                 <h3 className={`text-lg font-bold text-brand-primary mb-3 ${locale === "ar" ? "font-noto" : ""}`}>
@@ -106,7 +106,7 @@ export default function ContactPage() {
                 {/* Location Cards */}
                 <div className="absolute bottom-4 left-4 right-4 flex flex-col md:flex-row gap-4">
                   {/* Arar Location */}
-                  <div className="bg-brand-dark/90 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 w-full md:w-auto shadow-md">
+                  <div className="bg-[#C6AECC]/90 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 w-full md:w-auto shadow-md">
                     <div className="w-24 h-16 relative overflow-hidden" style={{ borderRadius: "3px" }}>
                       <Image src="/images/location-Area.JPG" alt="Arar showroom" fill className="object-cover" />
                     </div>
@@ -119,7 +119,7 @@ export default function ContactPage() {
                   </div>
 
                   {/* Riyadh Location */}
-                  <div className="bg-brand-dark/90 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 w-full md:w-auto shadow-md">
+                  <div className="bg-[#C6AECC]/90 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 w-full md:w-auto shadow-md">
                     <div className="w-24 h-16 relative overflow-hidden" style={{ borderRadius: "3px" }}>
                       <Image src="/images/location-Area.JPG" alt="Riyadh showroom" fill className="object-cover" />
                     </div>
@@ -136,7 +136,7 @@ export default function ContactPage() {
 
             {/* Visit Us Section */}
             <div className="w-full lg:w-1/4 flex items-center">
-              <div className="bg-brand-light rounded-xl p-6 w-full shadow-lg border border-gray-100">
+              <div className="bg-[#F8F2F8] rounded-xl p-6 w-full shadow-lg border border-gray-100">
                 <div className="flex flex-col items-center gap-4 mb-6">
                   <Image src="/images/Visit-Us.svg" alt="Visit Us Icon" width={48} height={48} />
                   <h3 className={`text-2xl font-bold text-brand-primary ${locale === "ar" ? "font-noto" : ""}`}>
@@ -165,7 +165,7 @@ export default function ContactPage() {
 
       {/* Car Image */}
       <div className="w-full h-[547px] relative">
-        <Image src="/images/main-car.jpg" alt="Car showcase" fill className="object-cover object-center" />
+        <Image src="/images/about-main-image.JPG" alt="Car showcase" fill className="object-cover object-center" />
       </div>
     </main>
   )
