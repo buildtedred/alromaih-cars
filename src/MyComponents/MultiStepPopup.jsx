@@ -1168,12 +1168,12 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     </div>
                                   </>
                                 )}
-                                <input
+                            <input
                                   type="radio"
                                   name="existingLoans"
                                   value="yes"
                                   checked={formData.existingLoans === "yes"}
-                                  onChange={handleInputChange}
+                              onChange={handleInputChange}
                                   className="sr-only"
                                   aria-label={isEnglish ? "Yes" : "نعم"}
                                 />
@@ -1242,16 +1242,16 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 <label className={`absolute top-0 ${isEnglish ? "left-0" : "right-0"} flex items-center text-gray-700 font-medium text-sm sm:text-base`}>
                                   <FileText className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"} text-[#46194F]`} />
                                   {isEnglish ? "Personal Obligation Amount" : "مبلغ الالتزام الشخصي"}
-                                </label>
-                                <input
+                            </label>
+                            <input
                                   type="number"
                                   name="personalLoanAmount"
                                   placeholder={isEnglish ? "Enter amount if applicable" : "أدخل المبلغ إذا كان متاحًا"}
                                   value={formData.personalLoanAmount}
-                                  onChange={handleInputChange}
+                              onChange={handleInputChange}
                                   className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} mt-6 sm:mt-8 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
-                                />
-                              </div>
+                            />
+                          </div>
                               
                               <div className="mb-3 sm:mb-6 relative">
                                 <label className={`absolute top-0 ${isEnglish ? "left-0" : "right-0"} flex items-center text-gray-700 font-medium text-sm sm:text-base`}>
@@ -1266,8 +1266,8 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                   onChange={handleInputChange}
                                   className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} mt-6 sm:mt-8 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
                                 />
-                              </div>
-                              
+                        </div>
+
                               {errors.loanDetails && (
                                 <p className={`text-red-500 text-xs ${isEnglish ? "text-left" : "text-right"}`}>{errors.loanDetails}</p>
                               )}
@@ -1363,12 +1363,12 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                           
                           <div className={`flex items-center ${isEnglish ? "justify-start" : "justify-end"} mb-8`}>
                             <div className="relative">
-                              <input
-                                id="hasWhatsapp"
-                                type="checkbox"
-                                name="hasWhatsapp"
-                                checked={formData.hasWhatsapp}
-                                onChange={handleInputChange}
+                            <input
+                              id="hasWhatsapp"
+                              type="checkbox"
+                              name="hasWhatsapp"
+                              checked={formData.hasWhatsapp}
+                              onChange={handleInputChange}
                                 className="sr-only"
                               />
                               <div 
@@ -1536,9 +1536,9 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                         }
                       </PDFDownloadLink>
                     </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
             )}
           </div>
         </div>
