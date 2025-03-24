@@ -75,7 +75,7 @@ if (!mounted) {
                 <img
                   src={`${mocData[0]?.avatar}`}
                   alt={"Logo"}
-                  className="h-8 md:h-12 w-auto"
+                  className="h-8 md:h-8 w-auto"
                 />
            }
               
