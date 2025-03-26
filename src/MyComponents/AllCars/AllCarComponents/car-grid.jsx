@@ -1,5 +1,4 @@
-import CarCardItem from "@/MyComponents/CarCard/CarCardItem"
-import { CarCard } from "./car-card"
+import CarCardItem from "@/MyComponents/Cards/car-listing"
 
 export function CarGrid({ cars, loading }) {
   if (!cars || cars.length === 0) {
@@ -10,12 +9,10 @@ export function CarGrid({ cars, loading }) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
       {cars.map((car) => (
         <div key={car.id}>
-          {/* <CarCard loading={loading}  car={car} /> */}
-          {/* below is main card */}
-          <CarCardItem car={car}/>
+          <CarCardItem car={car} />
         </div>
-  
       ))}
     </div>
   )
 }
+

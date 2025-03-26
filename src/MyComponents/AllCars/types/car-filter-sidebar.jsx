@@ -5,7 +5,6 @@ import { Search, ChevronDown } from "lucide-react"
 import { RangeSlider } from "../AllCarComponents/range-slider"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { SidebarSeparator } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
@@ -58,7 +57,7 @@ const translations = {
   },
 }
 
-function CarFilterSidebarComponent({ onFilterChange, carModels, filters, language = "en" }) {
+function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" }) {
   const [localFilters, setLocalFilters] = useState({
     priceRange: filters.priceRange || [0, 1000000],
     brands: filters.brands || {},
@@ -81,6 +80,36 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
   const t = translations[language]
   const isRTL = language === "ar"
 
+  const brandsData = useMemo(() => {
+    if (!carModels || carModels.length === 0) return []
+
+    const brands = {}
+    carModels.forEach((car) => {
+      const brandName = car.vehicle_brand_id?.name
+      if (!brandName) return
+
+      if (!brands[brandName]) {
+        brands[brandName] = {
+          id: car.vehicle_brand_id.id,
+          name: brandName,
+          models: [],
+        }
+      }
+
+      // Check if this model is already added
+      const modelExists = brands[brandName].models.some((model) => model.id === car.id)
+      if (!modelExists) {
+        brands[brandName].models.push({
+          id: car.id,
+          name: car.name,
+          slug: car.slug,
+        })
+      }
+    })
+
+    return Object.values(brands)
+  }, [carModels])
+
   const toggleBrand = useCallback((brandName) => {
     setExpandedBrands((prev) => (prev.includes(brandName) ? prev.filter((b) => b !== brandName) : [...prev, brandName]))
   }, [])
@@ -98,7 +127,7 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
         return { ...prev, brands: updatedBrands }
       })
     },
-    [], // Removed brandsData dependency
+    [brandsData],
   )
 
   const handleModelCheck = useCallback((brandName, modelName, checked) => {
@@ -179,7 +208,7 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
     return [...new Set(carModels.map((car) => car.vehicle_fuel_type_id?.name).filter(Boolean))]
   }, [carModels])
 
-  // Extract unique transmissions from car models - only from direct transmission property
+  // Extract unique transmissions from car models
   const transmissions = useMemo(() => {
     if (!carModels || carModels.length === 0) return []
     return [...new Set(carModels.map((car) => car.transmission).filter(Boolean))]
@@ -198,37 +227,6 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
     })
 
     return [...new Set(allSeats)].sort()
-  }, [carModels])
-
-  // Group cars by brand and model
-  const brandsData = useMemo(() => {
-    if (!carModels || carModels.length === 0) return []
-
-    const brands = {}
-    carModels.forEach((car) => {
-      const brandName = car.vehicle_brand_id?.name
-      if (!brandName) return
-
-      if (!brands[brandName]) {
-        brands[brandName] = {
-          id: car.vehicle_brand_id.id,
-          name: brandName,
-          models: [],
-        }
-      }
-
-      // Check if this model is already added
-      const modelExists = brands[brandName].models.some((model) => model.id === car.id)
-      if (!modelExists) {
-        brands[brandName].models.push({
-          id: car.id,
-          name: car.name,
-          slug: car.slug,
-        })
-      }
-    })
-
-    return Object.values(brands)
   }, [carModels])
 
   const isBrandChecked = useCallback(
@@ -319,8 +317,6 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
               </CollapsibleContent>
             </Collapsible>
 
-            <SidebarSeparator />
-
             {/* Brands Section */}
             <Collapsible open={openSections.brands} onOpenChange={() => toggleSection("brands")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
@@ -378,8 +374,6 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
               </CollapsibleContent>
             </Collapsible>
 
-            <SidebarSeparator />
-
             {/* Year Section */}
             <Collapsible open={openSections.year} onOpenChange={() => toggleSection("year")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
@@ -408,8 +402,6 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
               </CollapsibleContent>
             </Collapsible>
 
-            <SidebarSeparator />
-
             {/* Fuel Type Section */}
             <Collapsible open={openSections.fuelType} onOpenChange={() => toggleSection("fuelType")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
@@ -431,8 +423,6 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
                 </div>
               </CollapsibleContent>
             </Collapsible>
-
-            <SidebarSeparator />
 
             {/* Transmission Section */}
             <Collapsible open={openSections.transmission} onOpenChange={() => toggleSection("transmission")}>
@@ -459,8 +449,6 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
                 </div>
               </CollapsibleContent>
             </Collapsible>
-
-            <SidebarSeparator />
 
             {/* Seats Section */}
             <Collapsible open={openSections.seats} onOpenChange={() => toggleSection("seats")}>
@@ -512,5 +500,5 @@ function CarFilterSidebarComponent({ onFilterChange, carModels, filters, languag
   )
 }
 
-export default CarFilterSidebarComponent
+export default CarFilterSidebar
 
