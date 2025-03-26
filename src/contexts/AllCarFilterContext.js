@@ -18,7 +18,7 @@ export const CarProvider = ({ children }) => {
   const [sortOption, setSortOption] = useState("relevance");
   const [currentPage, setCurrentPage] = useState(1);
   const [carsPerPage] = useState(9);
-  console.log("sssssssssssssssssssss", cars);
+  // console.log("sssssssssssssssssssss", cars);
   useEffect(() => {
     const fetchCars = async () => {
       setLoading(true);

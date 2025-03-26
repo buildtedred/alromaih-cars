@@ -1,6 +1,5 @@
 "use client";
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
 
 // Create Context
 const SlidesContext = createContext();
@@ -11,33 +10,43 @@ export const SlidesProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data using Axios
+  // Fetch data using fetch()
   useEffect(() => {
     const fetchSlides = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("https://xn--mgbml9eg4a.com/api/custom_slides");
-        if (response.data && response.data.data) {
+        const response = await fetch("https://xn--mgbml9eg4a.com/api/custom_slides", {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data && data.data) {
           // Prevent unnecessary state updates if the data is the same
-          if (JSON.stringify(slides) !== JSON.stringify(response.data.data)) {
-            setSlides(response.data.data);
+          if (JSON.stringify(slides) !== JSON.stringify(data.data)) {
+            setSlides(data.data);
           }
         } else {
           setError("No slides found");
         }
-        // console.log("Slides data:", response);
-      } catch (error) {
-        setError(error.message);
+      } catch (err) {
+        setError(err.message || "Error fetching slides");
       } finally {
         setLoading(false);
       }
     };
 
-    // Call the fetch function if slides are not already set
+    // Call fetch function only if slides are not already set
     if (!slides.length) {
       fetchSlides();
     }
-  }, [slides.length]);  // Empty dependency array ensures this runs only once
+  }, [slides.length]);
 
   return (
     <SlidesContext.Provider value={{ slides, loading, error }}>

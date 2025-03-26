@@ -11,6 +11,80 @@ import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { Link } from "@/i18n/routing"
 
+// Minimal mock data with just 2 brands
+const mockBrands = {
+  data: [
+    {
+      id: 1,
+      name: {
+        en: {
+          name: "Toyota",
+          slug: "toyota"
+        }
+      },
+      image_url: "/brands/toyota.png",
+      car_models: [
+        {
+          id: 101,
+          name: {
+            en: {
+              name: "Camry 2023",
+              slug: "camry-2023",
+              condition: "Excellent",
+              transmission: "automatic"
+            }
+          },
+          image_url: "/cars/toyota-camry-2023.jpg",
+          price: 65,
+          year_of_manufacture: 2023,
+          seating_capacity: 5,
+          vehicle_fuel_types: [
+            {
+              fuel_type: {
+                en: "Petrol"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 2,
+      name: {
+        en: {
+          name: "Honda",
+          slug: "honda"
+        }
+      },
+      image_url: "/brands/honda.png",
+      car_models: [
+        {
+          id: 201,
+          name: {
+            en: {
+              name: "Civic 2023",
+              slug: "civic-2023",
+              condition: "Excellent",
+              transmission: "automatic"
+            }
+          },
+          image_url: "/cars/honda-civic-2023.jpg",
+          price: 60,
+          year_of_manufacture: 2023,
+          seating_capacity: 5,
+          vehicle_fuel_types: [
+            {
+              fuel_type: {
+                en: "Petrol"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
 export default function SearchComponent({ isVisible, onClose }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [brands, setBrands] = useState([])
@@ -20,7 +94,6 @@ export default function SearchComponent({ isVisible, onClose }) {
   const [expandedBrands, setExpandedBrands] = useState([])
   const [isMobile, setIsMobile] = useState(false)
   const [showCarDetails, setShowCarDetails] = useState(false)
-  const [issVisible, setIssVisible] = useState(true);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -30,23 +103,15 @@ export default function SearchComponent({ isVisible, onClose }) {
   }, [])
 
   useEffect(() => {
-    if (isVisible) fetchBrands()
-  }, [isVisible])
-
-  const fetchBrands = async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const response = await fetch("https://xn--mgbml9eg4a.com/api/brands")
-      if (!response.ok) throw new Error("Failed to fetch brands")
-      const data = await response.json()
-      setBrands(data.data)
-    } catch (err) {
-      setError("An error occurred while fetching data")
-    } finally {
-      setIsLoading(false)
+    if (isVisible) {
+      // Use mock data instead of API call
+      setIsLoading(true)
+      setTimeout(() => {
+        setBrands(mockBrands.data)
+        setIsLoading(false)
+      }, 500) // Simulate loading delay
     }
-  }
+  }, [isVisible])
 
   const filteredBrands = brands.filter(
     (brand) =>
@@ -75,33 +140,21 @@ export default function SearchComponent({ isVisible, onClose }) {
 
   const handleSearchClear = () => {
     setSearchQuery("")
-    // Do not change the view when clearing search on mobile
   }
 
   const renderCarDetails = (car) => (
     <div className="space-y-6">
-      <div className="relative w-full h-48 rounded-lg overflow-hidden">
-        <Image
-          src={`https://xn--mgbml9eg4a.com${car.image_url}`}
-          alt={car.name.en.name}
-          layout="fill"
-          objectFit="cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-3 left-3 right-3 text-white">
-          <h2 className="text-xl font-bold">{car.name.en.name}</h2>
-          <p className="text-sm opacity-90">{car.brandName}</p>
+      <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gray-200">
+        {/* Placeholder for image */}
+        <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+          Car Image
         </div>
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Image
-            src={`https://xn--mgbml9eg4a.com${car.brandLogo}`}
-            alt={car.brandName}
-            width={32}
-            height={32}
-            className="rounded-full"
-          />
+          <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+            Brand
+          </div>
           <div>
             <p className="font-semibold text-sm">{car.brandName}</p>
             <div className="flex items-center">
@@ -168,21 +221,18 @@ export default function SearchComponent({ isVisible, onClose }) {
           <ul className="text-xs space-y-1 list-disc list-inside">
             <li>Air Conditioning</li>
             <li>Bluetooth</li>
-            <li>Backup Camera</li>
             <li>Navigation</li>
-            <li>Keyless Entry</li>
           </ul>
         </TabsContent>
         <TabsContent value="reviews">
           <p className="text-xs text-gray-600">No reviews yet.</p>
         </TabsContent>
       </Tabs>
-        <Link href={`/car-details/${car.name.en.slug}`}>
+      <Link href={`/car-details/${car.name.en.slug}`}>
         <Button onClick={() => onClose()} className="border-4 w-full bg-brand-primary hover:bg-brand-dark text-white text-sm">
-        Show Details
+          Show Details
         </Button>
-        </Link>
-     
+      </Link>
     </div>
   )
 
@@ -200,8 +250,7 @@ export default function SearchComponent({ isVisible, onClose }) {
             initial={{ scale: 0.95, y: 10 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0, y: 10 }}
-            
-            transition={ { type: "spring", damping: 25, stiffness: 400 }}
+            transition={{ type: "spring", damping: 25, stiffness: 400 }}
             className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] md:max-h-[80vh] flex flex-col overflow-hidden"
           >
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
@@ -209,10 +258,7 @@ export default function SearchComponent({ isVisible, onClose }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => {
-                    setShowCarDetails(false)
-                    // Do not reset selectedCar when going back
-                  }}
+                  onClick={() => setShowCarDetails(false)}
                   className="mr-2"
                 >
                   <ArrowLeft className="h-5 w-5" />
@@ -233,7 +279,6 @@ export default function SearchComponent({ isVisible, onClose }) {
                   value={searchQuery}
                   onChange={handleSearchChange}
                   className="pl-9 pr-9 w-full bg-gray-100 border-transparent focus:ring-brand-primary focus:ring-0 text-sm"
-
                 />
                 {searchQuery && (
                   <button
@@ -258,7 +303,7 @@ export default function SearchComponent({ isVisible, onClose }) {
                     ) : error ? (
                       <div className="text-center text-red-500 p-4 bg-red-50 rounded-lg text-sm">
                         <p>{error}</p>
-                        <Button onClick={fetchBrands} className="mt-2 text-xs">
+                        <Button onClick={() => setBrands(mockBrands.data)} className="mt-2 text-xs">
                           Retry
                         </Button>
                       </div>
@@ -273,13 +318,9 @@ export default function SearchComponent({ isVisible, onClose }) {
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
-                                <Image
-                                  src={`https://xn--mgbml9eg4a.com${brand.image_url}`}
-                                  alt={brand.name.en.name}
-                                  width={40}
-                                  height={40}
-                                  className="rounded-full"
-                                />
+                                <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                  {brand.name.en.name.charAt(0)}
+                                </div>
                                 <div>
                                   <h3 className="font-semibold text-sm text-gray-900">{brand.name.en.name}</h3>
                                   <p className="text-xs text-gray-500">{brand.car_models.length} models</p>
@@ -346,4 +387,3 @@ export default function SearchComponent({ isVisible, onClose }) {
     </AnimatePresence>
   )
 }
-

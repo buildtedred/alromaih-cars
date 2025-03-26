@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect,useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Phone, Menu, X, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Nav from "./Nav"
@@ -8,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import LanguageToggle from "@/MyComponents/LanguageToggle"
 import SearchComponent from './search/SearchComponent';
 import { useOdoo } from "@/contexts/OdooContext"
-import  axios  from 'axios';
 
 const Header = () => {
   const { t } = useTranslation()
@@ -17,46 +16,42 @@ const Header = () => {
   const [mounted, setMounted] = useState(false)
   const { logo, loading } = useOdoo();
 
-  // console.log('object', logo)
-
-  // const { logos, loading, error } = useLogoContext()
-
   //////////////////////////////////////////// mode data for testing /////////////////////////////
 
-const [mocData, setmocData] = useState([]);
-const [loadingmocData, setloadingmocData] = useState(true);
+  const [mocData, setMocData] = useState([]);
+  const [loadingMocData, setLoadingMocData] = useState(true);
 
-console.log("logo api moc api:", mocData);
+  // console.log("logo api moc api:", mocData);
 
-const fetchsliderData = useCallback(async () => {
-  setloadingmocData(true); // Fix: Correct state setter
-  try {
-    const response = await axios.get("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/logo");
+  const fetchSliderData = useCallback(async () => {
+    setLoadingMocData(true);
+    try {
+      const response = await fetch("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/logo");
+      const data = await response.json();
+      setMocData(data);
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+    } finally {
+      setLoadingMocData(false);
+    }
+  }, []);
 
-    setmocData(response.data); // Fix: Access response.data
-  } catch (error) {
-    console.error("Error fetching brands:", error);
-  } finally {
-    setloadingmocData(false);
+  useEffect(() => {
+    fetchSliderData();
+  }, [fetchSliderData]);
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
+  const toggleSearch = () => setIsSearchVisible(!isSearchVisible)
+
+  if (!mounted) {
+    return null
   }
-}, []);
 
-useEffect(() => {
-  fetchsliderData();
-}, [fetchsliderData]);
-
-useEffect(() => {
-  setMounted(true)
-}, [])
-
-const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
-const toggleSearch = () => setIsSearchVisible(!isSearchVisible)
-
-if (!mounted) {
-  return null
-}
-
-//////////////////////////////////////////// mode data for testing end /////////////////////////////
+  //////////////////////////////////////////// mode data for testing end /////////////////////////////
 
   return (
     <header className="font-noto w-full shadow-sm relative">
@@ -65,20 +60,17 @@ if (!mounted) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
-           {loading?
-
+              {loading ?
                 <span>
                   <Skeleton className="w-[100px] h-[40px] rounded-full" />
                 </span>
-            
-              :
+                :
                 <img
                   src={`${mocData[0]?.avatar}`}
                   alt={"Logo"}
                   className="h-8 md:h-12 w-auto"
                 />
-           }
-              
+              }
             </div>
 
             {/* Desktop Navigation */}
@@ -92,7 +84,6 @@ if (!mounted) {
               </button>
               <LanguageToggle />
               <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-[30px] hover:bg-brand-dark hover:text-brand-primary transition-colors">
-
                 <span className="font-semibold flex items-center gap-2" dir="ltr">
                   <Phone className="h-5 w-5" />
                   <span>9200 31202</span>
@@ -142,4 +133,3 @@ if (!mounted) {
 }
 
 export default Header
-

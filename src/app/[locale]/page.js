@@ -12,10 +12,9 @@ export default async  function Home() {
 
   return (
     <main className="min-h-screen m-auto p-8">
-      <SlidesProvider>
         {/* HeroSection inside SlidesProvider */}
         <HeroSection />
-      </SlidesProvider>
+
 
       {/* Car Buying Interface below HeroSection */}
       <div className="my-12">

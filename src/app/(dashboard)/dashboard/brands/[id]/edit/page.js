@@ -97,7 +97,7 @@ export default function EditBrandPage() {
         image: imageUrl,
       };
 
-      const response = await axios.put(`/api/supabasPrisma/carbrands/${brandId}`, payload);
+      const response = await fetch(`/api/supabasPrisma/carbrands/${brandId}`, payload);
 
       if (response.status !== 200) {
         throw new Error(response.data.error || "Failed to update brand");

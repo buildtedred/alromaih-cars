@@ -1,83 +1,75 @@
-"use client"
+"use client";
 
-import { useState, useEffect,useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useTranslation } from "react-i18next"
-import { useSlides } from "@/contexts/SliderContext"
-import Image from "next/image"
-import Skeleton from "react-loading-skeleton"
-import { useOdoo } from "@/contexts/OdooContext"
-import  axios  from 'axios';
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { useSlides } from "@/contexts/SliderContext";
+import Image from "next/image";
+import Skeleton from "react-loading-skeleton";
+import { useOdoo } from "@/contexts/OdooContext";
 
-const SLIDE_DURATION = 5000 // 5 seconds per slide
+const SLIDE_DURATION = 5000; // 5 seconds per slide
 
 export const HeroSection = () => {
-  const { t } = useTranslation()
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [progress, setProgress] = useState(0)
-  // const { slides, loading, error } = useSlides()
-    const {   sliderData, loadingsliderData } = useOdoo();
-    
-    //////////////////////////////////////////// mode data for testing /////////////////////////////
-    
-    const [mocData, setmocData] = useState([]);
-    const [loadingmocData, setloadingmocData] = useState(true);
-    console.log("object ssssssssss", mocData)
+  const { t } = useTranslation();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [progress, setProgress] = useState(0);
+  
+  // Testing Mock Data
+  const [mocData, setMocData] = useState([]);
+  const [loadingMocData, setLoadingMocData] = useState(true);
 
-console.log("mocData data:", mocData);
+  // console.log("Mock Data:", mocData);
 
-const fetchsliderData = useCallback(async () => {
-  setloadingmocData(true); // Fix: Correct state setter
-  try {
-    const response = await axios.get("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/alromaihCarousel ");
+  const fetchSliderData = useCallback(async () => {
+    setLoadingMocData(true);
+    try {
+      const response = await fetch("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/alromaihCarousel");
 
-    setmocData(response.data); // Fix: Access response.data
-  } catch (error) {
-    console.error("Error fetching brands:", error);
-  } finally {
-    setloadingmocData(false);
-  }
-}, []);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-useEffect(() => {
-  fetchsliderData();
-}, [fetchsliderData]);
-
-//////////////////////////////////////////// mode data for testing end /////////////////////////////
+      const data = await response.json();
+      setMocData(data);
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+    } finally {
+      setLoadingMocData(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (mocData.length === 0) return
+    fetchSliderData();
+  }, [fetchSliderData]);
+
+  useEffect(() => {
+    if (mocData.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % mocData.length)
-      setProgress(0)
-    }, SLIDE_DURATION)
+      setCurrentSlide((prev) => (prev + 1) % mocData.length);
+      setProgress(0);
+    }, SLIDE_DURATION);
 
     const progressInterval = setInterval(() => {
-      setProgress((prev) => Math.min(prev + 1, 100))
-    }, SLIDE_DURATION / 100)
+      setProgress((prev) => Math.min(prev + 1, 100));
+    }, SLIDE_DURATION / 100);
 
     return () => {
-      clearInterval(interval)
-      clearInterval(progressInterval)
-    }
-  }, [mocData.length])
+      clearInterval(interval);
+      clearInterval(progressInterval);
+    };
+  }, [mocData.length]);
 
-  if (loadingmocData) {
+  if (loadingMocData) {
     return (
       <div className="relative px-4 md:px-36">
         <div className="relative aspect-[25/9] w-full">
           <Skeleton height="100%" className="rounded-none md:rounded-[20px]" />
         </div>
       </div>
-    )
+    );
   }
-
-  // if (error) {
-  //   return <div>Error: {error}</div>
-  // }
-
-  const baseURL = "https://xn--mgbml9eg4a.com"
 
   return (
     <div className="relative py-6 px-4 md:px-28">
@@ -92,11 +84,11 @@ useEffect(() => {
             className="absolute inset-0"
           >
             <Image
-                src={
-                  mocData[currentSlide]?.avatar
-                    ? `${mocData[currentSlide]?.avatar}`
-                    : "/fallback-image.jpg" // Default image if Base64 is missing
-                }
+              src={
+                mocData[currentSlide]?.avatar
+                  ? `${mocData[currentSlide]?.avatar}`
+                  : "/fallback-image.jpg"
+              }
               alt={mocData[currentSlide]?.name}
               className="w-full h-full object-cover"
               fill
@@ -111,8 +103,8 @@ useEffect(() => {
               <button
                 key={index}
                 onClick={() => {
-                  setCurrentSlide(index)
-                  setProgress(0)
+                  setCurrentSlide(index);
+                  setProgress(0);
                 }}
                 className={`w-3 h-3 rounded-full transition-all ${
                   currentSlide === index ? "bg-white w-8" : "bg-white/50"
@@ -132,6 +124,5 @@ useEffect(() => {
         </div>
       </div>
     </div>
-  )
-}
-
+  );
+};

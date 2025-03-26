@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Upload, Loader2 } from "lucide-react";
 import Link from "next/link";
-import axios from "axios";
 import { createClient } from "@supabase/supabase-js";
 
 import { Button } from "@/components/ui/button";
@@ -67,10 +66,17 @@ export default function NewBrandPage() {
         image: imageUrl,
       };
 
-      const response = await axios.post("/api/supabasPrisma/carbrands", payload);
+      const response = await fetch("/api/supabasPrisma/carbrands", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      if (response.status !== 201) {
-        throw new Error(response.data.error || "Failed to create brand");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create brand");
       }
 
       setUploadStatus("Brand created successfully! Redirecting...");

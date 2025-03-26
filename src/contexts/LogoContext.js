@@ -1,7 +1,6 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 // Create a context
 const LogoContext = createContext(null);
@@ -16,21 +15,24 @@ export const LogoProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch logos using axios
-  // console.log(" ddddddddd",logos[0]?.image_url)
+  // Fetch logos using fetch()
   useEffect(() => {
     const fetchLogos = async () => {
       try {
-        const response = await axios.get('https://xn--mgbml9eg4a.com/api/logos',{
+        const response = await fetch("https://xn--mgbml9eg4a.com/api/logos", {
           headers: {
-            // If needed, add custom headers here, like authentication tokens:
-            // 'Authorization': `Bearer YOUR_TOKEN`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        }); // Adjust API URL if needed
-        setLogos(response.data.data); // Set the logos data
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setLogos(data.data); // Set the logos data
       } catch (err) {
-        setError(err.message || 'Error fetching logos');
+        setError(err.message || "Error fetching logos");
       } finally {
         setLoading(false);
       }
