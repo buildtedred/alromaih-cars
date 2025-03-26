@@ -1,26 +1,31 @@
-import { useRef, useState, useEffect } from "react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import Image from "next/image";
-import Autoplay from "embla-carousel-autoplay";
+"use client"
+
+import { useRef } from "react"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import Image from "next/image"
+import Autoplay from "embla-carousel-autoplay"
 
 export function PromoSlider() {
-  const plugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true }));
-  const [slidesToShow, setSlidesToShow] = useState(2);
+  const plugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true }))
 
-  // useEffect(() => {
-    
-  //   const updateSlidesToShow = () => {
-  //     if (window.innerWidth < 768) {
-  //       setSlidesToShow(1); // Small devices ke liye 1 slide per view
-  //     } else {
-  //       setSlidesToShow(2); // Larger screens ke liye 2 slides per view
-  //     }
-  //   };
-
-  //   updateSlidesToShow();
-  //   window.addEventListener("resize", updateSlidesToShow);
-  //   return () => window.removeEventListener("resize", updateSlidesToShow);
-  // }, []);
+  // Static promotional slides data
+  const slides = [
+    {
+      src: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=1600&h=600&fit=crop",
+      title: "Financing made possible",
+      subtitle: "for every car buyer",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1619551734325-81aaf323686c?w=1600&h=600&fit=crop",
+      title: "Home Test Drive",
+      subtitle: "Buy comfortably from your home",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1605559424849-330b1f3d9d82?w=1600&h=600&fit=crop",
+      title: "Exclusive Discounts",
+      subtitle: "Save big on your next car",
+    },
+  ]
 
   return (
     <Carousel
@@ -28,32 +33,14 @@ export function PromoSlider() {
       opts={{
         align: "start",
         loop: true,
-        slidesToShow: slidesToShow, // Responsive slidesToShow
-        slidesToScroll: slidesToShow, // Ek sath jitne show ho utne hi scroll hon
       }}
       plugins={[plugin.current]}
     >
       <CarouselContent>
-        {[
-          {
-            src: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=1600&h=600&fit=crop",
-            title: "Financing made possible",
-            subtitle: "for every car buyer",
-          },
-          {
-            src: "https://images.unsplash.com/photo-1619551734325-81aaf323686c?w=1600&h=600&fit=crop",
-            title: "Home Test Drive",
-            subtitle: "Buy comfortably from your home",
-          },
-          {
-            src: "https://images.unsplash.com/photo-1605559424849-330b1f3d9d82?w=1600&h=600&fit=crop",
-            title: "Exclusive Discounts",
-            subtitle: "Save big on your next car",
-          },
-        ].map((slide, index) => (
-          <CarouselItem key={index} className=" md:basis-1/2 sm:basis-full">
+        {slides.map((slide, index) => (
+          <CarouselItem key={index} className="md:basis-1/2 sm:basis-full">
             <div className="relative h-[200px] w-full rounded-lg overflow-hidden">
-              <Image src={slide.src} alt={slide.title} fill className="object-cover" />
+              <Image src={slide.src || "/placeholder.svg"} alt={slide.title} fill className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
               <div className="absolute bottom-8 left-8 text-white">
                 <h2 className="text-xl md:text-3xl font-bold mb-2">{slide.title}</h2>
@@ -66,5 +53,6 @@ export function PromoSlider() {
       <CarouselPrevious className="left-4" />
       <CarouselNext className="right-4" />
     </Carousel>
-  );
+  )
 }
+

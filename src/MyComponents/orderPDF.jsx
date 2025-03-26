@@ -1,23 +1,15 @@
-"use client"
 import { Document, Page, Text, View, StyleSheet, Image, Font } from "@react-pdf/renderer"
 
-// Register custom fonts
+// Register font
 Font.register({
   family: "Roboto",
   fonts: [
-    { src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-light-webfont.ttf", fontWeight: 300 },
-    {
-      src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf",
-      fontWeight: 400,
-    },
-    {
-      src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-medium-webfont.ttf",
-      fontWeight: 500,
-    },
-    { src: "https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf", fontWeight: 700 },
+    { src: "https://fonts.gstatic.com/s/roboto/v29/KFOmCnqEu92Fr1Mu4mxP.ttf", fontWeight: 400 },
+    { src: "https://fonts.gstatic.com/s/roboto/v29/KFOlCnqEu92Fr1MmWUlfBBc9.ttf", fontWeight: 700 },
   ],
 })
 
+// Create styles
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
@@ -27,170 +19,222 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 20,
-    borderBottom: "1 solid #71308A",
+    borderBottom: "1px solid #46194F",
     paddingBottom: 10,
   },
   title: {
     fontSize: 24,
     textAlign: "center",
-    color: "#71308A",
-    fontWeight: 700,
+    color: "#46194F",
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   subtitle: {
     fontSize: 14,
     textAlign: "center",
-    color: "#555",
-    marginTop: 5,
+    color: "#666",
+    marginBottom: 5,
+  },
+  orderDate: {
+    fontSize: 12,
+    textAlign: "center",
+    color: "#888",
   },
   section: {
     margin: 10,
     padding: 10,
+    flexGrow: 1,
   },
-  carInfo: {
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#46194F",
+    marginBottom: 10,
+    borderBottom: "1px solid #eee",
+    paddingBottom: 5,
+  },
+  row: {
     flexDirection: "row",
-    marginBottom: 20,
-  },
-  image: {
-    width: 200,
-    height: 150,
-    objectFit: "contain",
-  },
-  carDetails: {
-    marginLeft: 20,
-    flex: 1,
-  },
-  carName: {
-    fontSize: 18,
-    fontWeight: 500,
-    color: "#71308A",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    borderBottomStyle: "solid",
+    paddingVertical: 5,
     marginBottom: 5,
   },
-  infoGroup: {
-    marginBottom: 15,
-  },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: "#333",
-    marginBottom: 5,
-  },
-  infoContent: {
+  label: {
+    width: "40%",
     fontSize: 12,
     color: "#555",
   },
-  boldText: {
-    fontWeight: 500,
+  value: {
+    width: "60%",
+    fontSize: 12,
+    color: "#333",
+  },
+  carImage: {
+    width: 250,
+    height: 150,
+    objectFit: "contain",
+    alignSelf: "center",
+    marginVertical: 15,
   },
   footer: {
-    position: "absolute",
-    bottom: 30,
-    left: 30,
-    right: 30,
-    textAlign: "center",
-    color: "#888",
-    borderTop: "1 solid #ddd",
+    marginTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    borderTopStyle: "solid",
     paddingTop: 10,
+    fontSize: 10,
+    textAlign: "center",
+    color: "#999",
+  },
+  rtlText: {
+    direction: "rtl",
+    textAlign: "right",
+  },
+  ltrText: {
+    direction: "ltr",
+    textAlign: "left",
   },
 })
 
-export const OrderPDF = ({ formData, car_Details }) => {
-  // Get model name
-  const getModelName = () => {
-    if (car_Details?.model?.name) {
-      return car_Details.model.name
-    }
-    return car_Details?.model || "N/A"
+export const OrderPDF = ({ formData, carDetails, carImage, isEnglish }) => {
+  // Format date for display
+  const formatDate = (dateString) => {
+    const date = new Date()
+    return date.toLocaleDateString(isEnglish ? "en-US" : "ar-SA", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
   }
 
-  // Get brand name
-  const getBrandName = () => {
-    if (car_Details?.brand?.name) {
-      return car_Details.brand.name
+  // Get car model and brand
+  const getModelName = () => {
+    if (carDetails?.model?.name) {
+      return carDetails.model.name
     }
-    return car_Details?.brand || ""
+    return carDetails?.model || "N/A"
+  }
+
+  const getBrandName = () => {
+    if (carDetails?.brand?.name) {
+      return carDetails.brand.name
+    }
+    return carDetails?.brand || "N/A"
   }
 
   // Format price
   const formatPrice = (price) => {
     if (!price) return "N/A"
-    const currency = car_Details?.pricing?.currency || "USD"
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency,
+    return new Intl.NumberFormat(isEnglish ? "en-US" : "ar-SA", {
       maximumFractionDigits: 0,
     }).format(price)
   }
 
+  // Text style based on language
+  const textStyle = isEnglish ? styles.ltrText : styles.rtlText
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Order Summary</Text>
-          <Text style={styles.subtitle}>Thank you for your interest in our vehicles</Text>
+          <Text style={styles.title}>{isEnglish ? "Car Purchase Order" : "طلب شراء سيارة"}</Text>
+          <Text style={styles.subtitle}>
+            {isEnglish ? `${getBrandName()} ${getModelName()}` : `${getModelName()} ${getBrandName()}`}
+          </Text>
+          <Text style={styles.orderDate}>
+            {isEnglish ? "Order Date: " : "تاريخ الطلب: "}
+            {formatDate(new Date().toISOString())}
+          </Text>
         </View>
 
-        <View style={styles.carInfo}>
-          <Image src={car_Details?.image || "/placeholder.svg?height=150&width=200"} style={styles.image} />
-          <View style={styles.carDetails}>
-            <Text style={styles.carName}>
-              {getBrandName()} {getModelName()}
-            </Text>
-            <Text style={styles.infoContent}>Year: {car_Details?.year || car_Details?.manufacture || "N/A"}</Text>
-            <Text style={styles.infoContent}>
-              Fuel Type: {car_Details?.fuelType || car_Details?.specifications?.fuel_type || "N/A"}
-            </Text>
-            <Text style={styles.infoContent}>Seating Capacity: {car_Details?.seat || "N/A"}</Text>
-            <Text style={styles.infoContent}>
-              Price:{" "}
-              {car_Details?.pricing?.base_price
-                ? formatPrice(car_Details.pricing.base_price)
-                : formatPrice(car_Details?.price)}
-            </Text>
-          </View>
-        </View>
+        {/* Car Image */}
+        {carImage && <Image src={carImage || "/placeholder.svg"} style={styles.carImage} />}
 
+        {/* Car Details */}
         <View style={styles.section}>
-          <View style={styles.infoGroup}>
-            <Text style={styles.infoTitle}>Buyer Information</Text>
-            <Text style={styles.infoContent}>
-              <Text style={styles.boldText}>Name:</Text> {`${formData.firstName} ${formData.lastName}`.trim()}
-            </Text>
-            <Text style={styles.infoContent}>
-              <Text style={styles.boldText}>Type:</Text> {formData.type}
-            </Text>
-            <Text style={styles.infoContent}>
-              <Text style={styles.boldText}>Email:</Text> {formData.email}
-            </Text>
-            <Text style={styles.infoContent}>
-              <Text style={styles.boldText}>Phone:</Text> {formData.phone}{" "}
-              {formData.hasWhatsapp && "(WhatsApp available)"}
-            </Text>
-            <Text style={styles.infoContent}>
-              <Text style={styles.boldText}>City:</Text> {formData.city}
+          <Text style={styles.sectionTitle}>{isEnglish ? "Car Details" : "تفاصيل السيارة"}</Text>
+
+          <View style={styles.row}>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "Brand" : "الماركة"}</Text>
+            <Text style={[styles.value, textStyle]}>{getBrandName()}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "Model" : "الموديل"}</Text>
+            <Text style={[styles.value, textStyle]}>{getModelName()}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "Year" : "السنة"}</Text>
+            <Text style={[styles.value, textStyle]}>{carDetails?.year || "N/A"}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "Price" : "السعر"}</Text>
+            <Text style={[styles.value, textStyle]}>
+              {formatPrice(carDetails?.price || carDetails?.pricing?.base_price)} SAR
             </Text>
           </View>
 
-          <View style={styles.infoGroup}>
-            <Text style={styles.infoTitle}>Visit Details</Text>
-            <Text style={styles.infoContent}>
-              <Text style={styles.boldText}>Date:</Text> {formData.visitDate}
-            </Text>
-            <Text style={styles.infoContent}>
-              <Text style={styles.boldText}>Time:</Text> {formData.visitTime}
+          <View style={styles.row}>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "Payment Method" : "طريقة الدفع"}</Text>
+            <Text style={[styles.value, textStyle]}>
+              {isEnglish
+                ? formData.paymentMethod === "cash"
+                  ? "Cash"
+                  : "Finance"
+                : formData.paymentMethod === "cash"
+                  ? "كاش"
+                  : "تمويل"}
             </Text>
           </View>
+        </View>
 
-          {formData.note && (
-            <View style={styles.infoGroup}>
-              <Text style={styles.infoTitle}>Additional Notes</Text>
-              <Text style={styles.infoContent}>{formData.note}</Text>
+        {/* Customer Details */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{isEnglish ? "Customer Details" : "بيانات العميل"}</Text>
+
+          <View style={styles.row}>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "Name" : "الاس��"}</Text>
+            <Text style={[styles.value, textStyle]}>{formData.firstName}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "National ID" : "رقم الهوية"}</Text>
+            <Text style={[styles.value, textStyle]}>{formData.nationalId}</Text>
+          </View>
+
+          {formData.email && (
+            <View style={styles.row}>
+              <Text style={[styles.label, textStyle]}>{isEnglish ? "Email" : "البريد الإلكتروني"}</Text>
+              <Text style={[styles.value, textStyle]}>{formData.email}</Text>
+            </View>
+          )}
+
+          <View style={styles.row}>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "Phone" : "رقم الهاتف"}</Text>
+            <Text style={[styles.value, textStyle]}>{formData.phone}</Text>
+          </View>
+
+          {formData.paymentMethod === "finance" && formData.bankName && (
+            <View style={styles.row}>
+              <Text style={[styles.label, textStyle]}>{isEnglish ? "Bank" : "البنك"}</Text>
+              <Text style={[styles.value, textStyle]}>{formData.bankName}</Text>
             </View>
           )}
         </View>
 
-        <Text style={styles.footer}>
-          This document is automatically generated and serves as a confirmation of your interest in the vehicle.
-        </Text>
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text>
+            {isEnglish
+              ? "This document is a confirmation of your car purchase order. Please keep it for your records."
+              : "هذا المستند هو تأكيد لطلب شراء سيارتك. يرجى الاحتفاظ به لسجلاتك."}
+          </Text>
+        </View>
       </Page>
     </Document>
   )
