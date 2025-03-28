@@ -1,5 +1,5 @@
 import React from 'react'
-import CarGallery from '@/MyComponents/car-gallery';
+import CarGallery from '@/MyComponents/Car-Details-page/car-gallery.jsx';
 import { NextIntlClientProvider } from 'next-intl'
 import BrandDynomicData from '@/MyComponents/BrandDynomicData/BrandDynomicData';
 
