@@ -39,7 +39,7 @@ const icons = {
   seats: "/icons/Horse.svg",
   transmission: "/icons/Transmission.svg",
   year: "/icons/Calendar.svg",
-  currency: "/icons/currency.svg", // Added Currency.svg
+  currency: "/icons/Currency.svg", // Changed to use capital "C"
 }
 
 // Mock car data with bilingual content - Updated specifications
