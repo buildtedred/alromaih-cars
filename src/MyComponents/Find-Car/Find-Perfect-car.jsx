@@ -323,7 +323,7 @@ export default function FindPerfectCar() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder={isArabic ? "��بحث عن العلامة التجارية" : "Search brand"}
+                placeholder={isArabic ? "ابحث عن العلامة التجارية" : "Search brand"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary"
@@ -460,7 +460,7 @@ export default function FindPerfectCar() {
 
   if (!paymentMethod) {
     return (
-      <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30">
+      <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30 shadow-lg">
         {/* Left side - Payment Method Selection */}
         <div className="p-8 md:w-1/2">
           <h1 className="text-2xl font-bold text-brand-primary mb-6">
@@ -477,7 +477,7 @@ export default function FindPerfectCar() {
           <div className="flex flex-col gap-3 mt-4">
             <button
               onClick={() => setPaymentMethod("cash")}
-              className="flex items-center gap-3 px-4 py-3 rounded-md bg-white border border-brand-primary/20 hover:border-brand-primary/50 transition-colors w-40"
+              className="flex items-center gap-3 px-4 py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-40"
             >
               <div className="w-6 h-6 relative">
                 <Image src="/icons/cash.svg" alt="Cash" width={24} height={24} className="text-brand-primary" />
@@ -487,7 +487,7 @@ export default function FindPerfectCar() {
 
             <button
               onClick={() => setPaymentMethod("finance")}
-              className="flex items-center gap-3 px-4 py-3 rounded-md bg-white border border-brand-primary/20 hover:border-brand-primary/50 transition-colors w-40"
+              className="flex items-center gap-3 px-4 py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-40"
             >
               <div className="w-6 h-6 relative">
                 <Image src="/icons/finance.svg" alt="Finance" width={24} height={24} className="text-brand-primary" />
@@ -576,7 +576,7 @@ export default function FindPerfectCar() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30">
+    <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30 shadow-lg">
       {paymentMethod === "cash" ? (
         <>
           {/* Left side - Payment Method Selection (Selected Cash) */}
@@ -605,7 +605,7 @@ export default function FindPerfectCar() {
 
               <button
                 onClick={() => setPaymentMethod("finance")}
-                className="flex items-center gap-3 px-4 py-3 rounded-md bg-white border border-brand-primary/20 hover:border-brand-primary/50 transition-colors w-40"
+                className="flex items-center gap-3 px-4 py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-40"
               >
                 <div className="w-6 h-6 relative">
                   <Image src="/icons/finance.svg" alt="Finance" width={24} height={24} className="text-brand-primary" />
@@ -691,7 +691,7 @@ export default function FindPerfectCar() {
           </div>
         </>
       ) : (
-        <div className="flex flex-col md:flex-row w-full relative">
+        <div className="flex flex-col md:flex-row w-full relative border border-brand-primary/20 shadow-lg">
           <button
             onClick={handleBack}
             className="absolute top-0 left-0 p-4 hover:bg-brand-primary/5 rounded-br-xl transition-colors z-10"
