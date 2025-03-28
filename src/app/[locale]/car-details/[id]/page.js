@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios';
-import CarGallery from '@/MyComponents/car-gallery';
+import CarGallery from '@/MyComponents/Car-Details-page/car-gallery.jsx';
 import { NextIntlClientProvider } from 'next-intl'
 
 
