@@ -3,10 +3,9 @@ import { useState, useEffect, useCallback } from "react"
 import { Phone, Menu, X, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Nav from "./Nav"
-import { useLogoContext } from "@/contexts/LogoContext"
 import { Skeleton } from "@/components/ui/skeleton"
-import LanguageToggle from "@/MyComponents/LanguageToggle"
-import SearchComponent from './search/SearchComponent';
+import LanguageToggle from "./LanguageToggle"
+import SearchComponent from "./search/SearchComponent"
 import { useOdoo } from "@/contexts/OdooContext"
 
 const Header = () => {
@@ -14,31 +13,32 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const { logo, loading } = useOdoo();
+  const { logo, loading } = useOdoo()
 
   //////////////////////////////////////////// mode data for testing /////////////////////////////
 
-  const [mocData, setMocData] = useState([]);
-  const [loadingMocData, setLoadingMocData] = useState(true);
+  const [mocData, setMocData] = useState([])
+  const [loadingMocData, setLoadingMocData] = useState(true)
 
-  // console.log("logo api moc api:", mocData);
+  // Remove async/await and use .then() instead
+  const fetchSliderData = useCallback(() => {
+    setLoadingMocData(true)
 
-  const fetchSliderData = useCallback(async () => {
-    setLoadingMocData(true);
-    try {
-      const response = await fetch("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/logo");
-      const data = await response.json();
-      setMocData(data);
-    } catch (error) {
-      console.error("Error fetching brands:", error);
-    } finally {
-      setLoadingMocData(false);
-    }
-  }, []);
+    fetch("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/logo")
+      .then((response) => response.json())
+      .then((data) => {
+        setMocData(data)
+        setLoadingMocData(false)
+      })
+      .catch((error) => {
+        console.error("Error fetching brands:", error)
+        setLoadingMocData(false)
+      })
+  }, [])
 
   useEffect(() => {
-    fetchSliderData();
-  }, [fetchSliderData]);
+    fetchSliderData()
+  }, [fetchSliderData])
 
   useEffect(() => {
     setMounted(true)
@@ -60,17 +60,13 @@ const Header = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
-              {loading ?
+              {loading ? (
                 <span>
                   <Skeleton className="w-[100px] h-[40px] rounded-full" />
                 </span>
-                :
-                <img
-                  src={`${mocData[0]?.avatar}`}
-                  alt={"Logo"}
-                  className="h-8 md:h-8 w-auto"
-                />
-              }
+              ) : (
+                <img src={`${mocData[0]?.avatar}`} alt={"Logo"} className="h-8 md:h-8 w-auto" />
+              )}
             </div>
 
             {/* Desktop Navigation */}
@@ -133,3 +129,4 @@ const Header = () => {
 }
 
 export default Header
+

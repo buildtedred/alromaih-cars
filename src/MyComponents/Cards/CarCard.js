@@ -3,16 +3,14 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Heart } from "lucide-react"
-import { useLocale } from "next-intl"
-import { Link } from "@/i18n/routing"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 
-const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite }) => {
+const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale }) => {
   const pathname = usePathname()
   // Detect language from URL path
   const pathLocale = pathname.startsWith("/ar") ? "ar" : "en"
-  const locale = useLocale()
-  // Use either the detected path locale or the locale from useLocale
+  // Use either the detected path locale or the provided locale prop
   const currentLocale = pathLocale || locale
   const isRTL = currentLocale === "ar"
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite || false)
@@ -59,16 +57,16 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite }) => {
     }
   }
 
-  // Get text based on current locale
+  // Get text based on current locale - fixed to always return a string
   const getText = (textObj) => {
     if (!textObj) return ""
-    return typeof textObj === "object" ? textObj[currentLocale] || textObj.en : textObj
+    return typeof textObj === "object" ? textObj[currentLocale] || textObj.en || "" : String(textObj)
   }
 
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
-      className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full max-w-[340px] mx-auto relative"
+      className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full md:max-w-[340px] relative"
     >
       {/* Status Badge - adjusted to ensure text is visible */}
       {car.status && (
@@ -87,7 +85,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite }) => {
       )}
 
       {/* Car Image Section */}
-      <div className="relative pt-4 px-4 border-b border-brand-primary mx-3">
+      <div className="relative pt-4 px-4 sm:px-4 border-b border-brand-primary mx-3">
         <div className="w-full h-[180px] relative">
           <Image
             src={car.image || "/placeholder.svg?height=200&width=300"}
@@ -109,9 +107,9 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite }) => {
       {/* Car Details Section with all divider lines */}
       <div className="flex flex-col flex-grow">
         {/* Brand Logo and Name with bottom border */}
-        <div className="flex flex-row-reverse justify-between items-center mb-0 pb-2 px-4 border-b border-brand-primary mx-3">
-          <div className="flex items-center">
-            <div className="h-8 w-24 relative">
+        <div className="flex flex-row-reverse justify-between items-center mb-0 pb-2 px-1 sm:px-2 border-b border-brand-primary mx-3">
+          <div className="flex items-center ml-2">
+            <div className="h-8 w-16 relative">
               <Image
                 src={car.brandLogo || "/placeholder.svg?height=30&width=80"}
                 alt="Brand Logo"
@@ -120,9 +118,16 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite }) => {
               />
             </div>
           </div>
-          <div className={isRTL ? "text-right" : "text-left"}>
-            <h3 className="text-xl font-bold text-brand-primary">{getText(car.name)}</h3>
-            <p className="text-xs text-gray-600">{getText(car.modelYear)}</p>
+          <div className={`${isRTL ? "text-right" : "text-left"} flex-1 min-w-0`}>
+            <h3
+              className="text-lg font-bold text-brand-primary overflow-hidden whitespace-nowrap"
+              style={{ textOverflow: "ellipsis" }}
+            >
+              {getText(car.name)}
+            </h3>
+            <p className="text-xs text-gray-600 overflow-hidden whitespace-nowrap" style={{ textOverflow: "ellipsis" }}>
+              {getText(car.modelYear)}
+            </p>
           </div>
         </div>
 
@@ -133,43 +138,47 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite }) => {
 
           {isRTL ? (
             <div className="flex">
-              <div className="w-1/2 px-4">
-                <p className="text-xs text-brand-primary mb-1">سعر الكاش</p>
-                <div className="font-bold text-lg text-brand-primary flex items-center">
-                  <span>{car.cashPrice.toLocaleString()}</span>
-                  <span className="mr-1">
-                    <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={14} height={14} />
-                  </span>
+              <div className="w-1/2 px-1 sm:px-2">
+                <div className="pl-[1.2rem]">
+                  <p className="text-xs text-brand-primary mb-1 whitespace-nowrap">يبدأ القسط من</p>
+                  <div className="font-bold text-base text-brand-primary flex items-center">
+                    <span className="truncate">{car.installmentPrice}</span>
+                    <span className="mr-1 flex-shrink-0">
+                      <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={12} height={12} />
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="w-1/2 px-4">
-                <p className="text-xs text-brand-primary mb-1">يبدأ القسط من</p>
-                <div className="font-bold text-lg text-brand-primary flex items-center">
-                  <span>{car.installmentPrice}</span>
-                  <span className="mr-1">
-                    <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={14} height={14} />
+              <div className="w-1/2 px-1 sm:px-2">
+                <p className="text-xs text-brand-primary mb-1 text-left">سعر الكاش</p>
+                <div className="font-bold text-base text-brand-primary flex items-center justify-start">
+                  <span className="truncate">{car.cashPrice.toLocaleString()}</span>
+                  <span className="mr-1 flex-shrink-0">
+                    <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={12} height={12} />
                   </span>
                 </div>
               </div>
             </div>
           ) : (
             <div className="flex">
-              <div className="w-1/2 px-4">
+              <div className="w-1/2 px-1 sm:px-2">
                 <p className="text-xs text-brand-primary mb-1">Cash Price</p>
-                <div className="font-bold text-lg text-brand-primary flex items-center">
-                  <span className="mr-1">
-                    <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={14} height={14} />
+                <div className="font-bold text-base text-brand-primary flex items-center">
+                  <span className="mr-1 flex-shrink-0">
+                    <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={12} height={12} />
                   </span>
-                  <span>{car.cashPrice.toLocaleString()}</span>
+                  <span className="truncate">{car.cashPrice.toLocaleString()}</span>
                 </div>
               </div>
-              <div className="w-1/2 px-4">
-                <p className="text-xs text-brand-primary mb-1">Installments from</p>
-                <div className="font-bold text-lg text-brand-primary flex items-center">
-                  <span className="mr-1">
-                    <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={14} height={14} />
-                  </span>
-                  <span>{car.installmentPrice}</span>
+              <div className="w-1/2 px-1 sm:px-2">
+                <div className="pl-[1.2rem]">
+                  <p className="text-xs text-brand-primary mb-1 whitespace-nowrap">Installments from</p>
+                  <div className="font-bold text-base text-brand-primary flex items-center">
+                    <span className="mr-1 flex-shrink-0">
+                      <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={12} height={12} />
+                    </span>
+                    <span className="truncate">{car.installmentPrice}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -177,65 +186,68 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite }) => {
         </div>
 
         {/* Specifications Icons with bottom border */}
-        <div className="flex flex-row-reverse justify-between py-2 px-4 border-b border-brand-primary mx-3">
+        <div className="flex flex-row-reverse justify-between py-1 px-1 sm:px-2 border-b border-brand-primary mx-3">
           <div className="flex flex-col items-center">
-            <div className="w-5 h-5 relative">
+            <div className="w-4 h-4 relative">
               <Image
                 src={car.icons.fuel || "/icons/Fuel.svg"}
                 alt="Fuel"
-                width={20}
-                height={20}
+                width={16}
+                height={16}
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[10px] mt-1 text-brand-primary">{getText(car.specs.fuelType)}</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-5 h-5 relative">
-              <Image
-                src={car.icons.seats || "/icons/Horse.svg"}
-                alt="Seats"
-                width={20}
-                height={20}
-                className="text-brand-primary"
-              />
-            </div>
-            <span className="text-[10px] mt-1 text-brand-primary">
-              {car.specs.seats} {isRTL ? "حصان" : "HP"}
+            <span className="text-[8px] mt-1 text-brand-primary truncate max-w-[35px] text-center">
+              {getText(car.specs.fuelType)}
             </span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-5 h-5 relative">
+            <div className="w-4 h-4 relative">
+              <Image
+                src={car.icons.seats || "/icons/Horse.svg"}
+                alt="Seats"
+                width={16}
+                height={16}
+                className="text-brand-primary"
+              />
+            </div>
+            <span className="text-[8px] mt-1 text-brand-primary truncate max-w-[35px] text-center">
+              {getText(car.specs.seats)}
+            </span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 relative">
               <Image
                 src={car.icons.transmission || "/icons/Transmission.svg"}
                 alt="Transmission"
-                width={20}
-                height={20}
+                width={16}
+                height={16}
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[10px] mt-1 text-brand-primary">{getText(car.specs.transmission)}</span>
+            <span className="text-[8px] mt-1 text-brand-primary truncate max-w-[35px] text-center">
+              {getText(car.specs.transmission)}
+            </span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-5 h-5 relative">
+            <div className="w-4 h-4 relative">
               <Image
                 src={car.icons.year || "/icons/Calendar.svg"}
                 alt="Year"
-                width={20}
-                height={20}
+                width={16}
+                height={16}
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[10px] mt-1 text-brand-primary">{car.specs.year}</span>
+            <span className="text-[8px] mt-1 text-brand-primary truncate max-w-[35px] text-center">
+              {car.specs.year}
+            </span>
           </div>
         </div>
 
         {/* View Details Link */}
-        <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-4 py-2`}>
-          <Link
-            href={`/${currentLocale}/car-details/${car.id}`}
-            className="text-brand-primary text-xs flex items-center"
-          >
+        <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-1 sm:px-2 py-1 mx-3`}>
+          <Link href={`/${currentLocale}/cars/${car.id}`} className="text-brand-primary text-xs flex items-center">
             {isRTL ? (
               <>
                 <span className="ml-1">{"<"}</span>
@@ -244,7 +256,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite }) => {
             ) : (
               <>
                 <span>View Details</span>
-                <span className="ml-3">{">"}</span>
+                <span className="ml-2">{">"}</span>
               </>
             )}
           </Link>

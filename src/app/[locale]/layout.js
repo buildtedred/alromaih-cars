@@ -19,7 +19,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children, params }) {
-  const locale = await(params).locale;
+  const locale = await(params.locale);
   
   // ✅ Ensure valid locale
   if (!routing.locales.includes(locale)) {

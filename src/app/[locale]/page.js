@@ -1,28 +1,34 @@
-"use client";
-
+"use client"
 import { SlidesProvider } from "@/contexts/SliderContext"
 import BrandShowcase from "@/MyComponents/brandshowcase"
 import { FinancePartners } from "@/MyComponents/FinancePartners"
 import { HeroSection } from "@/MyComponents/HeroSection/HeroSection"
-import CarBuyingInterface from "../../MyComponents/car-buying/car-buying-interface.jsx"
-import CarListing from "@/MyComponents/Cards/car-listing.jsx" // Add this import
+import CarBuyingInterface from "../../MyComponents/Find-Car/Find-Perfect-car.jsx"
+import CarListing from "@/MyComponents/Cards/car-listing.jsx"
+import { usePathname } from "next/navigation"
 
-export default async function Home() {
+export default function Home() {
+  const pathname = usePathname()
+  const isArabic = pathname?.startsWith("/ar")
+
   return (
     <main className="min-h-screen m-auto p-8">
+      <SlidesProvider>
         {/* HeroSection inside SlidesProvider */}
         <HeroSection />
-
+      </SlidesProvider>
 
       {/* Car Buying Interface below HeroSection */}
       <div className="my-12">
-        <h2 className="text-3xl font-bold text-center mb-8">Find Your Perfect Car</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">
+          {isArabic ? "ابحث عن سيارتك المثالية" : "Find Your Perfect Car"}
+        </h2>
         <CarBuyingInterface />
       </div>
 
-      {/* Replace your existing CarCard with the new CarListing */}
+      {/* Car Listing Component */}
       <div className="my-12">
-        <h2 className="text-3xl font-bold text-center mb-8">Our Car Collection</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">{isArabic ? "مجموعة سياراتنا" : "Our Car Collection"}</h2>
         <CarListing />
       </div>
 
@@ -32,3 +38,4 @@ export default async function Home() {
     </main>
   )
 }
+

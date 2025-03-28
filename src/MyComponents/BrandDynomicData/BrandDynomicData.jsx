@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import CarCardItem from "../CarCard/CarCardItem"
+import CarCardItem from "../Cards/car-listing"
 
 const BrandDynomicData = ({ carDetails }) => {
   const pathname = usePathname()

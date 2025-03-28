@@ -1,67 +1,57 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import CarCard from "./CarCard"
-import { fetchCars } from "@/app/api/mock-data.js"
 import { usePathname } from "next/navigation"
+import CarCard from "./CarCard.js"
+import carsData from "@/app/api/mock-data"
 
-const CarListing = () => {
+export default function CarListing() {
+  const pathname = usePathname()
+  const currentLocale = pathname.startsWith("/ar") ? "ar" : "en"
+  const isRTL = currentLocale === "ar"
   const [cars, setCars] = useState([])
   const [loading, setLoading] = useState(true)
-  const [favorites, setFavorites] = useState([])
-  const pathname = usePathname()
-  // Detect language from URL path
-  const currentLocale = pathname.startsWith("/ar") ? "ar" : "en"
+  const [favorites, setFavorites] = useState({})
 
-  // Fetch cars data
   useEffect(() => {
-    const getCars = async () => {
+    // Fetch cars data
+    const fetchData = () => {
       setLoading(true)
-      try {
-        const carsData = await fetchCars()
-        setCars(carsData)
-      } catch (error) {
-        console.error("Error fetching cars:", error)
-      } finally {
-        setLoading(false)
-      }
+      // Use the imported carsData directly
+      setCars(carsData)
+      setLoading(false)
     }
 
-    getCars()
+    fetchData()
   }, [])
 
-  // Handle favorite toggle
   const handleFavoriteToggle = (carId) => {
-    setFavorites((prev) => (prev.includes(carId) ? prev.filter((id) => id !== carId) : [...prev, carId]))
-  }
-
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-[400px] bg-gray-200 animate-pulse rounded-lg"></div>
-          ))}
-        </div>
-      </div>
-    )
+    setFavorites(prev => ({
+      ...prev,
+      [carId]: !prev[carId]
+    }))
   }
 
   return (
-    <div dir={currentLocale === "ar" ? "rtl" : "ltr"} className="max-w-7xl mx-auto p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {cars.map((car) => (
-          <CarCard
-            key={car.id}
-            car={car}
-            onFavoriteToggle={handleFavoriteToggle}
-            isFavorite={favorites.includes(car.id)}
-          />
-        ))}
-      </div>
+    <div dir={isRTL ? "rtl" : "ltr"} className="px-4 md:px-4 lg:px-[7rem]">
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {cars.map((car) => (
+            <div key={car.id} className="flex justify-center w-full">
+              <CarCard 
+                car={car} 
+                locale={currentLocale} 
+                onFavoriteToggle={handleFavoriteToggle}
+                isFavorite={favorites[car.id]}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
-
-export default CarListing
-
