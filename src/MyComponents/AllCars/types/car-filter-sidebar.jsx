@@ -2,17 +2,18 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { Search, ChevronDown } from "lucide-react"
-import { RangeSlider } from "../AllCarComponents/range-slider"
+import { RangeSlider } from "./AllCarComponents/range-slider"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
+// Update the scrollbarStyles to use the exact hex color from Tailwind config
 const scrollbarStyles = `
 /* Hide default scrollbar */
 .custom-scrollbar-container {
   scrollbar-width: thin;
-  scrollbar-color: #71308A transparent;
+  scrollbar-color: #46194F transparent;
 }
 .custom-scrollbar-container::-webkit-scrollbar {
   width: 8px;
@@ -21,7 +22,7 @@ const scrollbarStyles = `
   background: transparent;
 }
 .custom-scrollbar-container::-webkit-scrollbar-thumb {
-  background-color: #71308A;
+  background-color: #46194F;
   border-radius: 4px;
 }
 .flex-1.overflow-hidden.relative {
@@ -287,7 +288,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
     <div className={`bg-white rounded-lg shadow flex flex-col h-screen ${isRTL ? "rtl" : "ltr"}`}>
       <style>{scrollbarStyles}</style>
       <div className="p-4 border-b">
-        <h2 className="text-xl font-bold text-[#71308A]">{t.filters}</h2>
+        <h2 className="text-xl font-bold text-brand-primary">{t.filters}</h2>
       </div>
       <div className="flex-1 overflow-hidden relative">
         <div className="custom-scrollbar-container h-full overflow-y-auto pr-2">
@@ -295,7 +296,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
             {/* Price Range Section */}
             <Collapsible open={openSections.priceRange} onOpenChange={() => toggleSection("priceRange")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
-                <h3 className="text-lg font-semibold text-[#71308A]">{t.priceRange}</h3>
+                <h3 className="text-lg font-semibold text-brand-primary">{t.priceRange}</h3>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${openSections.priceRange ? "rotate-180" : ""}`}
                 />
@@ -310,7 +311,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
                   step={10000}
                   className="mb-2"
                 />
-                <div className="flex justify-between text-sm text-[#71308A]">
+                <div className="flex justify-between text-sm text-brand-primary">
                   <div>{formatPrice(localFilters.priceRange[0])}</div>
                   <div>{formatPrice(localFilters.priceRange[1])}</div>
                 </div>
@@ -320,7 +321,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
             {/* Brands Section */}
             <Collapsible open={openSections.brands} onOpenChange={() => toggleSection("brands")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
-                <h3 className="text-lg font-semibold text-[#71308A]">{t.brandsAndModels}</h3>
+                <h3 className="text-lg font-semibold text-brand-primary">{t.brandsAndModels}</h3>
                 <ChevronDown className={`w-4 h-4 transition-transform ${openSections.brands ? "rotate-180" : ""}`} />
               </CollapsibleTrigger>
               <CollapsibleContent className="pt-4">
@@ -330,25 +331,25 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
                     placeholder={t.searchPlaceholder}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full p-2 pl-8 border rounded-md focus:outline-none focus:ring-[#71308A]"
+                    className="w-full p-2 pl-8 border rounded-md focus:outline-none focus:ring-brand-primary"
                   />
                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 </div>
                 <div className="space-y-2">
                   {filteredBrandsData.map((brand) => (
                     <div key={brand.id} className="mb-2 border-b pb-2">
-                      <div className="flex items-center justify-between w-full p-2 hover:bg-[#71308A]/10 rounded">
+                      <div className="flex items-center justify-between w-full p-2 hover:bg-brand-primary/10 rounded">
                         <div className="flex items-center gap-3">
                           <Checkbox
                             checked={isBrandChecked(brand.name)}
                             onCheckedChange={(checked) => handleBrandCheck(brand.name, checked)}
-                            className="rounded border-[#71308A] text-[#71308A] focus:ring-[#71308A] data-[state=checked]:bg-[#71308A] data-[state=checked]:text-white checkbox-icon"
+                            className="rounded border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white checkbox-icon"
                           />
                           <span className="text-sm">{brand.name}</span>
                         </div>
                         <button onClick={() => toggleBrand(brand.name)}>
                           <ChevronDown
-                            className={`w-4 h-4 transition-transform text-[#71308A] ${
+                            className={`w-4 h-4 transition-transform text-brand-primary ${
                               expandedBrands.includes(brand.name) ? "rotate-180" : ""
                             }`}
                           />
@@ -361,7 +362,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
                               <Checkbox
                                 checked={isModelChecked(brand.name, model.name)}
                                 onCheckedChange={(checked) => handleModelCheck(brand.name, model.name, checked)}
-                                className="rounded border-[#71308A] text-[#71308A] focus:ring-[#71308A] data-[state=checked]:bg-[#71308A] data-[state=checked]:text-white checkbox-icon"
+                                className="rounded border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white checkbox-icon"
                               />
                               <span className="text-sm">{model.name}</span>
                             </div>
@@ -377,7 +378,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
             {/* Year Section */}
             <Collapsible open={openSections.year} onOpenChange={() => toggleSection("year")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
-                <h3 className="text-lg font-semibold text-[#71308A]">{t.year}</h3>
+                <h3 className="text-lg font-semibold text-brand-primary">{t.year}</h3>
                 <ChevronDown className={`w-4 h-4 transition-transform ${openSections.year ? "rotate-180" : ""}`} />
               </CollapsibleTrigger>
               <CollapsibleContent className="pt-4">
@@ -386,8 +387,8 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
                     <div key={year} className="flex items-center space-x-2">
                       <button onClick={() => handleYearChange(year)} className="flex items-center focus:outline-none">
                         <div
-                          className={`w-4 h-4 rounded-full border-2 border-[#71308A] flex items-center justify-center ${
-                            localFilters.year === year.toString() ? "bg-[#71308A]" : "bg-white"
+                          className={`w-4 h-4 rounded-full border-2 border-brand-primary flex items-center justify-center ${
+                            localFilters.year === year.toString() ? "bg-brand-primary" : "bg-white"
                           }`}
                         >
                           {localFilters.year === year.toString() && <div className="w-2 h-2 rounded-full bg-white" />}
@@ -405,7 +406,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
             {/* Fuel Type Section */}
             <Collapsible open={openSections.fuelType} onOpenChange={() => toggleSection("fuelType")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
-                <h3 className="text-lg font-semibold text-[#71308A]">{t.fuelType}</h3>
+                <h3 className="text-lg font-semibold text-brand-primary">{t.fuelType}</h3>
                 <ChevronDown className={`w-4 h-4 transition-transform ${openSections.fuelType ? "rotate-180" : ""}`} />
               </CollapsibleTrigger>
               <CollapsibleContent className="pt-4">
@@ -415,7 +416,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
                       <Checkbox
                         checked={Array.isArray(localFilters.fuelTypes) && localFilters.fuelTypes.includes(fuelType)}
                         onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
-                        className="rounded-sm border-[#71308A] text-[#71308A] focus:ring-[#71308A] data-[state=checked]:bg-[#71308A] data-[state=checked]:text-white checkbox-icon"
+                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white checkbox-icon"
                       />
                       <Label className="text-sm font-medium leading-none">{fuelType}</Label>
                     </div>
@@ -427,7 +428,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
             {/* Transmission Section */}
             <Collapsible open={openSections.transmission} onOpenChange={() => toggleSection("transmission")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
-                <h3 className="text-lg font-semibold text-[#71308A]">{t.transmission}</h3>
+                <h3 className="text-lg font-semibold text-brand-primary">{t.transmission}</h3>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform ${openSections.transmission ? "rotate-180" : ""}`}
                 />
@@ -441,7 +442,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
                           Array.isArray(localFilters.transmission) && localFilters.transmission.includes(transmission)
                         }
                         onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
-                        className="rounded-sm border-[#71308A] text-[#71308A] focus:ring-[#71308A] data-[state=checked]:bg-[#71308A] data-[state=checked]:text-white checkbox-icon"
+                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white checkbox-icon"
                       />
                       <Label className="text-sm font-medium leading-none">{transmission}</Label>
                     </div>
@@ -453,7 +454,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
             {/* Seats Section */}
             <Collapsible open={openSections.seats} onOpenChange={() => toggleSection("seats")}>
               <CollapsibleTrigger className="flex justify-between items-center w-full">
-                <h3 className="text-lg font-semibold text-[#71308A]">{t.seats}</h3>
+                <h3 className="text-lg font-semibold text-brand-primary">{t.seats}</h3>
                 <ChevronDown className={`w-4 h-4 transition-transform ${openSections.seats ? "rotate-180" : ""}`} />
               </CollapsibleTrigger>
               <CollapsibleContent className="pt-4">
@@ -463,7 +464,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
                       <Checkbox
                         checked={localFilters.seats.includes(seat)}
                         onCheckedChange={(checked) => handleSeatChange(seat, checked)}
-                        className="rounded-sm border-[#71308A] text-[#71308A] focus:ring-[#71308A] data-[state=checked]:bg-[#71308A] data-[state=checked]:text-white checkbox-icon"
+                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white checkbox-icon"
                       />
                       <Label className="text-sm font-medium leading-none">
                         {seat} {t.seats}
@@ -491,7 +492,7 @@ function CarFilterSidebar({ onFilterChange, carModels, filters, language = "en" 
             onFilterChange(clearedFilters)
           }}
           variant="outline"
-          className="w-full border-[#71308A] text-[#71308A] hover:bg-[#71308A] hover:text-white transition-colors"
+          className="w-full border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white transition-colors"
         >
           {t.clearAllFilters}
         </Button>

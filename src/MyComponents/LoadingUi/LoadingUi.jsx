@@ -1,38 +1,17 @@
-import { Skeleton } from '@/components/ui/skeleton'
-import React from 'react'
-import Image from 'next/image'
-import skeleton from "../../../public/images/car-skeleton.png"
+"use client"
+import { usePathname } from "next/navigation"
 
 const LoadingUi = () => {
+  const pathname = usePathname()
+  const currentLocale = pathname?.startsWith("/ar") ? "ar" : "en"
+
   return (
-    <div>
-       <div className="max-w-[calc(100%-18rem)] mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array(6)
-            .fill()
-            .map((_, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="relative h-48 w-full flex justify-center items-center">
-                  <Image className="" src={skeleton} alt="Car Skeleton"/>
-                </div>
-                <div className="p-4 space-y-3">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-4 w-1/4" />
-                    <Skeleton className="h-4 w-1/4" />
-                    <Skeleton className="h-4 w-1/4" />
-                  </div>
-                </div>
-              </div>
-            ))}
-        </div>
-      </div>
+    <div className="flex flex-col items-center justify-center min-h-[400px]">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-primary mb-4"></div>
+      <p className="text-brand-primary font-medium">{currentLocale === "ar" ? "جاري التحميل..." : "Loading..."}</p>
     </div>
   )
 }
 
 export default LoadingUi
+

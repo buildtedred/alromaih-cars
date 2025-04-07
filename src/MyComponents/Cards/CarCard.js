@@ -66,18 +66,18 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
-      className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full md:max-w-[340px] relative"
+      className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full h-full relative"
     >
-      {/* Status Badge - adjusted to ensure text is visible */}
+      {/* Status Badge - Fixed positioning */}
       {car.status && (
         <div
           className={`absolute ${getBadgeColor(car.status)} px-2 py-1 border-2 border-brand-primary border-l-0 text-sm font-medium z-20`}
           style={{
             top: "24px",
-            left: "-2px", // Adjusted to ensure text is visible
+            left: "-2px",
             borderTopRightRadius: "13px",
             borderBottomRightRadius: "13px",
-            paddingLeft: "8px", // Added extra padding on the left
+            paddingLeft: "8px",
           }}
         >
           {getBadgeText(car.status)}
@@ -85,8 +85,8 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
       )}
 
       {/* Car Image Section */}
-      <div className="relative pt-4 px-4 sm:px-4 border-b border-brand-primary mx-3">
-        <div className="w-full h-[180px] relative">
+      <div className="relative pt-4 px-2 border-b border-brand-primary mx-2">
+        <div className="w-full h-[160px] relative">
           <Image
             src={car.image || "/placeholder.svg?height=200&width=300"}
             alt={getText(car.name)}
@@ -96,8 +96,15 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
           />
         </div>
 
-        {/* Favorite Button - positioned flush against the right edge */}
-        <button onClick={handleFavoriteClick} className="absolute z-10" style={{ top: "24px", right: "0" }}>
+        {/* Favorite Button - Repositioned to align with status badge */}
+        <button
+          onClick={handleFavoriteClick}
+          className="absolute z-10"
+          style={{
+            top: "24px",
+            right: "8px",
+          }}
+        >
           <Heart
             className={isFavorite ? "w-6 h-6 fill-brand-primary text-brand-primary" : "w-6 h-6 text-brand-primary"}
           />
@@ -107,18 +114,19 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
       {/* Car Details Section with all divider lines */}
       <div className="flex flex-col flex-grow">
         {/* Brand Logo and Name with bottom border */}
-        <div className="flex flex-row-reverse justify-between items-center mb-0 pb-2 px-1 sm:px-2 border-b border-brand-primary mx-3">
-          <div className="flex items-center ml-2">
-            <div className="h-8 w-16 relative">
+        <div className="flex flex-row-reverse justify-between items-center pb-2 px-2 border-b border-brand-primary mx-3">
+          <div className="flex items-center justify-center ml-2 py-2">
+            <div className="h-10 w-20 relative flex items-center justify-center">
               <Image
-                src={car.brandLogo || "/placeholder.svg?height=30&width=80"}
+                src={car.brandLogo || "/placeholder.svg?height=40&width=80"}
                 alt="Brand Logo"
-                fill
+                width={80}
+                height={40}
                 style={{ objectFit: "contain" }}
               />
             </div>
           </div>
-          <div className={`${isRTL ? "text-right" : "text-left"} flex-1 min-w-0`}>
+          <div className={`${isRTL ? "text-right" : "text-left"} flex-1 min-w-0 flex flex-col justify-center`}>
             <h3
               className="text-lg font-bold text-brand-primary overflow-hidden whitespace-nowrap"
               style={{ textOverflow: "ellipsis" }}
@@ -131,104 +139,36 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
           </div>
         </div>
 
-        {/* Price Section with top and bottom borders */}
-        <div className="relative border-t-0 border-b border-brand-primary py-2 mx-3">
-          {/* Vertical line in the center - MODIFIED to be shorter */}
+        {/* Price Section with top and bottom borders - FIXED LAYOUT */}
+        <div className="relative border-t-0 border-b border-brand-primary py-2 mx-2">
+          {/* Vertical line in the center */}
           <div className="absolute top-2 bottom-2 left-1/2 transform -translate-x-1/2 w-px bg-brand-primary"></div>
 
-          {isRTL ? (
-            <div className="flex">
-              <div className="w-1/2 px-1 sm:px-2">
-                <div className="pl-[1.2rem]">
-                  <p className="text-xs text-brand-primary mb-1 whitespace-nowrap">يبدأ القسط من</p>
-                  <div className="font-bold text-base text-brand-primary flex items-center">
-                    <span className="truncate">{car.installmentPrice}</span>
-                    <span className="mr-1 flex-shrink-0">
-                      <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={12} height={12} />
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="w-1/2 px-1 sm:px-2">
-                <p className="text-xs text-brand-primary mb-1 text-left">سعر الكاش</p>
-                <div className="font-bold text-base text-brand-primary flex items-center justify-start">
-                  <span className="truncate">{car.cashPrice.toLocaleString()}</span>
-                  <span className="mr-1 flex-shrink-0">
-                    <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={12} height={12} />
-                  </span>
-                </div>
+          <div className="grid grid-cols-2 gap-0">
+            <div className="px-3">
+              <p className="text-xs text-brand-primary mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</p>
+              <div className="font-bold text-brand-primary flex items-center">
+                <span className="mr-1 flex-shrink-0">
+                  <Image src={car.icons.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
+                </span>
+                <span className="text-base">{car.cashPrice.toLocaleString()}</span>
               </div>
             </div>
-          ) : (
-            <div className="flex">
-              <div className="w-1/2 px-1 sm:px-2">
-                <p className="text-xs text-brand-primary mb-1">Cash Price</p>
-                <div className="font-bold text-base text-brand-primary flex items-center">
-                  <span className="mr-1 flex-shrink-0">
-                    <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={12} height={12} />
-                  </span>
-                  <span className="truncate">{car.cashPrice.toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="w-1/2 px-1 sm:px-2">
-                <div className="pl-[1.2rem]">
-                  <p className="text-xs text-brand-primary mb-1 whitespace-nowrap">Installments from</p>
-                  <div className="font-bold text-base text-brand-primary flex items-center">
-                    <span className="mr-1 flex-shrink-0">
-                      <Image src={car.icons.currency || "/icons/currency.svg"} alt="Currency" width={12} height={12} />
-                    </span>
-                    <span className="truncate">{car.installmentPrice}</span>
-                  </div>
-                </div>
+
+            <div className="px-3">
+              <p className="text-xs text-brand-primary mb-1">{isRTL ? "أقساط من" : "Installments from"}</p>
+              <div className="font-bold text-brand-primary flex items-center">
+                <span className="mr-1 flex-shrink-0">
+                  <Image src={car.icons.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
+                </span>
+                <span className="text-base">{car.installmentPrice}</span>
               </div>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Specifications Icons with bottom border */}
-        <div className="flex flex-row-reverse justify-between py-1 px-1 sm:px-2 border-b border-brand-primary mx-3">
-          <div className="flex flex-col items-center">
-            <div className="w-4 h-4 relative">
-              <Image
-                src={car.icons.fuel || "/icons/Fuel.svg"}
-                alt="Fuel"
-                width={16}
-                height={16}
-                className="text-brand-primary"
-              />
-            </div>
-            <span className="text-[8px] mt-1 text-brand-primary truncate max-w-[35px] text-center">
-              {getText(car.specs.fuelType)}
-            </span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-4 h-4 relative">
-              <Image
-                src={car.icons.seats || "/icons/Horse.svg"}
-                alt="Seats"
-                width={16}
-                height={16}
-                className="text-brand-primary"
-              />
-            </div>
-            <span className="text-[8px] mt-1 text-brand-primary truncate max-w-[35px] text-center">
-              {getText(car.specs.seats)}
-            </span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="w-4 h-4 relative">
-              <Image
-                src={car.icons.transmission || "/icons/Transmission.svg"}
-                alt="Transmission"
-                width={16}
-                height={16}
-                className="text-brand-primary"
-              />
-            </div>
-            <span className="text-[8px] mt-1 text-brand-primary truncate max-w-[35px] text-center">
-              {getText(car.specs.transmission)}
-            </span>
-          </div>
+        {/* Specifications Icons with bottom border - IMPROVED LAYOUT */}
+        <div className="grid grid-cols-4 gap-0 py-1 px-1 border-b border-brand-primary mx-2">
           <div className="flex flex-col items-center">
             <div className="w-4 h-4 relative">
               <Image
@@ -239,15 +179,52 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary truncate max-w-[35px] text-center">
-              {car.specs.year}
-            </span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{car.specs.year}</span>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 relative">
+              <Image
+                src={car.icons.transmission || "/icons/Transmission.svg"}
+                alt="Transmission"
+                width={16}
+                height={16}
+                className="text-brand-primary"
+              />
+            </div>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs.transmission)}</span>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 relative">
+              <Image
+                src={car.icons.seats || "/icons/Horse.svg"}
+                alt="Seats"
+                width={16}
+                height={16}
+                className="text-brand-primary"
+              />
+            </div>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs.seats)}</span>
+          </div>
+
+          <div className="flex flex-col items-center">
+            <div className="w-4 h-4 relative">
+              <Image
+                src={car.icons.fuel || "/icons/Fuel.svg"}
+                alt="Fuel"
+                width={16}
+                height={16}
+                className="text-brand-primary"
+              />
+            </div>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs.fuelType)}</span>
           </div>
         </div>
 
         {/* View Details Link */}
-        <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-1 sm:px-2 py-1 mx-3`}>
-          <Link href={`/${currentLocale}/cars/${car.id}`} className="text-brand-primary text-xs flex items-center">
+        <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-3 py-2 mx-2`}>
+          <Link href={`/${currentLocale}/cars/${car.id}`} className="text-brand-primary text-sm flex items-center">
             {isRTL ? (
               <>
                 <span className="ml-1">{"<"}</span>

@@ -50,7 +50,7 @@ export function RangeSlider({ min, max, value, onValueChange, onValueCommit, ste
                   height: `${height}%`,
                   opacity: isInRange ? 1 : 0,
                 }}
-                className="w-full bg-[#71308A] transition-all duration-300 ease-in-out"
+                className="w-full bg-brand-primary transition-all duration-300 ease-in-out"
               />
             )
           })}
@@ -68,10 +68,10 @@ export function RangeSlider({ min, max, value, onValueChange, onValueCommit, ste
         className="relative flex items-center w-full h-5 select-none touch-none"
       >
         <SliderPrimitive.Track className="relative h-[2px] grow rounded-full bg-[#E5E7EB]">
-          <SliderPrimitive.Range className="absolute h-full rounded-full bg-[#71308A]" />
+          <SliderPrimitive.Range className="absolute h-full rounded-full bg-brand-primary" />
         </SliderPrimitive.Track>
-        <SliderPrimitive.Thumb className="block w-4 h-4 bg-white border-2 border-[#71308A] rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#71308A] focus:ring-offset-2 transition-transform hover:scale-110" />
-        <SliderPrimitive.Thumb className="block w-4 h-4 bg-white border-2 border-[#71308A] rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#71308A] focus:ring-offset-2 transition-transform hover:scale-110" />
+        <SliderPrimitive.Thumb className="block w-4 h-4 bg-white border-2 border-brand-primary rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-transform hover:scale-110" />
+        <SliderPrimitive.Thumb className="block w-4 h-4 bg-white border-2 border-brand-primary rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-transform hover:scale-110" />
       </SliderPrimitive.Root>
     </div>
   )
