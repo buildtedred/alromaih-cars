@@ -22,7 +22,7 @@ export default function NewBrandPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
-
+  
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -34,27 +34,28 @@ export default function NewBrandPage() {
       reader.readAsDataURL(file);
     }
   };
-
+  
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
     setUploadStatus(null);
-
+    
     if (!name.trim()) {
       setError("Brand name is required");
       return;
     }
-
+    
     if (!image) {
       setError("Brand image is required");
       return;
     }
-
+    
     try {
       setLoading(true);
-
+      
       // Upload image to Supabase storage
       const { data, error: uploadError } = await supabase.storage.from("Alromaih").upload(`brands/${Date.now()}_${image.name}`, image);
+      // console.log("file is", data);
       if (uploadError) {
         throw new Error(uploadError.message);
       }
