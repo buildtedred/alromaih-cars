@@ -14,6 +14,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
   const currentLocale = pathLocale || locale
   const isRTL = currentLocale === "ar"
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite || false)
+  const [isHovered, setIsHovered] = useState(false)
 
   // This useEffect is important to keep the favorite state in sync with props
   useEffect(() => {
@@ -66,7 +67,9 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
-      className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full h-full relative"
+      className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Status Badge - Fixed positioning */}
       {car.status && (
@@ -85,28 +88,31 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
       )}
 
       {/* Car Image Section */}
-      <div className="relative pt-4 px-2 border-b border-brand-primary mx-2">
-        <div className="w-full h-[160px] relative">
+      <div className="relative pt-4 px-2 border-b border-brand-primary mx-2 overflow-hidden">
+        <div
+          className="w-full h-[160px] relative transition-transform duration-500"
+          style={{ transform: isHovered ? "scale(1.05)" : "scale(1)" }}
+        >
           <Image
             src={car.image || "/placeholder.svg?height=200&width=300"}
             alt={getText(car.name)}
             fill
             style={{ objectFit: "contain" }}
-            className="w-full h-full"
+            className="w-full h-full transition-all duration-500"
           />
         </div>
 
         {/* Favorite Button - Repositioned to align with status badge */}
         <button
           onClick={handleFavoriteClick}
-          className="absolute z-10"
+          className="absolute z-10 transition-all duration-300 hover:scale-110"
           style={{
             top: "24px",
             right: "8px",
           }}
         >
           <Heart
-            className={isFavorite ? "w-6 h-6 fill-brand-primary text-brand-primary" : "w-6 h-6 text-brand-primary"}
+            className={`w-6 h-6 transition-all duration-300 ${isFavorite ? "fill-brand-primary text-brand-primary scale-110" : "text-brand-primary hover:scale-110"}`}
           />
         </button>
       </div>
@@ -128,12 +134,15 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
           </div>
           <div className={`${isRTL ? "text-right" : "text-left"} flex-1 min-w-0 flex flex-col justify-center`}>
             <h3
-              className="text-lg font-bold text-brand-primary overflow-hidden whitespace-nowrap"
-              style={{ textOverflow: "ellipsis" }}
+              className="text-lg font-bold text-brand-primary overflow-hidden whitespace-nowrap transition-all duration-300"
+              style={{ textOverflow: "ellipsis", color: isHovered ? "#5a1f70" : "" }}
             >
               {getText(car.name)}
             </h3>
-            <p className="text-xs text-gray-600 overflow-hidden whitespace-nowrap" style={{ textOverflow: "ellipsis" }}>
+            <p
+              className="text-xs text-gray-600 overflow-hidden whitespace-nowrap transition-all duration-300"
+              style={{ textOverflow: "ellipsis" }}
+            >
               {getText(car.modelYear)}
             </p>
           </div>
@@ -169,7 +178,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
 
         {/* Specifications Icons with bottom border - IMPROVED LAYOUT */}
         <div className="grid grid-cols-4 gap-0 py-1 px-1 border-b border-brand-primary mx-2">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
             <div className="w-4 h-4 relative">
               <Image
                 src={car.icons.year || "/icons/Calendar.svg"}
@@ -182,7 +191,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
             <span className="text-[8px] mt-1 text-brand-primary text-center">{car.specs.year}</span>
           </div>
 
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
             <div className="w-4 h-4 relative">
               <Image
                 src={car.icons.transmission || "/icons/Transmission.svg"}
@@ -195,7 +204,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
             <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs.transmission)}</span>
           </div>
 
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
             <div className="w-4 h-4 relative">
               <Image
                 src={car.icons.seats || "/icons/Horse.svg"}
@@ -208,7 +217,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
             <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs.seats)}</span>
           </div>
 
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
             <div className="w-4 h-4 relative">
               <Image
                 src={car.icons.fuel || "/icons/Fuel.svg"}
@@ -224,16 +233,29 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
 
         {/* View Details Link */}
         <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-3 py-2 mx-2`}>
-          <Link href={`/${currentLocale}/cars/${car.id}`} className="text-brand-primary text-sm flex items-center">
+          <Link
+            href={`/${currentLocale}/cars/${car.id}`}
+            className="text-brand-primary text-sm flex items-center transition-all duration-300 hover:translate-x-1 hover:font-medium"
+          >
             {isRTL ? (
               <>
-                <span className="ml-1">{"<"}</span>
+                <span
+                  className="ml-1 transition-transform duration-300"
+                  style={{ transform: isHovered ? "translateX(-3px)" : "" }}
+                >
+                  {"<"}
+                </span>
                 <span>عرض التفاصيل</span>
               </>
             ) : (
               <>
                 <span>View Details</span>
-                <span className="ml-2">{">"}</span>
+                <span
+                  className="ml-2 transition-transform duration-300"
+                  style={{ transform: isHovered ? "translateX(3px)" : "" }}
+                >
+                  {">"}
+                </span>
               </>
             )}
           </Link>
@@ -244,4 +266,3 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
 }
 
 export default CarCard
-

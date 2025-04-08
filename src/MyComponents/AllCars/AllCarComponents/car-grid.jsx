@@ -1,10 +1,17 @@
-// Optimize the grid layout for tablet sizes
 import CarCard from "@/MyComponents/Cards/CarCard.js"
 
 export function CarGrid({ cars, loading, locale }) {
-  if (!cars || cars.length === 0) {
-    return <p className="text-center text-gray-500">No cars available at the moment.</p>
+  // Check if cars is undefined, null, or empty
+  if (!cars || !Array.isArray(cars) || cars.length === 0) {
+    console.log("CarGrid received empty cars array")
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No cars available at the moment.</p>
+      </div>
+    )
   }
+
+  console.log("CarGrid rendering with cars:", cars.length)
 
   // Process cars to ensure localized fields are properly handled
   const processedCars = cars.map((car) => {
@@ -39,9 +46,20 @@ export function CarGrid({ cars, loading, locale }) {
   })
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {processedCars.map((car) => (
-        <div key={car.id}>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+      {processedCars.map((car, index) => (
+        <div
+          key={car.id}
+          className="flex justify-center w-full transition-all duration-500 hover:translate-y-[-5px]"
+          style={{
+            animationName: "fadeIn",
+            animationDuration: "0.5s",
+            animationTimingFunction: "ease-out",
+            animationFillMode: "forwards",
+            animationDelay: `${index * 100}ms`,
+            opacity: 0,
+          }}
+        >
           <CarCard car={car} locale={locale} />
         </div>
       ))}
@@ -49,3 +67,18 @@ export function CarGrid({ cars, loading, locale }) {
   )
 }
 
+// Add keyframes for fadeIn animation
+const style = document.createElement("style")
+style.textContent = `
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+`
+document.head.appendChild(style)

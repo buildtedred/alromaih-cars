@@ -1,10 +1,26 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
 
 export function RangeSlider({ min, max, value, onValueChange, onValueCommit, step = 1, className = "" }) {
   const [lines, setLines] = React.useState(() => generateLines())
+
+  // Ensure value is always within min and max
+  const safeValue = React.useMemo(() => {
+    if (!value || !Array.isArray(value) || value.length !== 2) {
+      return [min, max]
+    }
+    return [
+      Math.max(min, Math.min(max, Number(value[0]) || min)),
+      Math.max(min, Math.min(max, Number(value[1]) || max)),
+    ]
+  }, [value, min, max])
+
+  // Log value changes for debugging
+  useEffect(() => {
+    console.log("RangeSlider value:", safeValue, "min:", min, "max:", max)
+  }, [safeValue, min, max])
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -19,6 +35,32 @@ export function RangeSlider({ min, max, value, onValueChange, onValueCommit, ste
       const cluster = Math.random() > 0.7 ? 0.7 : 0.3
       return baseHeight * cluster * 100
     })
+  }
+
+  // Handle value changes with validation
+  const handleValueChange = (newValue) => {
+    if (Array.isArray(newValue) && newValue.length === 2) {
+      // Ensure values are numbers and within range
+      const validatedValue = [
+        Math.max(min, Math.min(max, Number(newValue[0]) || min)),
+        Math.max(min, Math.min(max, Number(newValue[1]) || max)),
+      ]
+      console.log("RangeSlider onChange:", validatedValue)
+      onValueChange(validatedValue)
+    }
+  }
+
+  // Handle value commit with validation
+  const handleValueCommit = (newValue) => {
+    if (Array.isArray(newValue) && newValue.length === 2 && onValueCommit) {
+      // Ensure values are numbers and within range
+      const validatedValue = [
+        Math.max(min, Math.min(max, Number(newValue[0]) || min)),
+        Math.max(min, Math.min(max, Number(newValue[1]) || max)),
+      ]
+      console.log("RangeSlider onCommit:", validatedValue)
+      onValueCommit(validatedValue)
+    }
   }
 
   return (
@@ -41,7 +83,8 @@ export function RangeSlider({ min, max, value, onValueChange, onValueCommit, ste
           {lines.map((height, i) => {
             const percent = (i / (lines.length - 1)) * 100
             const isInRange =
-              percent >= ((value[0] - min) / (max - min)) * 100 && percent <= ((value[1] - min) / (max - min)) * 100
+              percent >= ((safeValue[0] - min) / (max - min)) * 100 &&
+              percent <= ((safeValue[1] - min) / (max - min)) * 100
 
             return (
               <div
@@ -49,8 +92,9 @@ export function RangeSlider({ min, max, value, onValueChange, onValueCommit, ste
                 style={{
                   height: `${height}%`,
                   opacity: isInRange ? 1 : 0,
+                  transition: "opacity 0.5s ease-in-out, height 1s ease-in-out",
                 }}
-                className="w-full bg-brand-primary transition-all duration-300 ease-in-out"
+                className="w-full bg-brand-primary transition-all duration-500 ease-in-out"
               />
             )
           })}
@@ -61,19 +105,18 @@ export function RangeSlider({ min, max, value, onValueChange, onValueCommit, ste
       <SliderPrimitive.Root
         min={min}
         max={max}
-        value={value}
-        onValueChange={onValueChange}
-        onValueCommit={onValueCommit}
+        value={safeValue}
+        onValueChange={handleValueChange}
+        onValueCommit={handleValueCommit}
         step={step}
         className="relative flex items-center w-full h-5 select-none touch-none"
       >
         <SliderPrimitive.Track className="relative h-[2px] grow rounded-full bg-[#E5E7EB]">
-          <SliderPrimitive.Range className="absolute h-full rounded-full bg-brand-primary" />
+          <SliderPrimitive.Range className="absolute h-full rounded-full bg-brand-primary transition-all duration-300" />
         </SliderPrimitive.Track>
-        <SliderPrimitive.Thumb className="block w-4 h-4 bg-white border-2 border-brand-primary rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-transform hover:scale-110" />
-        <SliderPrimitive.Thumb className="block w-4 h-4 bg-white border-2 border-brand-primary rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-transform hover:scale-110" />
+        <SliderPrimitive.Thumb className="block w-4 h-4 bg-white border-2 border-brand-primary rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-all duration-300 hover:scale-125" />
+        <SliderPrimitive.Thumb className="block w-4 h-4 bg-white border-2 border-brand-primary rounded-full hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-all duration-300 hover:scale-125" />
       </SliderPrimitive.Root>
     </div>
   )
 }
-
