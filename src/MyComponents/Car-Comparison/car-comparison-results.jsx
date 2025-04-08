@@ -239,8 +239,8 @@ const CarComparisonResults = ({ car1Id, car2Id, onCompareAgain }) => {
                   <Image
                     src="/icons/down-arrow.svg"
                     alt="Toggle"
-                    width={24}
-                    height={24}
+                    width={15}
+                    height={15}
                     className={`transition-transform duration-300 ${openCategories[category.id] ? "rotate-180" : ""}`}
                   />
                 </div>
