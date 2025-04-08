@@ -34,6 +34,20 @@ const scrollbarStyles = `
 .h-screen {
   overflow: hidden !important;
 }
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
 `
 
 // Fixed CarFilterSidebar component with working checkboxes
@@ -137,129 +151,350 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
     return language === "ar" ? `${price.toLocaleString()} ريال` : `₹ ${price.toLocaleString()}`
   }
 
+  // Update the handleYearChange function to toggle selection
+  const handleYearChange = (year) => {
+    // If the year is already selected, unselect it by setting to empty string
+    // Otherwise, select the year
+    onFilterChange({ year: filters.year === year.toString() ? "" : year.toString() })
+  }
+
+  const handleFuelTypeChange = (fuelType, checked) => {
+    let updatedFuelTypes = Array.isArray(filters.fuelTypes) ? [...filters.fuelTypes] : []
+
+    if (checked) {
+      if (!updatedFuelTypes.includes(fuelType)) {
+        updatedFuelTypes.push(fuelType)
+      }
+    } else {
+      updatedFuelTypes = updatedFuelTypes.filter((type) => type !== fuelType)
+    }
+
+    onFilterChange({ fuelTypes: updatedFuelTypes })
+  }
+
+  const handleTransmissionChange = (transmission, checked) => {
+    let updatedTransmission = Array.isArray(filters.transmission) ? [...filters.transmission] : []
+
+    if (checked) {
+      if (!updatedTransmission.includes(transmission)) {
+        updatedTransmission.push(transmission)
+      }
+    } else {
+      updatedTransmission = updatedTransmission.filter((trans) => trans !== transmission)
+    }
+
+    onFilterChange({ transmission: updatedTransmission })
+  }
+
+  const handleSeatChange = (seatOption, checked) => {
+    let updatedSeats = filters.seats ? [...filters.seats] : []
+
+    if (checked) {
+      if (!updatedSeats.includes(seatOption)) {
+        updatedSeats.push(seatOption)
+      }
+    } else {
+      updatedSeats = updatedSeats.filter((seat) => seat !== seatOption)
+    }
+
+    onFilterChange({ seats: updatedSeats })
+  }
+
+  // Fixed: Improved range slider handling to ensure values are properly validated
+  const handlePriceRangeChange = (newValue) => {
+    if (Array.isArray(newValue) && newValue.length === 2) {
+      // Ensure values are numbers and within range
+      const validatedValue = [
+        Math.max(0, Math.min(maxPrice, Number(newValue[0]) || 0)),
+        Math.max(0, Math.min(maxPrice, Number(newValue[1]) || maxPrice)),
+      ]
+      console.log("Range slider value changed:", validatedValue)
+      onFilterChange({ priceRange: validatedValue })
+    }
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b">
+    <div className="bg-white rounded-[4px] shadow-md overflow-hidden flex flex-col h-full">
+      {/* Fixed header */}
+      <div className="p-4 border-b sticky top-0 bg-white z-10">
         <h3 className="text-xl font-bold text-brand-primary">{language === "ar" ? "الفلاتر" : "Filters"}</h3>
       </div>
 
-      <div className="divide-y">
-        {/* Price Range Section */}
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-2">
-            <h4 className="font-medium text-brand-primary text-lg">
-              {language === "ar" ? "نطاق السعر" : "Price Range"}
-            </h4>
-            <ChevronDown className="h-5 w-5 text-brand-primary" />
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-auto custom-scrollbar-container">
+        <div className="divide-y">
+          {/* Price Range Section */}
+          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium text-brand-primary text-lg">
+                {language === "ar" ? "نطاق السعر" : "Price Range"}
+              </h4>
+              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
+            </div>
+
+            {/* Use the provided RangeSlider component */}
+            <div className="transition-all duration-300 ease-in-out">
+              <RangeSlider
+                min={0}
+                max={maxPrice}
+                value={filters.priceRange}
+                onValueChange={handlePriceRangeChange}
+                onValueCommit={handlePriceRangeChange}
+                step={10000}
+                className="mb-2"
+              />
+
+              {/* Price range display */}
+              <div className="flex justify-between text-sm text-brand-primary mt-4">
+                <span>{formatPrice(filters.priceRange[0])}</span>
+                <span>{formatPrice(filters.priceRange[1])}</span>
+              </div>
+            </div>
           </div>
 
-          {/* Use the provided RangeSlider component */}
-          <RangeSlider
-            min={0}
-            max={maxPrice}
-            value={filters.priceRange}
-            onValueChange={(newValue) => onFilterChange({ priceRange: newValue })}
-            onValueCommit={(newValue) => onFilterChange({ priceRange: newValue })}
-            step={10000}
-            className="mb-2"
-          />
+          {/* Brands + Models Section */}
+          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-medium text-brand-primary text-lg">
+                {language === "ar" ? "الماركات + الموديلات" : "Brands + Models"}
+              </h4>
+              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
+            </div>
 
-          {/* Price range display */}
-          <div className="flex justify-between text-sm text-brand-primary mt-4">
-            <span>{formatPrice(filters.priceRange[0])}</span>
-            <span>{formatPrice(filters.priceRange[1])}</span>
+            {/* Search box */}
+            <div className="relative mb-4 transition-all duration-300 ease-in-out">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <input
+                type="text"
+                placeholder={language === "ar" ? "ابحث عن الماركات والموديلات" : "Search brands and models"}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 border rounded-[4px] focus:outline-none focus:ring-1 focus:ring-brand-primary"
+              />
+            </div>
+
+            {/* Brand list */}
+            <div className="space-y-1 transition-all duration-300 ease-in-out">
+              {filteredBrands.map((brand) => (
+                <div key={brand} className="border-b pb-2">
+                  <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-[4px]">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id={`brand-${brand}`}
+                        checked={areAllModelsSelected(brand)}
+                        onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
+                        className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                      />
+                      <Label htmlFor={`brand-${brand}`} className="text-sm font-medium leading-none cursor-pointer">
+                        {brand}
+                      </Label>
+                    </div>
+                    <button
+                      onClick={() => toggleBrand(brand)}
+                      className="transition-all duration-200 hover:bg-gray-100 p-1 rounded-full"
+                    >
+                      {expandedBrands.includes(brand) ? (
+                        <ChevronUp className="h-4 w-4 text-brand-primary transition-transform duration-300" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-brand-primary transition-transform duration-300" />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Models under this brand (expandable) */}
+                  {(expandedBrands.includes(brand) || searchTerm) && (
+                    <div className="ml-8 mt-1 space-y-1 transition-all duration-300 ease-in-out">
+                      {modelsByBrand[brand]?.map((model) => (
+                        <div key={model.id} className="flex items-center gap-2 transition-opacity duration-200">
+                          <Checkbox
+                            id={`model-${model.id}`}
+                            checked={filters.selectedModels?.includes(model.id)}
+                            onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
+                            className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                          />
+                          <Label
+                            htmlFor={`model-${model.id}`}
+                            className="text-xs font-medium leading-none cursor-pointer"
+                          >
+                            {model.name}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Brands + Models Section */}
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="font-medium text-brand-primary text-lg">
-              {language === "ar" ? "الماركات + الموديلات" : "Brands + Models"}
-            </h4>
-            <ChevronDown className="h-5 w-5 text-brand-primary" />
+          {/* Year Section */}
+          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-medium text-brand-primary text-lg">{language === "ar" ? "السنة" : "Year"}</h4>
+              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
+            </div>
+
+            {/* In the Year Section, update the button onClick handler to toggle selection */}
+            <div className="space-y-3 transition-all duration-300 ease-in-out">
+              {/* Extract unique years from cars data */}
+              {[...new Set(cars.map((car) => car.specs.year))]
+                .sort((a, b) => b - a) // Sort years in descending order
+                .map((year) => (
+                  <button
+                    key={year}
+                    onClick={() => handleYearChange(year)}
+                    className="flex items-center focus:outline-none transition-all duration-200 hover:opacity-80"
+                  >
+                    <div
+                      className={`w-5 h-5 rounded-full border-2 border-brand-primary flex items-center justify-center transition-colors duration-200 ${
+                        filters.year === year.toString() ? "bg-brand-primary" : "bg-white"
+                      }`}
+                    >
+                      {filters.year === year.toString() && <div className="w-2 h-2 rounded-full bg-white" />}
+                    </div>
+                    <Label className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      {year}
+                    </Label>
+                  </button>
+                ))}
+            </div>
           </div>
 
-          {/* Search box */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <input
-              type="text"
-              placeholder={language === "ar" ? "ابحث عن الماركات والموديلات" : "Search brands and models"}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-brand-primary"
-            />
-          </div>
+          {/* Fuel Type Section */}
+          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-medium text-brand-primary text-lg">
+                {language === "ar" ? "نوع الوقود" : "Fuel Type"}
+              </h4>
+              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
+            </div>
 
-          {/* Brand list */}
-          <div className="space-y-1">
-            {filteredBrands.map((brand) => (
-              <div key={brand} className="border-b pb-2">
-                <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                  <div className="flex items-center gap-2">
+            <div className="space-y-3 transition-all duration-300 ease-in-out">
+              {/* Extract unique fuel types from cars data */}
+              {[
+                ...new Set(
+                  cars.map((car) => {
+                    // Handle both object and string fuel types
+                    return typeof car.specs.fuelType === "object"
+                      ? car.specs.fuelType[language] || car.specs.fuelType.en
+                      : car.specs.fuelType
+                  }),
+                ),
+              ]
+                .filter(Boolean) // Remove any undefined or null values
+                .map((fuelType) => (
+                  <div key={fuelType} className="flex items-center space-x-2">
                     <Checkbox
-                      id={`brand-${brand}`}
-                      checked={areAllModelsSelected(brand)}
-                      onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
-                      className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                      id={`fuel-${fuelType}`}
+                      checked={Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)}
+                      onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
+                      className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
                     />
-                    <Label htmlFor={`brand-${brand}`} className="text-sm font-medium leading-none cursor-pointer">
-                      {brand}
+                    <Label htmlFor={`fuel-${fuelType}`} className="text-sm font-medium leading-none cursor-pointer">
+                      {fuelType}
                     </Label>
                   </div>
-                  <button onClick={() => toggleBrand(brand)}>
-                    {expandedBrands.includes(brand) ? (
-                      <ChevronUp className="h-4 w-4 text-brand-primary" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-brand-primary" />
-                    )}
-                  </button>
-                </div>
+                ))}
+            </div>
+          </div>
 
-                {/* Models under this brand (expandable) */}
-                {(expandedBrands.includes(brand) || searchTerm) && (
-                  <div className="ml-8 mt-1 space-y-1">
-                    {modelsByBrand[brand]?.map((model) => (
-                      <div key={model.id} className="flex items-center gap-2">
-                        <Checkbox
-                          id={`model-${model.id}`}
-                          checked={filters.selectedModels?.includes(model.id)}
-                          onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
-                          className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
-                        />
-                        <Label
-                          htmlFor={`model-${model.id}`}
-                          className="text-xs font-medium leading-none cursor-pointer"
-                        >
-                          {model.name}
-                        </Label>
-                      </div>
-                    ))}
+          {/* Transmission Section */}
+          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-medium text-brand-primary text-lg">
+                {language === "ar" ? "ناقل الحركة" : "Transmission"}
+              </h4>
+              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
+            </div>
+
+            <div className="space-y-3 transition-all duration-300 ease-in-out">
+              {/* Extract unique transmission types from cars data */}
+              {[
+                ...new Set(
+                  cars.map((car) => {
+                    // Handle both object and string transmission types
+                    return typeof car.specs.transmission === "object"
+                      ? car.specs.transmission[language] || car.specs.transmission.en
+                      : car.specs.transmission
+                  }),
+                ),
+              ]
+                .filter(Boolean) // Remove any undefined or null values
+                .map((transmission) => (
+                  <div key={transmission} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`transmission-${transmission}`}
+                      checked={Array.isArray(filters.transmission) && filters.transmission.includes(transmission)}
+                      onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
+                      className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                    />
+                    <Label
+                      htmlFor={`transmission-${transmission}`}
+                      className="text-sm font-medium leading-none cursor-pointer"
+                    >
+                      {transmission}
+                    </Label>
                   </div>
-                )}
-              </div>
-            ))}
+                ))}
+            </div>
+          </div>
+
+          {/* Seats Section */}
+          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-medium text-brand-primary text-lg">{language === "ar" ? "المقاعد" : "Seats"}</h4>
+              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
+            </div>
+
+            <div className="space-y-3 transition-all duration-300 ease-in-out">
+              {/* Extract unique seat options from cars data */}
+              {[
+                ...new Set(
+                  cars.map((car) => {
+                    // Handle both object and string seats types
+                    return typeof car.specs.seats === "object"
+                      ? car.specs.seats[language] || car.specs.seats.en
+                      : car.specs.seats
+                  }),
+                ),
+              ]
+                .filter(Boolean) // Remove any undefined or null values
+                .map((seatOption) => (
+                  <div key={seatOption} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`seats-${seatOption}`}
+                      checked={filters.seats?.includes(seatOption)}
+                      onCheckedChange={(checked) => handleSeatChange(seatOption, checked)}
+                      className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                    />
+                    <Label htmlFor={`seats-${seatOption}`} className="text-sm font-medium leading-none cursor-pointer">
+                      {seatOption}
+                    </Label>
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Clear All Filters Button */}
-      <div className="p-4 border-t">
+      {/* Fixed footer */}
+      <div className="p-4 border-t sticky bottom-0 bg-white z-10">
         <Button
-          onClick={() =>
-            onFilterChange({
+          onClick={() => {
+            // Fixed: Improved reset functionality to ensure all filters are properly reset
+            const resetFilters = {
               priceRange: [0, maxPrice],
               selectedModels: [],
               year: "",
               fuelTypes: [],
               transmission: [],
               seats: [],
-            })
-          }
+            }
+            console.log("Resetting filters to:", resetFilters)
+            onFilterChange(resetFilters)
+          }}
           variant="outline"
-          className="w-full border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white"
+          className="w-full border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white rounded-[4px]"
         >
           {language === "ar" ? "إعادة تعيين الفلاتر" : "Clear All Filters"}
         </Button>
@@ -309,40 +544,96 @@ const AllCarMainpage = () => {
     setCurrentPage(1)
   }, [])
 
-  const clearAllFilters = () => {
-    setFilters({
-      priceRange: [0, 250000],
+  // Fixed: Improved clearAllFilters function to properly reset all filters
+  const clearAllFilters = useCallback(() => {
+    // Find the maximum price from the cars data
+    const maxCarPrice = Math.max(...cars.map((car) => car.cashPrice || 0), 250000)
+
+    // Define the cleared filters with the same structure as the initial state
+    const clearedFilters = {
+      priceRange: [0, maxCarPrice],
       selectedModels: [],
       year: "",
       fuelTypes: [],
       transmission: [],
       seats: [],
-    })
+    }
+
+    console.log("Clearing all filters:", clearedFilters)
+
+    // Update the filters state
+    setFilters(clearedFilters)
+
+    // Reset to the first page
     setCurrentPage(1)
-  }
+  }, [cars])
 
   const handleSortChange = (option) => {
     setSortOption(option)
   }
 
+  // Fixed: Improved filteredCars function to properly handle price range filtering
   const filteredCars = useMemo(() => {
     return cars.filter((car) => {
-      // Price range filter
-      if (car.cashPrice < filters.priceRange[0] || car.cashPrice > filters.priceRange[1]) return false
+      try {
+        // Price range filter - make sure we have valid numbers
+        const minPrice = Number(filters.priceRange[0]) || 0
+        const maxPrice = Number(filters.priceRange[1]) || Number.MAX_SAFE_INTEGER
+        const carPrice = Number(car.cashPrice) || 0
 
-      // Year filter
-      if (filters.year && car.specs.year.toString() !== filters.year.toString()) return false
+        if (carPrice < minPrice || carPrice > maxPrice) return false
 
-      // Model filter - if any models are selected, only show those models
-      if (filters.selectedModels && filters.selectedModels.length > 0) {
-        if (!filters.selectedModels.includes(car.id)) {
-          return false
+        // Year filter
+        if (filters.year && car.specs.year.toString() !== filters.year.toString()) return false
+
+        // Model filter - if any models are selected, only show those models
+        if (filters.selectedModels && filters.selectedModels.length > 0) {
+          if (!filters.selectedModels.includes(car.id)) {
+            return false
+          }
         }
-      }
 
-      return true
+        // Fuel Type filter
+        if (filters.fuelTypes && filters.fuelTypes.length > 0) {
+          const carFuelType =
+            typeof car.specs.fuelType === "object"
+              ? car.specs.fuelType[currentLocale] || car.specs.fuelType.en
+              : car.specs.fuelType
+
+          if (!filters.fuelTypes.includes(carFuelType)) {
+            return false
+          }
+        }
+
+        // Transmission filter
+        if (filters.transmission && filters.transmission.length > 0) {
+          const carTransmission =
+            typeof car.specs.transmission === "object"
+              ? car.specs.transmission[currentLocale] || car.specs.transmission.en
+              : car.specs.transmission
+
+          if (!filters.transmission.includes(carTransmission)) {
+            return false
+          }
+        }
+
+        // Seats filter
+        if (filters.seats && filters.seats.length > 0) {
+          const carSeats =
+            typeof car.specs.seats === "object" ? car.specs.seats[currentLocale] || car.specs.seats.en : car.specs.seats
+
+          if (!filters.seats.includes(carSeats)) {
+            return false
+          }
+        }
+
+        return true
+      } catch (error) {
+        console.error("Error filtering car:", error, car)
+        return false
+      }
     })
-  }, [cars, filters])
+  }, [cars, filters, currentLocale])
 
   // Sort cars based on selected option
   const sortedCars = useMemo(() => {
@@ -419,7 +710,7 @@ const AllCarMainpage = () => {
       <div className="container m-auto px-2 sm:px-3 md:px-4 lg:px-[5rem] xl:px-[7rem] py-4">
         <div className="relative flex flex-col md:flex-row gap-8">
           <Button
-            className="md:hidden mb-4 bg-brand-primary hover:bg-brand-dark text-white"
+            className="md:hidden mb-4 bg-brand-primary hover:bg-brand-dark text-white rounded-[4px] transition-all duration-300 transform hover:scale-105 hover:shadow-md"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           >
             {isSidebarOpen
@@ -432,7 +723,7 @@ const AllCarMainpage = () => {
           </Button>
 
           <div className={`md:w-80 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
-            <div className="sticky top-20 max-h-[calc(100vh-5rem)] overflow-auto custom-scrollbar-container">
+            <div className="sticky top-20 h-[calc(100vh-5rem)]">
               <CarFilterSidebar
                 onFilterChange={handleFilterChange}
                 filters={filters}
@@ -458,7 +749,7 @@ const AllCarMainpage = () => {
                   <select
                     value={sortOption}
                     onChange={(e) => handleSortChange(e.target.value)}
-                    className="p-2 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                    className="p-2 border rounded-[4px] text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary transition-all duration-300 hover:border-brand-primary cursor-pointer"
                   >
                     <option value="relevance">{currentLocale === "ar" ? "الصلة" : "Relevance"}</option>
                     <option value="price-low">
@@ -483,10 +774,10 @@ const AllCarMainpage = () => {
                       <button
                         key={i + 1}
                         onClick={() => paginate(i + 1)}
-                        className={`px-3 py-1 rounded ${
+                        className={`px-3 py-1 rounded-[4px] transition-all duration-300 transform hover:scale-105 ${
                           currentPage === i + 1
-                            ? "bg-brand-primary text-white"
-                            : "bg-white text-brand-primary border border-brand-primary"
+                            ? "bg-brand-primary text-white shadow-md"
+                            : "bg-white text-brand-primary border border-brand-primary hover:bg-brand-primary/10"
                         }`}
                       >
                         {i + 1}
@@ -498,7 +789,7 @@ const AllCarMainpage = () => {
 
               {/* No Results */}
               {filteredCars.length === 0 && (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <div className="text-center py-12 bg-gray-50 rounded-[4px] transition-all duration-500 animate-fadeIn">
                   <h3 className="text-xl font-medium text-gray-700 mb-2">
                     {currentLocale === "ar" ? "لا توجد سيارات متطابقة" : "No matching cars found"}
                   </h3>
@@ -507,7 +798,13 @@ const AllCarMainpage = () => {
                       ? "حاول تعديل معايير البحث الخاصة بك"
                       : "Try adjusting your search criteria"}
                   </p>
-                  <Button onClick={clearAllFilters} className="bg-brand-primary hover:bg-brand-dark text-white">
+                  <Button
+                    onClick={() => {
+                      console.log("Reset button clicked")
+                      clearAllFilters()
+                    }}
+                    className="bg-brand-primary hover:bg-brand-dark text-white rounded-[4px] transition-all duration-300 hover:shadow-lg transform hover:scale-105"
+                  >
                     {currentLocale === "ar" ? "إعادة تعيين الفلاتر" : "Reset Filters"}
                   </Button>
                 </div>
@@ -521,4 +818,3 @@ const AllCarMainpage = () => {
 }
 
 export default AllCarMainpage
-
