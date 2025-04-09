@@ -7,7 +7,7 @@ const navigationRoutes = (t) => [
   { key: "compare", label: t("compare"), href: "/compare-cars", icon: SplitSquareHorizontal },
   { key: "about", label: t("about"), href: "/about-us", icon: Info },
   { key: "contact", label: t("contact"), href: "/contact-us", icon: Phone },
-]
+] 
 
 export default navigationRoutes
 

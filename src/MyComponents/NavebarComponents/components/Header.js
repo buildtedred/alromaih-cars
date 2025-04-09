@@ -1,60 +1,74 @@
-"use client"
-import { useState, useEffect, useCallback } from "react"
-import { Phone, Menu, X, Search } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import Nav from "./Nav"
-import { Skeleton } from "@/components/ui/skeleton"
-import LanguageToggle from "./LanguageToggle"
-import SearchComponent from "./search/SearchComponent"
-import { useOdoo } from "@/contexts/OdooContext"
+"use client";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Phone, Menu, X, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import Nav from "./Nav";
+import { Skeleton } from "@/components/ui/skeleton";
+import LanguageToggle from "./LanguageToggle";
+import SearchComponent from "./search/SearchComponent";
+import { useOdoo } from "@/contexts/OdooContext";
+import { motion, useAnimation } from "framer-motion";
 
 const Header = () => {
-  const { t } = useTranslation()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isSearchVisible, setIsSearchVisible] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const { logo, loading } = useOdoo()
+  const { t } = useTranslation();
+  const { logo, loading } = useOdoo();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [mocData, setMocData] = useState([]);
+  const [loadingMocData, setLoadingMocData] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const controls = useAnimation();
 
-  //////////////////////////////////////////// mode data for testing /////////////////////////////
-
-  const [mocData, setMocData] = useState([])
-  const [loadingMocData, setLoadingMocData] = useState(true)
-
-  // Remove async/await and use .then() instead
   const fetchSliderData = useCallback(() => {
-    setLoadingMocData(true)
-
+    setLoadingMocData(true);
     fetch("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/logo")
       .then((response) => response.json())
       .then((data) => {
-        setMocData(data)
-        setLoadingMocData(false)
+        setMocData(data);
+        setLoadingMocData(false);
       })
       .catch((error) => {
-        console.error("Error fetching brands:", error)
-        setLoadingMocData(false)
-      })
-  }, [])
+        console.error("Error fetching brands:", error);
+        setLoadingMocData(false);
+      });
+  }, []);
 
   useEffect(() => {
-    fetchSliderData()
-  }, [fetchSliderData])
+    fetchSliderData();
+  }, [fetchSliderData]);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
-  const toggleSearch = () => setIsSearchVisible(!isSearchVisible)
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      setScrolled(isScrolled);
+      controls.start({
+        y: 0,
+        opacity: 1,
+        transition: { duration: 0.5, ease: "easeOut" },
+      });
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [controls]);
 
-  if (!mounted) {
-    return null
-  }
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const toggleSearch = () => setIsSearchVisible(!isSearchVisible);
 
-  //////////////////////////////////////////// mode data for testing end /////////////////////////////
+  if (!mounted) return null;
 
   return (
-    <header className="font-noto w-full shadow-sm relative">
+ 
+    <motion.div
+    animate={controls}
+    className={`w-full font-noto shadow-sm bg-white z-50 ${
+      scrolled ? "fixed top-0" : "relative"
+    }`}
+  >
       <div className="bg-white lg:px-[7rem]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -124,7 +138,8 @@ const Header = () => {
           </button>
         </div>
       </div>
-    </header>
+    </motion.div>
+ 
   )
 }
 

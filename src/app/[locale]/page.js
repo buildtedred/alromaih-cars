@@ -12,7 +12,7 @@ export default function Home() {
   const isArabic = pathname?.startsWith("/ar")
 
   return (
-    <main className="min-h-screen m-auto p-8">
+    <main className="min-h-screen m-auto p-2">
       <SlidesProvider>
         {/* HeroSection inside SlidesProvider */}
         <HeroSection />

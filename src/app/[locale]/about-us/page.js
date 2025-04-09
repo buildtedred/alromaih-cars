@@ -23,12 +23,12 @@ export default function Home() {
       {/* Content Section - Now positioned below the image */}
       <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto p-4 sm:p-6 bg-white mt-8 rounded-xl shadow-md">
         <h1
-          className={`text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-brand-primary ${locale === "ar" ? "rtl font-noto" : ""}`}
+          className={`mt-6 text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-brand-primary ${locale === "ar" ? "rtl font-noto" : ""}`}
         >
           {locale === "ar" ? "تعرف على الرميح للسيارات" : "About Al Rumaih Cars"}
         </h1>
 
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+        <div className="hidden md:flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
           {/* 1996 Location */}
           <div className="flex flex-col items-center">
             <Image
@@ -81,6 +81,69 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+
+        {/* for mobile  */}
+        <div className="md:hidden">
+
+          {/* Center Content */}
+          <div className={`  flex-1  max-w-xl px-2 sm:px-4 ${locale === "ar" ? "rtl" : ""}`}>
+            <p
+              className={` text-[12px] sm:text-base text-gray-700 leading-relaxed mb-4 sm:mb-6 text-center ${locale === "ar" ? "font-noto" : ""}`}
+            >
+              {locale === "ar"
+                ? "منذ عام 1996م انطلقنا في رحلة في مدينة عرعر شمال المملكة العربية السعودية. انطلاقاً من مبدأ خدمة العملاء وتقديم أفضل المنتجات، أصبحنا اليوم من أكبر معارض السيارات في المملكة العربية السعودية. ونسعى دائماً في تقديم أفضل الخدمات للعملاء لتلبية رغباتهم وتطلعاتهم."
+                : "Since 1996, we embarked on a journey in the city of Arar in northern Saudi Arabia. Based on the principle of customer service and providing the best products, we have become one of the largest car showrooms in the Kingdom of Saudi Arabia. We always strive to provide the best services to customers to meet their desires and aspirations."}
+            </p>
+          </div>
+
+          <div className="flex  justify-between gap-4 mb-8">
+
+            {/* 1996 Location */}
+            <div className="flex flex-col items-center">
+              <Image
+                src="/images/LocationPin.svg"
+                alt="Location pin"
+                width={30}
+                height={30}
+              // className="w-24 sm:w-28 md:w-32 lg:w-36 h-24 sm:h-28 md:h-32 lg:h-36"
+              />
+              <div className="bg-brand-light/30 px-4 sm:px-6 py-2 rounded-[5px] text-center mt-2">
+                <div className="font-bold text-lg sm:text-xl font-noto">1996</div>
+                <div className="text-xs sm:text-sm font-noto">{locale === "ar" ? "عرعر" : "Arar"}</div>
+              </div>
+            </div>
+
+            {/* Car SVG */}
+            <div className="flex justify-center my-2 sm:my-4">
+              <Image
+                src="/images/Car.svg"
+                alt="Car illustration"
+                width={130}
+                height={30}
+              // className="w-[180px] sm:w-[220px] md:w-[271px] h-auto"
+              />
+            </div>
+
+            {/* 2023 Location */}
+            <div className="flex flex-col items-center">
+              <Image
+                src="/images/LocationPin.svg"
+                alt="Location pin"
+                width={30}
+                height={30}
+              // className="w-24 sm:w-28 md:w-32 lg:w-36 h-24 sm:h-28 md:h-32 lg:h-36"
+              />
+              <div className="bg-brand-light/30 px-4 sm:px-6 py-2 rounded-[5px] text-center mt-2">
+                <div className="font-bold text-lg sm:text-xl font-noto">2023</div>
+                <div className="text-xs sm:text-sm font-noto">{locale === "ar" ? "الرياض" : "Riyadh"}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* for mobile  */}
+
+
       </div>
 
       {/* Features Section */}

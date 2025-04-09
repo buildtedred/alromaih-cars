@@ -132,7 +132,7 @@ const CarComparisonSelector = () => {
 
   // Otherwise, render the car selection form
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-6">
+    <div dir={isRTL ? "rtl" : "ltr"} className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm py-2">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-brand-primary">{isRTL ? "قارن بين السيارات" : "Compare Cars"}</h1>
@@ -142,7 +142,7 @@ const CarComparisonSelector = () => {
       </div>
 
       {/* Car Selection Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6 ">
         {/* First Car Panel */}
         <div className="border border-gray-200 rounded-lg p-4 order-2 md:order-1">
           <div className="flex justify-center mb-4">
