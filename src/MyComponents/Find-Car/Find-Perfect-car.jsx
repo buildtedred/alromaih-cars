@@ -1,16 +1,156 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, ChevronLeft } from "lucide-react"
+import { Search, X, ArrowLeft, Check } from "lucide-react"
 import { usePathname } from "next/navigation"
-import carsData from "@/app/api/mock-data" // Import the mock data
 import Image from "next/image"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 
-export default function FindPerfectCar() {
+// Import mock data (assuming this exists in your project)
+import carsData from "@/app/api/mock-data"
+
+export default function CarFinderModal() {
+  const pathname = usePathname()
+  const isArabic = pathname?.startsWith("/ar")
+  const [isOpen, setIsOpen] = useState(false)
+  const [initialPaymentMethod, setInitialPaymentMethod] = useState("")
+
+  const openModalWithPaymentMethod = (method) => {
+    setInitialPaymentMethod(method)
+    setIsOpen(true)
+  }
+
+  return (
+    <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30 shadow-lg">
+      {/* Left side - Payment Method Selection */}
+      <div className="p-4 sm:p-6 md:p-8 md:w-1/2">
+        <h1 className="text-xl sm:text-2xl font-bold text-brand-primary mb-4 sm:mb-6">
+          {isArabic ? "اختر طريقة الدفع" : "Choose Payment Method"}
+        </h1>
+
+        <p className="text-xs sm:text-sm text-brand-primary mb-4 sm:mb-6">
+          {isArabic
+            ? "اختر الطريقة التي تناسبك لامتلاك سيارتك الجديدة سواء من خلال التمويل المريح أو الدفع النقدي المباشر."
+            : "Choose the way that suits you to own your new car whether through convenient financing or direct cash payment."}
+        </p>
+
+        {/* Payment method buttons that open the modal */}
+        <div className="flex flex-row sm:flex-col gap-3 mt-4">
+          <button
+            onClick={() => openModalWithPaymentMethod("cash")}
+            className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-full sm:w-40"
+          >
+            <div className="w-5 h-5 sm:w-6 sm:h-6 relative">
+              <Image src="/icons/cash.svg" alt="Cash" width={24} height={24} className="text-brand-primary" />
+            </div>
+            <span className="text-brand-primary font-medium text-sm sm:text-base">{isArabic ? "نقدي" : "Cash"}</span>
+          </button>
+
+          <button
+            onClick={() => openModalWithPaymentMethod("finance")}
+            className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-full sm:w-40"
+          >
+            <div className="w-5 h-5 sm:w-6 sm:h-6 relative">
+              <Image src="/icons/finance.svg" alt="Finance" width={24} height={24} className="text-brand-primary" />
+            </div>
+            <span className="text-brand-primary font-medium text-sm sm:text-base">
+              {isArabic ? "تمويل" : "Finance"}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Right side - Process Diagram */}
+      <div className="p-4 sm:p-6 md:p-8 md:w-1/2 flex items-center justify-center">
+        {/* Circular diagram - make it smaller on mobile */}
+        <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64">
+          {/* Center circle */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-brand-primary/10 z-10"></div>
+
+          {/* Top circle - Compare & Explore */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/4 text-center">
+            <p className="text-xs text-brand-primary font-medium mb-2">
+              {isArabic ? "قارن واستكشف" : "Compare & Explore"}
+            </p>
+            <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center">
+              <Image src="/icons/CompareCar.svg" alt="Compare & Explore" width={40} height={40} />
+            </div>
+          </div>
+
+          {/* Right circle - Get Suitable Price */}
+          <div className="absolute top-1/2 right-0 transform translate-x-1/4 -translate-y-1/2 text-center">
+            <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
+              <Image src="/icons/Get-Suitable-Price.svg" alt="Get Suitable Price" width={40} height={40} />
+            </div>
+            <p className="text-xs text-brand-primary font-medium whitespace-nowrap">
+              {isArabic ? "احصل على السعر المناسب" : "Get Suitable Price"}
+            </p>
+          </div>
+
+          {/* Bottom circle - Car Home Delivery */}
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/4 text-center">
+            <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
+              <Image src="/icons/Car-Home-Delivery.svg" alt="Car Home Delivery" width={40} height={40} />
+            </div>
+            <p className="text-xs text-brand-primary font-medium">
+              {isArabic ? "توصيل السيارة للمنزل" : "Car Home Delivery"}
+            </p>
+          </div>
+
+          {/* Left circle - Discover Car */}
+          <div className="absolute top-1/2 left-0 transform -translate-x-1/4 -translate-y-1/2 text-center">
+            <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
+              <Image src="/icons/DiscoverCar.svg" alt="Discover Car" width={40} height={40} />
+            </div>
+            <p className="text-xs text-brand-primary font-medium">{isArabic ? "اكتشف السيارة" : "Discover Car"}</p>
+          </div>
+
+          {/* Connecting lines as curved paths */}
+          <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 200 200" fill="none">
+            <path
+              d="M100 40 C 90 60, 80 80, 80 100"
+              stroke="currentColor"
+              className="text-brand-primary"
+              strokeWidth="1"
+            />
+            <path
+              d="M120 100 C 140 80, 160 60, 160 100"
+              stroke="currentColor"
+              className="text-brand-primary"
+              strokeWidth="1"
+            />
+            <path
+              d="M100 160 C 110 140, 120 120, 120 100"
+              stroke="currentColor"
+              className="text-brand-primary"
+              strokeWidth="1"
+            />
+            <path
+              d="M40 100 C 60 120, 80 140, 80 100"
+              stroke="currentColor"
+              className="text-brand-primary"
+              strokeWidth="1"
+            />
+          </svg>
+        </div>
+      </div>
+
+      {/* Modal Dialog */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-6xl p-0 border-none bg-transparent">
+          <DialogTitle className="sr-only">{isArabic ? "اختيار السيارة" : "Car Selection"}</DialogTitle>
+          <CarFinderContent initialPaymentMethod={initialPaymentMethod} onClose={() => setIsOpen(false)} />
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
+function CarFinderContent({ initialPaymentMethod, onClose }) {
   const pathname = usePathname()
   const isArabic = pathname?.startsWith("/ar")
 
-  const [paymentMethod, setPaymentMethod] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState(initialPaymentMethod || "")
   const [activeStep, setActiveStep] = useState(0)
   const [selectedBrand, setSelectedBrand] = useState(null)
   const [selectedModel, setSelectedModel] = useState(null)
@@ -21,6 +161,14 @@ export default function FindPerfectCar() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [cars, setCars] = useState([])
+  const [showFinanceModal, setShowFinanceModal] = useState(false)
+  const [financeDetails, setFinanceDetails] = useState({
+    downPayment: 20,
+    loanTerm: 60,
+    interestRate: 3.5,
+    monthlyPayment: 0,
+  })
+  const [activeTab, setActiveTab] = useState("specs")
 
   // Derived data from mock data
   const [carBrands, setCarBrands] = useState([])
@@ -84,6 +232,33 @@ export default function FindPerfectCar() {
     }
   }, [])
 
+  // Calculate monthly payment when car or finance details change
+  useEffect(() => {
+    if (selectedCar && paymentMethod === "finance") {
+      calculateMonthlyPayment()
+    }
+  }, [selectedCar, financeDetails.downPayment, financeDetails.loanTerm, financeDetails.interestRate])
+
+  const calculateMonthlyPayment = () => {
+    if (!selectedCar) return
+
+    const carPrice = selectedCar.cashPrice
+    const downPaymentAmount = (carPrice * financeDetails.downPayment) / 100
+    const loanAmount = carPrice - downPaymentAmount
+    const monthlyInterest = financeDetails.interestRate / 100 / 12
+    const months = financeDetails.loanTerm
+
+    // Monthly payment formula: P * r * (1 + r)^n / ((1 + r)^n - 1)
+    const monthlyPayment =
+      (loanAmount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
+      (Math.pow(1 + monthlyInterest, months) - 1)
+
+    setFinanceDetails((prev) => ({
+      ...prev,
+      monthlyPayment: Math.round(monthlyPayment),
+    }))
+  }
+
   const steps = [
     { id: 0, title: isArabic ? "اختر العلامة التجارية" : "Choose the brand", completed: false },
     { id: 1, title: isArabic ? "اختر الموديل" : "Select model", completed: false },
@@ -91,7 +266,7 @@ export default function FindPerfectCar() {
   ]
 
   const handleBack = () => {
-    if (paymentMethod === "finance" && activeStep > 0) {
+    if (activeStep > 0) {
       // If we're showing the result and going back, reset showResult
       if (showResult) {
         setShowResult(false)
@@ -104,13 +279,9 @@ export default function FindPerfectCar() {
       } else if (activeStep === 2) {
         setSelectedCategory(null)
       }
-    } else if (paymentMethod === "finance" && activeStep === 0) {
-      setPaymentMethod("")
-      setSelectedBrand(null)
-      setSelectedModel(null)
-      setSelectedCategory(null)
-      setSelectedCar(null)
-      setShowResult(false)
+    } else {
+      // If at first step, close the modal
+      onClose()
     }
   }
 
@@ -138,148 +309,338 @@ export default function FindPerfectCar() {
     }
   }
 
+  const handleFinanceModalClose = () => {
+    setShowFinanceModal(false)
+  }
+
+  const handleFinanceDetailChange = (field, value) => {
+    setFinanceDetails((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  const renderFinanceModal = () => {
+    if (!showFinanceModal || !selectedCar) return null
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="text-xl font-bold text-brand-primary">{isArabic ? "تفاصيل التمويل" : "Finance Details"}</h3>
+            <button onClick={handleFinanceModalClose} className="p-2 rounded-full hover:bg-gray-100">
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+
+          <div className="p-6">
+            <div className="mb-6">
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-gray-500">{isArabic ? "السيارة" : "Car"}</span>
+                <span className="font-medium">{getText(selectedCar.name)}</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-gray-500">{isArabic ? "السعر الإجمالي" : "Total Price"}</span>
+                <span className="font-medium">{selectedCar.cashPrice.toLocaleString()} ريال</span>
+              </div>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {isArabic ? "الدفعة المقدمة (%)" : "Down Payment (%)"}
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={financeDetails.downPayment}
+                    onChange={(e) => handleFinanceDetailChange("downPayment", Number.parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <span className="ml-2 w-12 text-center">{financeDetails.downPayment}%</span>
+                </div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {((selectedCar.cashPrice * financeDetails.downPayment) / 100).toLocaleString()} ريال
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {isArabic ? "مدة القرض (شهر)" : "Loan Term (months)"}
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="range"
+                    min="12"
+                    max="84"
+                    step="12"
+                    value={financeDetails.loanTerm}
+                    onChange={(e) => handleFinanceDetailChange("loanTerm", Number.parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <span className="ml-2 w-12 text-center">{financeDetails.loanTerm}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  {isArabic ? "معدل الفائدة (%)" : "Interest Rate (%)"}
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    step="0.5"
+                    value={financeDetails.interestRate}
+                    onChange={(e) => handleFinanceDetailChange("interestRate", Number.parseFloat(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                  />
+                  <span className="ml-2 w-12 text-center">{financeDetails.interestRate}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-brand-light/30 p-4 rounded-lg mb-6">
+              <div className="flex justify-between mb-2">
+                <span className="text-sm">{isArabic ? "القسط الشهري" : "Monthly Payment"}</span>
+                <span className="font-bold text-xl text-brand-primary">
+                  {financeDetails.monthlyPayment.toLocaleString()} ريال
+                </span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-500">
+                <span>{isArabic ? "إجمالي المدفوعات" : "Total Payments"}</span>
+                <span>{(financeDetails.monthlyPayment * financeDetails.loanTerm).toLocaleString()} ريال</span>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                onClick={handleFinanceModalClose}
+                className="flex-1 py-2 border border-brand-primary text-brand-primary rounded-lg hover:bg-brand-primary/5"
+              >
+                {isArabic ? "إلغاء" : "Cancel"}
+              </button>
+              <button className="flex-1 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary/90">
+                {isArabic ? "تقديم طلب التمويل" : "Apply for Financing"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const renderResult = () => {
     if (!selectedCar) return null
 
     return (
-      <div className="p-8 pt-12 md:w-2/3 bg-brand-light/30">
-        <div className="space-y-8">
+      <div className="p-3 sm:p-4 md:p-6 lg:p-8 w-full bg-brand-light/30 h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+        {/* Back button */}
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-1 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>{isArabic ? "رجوع" : "Back"}</span>
+        </button>
+
+        <div className="space-y-4">
           {/* Filter Tags */}
           <div className="flex flex-wrap gap-2">
             {selectedBrand && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-sm text-brand-primary">
+              <div className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-xs sm:text-sm text-brand-primary">
                 {selectedBrand}
               </div>
             )}
             {selectedModel && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-sm text-brand-primary">
+              <div className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-xs sm:text-sm text-brand-primary">
                 {selectedModel}
               </div>
             )}
             {selectedCategory && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-sm text-brand-primary">
+              <div className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-xs sm:text-sm text-brand-primary">
                 {selectedCategory}
               </div>
             )}
           </div>
 
-          {/* Car Details */}
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-brand-dark">{getText(selectedCar.name)}</h2>
-            <p className="text-brand-primary">{getText(selectedCar.modelYear)}</p>
-            <p className="text-xl font-bold text-brand-dark">{selectedCar.cashPrice.toLocaleString()} ريال</p>
-          </div>
-
-          {/* Car Image */}
-          <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-white p-4">
-            <img
-              src={selectedCar.image || "/placeholder.svg"}
-              alt={getText(selectedCar.name)}
-              className="w-full h-full object-contain"
-            />
-          </div>
-
-          {/* Brand Logo */}
-          <div className="flex justify-center">
-            <div className="h-12 w-32 relative">
+          {/* Car Basic Info - Compact for Mobile */}
+          <div className="bg-white rounded-lg p-3 flex items-center gap-3 md:hidden">
+            <div className="w-16 h-16 relative shrink-0">
               <Image
-                src={selectedCar.brandLogo || "/placeholder.svg?height=48&width=128"}
+                src={selectedCar.brandLogo || "/placeholder.svg?height=64&width=64"}
                 alt={selectedCar.brand}
-                width={128}
-                height={48}
+                width={64}
+                height={64}
                 style={{ objectFit: "contain" }}
               />
             </div>
-          </div>
-
-          {/* Car Specifications */}
-          <div className="bg-white rounded-lg p-4 space-y-4">
-            <h3 className="text-lg font-bold text-brand-dark">{isArabic ? "المواصفات" : "Specifications"}</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "المحرك" : "Engine"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.engine)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "القوة الحصانية" : "Horsepower"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.power)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "ناقل الحركة" : "Transmission"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.transmission)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "نظام الدفع" : "Drivetrain"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.driveType)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "عزم الدوران" : "Torque"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.torque)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "نوع الوقود" : "Fuel Type"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.fuelType)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "التسارع" : "Acceleration"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.acceleration)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "المقاعد" : "Seats"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.seats)}</p>
-              </div>
+            <div>
+              <h2 className="text-lg font-bold text-brand-dark">{getText(selectedCar.name)}</h2>
+              <p className="text-sm text-brand-primary">{getText(selectedCar.modelYear)}</p>
+              <p className="text-base font-bold text-brand-dark">{selectedCar.cashPrice.toLocaleString()} ريال</p>
             </div>
           </div>
 
-          {/* Additional Specifications */}
-          <div className="bg-white rounded-lg p-4 space-y-4">
-            <h3 className="text-lg font-bold text-brand-dark">
-              {isArabic ? "مواصفات إضافية" : "Additional Specifications"}
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "الطول" : "Length"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.length)}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Left Column - Car Image and Basic Info */}
+            <div className="space-y-4">
+              {/* Car Details - Desktop Only */}
+              <div className="hidden md:block text-center md:text-left space-y-2">
+                <h2 className="text-xl md:text-2xl font-bold text-brand-dark">{getText(selectedCar.name)}</h2>
+                <p className="text-brand-primary">{getText(selectedCar.modelYear)}</p>
+                <p className="text-lg md:text-xl font-bold text-brand-dark">
+                  {selectedCar.cashPrice.toLocaleString()} ريال
+                </p>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "العرض" : "Width"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.width)}</p>
+
+              {/* Car Image */}
+              <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-white p-4">
+                <img
+                  src={selectedCar.image || "/placeholder.svg"}
+                  alt={getText(selectedCar.name)}
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "الارتفاع" : "Height"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.height)}</p>
+
+              {/* Brand Logo - Desktop Only */}
+              <div className="hidden md:flex justify-center md:justify-start">
+                <div className="h-10 w-28 relative">
+                  <Image
+                    src={selectedCar.brandLogo || "/placeholder.svg?height=40&width=112"}
+                    alt={selectedCar.brand}
+                    width={112}
+                    height={40}
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "قاعدة العجلات" : "Wheelbase"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.wheelbase)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "سعة خزان الوقود" : "Fuel Tank"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.fuelTank)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "سعة الحمولة" : "Cargo Capacity"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.cargoCapacity)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "الوسائد الهوائية" : "Airbags"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.airbags)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">{isArabic ? "المكابح" : "Brakes"}</p>
-                <p className="font-medium">{getText(selectedCar.specs.brakes)}</p>
+
+              {/* Action Buttons - Mobile View */}
+              <div className="flex flex-col gap-3 md:hidden">
+                <button
+                  className="w-full py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-dark transition-colors"
+                  onClick={() => console.log("View car details")}
+                >
+                  {isArabic ? "تواصل مع الوكيل" : "Contact Dealer"}
+                </button>
               </div>
             </div>
-          </div>
 
-          {/* Car Details Button */}
-          <div className="text-center">
-            <button
-              className="px-6 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-dark transition-colors"
-              onClick={() => console.log("View car details")}
-            >
-              {isArabic ? "تواصل مع الوكيل" : "Contact Dealer"}
-            </button>
+            {/* Right Column - Specifications */}
+            <div className="space-y-4">
+              {/* Tabs for Mobile */}
+              <div className="flex border-b border-gray-200 md:hidden">
+                <button
+                  className={`flex-1 py-2 text-sm font-medium ${
+                    activeTab === "specs" ? "text-brand-primary border-b-2 border-brand-primary" : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("specs")}
+                >
+                  {isArabic ? "المواصفات" : "Specifications"}
+                </button>
+                <button
+                  className={`flex-1 py-2 text-sm font-medium ${
+                    activeTab === "additional" ? "text-brand-primary border-b-2 border-brand-primary" : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("additional")}
+                >
+                  {isArabic ? "مواصفات إضافية" : "Additional"}
+                </button>
+              </div>
+
+              {/* Car Specifications */}
+              <div
+                className={`bg-white rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 ${activeTab !== "specs" && "hidden md:block"}`}
+              >
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-brand-dark">
+                  {isArabic ? "المواصفات" : "Specifications"}
+                </h3>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "المحرك" : "Engine"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.engine)}</p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "القوة الحصانية" : "Horsepower"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.power)}</p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "ناقل الحركة" : "Transmission"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">
+                      {getText(selectedCar.specs.transmission)}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "نظام الدفع" : "Drivetrain"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">
+                      {getText(selectedCar.specs.driveType)}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "عزم الدوران" : "Torque"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.torque)}</p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "نوع الوقود" : "Fuel Type"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.fuelType)}</p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "التسارع" : "Acceleration"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">
+                      {getText(selectedCar.specs.acceleration)}
+                    </p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "المقاعد" : "Seats"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.seats)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Specifications */}
+              <div
+                className={`bg-white rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 ${activeTab !== "additional" && "hidden md:block"}`}
+              >
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-brand-dark">
+                  {isArabic ? "مواصفات إضافية" : "Additional Specifications"}
+                </h3>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "الطول" : "Length"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.length)}</p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "العرض" : "Width"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.width)}</p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "الارتفاع" : "Height"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.height)}</p>
+                  </div>
+                  <div className="space-y-0.5 sm:space-y-1">
+                    <p className="text-xs text-muted-foreground">{isArabic ? "قاعدة العجلات" : "Wheelbase"}</p>
+                    <p className="text-xs sm:text-sm md:text-base font-medium">
+                      {getText(selectedCar.specs.wheelbase)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons - Desktop View */}
+              <div className="hidden md:flex md:flex-row gap-3 mt-4">
+                <button
+                  className="flex-1 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-dark transition-colors"
+                  onClick={() => console.log("View car details")}
+                >
+                  {isArabic ? "تواصل مع الوكيل" : "Contact Dealer"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -318,19 +679,28 @@ export default function FindPerfectCar() {
     switch (activeStep) {
       case 0:
         return (
-          <div className="space-y-6">
+          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+            {/* Back button */}
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{isArabic ? "رجوع" : "Back"}</span>
+            </button>
+
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 type="text"
                 placeholder={isArabic ? "ابحث عن العلامة التجارية" : "Search brand"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base"
               />
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-2 sm:gap-4">
               {carBrands
                 .filter((brand) => brand.toLowerCase().includes(searchQuery.toLowerCase()))
                 .map((brand) => {
@@ -367,7 +737,16 @@ export default function FindPerfectCar() {
 
       case 1:
         return (
-          <div className="space-y-6">
+          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+            {/* Back button */}
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{isArabic ? "رجوع" : "Back"}</span>
+            </button>
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -375,7 +754,7 @@ export default function FindPerfectCar() {
                 placeholder={isArabic ? "ابحث عن الموديل" : "Search Model"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base"
               />
             </div>
 
@@ -409,7 +788,16 @@ export default function FindPerfectCar() {
 
       case 2:
         return (
-          <div className="space-y-6">
+          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+            {/* Back button */}
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>{isArabic ? "رجوع" : "Back"}</span>
+            </button>
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -417,7 +805,7 @@ export default function FindPerfectCar() {
                 placeholder={isArabic ? "ابحث عن الفئة" : "Search category"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base"
               />
             </div>
 
@@ -458,301 +846,118 @@ export default function FindPerfectCar() {
     }
   }
 
-  if (!paymentMethod) {
-    return (
-      <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30 shadow-lg">
-        {/* Left side - Payment Method Selection */}
-        <div className="p-8 md:w-1/2">
-          <h1 className="text-2xl font-bold text-brand-primary mb-6">
-            {isArabic ? "اختر طريقة الدفع" : "Choose Payment Method"}
-          </h1>
-
-          <p className="text-sm text-brand-primary mb-6">
-            {isArabic
-              ? "اختر الطريقة التي تناسبك لامتلاك سيارتك الجديدة سواء من خلال التمويل المريح أو الدفع النقدي المباشر."
-              : "Choose the way that suits you to own your new car whether through convenient financing or direct cash payment."}
-          </p>
-
-          {/* Update the payment method buttons to be narrower and match the design in the image */}
-          <div className="flex flex-col gap-3 mt-4">
-            <button
-              onClick={() => setPaymentMethod("cash")}
-              className="flex items-center gap-3 px-4 py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-40"
-            >
-              <div className="w-6 h-6 relative">
-                <Image src="/icons/cash.svg" alt="Cash" width={24} height={24} className="text-brand-primary" />
-              </div>
-              <span className="text-brand-primary font-medium">{isArabic ? "نقدي" : "Cash"}</span>
-            </button>
-
-            <button
-              onClick={() => setPaymentMethod("finance")}
-              className="flex items-center gap-3 px-4 py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-40"
-            >
-              <div className="w-6 h-6 relative">
-                <Image src="/icons/finance.svg" alt="Finance" width={24} height={24} className="text-brand-primary" />
-              </div>
-              <span className="text-brand-primary font-medium">{isArabic ? "تمويل" : "Finance"}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Right side - Process Diagram */}
-        <div className="p-8 md:w-1/2 flex items-center justify-center">
-          {/* Update the circular diagram to match the image exactly */}
-          <div className="relative w-64 h-64">
-            {/* Center circle */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-brand-primary/10 z-10"></div>
-
-            {/* Top circle - Compare & Explore */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/4 text-center">
-              <p className="text-xs text-brand-primary font-medium mb-2">
-                {isArabic ? "قارن واستكشف" : "Compare & Explore"}
-              </p>
-              <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center">
-                <Image src="/icons/CompareCar.svg" alt="Compare & Explore" width={40} height={40} />
-              </div>
-            </div>
-
-            {/* Right circle - Get Suitable Price */}
-            <div className="absolute top-1/2 right-0 transform translate-x-1/4 -translate-y-1/2 text-center">
-              <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-                <Image src="/icons/Get-Suitable-Price.svg" alt="Get Suitable Price" width={40} height={40} />
-              </div>
-              <p className="text-xs text-brand-primary font-medium whitespace-nowrap">
-                {isArabic ? "احصل على السعر المناسب" : "Get Suitable Price"}
-              </p>
-            </div>
-
-            {/* Bottom circle - Car Home Delivery */}
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/4 text-center">
-              <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-                <Image src="/icons/Car-Home-Delivery.svg" alt="Car Home Delivery" width={40} height={40} />
-              </div>
-              <p className="text-xs text-brand-primary font-medium">
-                {isArabic ? "توصيل السيارة للمنزل" : "Car Home Delivery"}
-              </p>
-            </div>
-
-            {/* Left circle - Discover Car */}
-            <div className="absolute top-1/2 left-0 transform -translate-x-1/4 -translate-y-1/2 text-center">
-              <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-                <Image src="/icons/DiscoverCar.svg" alt="Discover Car" width={40} height={40} />
-              </div>
-              <p className="text-xs text-brand-primary font-medium">{isArabic ? "اكتشف السيارة" : "Discover Car"}</p>
-            </div>
-
-            {/* Connecting lines as curved paths to match the image */}
-            <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 200 200" fill="none">
-              <path
-                d="M100 40 C 90 60, 80 80, 80 100"
-                stroke="currentColor"
-                className="text-brand-primary"
-                strokeWidth="1"
-              />
-              <path
-                d="M120 100 C 140 80, 160 60, 160 100"
-                stroke="currentColor"
-                className="text-brand-primary"
-                strokeWidth="1"
-              />
-              <path
-                d="M100 160 C 110 140, 120 120, 120 100"
-                stroke="currentColor"
-                className="text-brand-primary"
-                strokeWidth="1"
-              />
-              <path
-                d="M40 100 C 60 120, 80 140, 80 100"
-                stroke="currentColor"
-                className="text-brand-primary"
-                strokeWidth="1"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30 shadow-lg">
-      {paymentMethod === "cash" ? (
-        <>
-          {/* Left side - Payment Method Selection (Selected Cash) */}
-          <div className="p-8 md:w-1/2">
-            <h1 className="text-2xl font-bold text-brand-primary mb-6">
-              {isArabic ? "اختر طريقة الدفع" : "Choose Payment Method"}
-            </h1>
-
-            <p className="text-sm text-brand-primary mb-6">
-              {isArabic
-                ? "اختر الطريقة التي تناسبك لامتلاك سيارتك الجديدة سواء من خلال التمويل المريح أو الدفع النقدي المباشر."
-                : "Choose the way that suits you to own your new car whether through convenient financing or direct cash payment."}
-            </p>
-
-            {/* Update the selected cash button style */}
-            <div className="flex flex-col gap-3 mt-4">
-              <button
-                onClick={() => setPaymentMethod("cash")}
-                className="flex items-center gap-3 px-4 py-3 rounded-md bg-white border-2 border-brand-primary transition-colors w-40"
-              >
-                <div className="w-6 h-6 relative">
-                  <Image src="/icons/cash.svg" alt="Cash" width={24} height={24} className="text-brand-primary" />
+    <div className="flex flex-col w-full relative border border-brand-primary/20 shadow-lg rounded-xl overflow-hidden bg-white">
+      {/* Vertical Steps Indicator for Mobile */}
+      <div className="flex flex-col md:flex-row w-full">
+        <div className="p-4 pt-6 w-full md:w-1/4 bg-brand-light/30 border-b md:border-b-0 md:border-r border-brand-primary/10">
+          {/* Mobile Steps (Horizontal) */}
+          <div className="flex md:hidden justify-between items-center w-full px-2 py-3">
+            {steps.map((step, index) => (
+              <div key={step.id} className="flex flex-col items-center relative">
+                {/* Step Circle */}
+                <div
+                  className={`
+              w-8 h-8 rounded-full flex items-center justify-center z-10
+              ${
+                index < activeStep || (index === 2 && showResult && selectedCar)
+                  ? "bg-brand-primary text-white"
+                  : index === activeStep
+                    ? "bg-brand-primary text-white"
+                    : "bg-gray-200 text-gray-500"
+              }
+            `}
+                >
+                  {index < activeStep || (index === 2 && showResult && selectedCar) ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <span>{index + 1}</span>
+                  )}
                 </div>
-                <span className="text-brand-primary font-medium">{isArabic ? "نقدي" : "Cash"}</span>
-              </button>
 
-              <button
-                onClick={() => setPaymentMethod("finance")}
-                className="flex items-center gap-3 px-4 py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-40"
-              >
-                <div className="w-6 h-6 relative">
-                  <Image src="/icons/finance.svg" alt="Finance" width={24} height={24} className="text-brand-primary" />
-                </div>
-                <span className="text-brand-primary font-medium">{isArabic ? "تمويل" : "Finance"}</span>
-              </button>
-            </div>
+                {/* Step Label */}
+                <span
+                  className={`text-xs mt-2 text-center max-w-[70px] ${
+                    index === activeStep ? "text-brand-primary font-medium" : "text-gray-500"
+                  }`}
+                >
+                  {step.title}
+                </span>
+
+                {/* Connecting Line */}
+                {index < steps.length - 1 && (
+                  <div className="absolute top-4 left-[calc(100%_-_8px)] w-[calc(100%_-_16px)] h-0.5 -z-0">
+                    <div className={`h-full ${index < activeStep ? "bg-brand-primary" : "bg-gray-200"}`}></div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
-          {/* Right side - Process Diagram */}
-          <div className="p-8 md:w-1/2 flex items-center justify-center">
-            {/* Update the circular diagram to match the image exactly */}
-            <div className="relative w-64 h-64">
-              {/* Center circle */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-brand-primary/10 z-10"></div>
+          {/* Desktop Steps (Vertical) */}
+          <div className="hidden md:block">
+            <div className="relative">
+              {/* Vertical Line */}
+              <div className="absolute left-4 top-4 w-0.5 h-[calc(100%_-_32px)] bg-gray-200"></div>
 
-              {/* Top circle - Compare & Explore */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/4 text-center">
-                <p className="text-xs text-brand-primary font-medium mb-2">
-                  {isArabic ? "قارن واستكشف" : "Compare & Explore"}
-                </p>
-                <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center">
-                  <Image src="/icons/CompareCar.svg" alt="Compare & Explore" width={40} height={40} />
-                </div>
-              </div>
-
-              {/* Right circle - Get Suitable Price */}
-              <div className="absolute top-1/2 right-0 transform translate-x-1/4 -translate-y-1/2 text-center">
-                <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-                  <Image src="/icons/Get-Suitable-Price.svg" alt="Get Suitable Price" width={40} height={40} />
-                </div>
-                <p className="text-xs text-brand-primary font-medium whitespace-nowrap">
-                  {isArabic ? "احصل على السعر المناسب" : "Get Suitable Price"}
-                </p>
-              </div>
-
-              {/* Bottom circle - Car Home Delivery */}
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/4 text-center">
-                <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-                  <Image src="/icons/Car-Home-Delivery.svg" alt="Car Home Delivery" width={40} height={40} />
-                </div>
-                <p className="text-xs text-brand-primary font-medium">
-                  {isArabic ? "توصيل السيارة للمنزل" : "Car Home Delivery"}
-                </p>
-              </div>
-
-              {/* Left circle - Discover Car */}
-              <div className="absolute top-1/2 left-0 transform -translate-x-1/4 -translate-y-1/2 text-center">
-                <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-                  <Image src="/icons/DiscoverCar.svg" alt="Discover Car" width={40} height={40} />
-                </div>
-                <p className="text-xs text-brand-primary font-medium">{isArabic ? "اكتشف السيارة" : "Discover Car"}</p>
-              </div>
-
-              {/* Connecting lines as curved paths to match the image */}
-              <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 200 200" fill="none">
-                <path
-                  d="M100 40 C 90 60, 80 80, 80 100"
-                  stroke="currentColor"
-                  className="text-brand-primary"
-                  strokeWidth="1"
-                />
-                <path
-                  d="M120 100 C 140 80, 160 60, 160 100"
-                  stroke="currentColor"
-                  className="text-brand-primary"
-                  strokeWidth="1"
-                />
-                <path
-                  d="M100 160 C 110 140, 120 120, 120 100"
-                  stroke="currentColor"
-                  className="text-brand-primary"
-                  strokeWidth="1"
-                />
-                <path
-                  d="M40 100 C 60 120, 80 140, 80 100"
-                  stroke="currentColor"
-                  className="text-brand-primary"
-                  strokeWidth="1"
-                />
-              </svg>
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="flex flex-col md:flex-row w-full relative border border-brand-primary/20 shadow-lg">
-          <button
-            onClick={handleBack}
-            className="absolute top-0 left-0 p-4 hover:bg-brand-primary/5 rounded-br-xl transition-colors z-10"
-          >
-            <ChevronLeft className="w-6 h-6 text-brand-primary" />
-            <span className="sr-only">{isArabic ? "العودة" : "Go back"}</span>
-          </button>
-
-          <div className="p-8 md:w-1/3 border-r border-brand-primary/10 bg-brand-light/30">
-            <div className="relative mt-12">
               {steps.map((step, index) => (
                 <div key={step.id} className="flex items-start mb-8 relative">
-                  <div className="flex flex-col items-center mr-4">
-                    <div
-                      className={`w-10 h-10 flex items-center justify-center relative overflow-visible
-                        ${
-                          index < activeStep || (index === 2 && showResult && selectedCar)
-                            ? ""
-                            : index === activeStep
-                              ? "bg-brand-primary text-white rounded-lg"
-                              : "bg-brand-primary/10 text-brand-primary/30 rounded-lg"
-                        }`}
-                    >
-                      {index < activeStep || (index === 2 && showResult && selectedCar) ? (
-                        <svg
-                          width="25"
-                          height="24"
-                          viewBox="0 0 25 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="text-brand-primary"
-                        >
-                          <path
-                            d="M4.67195 0.0805694C7.03552 -0.150928 9.70639 0.20298 12.1013 0.0772385C13.5792 0.466122 13.4754 2.5546 11.9241 2.73613C9.78548 2.98678 7.20853 2.56542 5.02208 2.7403C3.97828 2.82357 3.08937 3.57136 2.75489 4.5623C2.51104 9.30301 2.72194 14.0979 2.64697 18.8577C2.73759 20.1693 3.68912 21.1336 4.96276 21.3168L18.6548 21.3193C19.8197 21.2227 20.852 20.2708 21.011 19.0884C21.2895 17.0099 20.8413 14.386 21.025 12.2459C21.17 10.5521 23.2823 10.4222 23.6736 12.0044C23.5501 14.331 23.8582 16.8642 23.6778 19.1658C23.4809 21.6798 21.3686 23.7691 18.8987 23.9965L4.83754 23.9998C2.28531 23.7708 0.257859 21.7381 0 19.1658L0.00576682 4.83877C0.257859 2.40221 2.23918 0.318729 4.67195 0.0805694Z"
-                            fill="currentColor"
-                          />
-                          <path
-                            d="M23.4779 1.38704C24.5819 1.24381 25.3167 2.3555 24.862 3.34645C20.9661 7.51757 16.8387 11.4872 12.8571 15.5842C12.1544 16.1696 11.5703 16.1971 10.8511 15.615C9.29566 13.8346 7.23773 12.235 5.73177 10.4421C4.5232 9.00315 5.88006 7.40099 7.40003 8.31949L11.8611 12.7729L22.8749 1.65018C23.0339 1.51028 23.2695 1.41452 23.4779 1.38704Z"
-                            fill="currentColor"
-                          />
-                        </svg>
-                      ) : (
-                        <span>{index + 1}</span>
-                      )}
-                    </div>
-                    {index < steps.length - 1 && (
-                      <div className={`w-0.5 h-8 ${index < activeStep ? "bg-brand-primary" : "bg-brand-primary/20"}`} />
+                  {/* Step Circle */}
+                  <div
+                    className={`
+                w-8 h-8 rounded-full flex items-center justify-center z-10
+                ${
+                  index < activeStep || (index === 2 && showResult && selectedCar)
+                    ? "bg-brand-primary text-white"
+                    : index === activeStep
+                      ? "bg-brand-primary text-white"
+                      : "bg-gray-200 text-gray-500"
+                }
+              `}
+                  >
+                    {index < activeStep || (index === 2 && showResult && selectedCar) ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <span>{index + 1}</span>
                     )}
                   </div>
-                  <div className={`flex-1 pt-2 ${index === activeStep ? "" : "opacity-50"}`}>
-                    <h4 className="text-sm font-medium text-brand-primary">{step.title}</h4>
+
+                  {/* Step Content */}
+                  <div className="ml-4">
+                    <p
+                      className={`text-sm font-medium ${index === activeStep ? "text-brand-primary" : "text-gray-600"}`}
+                    >
+                      {step.title}
+                    </p>
+
+                    {/* Selected Value */}
+                    {index === 0 && selectedBrand && (
+                      <p className="text-xs text-brand-primary/70 mt-1">{selectedBrand}</p>
+                    )}
+                    {index === 1 && selectedModel && (
+                      <p className="text-xs text-brand-primary/70 mt-1">{selectedModel}</p>
+                    )}
+                    {index === 2 && selectedCategory && (
+                      <p className="text-xs text-brand-primary/70 mt-1">{selectedCategory}</p>
+                    )}
                   </div>
+
+                  {/* Colored Line Segment */}
+                  {index < steps.length - 1 && (
+                    <div
+                      className="absolute left-4 top-8 w-0.5 h-[calc(100%_-_8px)] bg-brand-primary"
+                      style={{ opacity: index < activeStep ? 1 : 0 }}
+                    ></div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
-
-          <div className="p-8 pt-12 md:w-2/3 bg-brand-light/30">{renderStepContent()}</div>
         </div>
-      )}
+
+        <div className="w-full md:w-3/4 bg-brand-light/10">{renderStepContent()}</div>
+      </div>
+      {renderFinanceModal()}
     </div>
   )
 }
-

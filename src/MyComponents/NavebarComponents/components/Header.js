@@ -79,7 +79,7 @@ const Header = () => {
                 <Search className="h-5 w-5 text-gray-700" />
               </button>
               <LanguageToggle />
-              <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-[30px] hover:bg-brand-dark hover:text-brand-primary transition-colors">
+              <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-[10px] hover:bg-brand-dark hover:text-brand-primary transition-colors">
                 <span className="font-semibold flex items-center gap-2" dir="ltr">
                   <Phone className="h-5 w-5" />
                   <span>9200 31202</span>

@@ -50,10 +50,19 @@ const scrollbarStyles = `
 }
 `
 
-// Fixed CarFilterSidebar component with working checkboxes
+// Replace the CarFilterSidebar component with this implementation
 const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
   const [expandedBrands, setExpandedBrands] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
+  // Add state to track which sections are expanded
+  const [expandedSections, setExpandedSections] = useState({
+    priceRange: true,
+    brandsAndModels: true,
+    year: true,
+    fuelType: true,
+    transmission: true,
+    seats: true,
+  })
 
   // Get max price for range slider
   const maxPrice = useMemo(() => {
@@ -89,7 +98,23 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
     )
   }, [brands, modelsByBrand, searchTerm])
 
-  const toggleBrand = (brand) => {
+  // Toggle section expansion
+  const toggleSection = (section, e) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }))
+  }
+
+  const toggleBrand = (brand, e) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     setExpandedBrands((prev) => (prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]))
   }
 
@@ -224,255 +249,322 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
       <div className="flex-1 overflow-auto custom-scrollbar-container">
         <div className="divide-y">
           {/* Price Range Section */}
-          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <div className="flex justify-between items-center mb-2">
+          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <button
+              type="button"
+              onClick={(e) => toggleSection("priceRange", e)}
+              className="flex justify-between items-center mb-2 w-full text-left"
+            >
               <h4 className="font-medium text-brand-primary text-lg">
                 {language === "ar" ? "نطاق السعر" : "Price Range"}
               </h4>
-              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
-            </div>
+              <ChevronDown
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.priceRange ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
             {/* Use the provided RangeSlider component */}
-            <div className="transition-all duration-300 ease-in-out">
-              <RangeSlider
-                min={0}
-                max={maxPrice}
-                value={filters.priceRange}
-                onValueChange={handlePriceRangeChange}
-                onValueCommit={handlePriceRangeChange}
-                step={10000}
-                className="mb-2"
-              />
+            {expandedSections.priceRange && (
+              <div className="transition-all duration-300 ease-in-out">
+                <RangeSlider
+                  min={0}
+                  max={maxPrice}
+                  value={filters.priceRange}
+                  onValueChange={handlePriceRangeChange}
+                  onValueCommit={handlePriceRangeChange}
+                  step={10000}
+                  className="mb-2"
+                />
 
-              {/* Price range display */}
-              <div className="flex justify-between text-sm text-brand-primary mt-4">
-                <span>{formatPrice(filters.priceRange[0])}</span>
-                <span>{formatPrice(filters.priceRange[1])}</span>
+                {/* Price range display */}
+                <div className="flex justify-between text-sm text-brand-primary mt-4">
+                  <span>{formatPrice(filters.priceRange[0])}</span>
+                  <span>{formatPrice(filters.priceRange[1])}</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Brands + Models Section */}
-          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <div className="flex justify-between items-center mb-4">
+          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <button
+              type="button"
+              onClick={(e) => toggleSection("brandsAndModels", e)}
+              className="flex justify-between items-center mb-4 w-full text-left"
+            >
               <h4 className="font-medium text-brand-primary text-lg">
                 {language === "ar" ? "الماركات + الموديلات" : "Brands + Models"}
               </h4>
-              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
-            </div>
-
-            {/* Search box */}
-            <div className="relative mb-4 transition-all duration-300 ease-in-out">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                placeholder={language === "ar" ? "ابحث عن الماركات والموديلات" : "Search brands and models"}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 border rounded-[4px] focus:outline-none focus:ring-1 focus:ring-brand-primary"
+              <ChevronDown
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.brandsAndModels ? "rotate-180" : ""
+                }`}
               />
-            </div>
+            </button>
 
-            {/* Brand list */}
-            <div className="space-y-1 transition-all duration-300 ease-in-out">
-              {filteredBrands.map((brand) => (
-                <div key={brand} className="border-b pb-2">
-                  <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-[4px]">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id={`brand-${brand}`}
-                        checked={areAllModelsSelected(brand)}
-                        onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
-                        className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
-                      />
-                      <Label htmlFor={`brand-${brand}`} className="text-sm font-medium leading-none cursor-pointer">
-                        {brand}
-                      </Label>
-                    </div>
-                    <button
-                      onClick={() => toggleBrand(brand)}
-                      className="transition-all duration-200 hover:bg-gray-100 p-1 rounded-full"
-                    >
-                      {expandedBrands.includes(brand) ? (
-                        <ChevronUp className="h-4 w-4 text-brand-primary transition-transform duration-300" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-brand-primary transition-transform duration-300" />
-                      )}
-                    </button>
-                  </div>
+            {expandedSections.brandsAndModels && (
+              <>
+                {/* Search box */}
+                <div className="relative mb-4 transition-all duration-300 ease-in-out">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <input
+                    type="text"
+                    placeholder={language === "ar" ? "ابحث عن الماركات والموديلات" : "Search brands and models"}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 border rounded-[4px] focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                  />
+                </div>
 
-                  {/* Models under this brand (expandable) */}
-                  {(expandedBrands.includes(brand) || searchTerm) && (
-                    <div className="ml-8 mt-1 space-y-1 transition-all duration-300 ease-in-out">
-                      {modelsByBrand[brand]?.map((model) => (
-                        <div key={model.id} className="flex items-center gap-2 transition-opacity duration-200">
+                {/* Brand list */}
+                <div className="space-y-1 transition-all duration-300 ease-in-out">
+                  {filteredBrands.map((brand) => (
+                    <div key={brand} className="border-b pb-2">
+                      <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-[4px]">
+                        <div className="flex items-center gap-2">
                           <Checkbox
-                            id={`model-${model.id}`}
-                            checked={filters.selectedModels?.includes(model.id)}
-                            onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
+                            id={`brand-${brand}`}
+                            checked={areAllModelsSelected(brand)}
+                            onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
                             className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
                           />
-                          <Label
-                            htmlFor={`model-${model.id}`}
-                            className="text-xs font-medium leading-none cursor-pointer"
-                          >
-                            {model.name}
+                          <Label htmlFor={`brand-${brand}`} className="text-sm font-medium leading-none cursor-pointer">
+                            {brand}
                           </Label>
                         </div>
-                      ))}
+                        <button
+                          type="button"
+                          onClick={(e) => toggleBrand(brand, e)}
+                          className="transition-all duration-200 hover:bg-gray-100 p-1 rounded-full"
+                        >
+                          {expandedBrands.includes(brand) ? (
+                            <ChevronUp className="h-4 w-4 text-brand-primary transition-transform duration-300" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-brand-primary transition-transform duration-300" />
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Models under this brand (expandable) */}
+                      {(expandedBrands.includes(brand) || searchTerm) && (
+                        <div className="ml-8 mt-1 space-y-1 transition-all duration-300 ease-in-out">
+                          {modelsByBrand[brand]?.map((model) => (
+                            <div key={model.id} className="flex items-center gap-2 transition-opacity duration-200">
+                              <Checkbox
+                                id={`model-${model.id}`}
+                                checked={filters.selectedModels?.includes(model.id)}
+                                onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
+                                className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                              />
+                              <Label
+                                htmlFor={`model-${model.id}`}
+                                className="text-xs font-medium leading-none cursor-pointer"
+                              >
+                                {model.name}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </div>
 
           {/* Year Section */}
-          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <div className="flex justify-between items-center mb-4">
+          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <button
+              type="button"
+              onClick={(e) => toggleSection("year", e)}
+              className="flex justify-between items-center mb-4 w-full text-left"
+            >
               <h4 className="font-medium text-brand-primary text-lg">{language === "ar" ? "السنة" : "Year"}</h4>
-              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
-            </div>
+              <ChevronDown
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.year ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
             {/* In the Year Section, update the button onClick handler to toggle selection */}
-            <div className="space-y-3 transition-all duration-300 ease-in-out">
-              {/* Extract unique years from cars data */}
-              {[...new Set(cars.map((car) => car.specs.year))]
-                .sort((a, b) => b - a) // Sort years in descending order
-                .map((year) => (
-                  <button
-                    key={year}
-                    onClick={() => handleYearChange(year)}
-                    className="flex items-center focus:outline-none transition-all duration-200 hover:opacity-80"
-                  >
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 border-brand-primary flex items-center justify-center transition-colors duration-200 ${
-                        filters.year === year.toString() ? "bg-brand-primary" : "bg-white"
-                      }`}
+            {expandedSections.year && (
+              <div className="space-y-3 transition-all duration-300 ease-in-out">
+                {/* Extract unique years from cars data */}
+                {[...new Set(cars.map((car) => car.specs.year))]
+                  .sort((a, b) => b - a) // Sort years in descending order
+                  .map((year) => (
+                    <button
+                      key={year}
+                      type="button"
+                      onClick={() => handleYearChange(year)}
+                      className="flex items-center focus:outline-none transition-all duration-200 hover:opacity-80 w-full text-left"
                     >
-                      {filters.year === year.toString() && <div className="w-2 h-2 rounded-full bg-white" />}
-                    </div>
-                    <Label className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      {year}
-                    </Label>
-                  </button>
-                ))}
-            </div>
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 border-brand-primary flex items-center justify-center transition-colors duration-200 ${
+                          filters.year === year.toString() ? "bg-brand-primary" : "bg-white"
+                        }`}
+                      >
+                        {filters.year === year.toString() && <div className="w-2 h-2 rounded-full bg-white" />}
+                      </div>
+                      <Label className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        {year}
+                      </Label>
+                    </button>
+                  ))}
+              </div>
+            )}
           </div>
 
           {/* Fuel Type Section */}
-          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <div className="flex justify-between items-center mb-4">
+          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <button
+              type="button"
+              onClick={(e) => toggleSection("fuelType", e)}
+              className="flex justify-between items-center mb-4 w-full text-left"
+            >
               <h4 className="font-medium text-brand-primary text-lg">
                 {language === "ar" ? "نوع الوقود" : "Fuel Type"}
               </h4>
-              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
-            </div>
+              <ChevronDown
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.fuelType ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
-            <div className="space-y-3 transition-all duration-300 ease-in-out">
-              {/* Extract unique fuel types from cars data */}
-              {[
-                ...new Set(
-                  cars.map((car) => {
-                    // Handle both object and string fuel types
-                    return typeof car.specs.fuelType === "object"
-                      ? car.specs.fuelType[language] || car.specs.fuelType.en
-                      : car.specs.fuelType
-                  }),
-                ),
-              ]
-                .filter(Boolean) // Remove any undefined or null values
-                .map((fuelType) => (
-                  <div key={fuelType} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`fuel-${fuelType}`}
-                      checked={Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)}
-                      onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
-                      className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
-                    />
-                    <Label htmlFor={`fuel-${fuelType}`} className="text-sm font-medium leading-none cursor-pointer">
-                      {fuelType}
-                    </Label>
-                  </div>
-                ))}
-            </div>
+            {expandedSections.fuelType && (
+              <div className="space-y-3 transition-all duration-300 ease-in-out">
+                {/* Extract unique fuel types from cars data */}
+                {[
+                  ...new Set(
+                    cars.map((car) => {
+                      // Handle both object and string fuel types
+                      return typeof car.specs.fuelType === "object"
+                        ? car.specs.fuelType[language] || car.specs.fuelType.en
+                        : car.specs.fuelType
+                    }),
+                  ),
+                ]
+                  .filter(Boolean) // Remove any undefined or null values
+                  .map((fuelType) => (
+                    <div key={fuelType} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`fuel-${fuelType}`}
+                        checked={Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)}
+                        onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
+                        className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                      />
+                      <Label htmlFor={`fuel-${fuelType}`} className="text-sm font-medium leading-none cursor-pointer">
+                        {fuelType}
+                      </Label>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
 
           {/* Transmission Section */}
-          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <div className="flex justify-between items-center mb-4">
+          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <button
+              type="button"
+              onClick={(e) => toggleSection("transmission", e)}
+              className="flex justify-between items-center mb-4 w-full text-left"
+            >
               <h4 className="font-medium text-brand-primary text-lg">
                 {language === "ar" ? "ناقل الحركة" : "Transmission"}
               </h4>
-              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
-            </div>
+              <ChevronDown
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.transmission ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
-            <div className="space-y-3 transition-all duration-300 ease-in-out">
-              {/* Extract unique transmission types from cars data */}
-              {[
-                ...new Set(
-                  cars.map((car) => {
-                    // Handle both object and string transmission types
-                    return typeof car.specs.transmission === "object"
-                      ? car.specs.transmission[language] || car.specs.transmission.en
-                      : car.specs.transmission
-                  }),
-                ),
-              ]
-                .filter(Boolean) // Remove any undefined or null values
-                .map((transmission) => (
-                  <div key={transmission} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`transmission-${transmission}`}
-                      checked={Array.isArray(filters.transmission) && filters.transmission.includes(transmission)}
-                      onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
-                      className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
-                    />
-                    <Label
-                      htmlFor={`transmission-${transmission}`}
-                      className="text-sm font-medium leading-none cursor-pointer"
-                    >
-                      {transmission}
-                    </Label>
-                  </div>
-                ))}
-            </div>
+            {expandedSections.transmission && (
+              <div className="space-y-3 transition-all duration-300 ease-in-out">
+                {/* Extract unique transmission types from cars data */}
+                {[
+                  ...new Set(
+                    cars.map((car) => {
+                      // Handle both object and string transmission types
+                      return typeof car.specs.transmission === "object"
+                        ? car.specs.transmission[language] || car.specs.transmission.en
+                        : car.specs.transmission
+                    }),
+                  ),
+                ]
+                  .filter(Boolean) // Remove any undefined or null values
+                  .map((transmission) => (
+                    <div key={transmission} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`transmission-${transmission}`}
+                        checked={Array.isArray(filters.transmission) && filters.transmission.includes(transmission)}
+                        onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
+                        className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                      />
+                      <Label
+                        htmlFor={`transmission-${transmission}`}
+                        className="text-sm font-medium leading-none cursor-pointer"
+                      >
+                        {transmission}
+                      </Label>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
 
           {/* Seats Section */}
-          <div className="p-4 group cursor-pointer hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <div className="flex justify-between items-center mb-4">
+          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
+            <button
+              type="button"
+              onClick={(e) => toggleSection("seats", e)}
+              className="flex justify-between items-center mb-4 w-full text-left"
+            >
               <h4 className="font-medium text-brand-primary text-lg">{language === "ar" ? "المقاعد" : "Seats"}</h4>
-              <ChevronDown className="h-5 w-5 text-brand-primary transition-transform duration-300" />
-            </div>
+              <ChevronDown
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.seats ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
-            <div className="space-y-3 transition-all duration-300 ease-in-out">
-              {/* Extract unique seat options from cars data */}
-              {[
-                ...new Set(
-                  cars.map((car) => {
-                    // Handle both object and string seats types
-                    return typeof car.specs.seats === "object"
-                      ? car.specs.seats[language] || car.specs.seats.en
-                      : car.specs.seats
-                  }),
-                ),
-              ]
-                .filter(Boolean) // Remove any undefined or null values
-                .map((seatOption) => (
-                  <div key={seatOption} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`seats-${seatOption}`}
-                      checked={filters.seats?.includes(seatOption)}
-                      onCheckedChange={(checked) => handleSeatChange(seatOption, checked)}
-                      className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
-                    />
-                    <Label htmlFor={`seats-${seatOption}`} className="text-sm font-medium leading-none cursor-pointer">
-                      {seatOption}
-                    </Label>
-                  </div>
-                ))}
-            </div>
+            {expandedSections.seats && (
+              <div className="space-y-3 transition-all duration-300 ease-in-out">
+                {/* Extract unique seat options from cars data */}
+                {[
+                  ...new Set(
+                    cars.map((car) => {
+                      // Handle both object and string seats types
+                      return typeof car.specs.seats === "object"
+                        ? car.specs.seats[language] || car.specs.seats.en
+                        : car.specs.seats
+                    }),
+                  ),
+                ]
+                  .filter(Boolean) // Remove any undefined or null values
+                  .map((seatOption) => (
+                    <div key={seatOption} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`seats-${seatOption}`}
+                        checked={filters.seats?.includes(seatOption)}
+                        onCheckedChange={(checked) => handleSeatChange(seatOption, checked)}
+                        className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                      />
+                      <Label
+                        htmlFor={`seats-${seatOption}`}
+                        className="text-sm font-medium leading-none cursor-pointer"
+                      >
+                        {seatOption}
+                      </Label>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
