@@ -1,4 +1,5 @@
 import CarCard from "@/MyComponents/Cards/CarCard.js"
+import { motion } from "framer-motion"
 
 export function CarGrid({ cars, loading, locale }) {
   // Check if cars is undefined, null, or empty
@@ -48,20 +49,32 @@ export function CarGrid({ cars, loading, locale }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
       {processedCars.map((car, index) => (
-        <div
+        <motion.div
           key={car.id}
-          className="flex justify-center w-full transition-all duration-500 hover:translate-y-[-5px]"
-          style={{
-            animationName: "fadeIn",
-            animationDuration: "0.5s",
-            animationTimingFunction: "ease-out",
-            animationFillMode: "forwards",
-            animationDelay: `${index * 100}ms`,
-            opacity: 0,
+          className="flex justify-center w-full"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1.5, y: 0 }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 0.3,
+            delay: index * 0.2 // stagger effect
           }}
         >
-          <CarCard car={car} locale={locale} />
-        </div>
+          <div
+            key={car.id}
+            className="flex justify-center w-full transition-all duration-500 hover:translate-y-[-5px]"
+            style={{
+              animationName: "fadeIn",
+              animationDuration: "0.5s",
+              animationTimingFunction: "ease-out",
+              animationFillMode: "forwards",
+              animationDelay: `${index * 100}ms`,
+              opacity: 0,
+            }}
+          >
+            <CarCard car={car} locale={locale} />
+          </div>
+        </motion.div>
       ))}
     </div>
   )

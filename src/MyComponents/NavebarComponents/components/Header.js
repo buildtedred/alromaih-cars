@@ -7,7 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import LanguageToggle from "./LanguageToggle";
 import SearchComponent from "./search/SearchComponent";
 import { useOdoo } from "@/contexts/OdooContext";
-import { motion, useAnimation } from "framer-motion";
+import { motion ,useMotionValueEvent} from "framer-motion";
+import { useScroll } from "motion/react"
 
 const Header = () => {
   const { t } = useTranslation();
@@ -18,7 +19,12 @@ const Header = () => {
   const [loadingMocData, setLoadingMocData] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const controls = useAnimation();
+  const [scroll, setScroll] = useState(0);
+  const { scrollY } = useScroll()
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScroll(latest)
+    console.log("Page scroll: ", latest)
+  })
 
   const fetchSliderData = useCallback(() => {
     setLoadingMocData(true);
@@ -42,31 +48,29 @@ const Header = () => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled = window.scrollY > 10;
-      setScrolled(isScrolled);
-      controls.start({
-        y: 0,
-        opacity: 1,
-        transition: { duration: 0.5, ease: "easeOut" },
-      });
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [controls]);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleSearch = () => setIsSearchVisible(!isSearchVisible);
 
   if (!mounted) return null;
 
+
+
   return (
  
     <motion.div
-    animate={controls}
+    animate={{
+      opacity: scroll > 100 ? 1 : 1, // Always visible (opacity: 1)
+    }}
+    initial={{ opacity: 0 }} // Start with opacity 0 for smooth transition
+    transition={{
+      opacity: {
+        duration: scroll > 100 ? 0.5 : 0, // Apply transition only if scroll > 100
+        ease: "easeInOut",
+      },
+    }}
     className={`w-full font-noto shadow-sm bg-white z-50 ${
-      scrolled ? "fixed top-0" : "relative"
+      scroll > 100 ? "fixed top-0" : "relative"
     }`}
   >
       <div className="bg-white lg:px-[7rem]">
@@ -93,7 +97,7 @@ const Header = () => {
                 <Search className="h-5 w-5 text-gray-700" />
               </button>
               <LanguageToggle />
-              <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-[10px] hover:bg-brand-dark hover:text-brand-primary transition-colors">
+              <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-[30px] hover:bg-brand-dark hover:text-brand-primary transition-colors">
                 <span className="font-semibold flex items-center gap-2" dir="ltr">
                   <Phone className="h-5 w-5" />
                   <span>9200 31202</span>

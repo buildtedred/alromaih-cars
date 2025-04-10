@@ -1,8 +1,8 @@
 "use client"
 
 import navigationRoutes from "@/All-routes/All-routes"
-import { Link } from "@/i18n/routing"
-import { usePathname } from "next/navigation"
+import Link from "next/link"
+import { useParams, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -10,7 +10,10 @@ const Nav = ({ isMobile }) => {
   const pathname = usePathname()
   const [isClient, setIsClient] = useState(false)
   const { t } = useTranslation()
-
+  // Get locale from URL params
+  const params = useParams()
+  // Get current locale from the pathname (assuming the locale is the first part of the path)
+  const locale = pathname.startsWith("/ar") ? "ar" : "en";
   // Create a translation function that works with your structure
   const getTranslation = (key) => {
     // Define hardcoded fallbacks for when translations fail
@@ -81,10 +84,11 @@ const Nav = ({ isMobile }) => {
               const isActive = pathname === item.href
 
               return (
+                <div key={item.key}  onClick={handleLinkClick}>
                 <Link
-                  onClick={handleLinkClick}
-                  href={item.href}
-                  key={item.key}
+                 
+                  href={`/${locale}/${item.href}`}
+                  
                   className={`flex items-center text-gray-700 hover:text-brand-primary font-medium transition-colors py-3 md:py-0 border-b md:border-b-0 border-gray-100 last:border-b-0 ${
                     isActive ? "text-brand-primary" : ""
                   }`}
@@ -94,6 +98,7 @@ const Nav = ({ isMobile }) => {
                   {/* Make sure item.label is a string */}
                   {typeof item.label === "string" ? item.label : ""}
                 </Link>
+                </div>
               )
             })}
           </div>
