@@ -240,35 +240,35 @@ export default function Footer() {
             className={`flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4 ${locale === "ar" ? "rtl" : ""}`}
           >
             {/* Payment Methods */}
-            <div className="flex gap-6 items-center order-2 md:order-1">
+            <div className="flex gap-6 items-center order-1 md:order-1">
               <Image src="/images/Visa.png" alt="Visa" width={45} height={30} className="object-contain" />
               <Image src="/images/MasterCard.png" alt="MasterCard" width={45} height={30} className="object-contain" />
               <Image src="/images/Mada.png" alt="Mada" width={45} height={30} className="object-contain" />
             </div>
 
             {/* Terms and Copyright */}
-            <div className="flex items-center gap-2 text-gray-600 text-sm order-1 md:order-2 text-center">
+            <div className="order-3 md:order-2 flex items-center gap-2 text-gray-600 text-sm  text-center">
               <Link
                 href={`/${locale}/terms-and-conditions`}
-                className={`hover:text-brand-600 transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                className={`hover:text-brand-600 transition-colors text-[10px]  md:text-[15px] ${locale === "ar" ? "font-noto" : ""}`}
               >
                 {locale === "ar" ? "الشروط والأحكام" : "Terms & Conditions"}
               </Link>
               <span>|</span>
               <Link
                 href={`/${locale}/privacy-policy`}
-                className={`hover:text-brand-600 transition-colors ${locale === "ar" ? "font-noto" : ""}`}
+                className={`hover:text-brand-600 transition-colors text-[10px] md:text-[15px] ${locale === "ar" ? "font-noto" : ""}`}
               >
                 {locale === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}
               </Link>
               <span>|</span>
-              <p className={locale === "ar" ? "font-noto" : ""}>
+              <p className={locale === "ar" ? "font-noto text-[10px]" : "text-[10px] md:text-[15px]"}>
                 {locale === "ar" ? "© 2025 الرميح. جميع الحقوق محفوظة" : "© 2025 Alromaih. All rights reserved"}
               </p>
             </div>
 
             {/* Certificates */}
-            <div className="flex gap-4 order-3">
+            <div className="flex gap-4 order-2 md:order-3">
               <Image src="/images/Maroof.png" alt="Maroof" width={35} height={35} className="object-contain" />
               <Image src="/images/Vat.png" alt="VAT" width={35} height={35} className="object-contain" />
             </div>

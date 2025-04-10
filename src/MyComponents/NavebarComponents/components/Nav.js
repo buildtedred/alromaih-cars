@@ -59,9 +59,9 @@ const Nav = ({ isMobile }) => {
   }, [])
 
   const handleLinkClick = () => {
-    if (typeof isMobile === "function") {
+ 
       isMobile(false)
-    }
+ 
   }
 
   // Create navItems only when client-side

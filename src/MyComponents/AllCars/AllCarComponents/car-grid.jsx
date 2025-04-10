@@ -11,7 +11,7 @@ export function CarGrid({ cars, loading, locale }) {
     )
   }
 
-  console.log("CarGrid rendering with cars:", cars.length)
+  // console.log("CarGrid rendering with cars:", cars.length)
 
   // Process cars to ensure localized fields are properly handled
   const processedCars = cars.map((car) => {
