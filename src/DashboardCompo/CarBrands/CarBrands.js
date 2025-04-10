@@ -65,6 +65,8 @@ export default function CarBrands() {
 
       const response = await fetch("/api/supabasPrisma/carbrands")
 
+      
+
       if (!response.ok) {
         const text = await response.text()
         try {
@@ -80,6 +82,7 @@ export default function CarBrands() {
       }
 
       const data = await response.json()
+      console.log(" response is", data)
       setBrands(data)
     } catch (error) {
       console.error("Error fetching brands:", error)
@@ -98,6 +101,8 @@ export default function CarBrands() {
       })
 
       if (!response.ok) throw new Error("Failed to delete brand")
+
+        
 
       setBrands(brands.filter((brand) => brand.id !== id))
       setSelectedBrands(selectedBrands.filter((brandId) => brandId !== id))
@@ -175,6 +180,7 @@ export default function CarBrands() {
   })
 
   const confirmDelete = (id) => {
+    
     setBrandsToDelete([id])
     setDeleteDialogOpen(true)
   }
