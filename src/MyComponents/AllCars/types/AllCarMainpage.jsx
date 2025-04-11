@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label"
 import { PromoSlider } from "../AllCarComponents/promo-slider"
 import { RangeSlider } from "../AllCarComponents/range-slider"
 import { CarGrid } from "../AllCarComponents/car-grid"
-import { motion, useMotionValueEvent, AnimatePresence } from "framer-motion"
 
 // Update the scrollbarStyles to use the exact hex color from Tailwind config
 const scrollbarStyles = `
@@ -260,8 +259,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                 {language === "ar" ? "نطاق السعر" : "Price Range"}
               </h4>
               <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${expandedSections.priceRange ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.priceRange ? "rotate-180" : ""
+                }`}
               />
             </button>
 
@@ -298,8 +298,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                 {language === "ar" ? "الماركات + الموديلات" : "Brands + Models"}
               </h4>
               <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${expandedSections.brandsAndModels ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.brandsAndModels ? "rotate-180" : ""
+                }`}
               />
             </button>
 
@@ -383,8 +384,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
             >
               <h4 className="font-medium text-brand-primary text-lg">{language === "ar" ? "السنة" : "Year"}</h4>
               <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${expandedSections.year ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.year ? "rotate-180" : ""
+                }`}
               />
             </button>
 
@@ -402,8 +404,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                       className="flex items-center focus:outline-none transition-all duration-200 hover:opacity-80 w-full text-left"
                     >
                       <div
-                        className={`w-5 h-5 rounded-full border-2 border-brand-primary flex items-center justify-center transition-colors duration-200 ${filters.year === year.toString() ? "bg-brand-primary" : "bg-white"
-                          }`}
+                        className={`w-5 h-5 rounded-full border-2 border-brand-primary flex items-center justify-center transition-colors duration-200 ${
+                          filters.year === year.toString() ? "bg-brand-primary" : "bg-white"
+                        }`}
                       >
                         {filters.year === year.toString() && <div className="w-2 h-2 rounded-full bg-white" />}
                       </div>
@@ -427,8 +430,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                 {language === "ar" ? "نوع الوقود" : "Fuel Type"}
               </h4>
               <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${expandedSections.fuelType ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.fuelType ? "rotate-180" : ""
+                }`}
               />
             </button>
 
@@ -474,8 +478,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                 {language === "ar" ? "ناقل الحركة" : "Transmission"}
               </h4>
               <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${expandedSections.transmission ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.transmission ? "rotate-180" : ""
+                }`}
               />
             </button>
 
@@ -522,8 +527,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
             >
               <h4 className="font-medium text-brand-primary text-lg">{language === "ar" ? "المقاعد" : "Seats"}</h4>
               <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${expandedSections.seats ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                  expandedSections.seats ? "rotate-180" : ""
+                }`}
               />
             </button>
 
@@ -807,28 +813,17 @@ const AllCarMainpage = () => {
                 ? "فتح الفلاتر"
                 : "Open Filters"}
           </Button>
-          <AnimatePresence>
-            {isSidebarOpen && (
-              <motion.div
-                key="sidebar"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-                className="md:w-80"
-              >
-                <div className="sticky top-20 h-[calc(100vh-5rem)]">
-                  <CarFilterSidebar
-                    onFilterChange={handleFilterChange}
-                    filters={filters}
-                    language={currentLocale}
-                    cars={cars}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
+          <div className={`md:w-80 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
+            <div className="sticky top-20 h-[calc(100vh-5rem)]">
+              <CarFilterSidebar
+                onFilterChange={handleFilterChange}
+                filters={filters}
+                language={currentLocale}
+                cars={cars}
+              />
+            </div>
+          </div>
 
           <div className="flex-1">
             <PromoSlider />
@@ -871,10 +866,11 @@ const AllCarMainpage = () => {
                       <button
                         key={i + 1}
                         onClick={() => paginate(i + 1)}
-                        className={`px-3 py-1 rounded-[4px] transition-all duration-300 transform hover:scale-105 ${currentPage === i + 1
-                          ? "bg-brand-primary text-white shadow-md"
-                          : "bg-white text-brand-primary border border-brand-primary hover:bg-brand-primary/10"
-                          }`}
+                        className={`px-3 py-1 rounded-[4px] transition-all duration-300 transform hover:scale-105 ${
+                          currentPage === i + 1
+                            ? "bg-brand-primary text-white shadow-md"
+                            : "bg-white text-brand-primary border border-brand-primary hover:bg-brand-primary/10"
+                        }`}
                       >
                         {i + 1}
                       </button>
