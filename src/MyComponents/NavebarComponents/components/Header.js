@@ -1,78 +1,62 @@
-"use client";
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Phone, Menu, X, Search } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import Nav from "./Nav";
-import { Skeleton } from "@/components/ui/skeleton";
-import LanguageToggle from "./LanguageToggle";
-import SearchComponent from "./search/SearchComponent";
-import { useOdoo } from "@/contexts/OdooContext";
-import { motion ,useMotionValueEvent} from "framer-motion";
+"use client"
+import { useState, useEffect, useCallback } from "react"
+import { Phone, Menu, X, Search } from "lucide-react"
+import { useTranslation } from "react-i18next"
+import Nav from "./Nav"
+import { Skeleton } from "@/components/ui/skeleton"
+import LanguageToggle from "./LanguageToggle"
+import SearchComponent from "./search/SearchComponent"
+import { useOdoo } from "@/contexts/OdooContext"
+import { motion, useMotionValueEvent, AnimatePresence } from "framer-motion"
 import { useScroll } from "motion/react"
 
 const Header = () => {
-  const { t } = useTranslation();
-  const { logo, loading } = useOdoo();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [mocData, setMocData] = useState([]);
-  const [loadingMocData, setLoadingMocData] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [scroll, setScroll] = useState(0);
+  const { t } = useTranslation()
+  const { logo, loading } = useOdoo()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchVisible, setIsSearchVisible] = useState(false)
+  const [mocData, setMocData] = useState([])
+  const [loadingMocData, setLoadingMocData] = useState(true)
+  const [mounted, setMounted] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [scroll, setScroll] = useState(0)
   const { scrollY } = useScroll()
+
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScroll(latest)
     console.log("Page scroll: ", latest)
   })
 
   const fetchSliderData = useCallback(() => {
-    setLoadingMocData(true);
+    setLoadingMocData(true)
     fetch("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/logo")
       .then((response) => response.json())
       .then((data) => {
-        setMocData(data);
-        setLoadingMocData(false);
+        setMocData(data)
+        setLoadingMocData(false)
       })
       .catch((error) => {
-        console.error("Error fetching brands:", error);
-        setLoadingMocData(false);
-      });
-  }, []);
+        console.error("Error fetching brands:", error)
+        setLoadingMocData(false)
+      })
+  }, [])
 
   useEffect(() => {
-    fetchSliderData();
-  }, [fetchSliderData]);
+    fetchSliderData()
+  }, [fetchSliderData])
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
+  const toggleSearch = () => setIsSearchVisible(!isSearchVisible)
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const toggleSearch = () => setIsSearchVisible(!isSearchVisible);
+  if (!mounted) return null
 
-  if (!mounted) return null;
-
-
-
-  return (
- 
-    <motion.div
-    animate={{
-      opacity: scroll > 100 ? 1 : 1, // Always visible (opacity: 1)
-    }}
-    initial={{ opacity: 0 }} // Start with opacity 0 for smooth transition
-    transition={{
-      opacity: {
-        duration: scroll > 100 ? 0.5 : 0, // Apply transition only if scroll > 100
-        ease: "easeInOut",
-      },
-    }}
-    className={`w-full font-noto shadow-sm bg-white z-50 ${
-      scroll > 100 ? "fixed top-0" : "relative"
-    }`}
-  >
+  // Content of the header
+  const headerContent = (
+    <>
       <div className="bg-white lg:px-[7rem]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -127,25 +111,60 @@ const Header = () => {
       {isSearchVisible && <SearchComponent isVisible={isSearchVisible} onClose={toggleSearch} />}
 
       {/* Navigation for desktop */}
-      <Nav isMobile={false} />
+      <Nav isMobile={false} setIsMobileMenuOpen={setIsMobileMenuOpen} />
 
       {/* Mobile Menu */}
-      <div className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"} bg-white border-t`}>
-        {/* Navigation for mobile */}
-        <Nav isMobile={true} />
-        <div className="p-4">
-          <button className="w-full flex items-center justify-center space-x-3 rtl:space-x-reverse px-4 py-2 bg-brand-primary text-white rounded-lg">
-            <Phone className="h-5 w-5" />
-            <span className="text-center" dir="ltr">
-              9200 31202
-            </span>
-          </button>
-        </div>
-      </div>
-    </motion.div>
- 
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="md:hidden bg-white border-t"
+          >
+            {/* Navigation for mobile */}
+            <Nav isMobile={true} setIsMobileMenuOpen={setIsMobileMenuOpen} />
+            <div className="p-4">
+              <button className="w-full flex items-center justify-center space-x-3 rtl:space-x-reverse px-4 py-2 bg-brand-primary text-white rounded-lg">
+                <Phone className="h-5 w-5" />
+                <span className="text-center" dir="ltr">
+                  9200 31202
+                </span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  )
+
+  return (
+    <>
+      {/* Static header (visible when not scrolled) */}
+      {scroll <= 100 && <div className="w-full font-noto shadow-sm bg-white z-40 relative">{headerContent}</div>}
+
+      {/* Animated fixed header (appears when scrolled) */}
+      <AnimatePresence>
+        {scroll > 100 && (
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 70,
+              damping: 15,
+              duration: 0.6,
+            }}
+            className="w-full font-noto shadow-md bg-white z-50 fixed top-0"
+          >
+            {headerContent}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   )
 }
 
 export default Header
-
