@@ -47,9 +47,9 @@ export default function CarListing() {
                 delay: index * 0.2 // stagger effect
               }}
             >
-              <CarCard 
-                car={car} 
-                locale={currentLocale} 
+              <CarCard
+                car={car}
+                locale={currentLocale}
                 onFavoriteToggle={handleFavoriteToggle}
                 isFavorite={favorites[car.id]}
               />
