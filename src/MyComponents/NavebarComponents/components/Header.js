@@ -54,7 +54,7 @@ const Header = () => {
 
   if (!mounted) return null
 
-  // Content of the header
+  // Header content without mobile menu
   const headerContent = (
     <>
       <div className="bg-white lg:px-[7rem]">
@@ -81,7 +81,7 @@ const Header = () => {
                 <Search className="h-5 w-5 text-gray-700" />
               </button>
               <LanguageToggle />
-              <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-[30px] hover:bg-brand-dark hover:text-brand-primary transition-colors">
+              <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-[5px] hover:bg-brand-dark hover:text-brand-primary transition-colors">
                 <span className="font-semibold flex items-center gap-2" dir="ltr">
                   <Phone className="h-5 w-5" />
                   <span>9200 31202</span>
@@ -99,7 +99,7 @@ const Header = () => {
                 <Search className="h-5 w-5 text-gray-700" />
               </button>
               <LanguageToggle />
-              <button className="p-2 rounded-lg hover:bg-gray-100" onClick={toggleMobileMenu}>
+              <button className="p-2 rounded-[5px] hover:bg-gray-100" onClick={toggleMobileMenu}>
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
             </div>
@@ -112,37 +112,41 @@ const Header = () => {
 
       {/* Navigation for desktop */}
       <Nav isMobile={false} setIsMobileMenuOpen={setIsMobileMenuOpen} />
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="md:hidden bg-white border-t"
-          >
-            {/* Navigation for mobile */}
-            <Nav isMobile={true} setIsMobileMenuOpen={setIsMobileMenuOpen} />
-            <div className="p-4">
-              <button className="w-full flex items-center justify-center space-x-3 rtl:space-x-reverse px-4 py-2 bg-brand-primary text-white rounded-lg">
-                <Phone className="h-5 w-5" />
-                <span className="text-center" dir="ltr">
-                  9200 31202
-                </span>
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   )
 
   return (
     <>
       {/* Static header (visible when not scrolled) */}
-      {scroll <= 100 && <div className="w-full font-noto shadow-sm bg-white z-40 relative">{headerContent}</div>}
+      {scroll <= 100 && (
+        <div className="w-full font-noto shadow-sm bg-white z-40 relative">
+          {headerContent}
+
+          {/* Mobile Menu Overlay */}
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+                className="md:hidden absolute top-full left-0 right-0 bg-white border-t shadow-lg z-50"
+              >
+                {/* Navigation for mobile */}
+                <Nav isMobile={true} setIsMobileMenuOpen={setIsMobileMenuOpen} />
+                <div className="p-4">
+                  <button className="w-full flex items-center justify-center space-x-3 rtl:space-x-reverse px-4 py-2 bg-brand-primary text-white rounded-[5px]">
+                    <Phone className="h-5 w-5" />
+                    <span className="text-center" dir="ltr">
+                      9200 31202
+                    </span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       {/* Animated fixed header (appears when scrolled) */}
       <AnimatePresence>
@@ -160,6 +164,30 @@ const Header = () => {
             className="w-full font-noto shadow-md bg-white z-50 fixed top-0"
           >
             {headerContent}
+
+            {/* Mobile Menu Overlay */}
+            <AnimatePresence>
+              {isMobileMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="md:hidden absolute top-full left-0 right-0 bg-white border-t shadow-lg z-50"
+                >
+                  {/* Navigation for mobile */}
+                  <Nav isMobile={true} setIsMobileMenuOpen={setIsMobileMenuOpen} />
+                  <div className="p-4">
+                    <button className="w-full flex items-center justify-center space-x-3 rtl:space-x-reverse px-4 py-2 bg-brand-primary text-white rounded-[5px]">
+                      <Phone className="h-5 w-5" />
+                      <span className="text-center" dir="ltr">
+                        9200 31202
+                      </span>
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
