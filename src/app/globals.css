@@ -10,6 +10,32 @@ body {
   background: rgb(243 244 246 / var(--tw-bg-opacity, 1));
 }
 
+/* Global Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(113, 48, 138, 0.05);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #71308a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a1d6e;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #71308a rgba(113, 48, 138, 0.05);
+}
+
 /* Custom Range Input Styles */
 .range-slider {
   height: 0;
@@ -145,3 +171,106 @@ body {
   }
 }
 
+/* Custom Scrollbar Styles (for specific elements) */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(113, 48, 138, 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #71308a;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #4a1d6e;
+}
+
+/* For Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #71308a rgba(113, 48, 138, 0.05);
+}
+
+/* Specifications container - prevent scrolling */
+.specs-container {
+  height: auto !important;
+  min-height: 400px;
+  overflow: visible !important;
+}
+
+@media (max-width: 768px) {
+  .specs-container {
+    min-height: 300px;
+  }
+}
+
+/* Make sure all scrollbars use brand color */
+html,
+body,
+div,
+section,
+article,
+aside,
+nav,
+main,
+header,
+footer {
+  scrollbar-color: #71308a rgba(113, 48, 138, 0.05) !important;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+div::-webkit-scrollbar-thumb,
+section::-webkit-scrollbar-thumb,
+article::-webkit-scrollbar-thumb,
+aside::-webkit-scrollbar-thumb,
+nav::-webkit-scrollbar-thumb,
+main::-webkit-scrollbar-thumb,
+header::-webkit-scrollbar-thumb,
+footer::-webkit-scrollbar-thumb {
+  background: #71308a !important;
+  border-radius: 10px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+div::-webkit-scrollbar-track,
+section::-webkit-scrollbar-track,
+article::-webkit-scrollbar-track,
+aside::-webkit-scrollbar-track,
+nav::-webkit-scrollbar-track,
+main::-webkit-scrollbar-track,
+header::-webkit-scrollbar-track,
+footer::-webkit-scrollbar-track {
+  background: rgba(113, 48, 138, 0.05) !important;
+  border-radius: 10px;
+}
+
+/* Dialog scrollbar styles */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: #71308a rgba(113, 48, 138, 0.05);
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: rgba(113, 48, 138, 0.05);
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #71308a;
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: #4a1d6e;
+}

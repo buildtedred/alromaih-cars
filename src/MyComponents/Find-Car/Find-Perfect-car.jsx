@@ -1,13 +1,35 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, X, ArrowLeft, Check } from "lucide-react"
+import { Search, X, ArrowLeft, ArrowRight, Check } from "lucide-react"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 
 // Import mock data (assuming this exists in your project)
 import carsData from "@/app/api/mock-data"
+
+// Custom scrollbar styles
+const scrollbarStyles = `
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: rgba(113, 48, 138, 0.05);
+    border-radius: 10px;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background: #71308a;
+    border-radius: 10px;
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: #4a1d6e;
+  }
+`
 
 export default function CarFinderModal() {
   const pathname = usePathname()
@@ -438,19 +460,29 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
     if (!selectedCar) return null
 
     return (
-      <div className="p-3 sm:p-4 md:p-6 lg:p-8 w-full bg-brand-light/30 h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+      <div className="p-3 sm:p-4 md:p-6 lg:p-8 w-full bg-brand-light/30 h-[calc(100vh-180px)] overflow-y-auto scrollbar-custom">
         {/* Back button */}
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-1 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>{isArabic ? "رجوع" : "Back"}</span>
-        </button>
+        {isArabic ? (
+          <button
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+          >
+            <ArrowRight className="w-4 h-4" />
+            <span>رجوع</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back</span>
+          </button>
+        )}
 
         <div className="space-y-4">
           {/* Filter Tags */}
-          <div className="flex flex-wrap gap-2">
+          <div className={`flex flex-wrap gap-2 ${isArabic ? "justify-end" : ""}`}>
             {selectedBrand && (
               <div className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-xs sm:text-sm text-brand-primary">
                 {selectedBrand}
@@ -488,9 +520,9 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Left Column - Car Image and Basic Info */}
-            <div className="space-y-4">
+            <div className={`space-y-4 ${isArabic ? "md:order-2" : ""}`}>
               {/* Car Details - Desktop Only */}
-              <div className="hidden md:block text-center md:text-left space-y-2">
+              <div className={`hidden md:block text-center md:text-left space-y-2 ${isArabic ? "md:text-right" : ""}`}>
                 <h2 className="text-xl md:text-2xl font-bold text-brand-dark">{getText(selectedCar.name)}</h2>
                 <p className="text-brand-primary">{getText(selectedCar.modelYear)}</p>
                 <p className="text-lg md:text-xl font-bold text-brand-dark">
@@ -508,7 +540,7 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
               </div>
 
               {/* Brand Logo - Desktop Only */}
-              <div className="hidden md:flex justify-center md:justify-start">
+              <div className={`hidden md:flex justify-center md:justify-start ${isArabic ? "md:justify-end" : ""}`}>
                 <div className="h-10 w-28 relative">
                   <Image
                     src={selectedCar.brandLogo || "/placeholder.svg?height=40&width=112"}
@@ -532,7 +564,7 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
             </div>
 
             {/* Right Column - Specifications */}
-            <div className="space-y-4">
+            <div className={`space-y-4 ${isArabic ? "md:order-1" : ""}`}>
               {/* Tabs for Mobile */}
               <div className="flex border-b border-gray-200 md:hidden">
                 <button
@@ -557,45 +589,47 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
               <div
                 className={`bg-white rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 ${activeTab !== "specs" && "hidden md:block"}`}
               >
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-brand-dark">
+                <h3
+                  className={`text-sm sm:text-base md:text-lg font-bold text-brand-dark ${isArabic ? "text-right" : ""}`}
+                >
                   {isArabic ? "المواصفات" : "Specifications"}
                 </h3>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "المحرك" : "Engine"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.engine)}</p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "القوة الحصانية" : "Horsepower"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.power)}</p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "ناقل الحركة" : "Transmission"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">
                       {getText(selectedCar.specs.transmission)}
                     </p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "نظام الدفع" : "Drivetrain"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">
                       {getText(selectedCar.specs.driveType)}
                     </p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "عزم الدوران" : "Torque"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.torque)}</p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "نوع الوقود" : "Fuel Type"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.fuelType)}</p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "التسارع" : "Acceleration"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">
                       {getText(selectedCar.specs.acceleration)}
                     </p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "المقاعد" : "Seats"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.seats)}</p>
                   </div>
@@ -606,23 +640,25 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
               <div
                 className={`bg-white rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-3 ${activeTab !== "additional" && "hidden md:block"}`}
               >
-                <h3 className="text-sm sm:text-base md:text-lg font-bold text-brand-dark">
+                <h3
+                  className={`text-sm sm:text-base md:text-lg font-bold text-brand-dark ${isArabic ? "text-right" : ""}`}
+                >
                   {isArabic ? "مواصفات إضافية" : "Additional Specifications"}
                 </h3>
                 <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "الطول" : "Length"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.length)}</p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "العرض" : "Width"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.width)}</p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "الارتفاع" : "Height"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">{getText(selectedCar.specs.height)}</p>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className={`space-y-0.5 sm:space-y-1 ${isArabic ? "text-right" : ""}`}>
                     <p className="text-xs text-muted-foreground">{isArabic ? "قاعدة العجلات" : "Wheelbase"}</p>
                     <p className="text-xs sm:text-sm md:text-base font-medium">
                       {getText(selectedCar.specs.wheelbase)}
@@ -679,24 +715,36 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
     switch (activeStep) {
       case 0:
         return (
-          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto scrollbar-custom">
             {/* Back button */}
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-1 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>{isArabic ? "رجوع" : "Back"}</span>
-            </button>
+            {isArabic ? (
+              <button
+                onClick={handleBack}
+                className="inline-flex items-center gap-2 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+              >
+                <ArrowRight className="w-4 h-4" />
+                <span>رجوع</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleBack}
+                className="inline-flex items-center gap-2 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+            )}
 
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
+              <Search
+                className={`absolute ${isArabic ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5`}
+              />
               <input
                 type="text"
                 placeholder={isArabic ? "ابحث عن العلامة التجارية" : "Search brand"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base"
+                className={`w-full ${isArabic ? "pr-10 pl-4" : "pl-10 pr-4"} py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base ${isArabic ? "text-right" : ""}`}
               />
             </div>
 
@@ -737,28 +785,40 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
 
       case 1:
         return (
-          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto scrollbar-custom">
             {/* Back button */}
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-1 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>{isArabic ? "رجوع" : "Back"}</span>
-            </button>
+            {isArabic ? (
+              <button
+                onClick={handleBack}
+                className="inline-flex items-center gap-2 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+              >
+                <ArrowRight className="w-4 h-4" />
+                <span>رجوع</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleBack}
+                className="inline-flex items-center gap-2 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+            )}
 
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search
+                className={`absolute ${isArabic ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5`}
+              />
               <input
                 type="text"
                 placeholder={isArabic ? "ابحث عن الموديل" : "Search Model"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base"
+                className={`w-full ${isArabic ? "pr-10 pl-4" : "pl-10 pr-4"} py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base ${isArabic ? "text-right" : ""}`}
               />
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className={`flex flex-wrap gap-2 ${isArabic ? "justify-end" : ""}`}>
               {selectedBrand && (
                 <div className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-sm text-brand-primary">
                   {selectedBrand}
@@ -788,28 +848,40 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
 
       case 2:
         return (
-          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+          <div className="p-4 md:p-6 lg:p-8 space-y-6 h-[calc(100vh-180px)] overflow-y-auto scrollbar-custom">
             {/* Back button */}
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-1 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>{isArabic ? "رجوع" : "Back"}</span>
-            </button>
+            {isArabic ? (
+              <button
+                onClick={handleBack}
+                className="inline-flex items-center gap-2 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+              >
+                <ArrowRight className="w-4 h-4" />
+                <span>رجوع</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleBack}
+                className="inline-flex items-center gap-2 text-brand-primary mb-4 hover:text-brand-dark transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+            )}
 
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search
+                className={`absolute ${isArabic ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5`}
+              />
               <input
                 type="text"
                 placeholder={isArabic ? "ابحث عن الفئة" : "Search category"}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base"
+                className={`w-full ${isArabic ? "pr-10 pl-4" : "pl-10 pr-4"} py-2 rounded-lg border border-brand-primary/20 focus:outline-none focus:border-brand-primary text-sm sm:text-base ${isArabic ? "text-right" : ""}`}
               />
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className={`flex flex-wrap gap-2 ${isArabic ? "justify-end" : ""}`}>
               {selectedBrand && (
                 <div className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-brand-primary/20 text-sm text-brand-primary">
                   {selectedBrand}
@@ -850,70 +922,125 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
     <div className="flex flex-col w-full relative border border-brand-primary/20 shadow-lg rounded-xl overflow-hidden bg-white">
       {/* Vertical Steps Indicator for Mobile */}
       <div className="flex flex-col md:flex-row w-full">
-        <div className="p-4 pt-6 w-full md:w-1/4 bg-brand-light/30 border-b md:border-b-0 md:border-r border-brand-primary/10">
+        <div
+          className={`p-4 pt-6 w-full md:w-1/4 bg-brand-light/30 border-b md:border-b-0 ${
+            isArabic ? "md:border-l" : "md:border-r"
+          } border-brand-primary/10 ${isArabic ? "md:order-1" : "md:order-1"}`}
+        >
           {/* Mobile Steps (Horizontal) */}
           <div className="flex md:hidden justify-between items-center w-full px-2 py-3">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex flex-col items-center relative">
-                {/* Step Circle */}
-                <div
-                  className={`
-              w-8 h-8 rounded-full flex items-center justify-center z-10
-              ${
-                index < activeStep || (index === 2 && showResult && selectedCar)
-                  ? "bg-brand-primary text-white"
-                  : index === activeStep
+            {isArabic
+              ? // Arabic - reversed order
+                [...steps]
+                  .reverse()
+                  .map((step, index) => {
+                    const actualIndex = steps.length - 1 - index
+                    return (
+                      <div key={step.id} className="flex flex-col items-center relative">
+                        {/* Step Circle */}
+                        <div
+                          className={`
+                w-8 h-8 rounded-full flex items-center justify-center z-10
+                ${
+                  actualIndex < activeStep || (actualIndex === 2 && showResult && selectedCar)
                     ? "bg-brand-primary text-white"
-                    : "bg-gray-200 text-gray-500"
-              }
-            `}
-                >
-                  {index < activeStep || (index === 2 && showResult && selectedCar) ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    <span>{index + 1}</span>
-                  )}
-                </div>
+                    : actualIndex === activeStep
+                      ? "bg-brand-primary text-white"
+                      : "bg-gray-200 text-gray-500"
+                }
+              `}
+                        >
+                          {actualIndex < activeStep || (actualIndex === 2 && showResult && selectedCar) ? (
+                            <Check className="w-4 h-4" />
+                          ) : (
+                            <span>{actualIndex + 1}</span>
+                          )}
+                        </div>
 
-                {/* Step Label */}
-                <span
-                  className={`text-xs mt-2 text-center max-w-[70px] ${
-                    index === activeStep ? "text-brand-primary font-medium" : "text-gray-500"
-                  }`}
-                >
-                  {step.title}
-                </span>
+                        {/* Step Label */}
+                        <span
+                          className={`text-xs mt-2 text-center max-w-[80px] px-1 ${
+                            actualIndex === activeStep ? "text-brand-primary font-medium" : "text-gray-500"
+                          }`}
+                        >
+                          {step.title}
+                        </span>
 
-                {/* Connecting Line */}
-                {index < steps.length - 1 && (
-                  <div className="absolute top-4 left-[calc(100%_-_8px)] w-[calc(100%_-_16px)] h-0.5 -z-0">
-                    <div className={`h-full ${index < activeStep ? "bg-brand-primary" : "bg-gray-200"}`}></div>
+                        {/* Connecting Line */}
+                        {index < steps.length - 1 && (
+                          <div className="absolute top-4 right-[calc(100%_-_8px)] w-[calc(100%_-_16px)] h-0.5 -z-0">
+                            <div
+                              className={`h-full ${actualIndex > activeStep ? "bg-brand-primary" : "bg-gray-200"}`}
+                            ></div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })
+              : // English - normal order
+                steps.map((step, index) => (
+                  <div key={step.id} className="flex flex-col items-center relative">
+                    {/* Step Circle */}
+                    <div
+                      className={`
+            w-8 h-8 rounded-full flex items-center justify-center z-10
+            ${
+              index < activeStep || (index === 2 && showResult && selectedCar)
+                ? "bg-brand-primary text-white"
+                : index === activeStep
+                  ? "bg-brand-primary text-white"
+                  : "bg-gray-200 text-gray-500"
+            }
+          `}
+                    >
+                      {index < activeStep || (index === 2 && showResult && selectedCar) ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        <span>{index + 1}</span>
+                      )}
+                    </div>
+
+                    {/* Step Label */}
+                    <span
+                      className={`text-xs mt-2 text-center max-w-[80px] px-1 ${
+                        index === activeStep ? "text-brand-primary font-medium" : "text-gray-500"
+                      }`}
+                    >
+                      {step.title}
+                    </span>
+
+                    {/* Connecting Line */}
+                    {index < steps.length - 1 && (
+                      <div className="absolute top-4 left-[calc(100%_-_8px)] w-[calc(100%_-_16px)] h-0.5 -z-0">
+                        <div className={`h-full ${index < activeStep ? "bg-brand-primary" : "bg-gray-200"}`}></div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                ))}
           </div>
 
           {/* Desktop Steps (Vertical) */}
           <div className="hidden md:block">
             <div className="relative">
               {/* Vertical Line */}
-              <div className="absolute left-4 top-4 w-0.5 h-[calc(100%_-_32px)] bg-gray-200"></div>
+              <div
+                className={`absolute ${isArabic ? "right-4" : "left-4"} top-4 w-0.5 h-[calc(100%_-_32px)] bg-gray-200`}
+              ></div>
 
               {steps.map((step, index) => (
                 <div key={step.id} className="flex items-start mb-8 relative">
                   {/* Step Circle */}
                   <div
                     className={`
-                w-8 h-8 rounded-full flex items-center justify-center z-10
-                ${
-                  index < activeStep || (index === 2 && showResult && selectedCar)
-                    ? "bg-brand-primary text-white"
-                    : index === activeStep
-                      ? "bg-brand-primary text-white"
-                      : "bg-gray-200 text-gray-500"
-                }
-              `}
+            w-8 h-8 rounded-full flex items-center justify-center z-10
+            ${
+              index < activeStep || (index === 2 && showResult && selectedCar)
+                ? "bg-brand-primary text-white"
+                : index === activeStep
+                  ? "bg-brand-primary text-white"
+                  : "bg-gray-200 text-gray-500"
+            }
+          `}
                   >
                     {index < activeStep || (index === 2 && showResult && selectedCar) ? (
                       <Check className="w-4 h-4" />
@@ -923,7 +1050,7 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
                   </div>
 
                   {/* Step Content */}
-                  <div className="ml-4">
+                  <div className={`${isArabic ? "ml-6 mr-2" : "ml-4"} ${isArabic ? "text-right" : ""}`}>
                     <p
                       className={`text-sm font-medium ${index === activeStep ? "text-brand-primary" : "text-gray-600"}`}
                     >
@@ -945,7 +1072,7 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
                   {/* Colored Line Segment */}
                   {index < steps.length - 1 && (
                     <div
-                      className="absolute left-4 top-8 w-0.5 h-[calc(100%_-_8px)] bg-brand-primary"
+                      className={`absolute ${isArabic ? "right-4" : "left-4"} top-8 w-0.5 h-[calc(100%_-_8px)] bg-brand-primary`}
                       style={{ opacity: index < activeStep ? 1 : 0 }}
                     ></div>
                   )}
@@ -955,7 +1082,9 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
           </div>
         </div>
 
-        <div className="w-full md:w-3/4 bg-brand-light/10">{renderStepContent()}</div>
+        <div className={`w-full md:w-3/4 bg-brand-light/10 ${isArabic ? "md:order-2" : "md:order-2"}`}>
+          {renderStepContent()}
+        </div>
       </div>
       {renderFinanceModal()}
     </div>
