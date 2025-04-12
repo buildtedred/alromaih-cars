@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, X, ArrowLeft, ArrowRight, Check } from "lucide-react"
+import { Search, X, ArrowLeft, ArrowRight, Check, Tag, Percent } from "lucide-react"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
@@ -31,54 +31,151 @@ const scrollbarStyles = `
   }
 `
 
+// Custom animations for badges
+const badgeAnimations = `
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 107, 107, 0.5); }
+    50% { box-shadow: 0 0 10px rgba(255, 107, 107, 0.8); }
+  }
+  
+  .badge-pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  .badge-bounce {
+    animation: bounce 2s infinite;
+  }
+  
+  .badge-glow {
+    animation: glow 1.5s infinite;
+  }
+`
+
 export default function CarFinderModal() {
   const pathname = usePathname()
   const isArabic = pathname?.startsWith("/ar")
   const [isOpen, setIsOpen] = useState(false)
   const [initialPaymentMethod, setInitialPaymentMethod] = useState("")
+  const [badgeStyleAdded, setBadgeStyleAdded] = useState(false)
 
   const openModalWithPaymentMethod = (method) => {
     setInitialPaymentMethod(method)
     setIsOpen(true)
   }
 
+  // Add style tag to document head
+  useEffect(() => {
+    if (!badgeStyleAdded && typeof document !== "undefined") {
+      const style = document.createElement("style")
+      style.innerHTML = badgeAnimations
+      document.head.appendChild(style)
+
+      setBadgeStyleAdded(true)
+
+      return () => {
+        document.head.removeChild(style)
+      }
+    }
+  }, [badgeStyleAdded])
+
   return (
     <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30 shadow-lg">
       {/* Left side - Payment Method Selection */}
       <div className="p-4 sm:p-6 md:p-8 md:w-1/2">
-        <h1 className="text-xl sm:text-2xl font-bold text-brand-primary mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-brand-primary mb-4 sm:mb-6 text-center md:text-left">
           {isArabic ? "اختر طريقة الدفع" : "Choose Payment Method"}
         </h1>
 
-        <p className="text-xs sm:text-sm text-brand-primary mb-4 sm:mb-6">
+        <p className="text-xs sm:text-sm text-brand-primary mb-4 sm:mb-6 text-center md:text-left">
           {isArabic
             ? "اختر الطريقة التي تناسبك لامتلاك سيارتك الجديدة سواء من خلال التمويل المريح أو الدفع النقدي المباشر."
             : "Choose the way that suits you to own your new car whether through convenient financing or direct cash payment."}
         </p>
 
-        {/* Payment method buttons that open the modal */}
-        <div className="flex flex-row sm:flex-col gap-3 mt-4">
-          <button
-            onClick={() => openModalWithPaymentMethod("cash")}
-            className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-full sm:w-40"
-          >
-            <div className="w-5 h-5 sm:w-6 sm:h-6 relative">
-              <Image src="/icons/cash.svg" alt="Cash" width={24} height={24} className="text-brand-primary" />
+        {/* Payment method buttons that open the modal - Enhanced with premium styling and offers */}
+        <div className="flex flex-col gap-5 mt-6 w-full md:max-w-[300px] md:ml-0 mx-auto md:mx-0">
+          {/* Cash Payment Option */}
+          <div className="relative group">
+            {/* New Tag */}
+            <div className="absolute -top-2 -right-2 z-10">
+              <div className="bg-brand-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md whitespace-nowrap">
+                {isArabic ? "جديد" : "NEW"}
+              </div>
             </div>
-            <span className="text-brand-primary font-medium text-sm sm:text-base">{isArabic ? "نقدي" : "Cash"}</span>
-          </button>
 
-          <button
-            onClick={() => openModalWithPaymentMethod("finance")}
-            className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-md bg-white shadow-lg hover:border-brand-primary/50 transition-colors w-full sm:w-40"
-          >
-            <div className="w-5 h-5 sm:w-6 sm:h-6 relative">
-              <Image src="/icons/finance.svg" alt="Finance" width={24} height={24} className="text-brand-primary" />
+            {/* Offer Badge */}
+            <div className="absolute -top-2 -left-2 z-10 bg-[#FF6B6B] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap animate-pulse">
+              <Percent className="w-2.5 h-2.5 mr-0.5" />
+              {isArabic ? "خصم ١٠٪" : "10% OFF"}
             </div>
-            <span className="text-brand-primary font-medium text-sm sm:text-base">
-              {isArabic ? "تمويل" : "Finance"}
-            </span>
-          </button>
+
+            <button
+              onClick={() => openModalWithPaymentMethod("cash")}
+              className="flex items-center justify-between w-full md:max-w-[300px] mx-auto md:mx-0 px-4 py-3 rounded-[5px] bg-white shadow-md hover:shadow-lg transition-all border border-transparent hover:border-brand-primary/30 group-hover:scale-[1.01]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-brand-light flex items-center justify-center">
+                  <img src="/icons/cash.svg" alt="Cash" width={20} height={20} className="text-brand-primary" />
+                </div>
+                <div className="max-w-[120px]">
+                  <span className="text-brand-primary font-bold text-sm block">
+                    {isArabic ? "نقدي" : "Cash Payment"}
+                  </span>
+                  <span className="text-gray-500 text-xs line-clamp-1">
+                    {isArabic ? "دفع كامل المبلغ مرة واحدة" : "Pay the full amount at once"}
+                  </span>
+                </div>
+              </div>
+              <ArrowRight className={`w-4 h-4 text-brand-primary ${isArabic ? "rotate-180" : ""}`} />
+            </button>
+          </div>
+
+          {/* Finance Payment Option */}
+          <div className="relative group">
+            {/* Save Tag */}
+            <div className="animate-pulse absolute -top-2 -right-2 z-10">
+              <div className="bg-gradient-to-r from-pink-200 to-teal-100 text-brand-primary text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap badge-pulse">
+                <span className=" bg-pink-200 text-[8px] px-1 py-0.5 rounded-full mr-1">NEW</span>
+                <span>Save up to 40%</span>
+              </div>
+            </div>
+
+            {/* Featured Badge */}
+            <div className="absolute -top-2 -left-2 z-10 bg-[#FFD166] text-brand-primary text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap">
+              <Tag className="w-2.5 h-2.5 mr-0.5" />
+              {isArabic ? "الأكثر شيوعاً" : "POPULAR"}
+            </div>
+
+            <button
+              onClick={() => openModalWithPaymentMethod("finance")}
+              className="flex items-center justify-between w-full md:max-w-[300px] mx-auto md:mx-0 px-4 py-3 rounded-[5px] bg-gradient-to-r from-brand-light to-white shadow-md hover:shadow-lg transition-all border border-transparent hover:border-brand-primary/30 group-hover:scale-[1.01]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-brand-light flex items-center justify-center">
+                  <img src="/icons/finance.svg" alt="Finance" width={20} height={20} className="text-brand-primary" />
+                </div>
+                <div className="max-w-[120px]">
+                  <span className="text-brand-primary font-bold text-sm block">
+                    {isArabic ? "تمويل" : "Finance Options"}
+                  </span>
+                  <span className="text-gray-500 text-xs line-clamp-1">
+                    {isArabic ? "أقساط شهرية مريحة" : "Comfortable monthly installments"}
+                  </span>
+                </div>
+              </div>
+              <ArrowRight className={`w-4 h-4 text-brand-primary ${isArabic ? "rotate-180" : ""}`} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -206,51 +303,67 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
 
   // Use mock data instead of API call
   useEffect(() => {
-    try {
-      setLoading(true)
+    let isMounted = true // Add a flag to track component mount status
 
-      // Add category field to each car based on the model name
-      const processedCars = carsData.map((car) => {
-        // Determine category based on model name
-        let category = "SUV" // Default category
-        const modelName = getText(car.name).toLowerCase()
+    const fetchData = async () => {
+      try {
+        setLoading(true)
 
-        if (modelName.includes("x70") || modelName.includes("x90") || modelName.includes("x95")) {
-          category = "SUV"
-        } else if (modelName.includes("t1") || modelName.includes("t2")) {
-          category = "Crossover"
-        } else if (modelName.includes("dashing") || modelName.includes("camry") || modelName.includes("accord")) {
-          category = "Sedan"
+        // Add category field to each car based on the model name
+        const processedCars = carsData.map((car) => {
+          // Determine category based on model name
+          let category = "SUV" // Default category
+          const modelName = getText(car.name).toLowerCase()
+
+          if (modelName.includes("x70") || modelName.includes("x90") || modelName.includes("x95")) {
+            category = "SUV"
+          } else if (modelName.includes("t1") || modelName.includes("t2")) {
+            category = "Crossover"
+          } else if (modelName.includes("dashing") || modelName.includes("camry") || modelName.includes("accord")) {
+            category = "Sedan"
+          }
+
+          return { ...car, category }
+        })
+
+        if (isMounted) {
+          setCars(processedCars)
+
+          // Extract unique brands, models, categories, and years
+          const brands = [...new Set(processedCars.map((car) => car.brand))]
+          setCarBrands(brands)
+
+          const categories = [...new Set(processedCars.map((car) => car.category))]
+          setCarCategories(categories)
+
+          const years = [...new Set(processedCars.map((car) => car.specs.year))]
+          setCarYears(years.sort((a, b) => b - a)) // Sort years in descending order
+
+          // Group models by brand
+          const modelsByBrand = {}
+          brands.forEach((brand) => {
+            modelsByBrand[brand] = [
+              ...new Set(processedCars.filter((car) => car.brand === brand).map((car) => getText(car.name))),
+            ]
+          })
+          setCarModels(modelsByBrand)
         }
 
-        return { ...car, category }
-      })
+        if (isMounted) {
+          setLoading(false)
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err instanceof Error ? err.message : "An error occurred")
+          setLoading(false)
+        }
+      }
+    }
 
-      setCars(processedCars)
+    fetchData()
 
-      // Extract unique brands, models, categories, and years
-      const brands = [...new Set(processedCars.map((car) => car.brand))]
-      setCarBrands(brands)
-
-      const categories = [...new Set(processedCars.map((car) => car.category))]
-      setCarCategories(categories)
-
-      const years = [...new Set(processedCars.map((car) => car.specs.year))]
-      setCarYears(years.sort((a, b) => b - a)) // Sort years in descending order
-
-      // Group models by brand
-      const modelsByBrand = {}
-      brands.forEach((brand) => {
-        modelsByBrand[brand] = [
-          ...new Set(processedCars.filter((car) => car.brand === brand).map((car) => getText(car.name))),
-        ]
-      })
-      setCarModels(modelsByBrand)
-
-      setLoading(false)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      setLoading(false)
+    return () => {
+      isMounted = false // Set the flag to false when the component unmounts
     }
   }, [])
 
@@ -270,7 +383,7 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
     const monthlyInterest = financeDetails.interestRate / 100 / 12
     const months = financeDetails.loanTerm
 
-    // Monthly payment formula: P * r * (1 + r)^n / ((1 + r)^n - 1)
+    // Monthly payment formula: P * r * (1 + monthlyInterest, months)) / ((1 + r)^n - 1)
     const monthlyPayment =
       (loanAmount * monthlyInterest * Math.pow(1 + monthlyInterest, months)) /
       (Math.pow(1 + monthlyInterest, months) - 1)
