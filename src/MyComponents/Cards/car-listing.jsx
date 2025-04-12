@@ -28,13 +28,13 @@ export default function CarListing() {
   }
 
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className="px-4 md:px-4 lg:px-[7rem]">
+    <div dir={isRTL ? "rtl" : "ltr"} className=" px-4 md:px-4 lg:px-[7rem]">
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {cars.map((car, index) => (
             <motion.div
               key={car.id}

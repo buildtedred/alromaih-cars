@@ -66,7 +66,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
 
   return (
     <div
-      dir={isRTL ? "rtl" : "ltr"}
+     
       className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

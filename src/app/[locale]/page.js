@@ -27,9 +27,13 @@ export default function Home() {
       </div>
 
       {/* Car Listing Component */}
-      <div className="my-12">
-        <h2 className="text-3xl font-bold text-center mb-8">{isArabic ? "مجموعة سياراتنا" : "Our Car Collection"}</h2>
-        <CarListing />
+      <div className="flex justify-center items-center">
+        <div className="container my-12 text-center">
+          <h2 className="text-3xl font-bold mb-8">
+            {isArabic ? "مجموعة سياراتنا" : "Our Car Collection"}
+          </h2>
+          <CarListing />
+        </div>
       </div>
 
       {/* Other Components */}
