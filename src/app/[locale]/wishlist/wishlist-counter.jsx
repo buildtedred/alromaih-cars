@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Heart } from "lucide-react"
+import { Heart } from 'lucide-react'
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -63,8 +63,11 @@ export default function WishlistCounter() {
       >
         <Heart className="h-5 w-5 text-gray-700" />
         {count > 0 && (
-          <span className="absolute -top-1 -right-1 bg-brand-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-            {count}
+          <span className="absolute -top-1 -right-1 flex items-center justify-center">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-primary opacity-75"></span>
+            <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-white">
+              {count}
+            </span>
           </span>
         )}
       </button>
