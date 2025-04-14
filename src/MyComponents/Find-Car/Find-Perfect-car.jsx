@@ -114,7 +114,7 @@ export default function CarFinderModal() {
             </div>
 
             {/* Offer Badge */}
-            <div className="absolute -top-2 -left-2 z-10 bg-[#FF6B6B] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap badge-bounce badge-glow">
+            <div className="absolute -top-2 -left-2 z-10 bg-[#FF6B6B] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap animate-pulse">
               <Percent className="w-2.5 h-2.5 mr-0.5" />
               {isArabic ? "خصم ١٠٪" : "10% OFF"}
             </div>
@@ -146,7 +146,7 @@ export default function CarFinderModal() {
             <div className="absolute -top-2 -right-2 z-10">
               <div className="bg-gradient-to-r from-pink-200 to-teal-100 text-brand-primary text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap badge-pulse">
                 <span className="bg-pink-200 text-[8px] px-1 py-0.5 rounded-full mr-1">NEW</span>
-                <span>Save up to 40%</span>
+                <span className="animate-pulse">Save up to 40%</span>
               </div>
             </div>
 
