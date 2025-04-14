@@ -9,8 +9,10 @@ import { usePathname } from "next/navigation"
 import CarOverview from "./car-overview"
 import { MultiStepPopup } from "./MultiStepPopup"
 import PriceCardSimple from "./PriceCard"
+import { useDetailContext } from "@/contexts/detailProvider"
 
-const CompactCarListing = ({ car_Details, brand_Details }) => {
+const CompactCarListing = ({ brand_Details }) => {
+    const {car_Details, loading } = useDetailContext();
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 

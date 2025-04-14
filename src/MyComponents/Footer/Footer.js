@@ -250,19 +250,19 @@ export default function Footer() {
             <div className="order-3 md:order-2 flex items-center gap-2 text-gray-600 text-sm  text-center">
               <Link
                 href={`/${locale}/terms-and-conditions`}
-                className={`hover:text-brand-600 transition-colors text-[10px]  md:text-[15px] ${locale === "ar" ? "font-noto" : ""}`}
+                className={`hover:text-brand-600 transition-colors text-[9px]  md:text-[15px] ${locale === "ar" ? "font-noto" : ""}`}
               >
                 {locale === "ar" ? "الشروط والأحكام" : "Terms & Conditions"}
               </Link>
               <span>|</span>
               <Link
                 href={`/${locale}/privacy-policy`}
-                className={`hover:text-brand-600 transition-colors text-[10px] md:text-[15px] ${locale === "ar" ? "font-noto" : ""}`}
+                className={`hover:text-brand-600 transition-colors text-[9px] md:text-[15px] ${locale === "ar" ? "font-noto" : ""}`}
               >
                 {locale === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}
               </Link>
               <span>|</span>
-              <p className={locale === "ar" ? "font-noto text-[10px]" : "text-[10px] md:text-[15px]"}>
+              <p className={locale === "ar" ? "font-noto text-[9px]" : "text-[9px] md:text-[15px]"}>
                 {locale === "ar" ? "© 2025 الرميح. جميع الحقوق محفوظة" : "© 2025 Alromaih. All rights reserved"}
               </p>
             </div>

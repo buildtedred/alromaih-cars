@@ -40,11 +40,11 @@ export default function CarListing() {
               key={car.id}
               className="flex justify-center w-full"
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1.5, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{
-                duration: 0.3,
-                delay: index * 0.2 // stagger effect
+                duration: 0.2,
+                delay: index * 0.1 // stagger effect
               }}
             >
               <CarCard
