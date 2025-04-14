@@ -9,6 +9,8 @@ import SearchComponent from "./search/SearchComponent"
 import { useOdoo } from "@/contexts/OdooContext"
 import { motion, useMotionValueEvent, AnimatePresence } from "framer-motion"
 import { useScroll } from "motion/react"
+import WishlistCounter from "@/app/[locale]/wishlist/wishlist-counter"
+
 
 const Header = () => {
   const { t } = useTranslation()
@@ -80,6 +82,7 @@ const Header = () => {
               >
                 <Search className="h-5 w-5 text-gray-700" />
               </button>
+              <WishlistCounter />
               <LanguageToggle />
               <button className="flex items-center space-x-2 rtl:space-x-reverse bg-brand-primary text-white px-4 py-2 rounded-[5px] hover:bg-brand-dark hover:text-brand-primary transition-colors">
                 <span className="font-semibold flex items-center gap-2" dir="ltr">
@@ -98,6 +101,7 @@ const Header = () => {
               >
                 <Search className="h-5 w-5 text-gray-700" />
               </button>
+              <WishlistCounter />
               <LanguageToggle />
               <button className="p-2 rounded-[5px] hover:bg-gray-100" onClick={toggleMobileMenu}>
                 {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

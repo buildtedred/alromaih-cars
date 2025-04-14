@@ -4,13 +4,11 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Heart } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
-import Link from "next/link"
-import { useDetailContext } from "@/contexts/detailProvider"
+import { toggleWishlistItem, isInWishlist } from "@/lib/wishlist-utils"
 
 const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale }) => {
-  const {setcar_Details, loading } = useDetailContext();
+  const router = useRouter()
   const pathname = usePathname()
-  const router = useRouter();
   // Detect language from URL path
   const pathLocale = pathname.startsWith("/ar") ? "ar" : "en"
   // Use either the detected path locale or the provided locale prop
@@ -24,10 +22,23 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
     setIsFavorite(initialIsFavorite || false)
   }, [initialIsFavorite])
 
+  // Check localStorage on component mount
+  useEffect(() => {
+    setIsFavorite(isInWishlist(car.id))
+  }, [car.id])
+
   const handleFavoriteClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsFavorite(!isFavorite)
+
+    // Toggle in localStorage
+    toggleWishlistItem(car)
+
+    // Update local state
+    const newFavoriteState = !isFavorite
+    setIsFavorite(newFavoriteState)
+
+    // Call parent callback if provided
     if (onFavoriteToggle) {
       onFavoriteToggle(car.id)
     }
@@ -66,15 +77,13 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
     if (!textObj) return ""
     return typeof textObj === "object" ? textObj[currentLocale] || textObj.en || "" : String(textObj)
   }
+
   const handleViewDetails = () => {
-    router.push(
-      `/${currentLocale}/car-details/${car.id}`
-    );
-    setcar_Details(car) // ✅ sets details from context
-  };
+    router.push(`/${currentLocale}/car-details/${car.id}`)
+  }
+
   return (
     <div
-     
       className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -166,9 +175,9 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
               <p className="text-xs text-brand-primary mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</p>
               <div className="font-bold text-brand-primary flex items-center">
                 <span className="mr-1 flex-shrink-0">
-                  <Image src={car.icons.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
+                  <Image src={car.icons?.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
                 </span>
-                <span className="text-base">{car.cashPrice.toLocaleString()}</span>
+                <span className="text-base">{car.cashPrice?.toLocaleString()}</span>
               </div>
             </div>
 
@@ -176,7 +185,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
               <p className="text-xs text-brand-primary mb-1">{isRTL ? "أقساط من" : "Installments from"}</p>
               <div className="font-bold text-brand-primary flex items-center">
                 <span className="mr-1 flex-shrink-0">
-                  <Image src={car.icons.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
+                  <Image src={car.icons?.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
                 </span>
                 <span className="text-base">{car.installmentPrice}</span>
               </div>
@@ -189,60 +198,59 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
           <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
             <div className="w-4 h-4 relative">
               <Image
-                src={car.icons.year || "/icons/Calendar.svg"}
+                src={car.icons?.year || "/icons/Calendar.svg"}
                 alt="Year"
                 width={16}
                 height={16}
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary text-center">{car.specs.year}</span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{car.specs?.year}</span>
           </div>
 
           <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
             <div className="w-4 h-4 relative">
               <Image
-                src={car.icons.transmission || "/icons/Transmission.svg"}
+                src={car.icons?.transmission || "/icons/Transmission.svg"}
                 alt="Transmission"
                 width={16}
                 height={16}
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs.transmission)}</span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs?.transmission)}</span>
           </div>
 
           <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
             <div className="w-4 h-4 relative">
               <Image
-                src={car.icons.seats || "/icons/Horse.svg"}
+                src={car.icons?.seats || "/icons/Horse.svg"}
                 alt="Seats"
                 width={16}
                 height={16}
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs.seats)}</span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs?.seats)}</span>
           </div>
 
           <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
             <div className="w-4 h-4 relative">
               <Image
-                src={car.icons.fuel || "/icons/Fuel.svg"}
+                src={car.icons?.fuel || "/icons/Fuel.svg"}
                 alt="Fuel"
                 width={16}
                 height={16}
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs.fuelType)}</span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs?.fuelType)}</span>
           </div>
         </div>
 
         {/* View Details Link */}
         <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-3 py-2 mx-2`}>
           <div
-            // href={`/${currentLocale}/cars/${car.id}`}
             onClick={handleViewDetails}
             className="cursor-pointer text-brand-primary text-sm flex items-center transition-all duration-300 hover:translate-x-1 hover:font-medium"
           >

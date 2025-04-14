@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { PromoSlider } from "../AllCarComponents/promo-slider"
 import { RangeSlider } from "../AllCarComponents/range-slider"
 import { CarGrid } from "../AllCarComponents/car-grid"
+import CarSkeletonUI from "@/app/[locale]/all-cars/CarSkeletonUI"
 
 // Update the scrollbarStyles to use the exact hex color from Tailwind config
 const scrollbarStyles = `
@@ -785,7 +786,7 @@ const AllCarMainpage = () => {
   })
 
   if (loading) {
-    return <LoadingUi />
+    return <CarSkeletonUI/>
   }
 
   if (error) {
