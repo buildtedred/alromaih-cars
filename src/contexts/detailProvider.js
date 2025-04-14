@@ -13,7 +13,7 @@ export const useDetailContext = () => {
 export const DetailProvider = ({ children }) => {
   const [car_Details, setcar_Details] = useState('');
   const [loading, setLoading] = useState(true);
-//   console.log("jjjjjjjjjjjjjjjjjjjj", details);
+  console.log("jjjjjjjjjjjjjjjjjjjj", car_Details);
 
 
   return (

@@ -4,16 +4,19 @@ import { useState, useEffect } from "react"
 import { Trash2, ShoppingCart, ArrowLeft, Heart } from 'lucide-react'
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import CarCard from "@/MyComponents/Cards/CarCard"
+import { useDetailContext } from "@/contexts/detailProvider"
 
 
 export default function WishlistPage() {
+  const {setcar_Details, loading } = useDetailContext();
   const [wishlistItems, setWishlistItems] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const pathname = usePathname()
   const currentLocale = pathname.startsWith("/ar") ? "ar" : "en"
   const isRTL = currentLocale === "ar"
+  const router = useRouter()
 
   // Helper function to extract text from multilingual objects
   const getText = (textObj) => {
@@ -52,6 +55,10 @@ export default function WishlistPage() {
     localStorage.removeItem("carWishlist")
   }
 
+  const handleViewDetails = (car) => {
+    router.push(`/${currentLocale}/car-details/${car.id}`)
+    setcar_Details(car)
+  }
   if (isLoading) {
     return (
       <div className="container mx-auto py-10 px-4 min-h-screen flex items-center justify-center">
@@ -174,11 +181,11 @@ export default function WishlistPage() {
                     </td>
                     <td className="p-4">
                       <div className="flex justify-center gap-2">
-                        <Link href={`/${currentLocale}/car-details/${car.id}`}>
+                        <div onClick={ ()=>handleViewDetails(car)}>
                           <Button variant="outline" size="sm" className="text-brand-primary border-brand-primary">
                             {isRTL ? "عرض التفاصيل" : "View Details"}
                           </Button>
-                        </Link>
+                        </div>
                         <Button
                           variant="outline"
                           size="sm"
