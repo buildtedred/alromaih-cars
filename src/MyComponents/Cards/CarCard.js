@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Heart } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
+import { useDetailContext } from "@/contexts/detailProvider"
 
 const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale }) => {
+  const {setcar_Details, loading } = useDetailContext();
   const pathname = usePathname()
+  const router = useRouter();
   // Detect language from URL path
   const pathLocale = pathname.startsWith("/ar") ? "ar" : "en"
   // Use either the detected path locale or the provided locale prop
@@ -63,7 +66,12 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
     if (!textObj) return ""
     return typeof textObj === "object" ? textObj[currentLocale] || textObj.en || "" : String(textObj)
   }
-
+  const handleViewDetails = () => {
+    router.push(
+      `/${currentLocale}/car-details/${car.id}`
+    );
+    setcar_Details(car) // ✅ sets details from context
+  };
   return (
     <div
      
@@ -233,9 +241,10 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
 
         {/* View Details Link */}
         <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-3 py-2 mx-2`}>
-          <Link
-            href={`/${currentLocale}/cars/${car.id}`}
-            className="text-brand-primary text-sm flex items-center transition-all duration-300 hover:translate-x-1 hover:font-medium"
+          <div
+            // href={`/${currentLocale}/cars/${car.id}`}
+            onClick={handleViewDetails}
+            className="cursor-pointer text-brand-primary text-sm flex items-center transition-all duration-300 hover:translate-x-1 hover:font-medium"
           >
             {isRTL ? (
               <>
@@ -258,7 +267,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
                 </span>
               </>
             )}
-          </Link>
+          </div>
         </div>
       </div>
     </div>
