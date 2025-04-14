@@ -91,7 +91,7 @@ export default function CarFinderModal() {
   return (
     <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30 shadow-lg">
       {/* Left side - Payment Method Selection */}
-      <div className="p-4 sm:p-6 md:p-8 md:w-1/2">
+      <div className="p-4 sm:p-6 md:p-8 md:w-1/2 bg-brand-primary/10">
         <h1 className="text-xl sm:text-2xl font-bold text-brand-primary mb-4 sm:mb-6 text-center md:text-left">
           {isArabic ? "اختر طريقة الدفع" : "Choose Payment Method"}
         </h1>
@@ -114,7 +114,7 @@ export default function CarFinderModal() {
             </div>
 
             {/* Offer Badge */}
-            <div className="absolute -top-2 -left-2 z-10 bg-[#FF6B6B] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap animate-pulse">
+            <div className="absolute -top-2 -left-2 z-10 bg-[#FF6B6B] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap badge-bounce badge-glow">
               <Percent className="w-2.5 h-2.5 mr-0.5" />
               {isArabic ? "خصم ١٠٪" : "10% OFF"}
             </div>
@@ -143,9 +143,9 @@ export default function CarFinderModal() {
           {/* Finance Payment Option */}
           <div className="relative group">
             {/* Save Tag */}
-            <div className="animate-pulse absolute -top-2 -right-2 z-10">
+            <div className="absolute -top-2 -right-2 z-10">
               <div className="bg-gradient-to-r from-pink-200 to-teal-100 text-brand-primary text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center whitespace-nowrap badge-pulse">
-                <span className=" bg-pink-200 text-[8px] px-1 py-0.5 rounded-full mr-1">NEW</span>
+                <span className="bg-pink-200 text-[8px] px-1 py-0.5 rounded-full mr-1">NEW</span>
                 <span>Save up to 40%</span>
               </div>
             </div>
@@ -184,73 +184,70 @@ export default function CarFinderModal() {
         {/* Circular diagram - make it smaller on mobile */}
         <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64">
           {/* Center circle */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-brand-primary/10 z-10"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-brand-primary/10 z-30"></div>
+
+          {/* Connecting lines using SVG files - positioned behind circles */}
+          {/* Line from Discover to Compare (Left to Top) */}
+          <img
+            src="/icons/CircleLine1.svg"
+            alt="Line from Discover to Compare"
+            className="absolute top-[20%] left-0 w-[40%] h-[12%] object-contain z-10"
+            style={{ clipPath: "inset(0 0 0 30%)", opacity: 0.8 }}
+          />
+          {/* Line from Compare to Get Suitable (Top to Right) */}
+          <img
+            src="/icons/CircleLine2.svg"
+            alt="Line from Compare to Get Suitable"
+            className="absolute top-[15%] left-[50%] w-[40%] h-[12%] object-contain z-10"
+            style={{ clipPath: "inset(0 0 0 20%)", opacity: 0.8 }}
+          />
+          {/* Line from Get Suitable to Car Home (Right to Bottom) */}
+          <img
+            src="/icons/CircleLine3.svg"
+            alt="Line from Get Suitable to Car Home"
+            className="absolute bottom-[20%] right-0 w-[40%] h-[12%] object-contain z-10"
+            style={{ clipPath: "inset(0 20% 0 0)", opacity: 0.8 }}
+          />
 
           {/* Top circle - Compare & Explore */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/4 text-center">
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/4 text-center z-30">
             <p className="text-xs text-brand-primary font-medium mb-2">
               {isArabic ? "قارن واستكشف" : "Compare & Explore"}
             </p>
-            <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center">
-              <Image src="/icons/CompareCar.svg" alt="Compare & Explore" width={40} height={40} />
+            <div className="w-16 h-16 rounded-full bg-brand-light mx-auto flex items-center justify-center">
+              <Image src="/icons/CompareCar.svg" alt="Compare & Explore" width={60} height={60} />
             </div>
           </div>
 
           {/* Right circle - Get Suitable Price */}
-          <div className="absolute top-1/2 right-0 transform translate-x-1/4 -translate-y-1/2 text-center">
-            <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-              <Image src="/icons/Get-Suitable-Price.svg" alt="Get Suitable Price" width={40} height={40} />
+          <div className="absolute top-1/2 right-0 transform translate-x-1/3 -translate-y-1/2 text-center z-30">
+            <div className="w-16 h-16 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
+              <Image src="/icons/Get-Suitable-Price.svg" alt="Get Suitable Price" width={60} height={60} />
             </div>
-            <p className="text-xs text-brand-primary font-medium whitespace-nowrap">
+            <p className="text-xs text-brand-primary font-medium whitespace-nowrap relative z-40">
               {isArabic ? "احصل على السعر المناسب" : "Get Suitable Price"}
             </p>
           </div>
 
           {/* Bottom circle - Car Home Delivery */}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/4 text-center">
-            <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-              <Image src="/icons/Car-Home-Delivery.svg" alt="Car Home Delivery" width={40} height={40} />
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/3 text-center z-30">
+            <div className="w-16 h-16 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
+              <Image src="/icons/Car-Home-Delivery.svg" alt="Car Home Delivery" width={60} height={60} />
             </div>
-            <p className="text-xs text-brand-primary font-medium">
+            <p className="text-xs text-brand-primary font-medium relative z-40">
               {isArabic ? "توصيل السيارة للمنزل" : "Car Home Delivery"}
             </p>
           </div>
 
           {/* Left circle - Discover Car */}
-          <div className="absolute top-1/2 left-0 transform -translate-x-1/4 -translate-y-1/2 text-center">
-            <div className="w-20 h-20 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
-              <Image src="/icons/DiscoverCar.svg" alt="Discover Car" width={40} height={40} />
+          <div className="absolute top-1/2 left-0 transform -translate-x-1/3 -translate-y-1/2 text-center z-30">
+            <div className="w-16 h-16 rounded-full bg-brand-light mx-auto flex items-center justify-center mb-2">
+              <Image src="/icons/DiscoverCar.svg" alt="Discover Car" width={60} height={60} />
             </div>
-            <p className="text-xs text-brand-primary font-medium">{isArabic ? "اكتشف السيارة" : "Discover Car"}</p>
+            <p className="text-xs text-brand-primary font-medium relative z-40">
+              {isArabic ? "اكتشف السيارة" : "Discover Car"}
+            </p>
           </div>
-
-          {/* Connecting lines as curved paths */}
-          <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 200 200" fill="none">
-            <path
-              d="M100 40 C 90 60, 80 80, 80 100"
-              stroke="currentColor"
-              className="text-brand-primary"
-              strokeWidth="1"
-            />
-            <path
-              d="M120 100 C 140 80, 160 60, 160 100"
-              stroke="currentColor"
-              className="text-brand-primary"
-              strokeWidth="1"
-            />
-            <path
-              d="M100 160 C 110 140, 120 120, 120 100"
-              stroke="currentColor"
-              className="text-brand-primary"
-              strokeWidth="1"
-            />
-            <path
-              d="M40 100 C 60 120, 80 140, 80 100"
-              stroke="currentColor"
-              className="text-brand-primary"
-              strokeWidth="1"
-            />
-          </svg>
         </div>
       </div>
 
