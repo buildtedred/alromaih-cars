@@ -18,6 +18,13 @@ import {
   X,
 } from "lucide-react"
 
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogHeader,
+} from "@/components/ui/dialog";
+
 // Add custom scrollbar styles
 const scrollbarStyles = `
   .custom-scrollbar::-webkit-scrollbar {
@@ -54,6 +61,7 @@ const CarOverview = ({ carDetails }) => {
   const isEnglish = pathname.startsWith("/en")
   const [showSpecDialog, setShowSpecDialog] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState(null)
+  
 
   // Set default selected category when dialog opens
   useEffect(() => {
@@ -398,7 +406,7 @@ const CarOverview = ({ carDetails }) => {
               <button
                 key={category.id}
                 onClick={() => handleCategoryClick(category)}
-                className={`flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                className={` flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
                   selectedCategory?.id === category.id && showSpecDialog ? "bg-brand-light" : ""
                 }`}
               >
@@ -419,85 +427,99 @@ const CarOverview = ({ carDetails }) => {
         </div>
       </div>
 
-      {showSpecDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-[15px] overflow-hidden max-w-2xl w-full border border-gray-200 shadow-xl">
-            <div className="relative">
-              {/* Close button */}
-              <button
-                onClick={() => setShowSpecDialog(false)}
-                className="absolute top-3 right-3 z-10 p-1 rounded-full bg-white shadow-sm hover:bg-gray-100"
-              >
-                <X className="h-5 w-5 text-gray-500" />
-              </button>
+      <Dialog open={showSpecDialog} onOpenChange={setShowSpecDialog} className="rounded-10px">
+      <DialogContent className="max-w-4xl p-0 overflow-hidden  rounded-lg border-gray-200 custom-dialog">
+        <div className="relative">
+          {/* Close Button */}
+      
 
-              <div className="flex">
-                {/* Left side - Categories Menu */}
-                <div className="w-1/3 border-r flex flex-col h-[70vh]">
-                  <div className="p-4 bg-white border-b">
-                    <h3 className={`text-lg font-semibold text-brand-primary pr-8 ${!isEnglish ? "text-right" : ""}`}>
-                      {isEnglish ? "Car Specifications" : "صفات السيارة"}
-                    </h3>
-                  </div>
-                  <div className="overflow-y-auto flex-1 custom-scrollbar">
-                    {categories.map((category) => (
-                      <button
-                        key={category.id}
-                        onMouseEnter={() => setSelectedCategory(category)}
-                        className={`w-full flex items-center gap-2 p-4 hover:bg-gray-50 transition-colors ${
-                          selectedCategory?.id === category.id ? "bg-brand-light" : ""
+          <div className="flex">
+            {/* Left side - Categories */}
+            <div className="w-1/3 border-r flex flex-col h-[70vh] bg-white">
+              <div className="p-4 border-b">
+                <h3
+                  className={`text-lg font-semibold text-brand-primary pr-8 ${
+                    !isEnglish ? "text-right" : ""
+                  }`}
+                >
+                  {isEnglish ? "Car Specifications" : "صفات السيارة"}
+                </h3>
+              </div>
+              <div className="overflow-y-auto flex-1 custom-scrollbar">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onMouseEnter={() => setSelectedCategory(category)}
+                    className={`w-full flex items-center gap-2 p-4 hover:bg-gray-50 transition-colors ${
+                      selectedCategory?.id === category.id ? "bg-brand-light" : ""
+                    }`}
+                  >
+                    <span className="text-brand-primary">{category.icon}</span>
+                    <span
+                      className={`flex-1 text-sm font-medium ${
+                        !isEnglish ? "text-right" : "text-left"
+                      }`}
+                    >
+                      {isEnglish ? category.title : category.titleAr}
+                    </span>
+                    {isEnglish ? (
+                      <ChevronRight
+                        className={`w-4 h-4 text-gray-400 ${
+                          selectedCategory?.id === category.id ? "text-brand-primary" : ""
                         }`}
+                      />
+                    ) : (
+                      <ChevronLeft
+                        className={`w-4 h-4 text-gray-400 ${
+                          selectedCategory?.id === category.id ? "text-brand-primary" : ""
+                        }`}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Right side - Details */}
+            <div className="flex-1 p-6 h-[70vh] overflow-y-auto custom-scrollbar bg-white">
+              {selectedCategory && (
+                <>
+                  <h3 className="text-lg font-semibold text-brand-primary mb-6 flex items-center gap-2">
+                    {selectedCategory.icon}
+                    <span className={`${!isEnglish ? "text-right" : ""}`}>
+                      {isEnglish
+                        ? selectedCategory.title
+                        : selectedCategory.titleAr}
+                    </span>
+                  </h3>
+                  <div className="space-y-4">
+                    {selectedCategory.details.map((detail, index) => (
+                      <div
+                        key={index}
+                        className="border-b border-gray-100 pb-4 last:border-0"
                       >
-                        <span className="text-brand-primary">{category.icon}</span>
-                        <span className={`flex-1 text-sm font-medium ${!isEnglish ? "text-right" : "text-left"}`}>
-                          {isEnglish ? category.title : category.titleAr}
-                        </span>
-                        {isEnglish ? (
-                          <ChevronRight
-                            className={`w-4 h-4 text-gray-400 ${selectedCategory?.id === category.id ? "text-brand-primary" : ""}`}
-                          />
-                        ) : (
-                          <ChevronLeft
-                            className={`w-4 h-4 text-gray-400 ${selectedCategory?.id === category.id ? "text-brand-primary" : ""}`}
-                          />
-                        )}
-                      </button>
+                        <div
+                          className={`flex justify-between items-start ${
+                            !isEnglish ? "flex-row-reverse" : ""
+                          }`}
+                        >
+                          <span className="text-gray-600 max-w-[45%]">
+                            {isEnglish ? detail.label : detail.labelAr}
+                          </span>
+                          <span className="font-medium text-brand-primary text-right max-w-[45%] break-words">
+                            {isEnglish ? detail.value : detail.valueAr}
+                          </span>
+                        </div>
+                      </div>
                     ))}
                   </div>
-                </div>
-
-                {/* Right side - Details */}
-                <div className="flex-1 p-6 h-[70vh] overflow-y-auto custom-scrollbar">
-                  {selectedCategory && (
-                    <>
-                      <h3 className="text-lg font-semibold text-brand-primary mb-6 flex items-center gap-2">
-                        {selectedCategory.icon}
-                        <span className={`${!isEnglish ? "text-right" : ""}`}>
-                          {isEnglish ? selectedCategory.title : selectedCategory.titleAr}
-                        </span>
-                      </h3>
-                      <div className="space-y-4">
-                        {selectedCategory.details.map((detail, index) => (
-                          <div key={index} className="border-b border-gray-100 pb-4 last:border-0">
-                            <div className={`flex justify-between items-start ${!isEnglish ? "flex-row-reverse" : ""}`}>
-                              <span className="text-gray-600 max-w-[45%]">
-                                {isEnglish ? detail.label : detail.labelAr}
-                              </span>
-                              <span className="font-medium text-brand-primary text-right max-w-[45%] break-words">
-                                {isEnglish ? detail.value : detail.valueAr}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>
-      )}
+      </DialogContent>
+    </Dialog>
     </div>
   )
 }

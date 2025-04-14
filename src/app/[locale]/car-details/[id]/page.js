@@ -78,7 +78,7 @@ const fetchCarDetails = async (id) => {
 
 const page = async ({ params }) => {
   const id = (await params).id
-  console.log("idddd",params)
+  // console.log("idddd",params)
   
   const carDetails = await fetchCarDetails(id);
 

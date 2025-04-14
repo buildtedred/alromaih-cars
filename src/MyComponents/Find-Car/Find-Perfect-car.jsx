@@ -253,7 +253,7 @@ export default function CarFinderModal() {
 
       {/* Modal Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-6xl p-0 border-none bg-transparent">
+        <DialogContent className="max-w-6xl p-0  bg-transparent">
           <DialogTitle className="sr-only">{isArabic ? "اختيار السيارة" : "Car Selection"}</DialogTitle>
           <CarFinderContent initialPaymentMethod={initialPaymentMethod} onClose={() => setIsOpen(false)} />
         </DialogContent>
