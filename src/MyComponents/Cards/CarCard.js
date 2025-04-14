@@ -5,11 +5,13 @@ import Image from "next/image"
 import { Heart } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { toggleWishlistItem, isInWishlist } from "@/lib/wishlist-utils"
+import { useDetailContext } from "@/contexts/detailProvider"
 
 const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale }) => {
   const router = useRouter()
   const pathname = usePathname()
   // Detect language from URL path
+     const {setcar_Details, loading } = useDetailContext();
   const pathLocale = pathname.startsWith("/ar") ? "ar" : "en"
   // Use either the detected path locale or the provided locale prop
   const currentLocale = pathLocale || locale
@@ -80,6 +82,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
 
   const handleViewDetails = () => {
     router.push(`/${currentLocale}/car-details/${car.id}`)
+    setcar_Details(car)
   }
 
   return (

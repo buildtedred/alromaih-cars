@@ -16,6 +16,8 @@ const CompactCarListing = ({ brand_Details }) => {
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 
+  console.log("object", car_Details)
+
   const [activeImage, setActiveImage] = useState(0)
   const [activePaymentTab, setActivePaymentTab] = useState("cash")
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false)
