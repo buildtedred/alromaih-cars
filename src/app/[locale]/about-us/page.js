@@ -1,14 +1,9 @@
-import React from 'react'
-import aboutUs from './../../../MyComponents/AboutUs/aboutUs.jsx';
+// src/app/[locale]/about-us/page.js
+import React from 'react';
+import AboutUsContent from '../../../MyComponents/AboutUs-Page/About.jsx';
 
-const page = () => {
-  return (
-    
-    <>
-    <aboutUs />
-    </>
-    
-  )
-}
+const AboutUsPage = () => {
+  return <AboutUsContent />;
+};
 
-export default page
+export default AboutUsPage;

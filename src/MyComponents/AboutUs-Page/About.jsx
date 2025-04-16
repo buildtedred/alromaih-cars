@@ -12,7 +12,7 @@ export default function Home() {
       {/* Hero Image */}
       <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px]">
         <Image
-          src="/images/about-main-image.JPG"
+          src="/images/main-car.jpg"
           alt="Car image"
           fill
           className="object-cover object-center"

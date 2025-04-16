@@ -39,7 +39,10 @@ export default function WishlistPage() {
       } catch (error) {
         console.error("Error loading wishlist:", error)
       } finally {
-        setIsLoading(false)
+        // Simulate loading for better skeleton demonstration
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 300)
       }
     }
 
@@ -107,10 +110,147 @@ export default function WishlistPage() {
     setcar_Details(car)
   }
 
+  // Skeleton loader for mobile view
+  const MobileSkeletonLoader = () => (
+    <div className="md:hidden">
+      {[1, 2, 3].map((item) => (
+        <div key={item} className="bg-white rounded-[5px] shadow-sm mb-4 overflow-hidden animate-pulse">
+          <div className="flex flex-col sm:flex-row">
+            {/* Image skeleton */}
+            <div className="relative sm:w-1/3">
+              <div className="h-48 sm:h-full bg-gray-200"></div>
+            </div>
+
+            {/* Content skeleton */}
+            <div className="p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start">
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/6"></div>
+                </div>
+
+                {/* Specifications skeleton */}
+                <div className="flex flex-wrap gap-2 my-3">
+                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                  <div className="h-6 bg-gray-200 rounded w-16"></div>
+                  <div className="h-6 bg-gray-200 rounded w-24"></div>
+                </div>
+
+                {/* Price section skeleton */}
+                <div className="flex justify-between items-center mt-2">
+                  <div>
+                    <div className="h-3 bg-gray-200 rounded w-16 mb-1"></div>
+                    <div className="h-6 bg-gray-200 rounded w-24"></div>
+                  </div>
+
+                  <div>
+                    <div className="h-3 bg-gray-200 rounded w-16 mb-1"></div>
+                    <div className="h-5 bg-gray-200 rounded w-20"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action buttons skeleton */}
+              <div className="flex gap-2 mt-4">
+                <div className="h-10 bg-gray-200 rounded flex-1"></div>
+                <div className="h-10 bg-gray-200 rounded w-10"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  // Skeleton loader for desktop view
+  const DesktopSkeletonLoader = () => (
+    <div className="hidden md:block overflow-x-auto">
+      <div className="bg-white rounded-[5px] shadow-sm animate-pulse">
+        {/* Table header skeleton */}
+        <div className="bg-gray-100 border-b border-gray-200 grid grid-cols-6 p-4">
+          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-6 bg-gray-200 rounded w-2/3"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto"></div>
+        </div>
+
+        {/* Table rows skeleton */}
+        {[1, 2, 3, 4].map((item) => (
+          <div key={item} className="border-b border-gray-100 grid grid-cols-6 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-24 h-16 bg-gray-200 rounded-[5px]"></div>
+              <div className="flex-1">
+                <div className="h-5 bg-gray-200 rounded w-3/4 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+            <div className="h-5 bg-gray-200 rounded w-1/2 self-center"></div>
+            <div className="h-5 bg-gray-200 rounded w-2/3 self-center"></div>
+            <div className="h-5 bg-gray-200 rounded w-1/2 self-center"></div>
+            <div className="flex flex-wrap gap-2 self-center">
+              <div className="h-6 bg-gray-200 rounded w-16"></div>
+              <div className="h-6 bg-gray-200 rounded w-16"></div>
+            </div>
+            <div className="flex justify-center gap-2 self-center">
+              <div className="h-8 bg-gray-200 rounded w-24"></div>
+              <div className="h-8 bg-gray-200 rounded w-10"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  // Header skeleton
+  const HeaderSkeleton = () => (
+    <div className="bg-gradient-to-r from-brand-primary to-[#6B2A77] rounded-[5px] p-6 mb-6 animate-pulse">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex items-center">
+          <div className="w-8 h-8 bg-white/30 rounded-full mr-3"></div>
+          <div>
+            <div className="h-8 bg-white/30 rounded w-40 mb-2"></div>
+            <div className="h-4 bg-white/20 rounded w-24"></div>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <div className="h-10 bg-white/20 rounded w-36"></div>
+          <div className="h-10 bg-white/20 rounded w-32"></div>
+        </div>
+      </div>
+    </div>
+  )
+
   if (isLoading) {
     return (
-      <div className="container mx-auto py-10 px-4 min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="container mx-auto py-8 px-4 lg:pl-28 lg:pr-28 min-h-screen">
+        {/* Breadcrumb skeleton */}
+        <div className="flex items-center mb-6">
+          <div className="h-4 bg-gray-200 rounded w-12"></div>
+          <div className="mx-2 h-4 w-4 bg-gray-200 rounded"></div>
+          <div className="h-4 bg-gray-200 rounded w-16"></div>
+        </div>
+
+        {/* Header skeleton */}
+        <HeaderSkeleton />
+
+        {/* Search and filter skeleton */}
+        <div className="bg-white rounded-[5px] shadow-sm p-4 mb-6 animate-pulse">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="h-10 bg-gray-200 rounded w-full sm:w-32"></div>
+            <div className="h-10 bg-gray-200 rounded w-full sm:w-48"></div>
+          </div>
+        </div>
+
+        {/* Results count skeleton */}
+        <div className="mb-4 h-4 bg-gray-200 rounded w-40"></div>
+
+        {/* Mobile skeleton */}
+        <MobileSkeletonLoader />
+
+        {/* Desktop skeleton */}
+        <DesktopSkeletonLoader />
       </div>
     )
   }
@@ -333,16 +473,22 @@ export default function WishlistPage() {
                         <div className="flex justify-between items-center mt-2">
                           <div>
                             <div className="text-xs text-gray-500">{isRTL ? "السعر النقدي" : "Cash Price"}</div>
-                            <div className="text-lg font-bold text-brand-primary">
-                              {car.cashPrice?.toLocaleString()} {isRTL ? "ريال" : "SAR"}
+                            <div className="text-lg font-bold text-brand-primary flex items-center">
+                              {car.cashPrice?.toLocaleString()}
+                              <img src="/icons/Currency.svg" alt="Currency" className="w-4 h-4 ml-1 inline-block" />
                             </div>
                           </div>
 
                           {car.installmentPrice && (
                             <div>
                               <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
-                              <div className="text-sm font-medium">
-                                {car.installmentPrice?.toLocaleString()} {isRTL ? "ريال" : "SAR"}
+                              <div className="text-sm font-medium flex items-center">
+                                {car.installmentPrice?.toLocaleString()}
+                                <img
+                                  src="/icons/Currency.svg"
+                                  alt="Currency"
+                                  className="w-3.5 h-3.5 ml-1 inline-block"
+                                />
                               </div>
                             </div>
                           )}
@@ -417,14 +563,16 @@ export default function WishlistPage() {
                       </td>
                       <td className="p-4">{getText(car.modelYear)}</td>
                       <td className="p-4">
-                        <span className="font-semibold text-gray-800">
-                          {car.cashPrice?.toLocaleString()} {isRTL ? "ريال" : "SAR"}
+                        <span className="font-semibold text-gray-800 flex items-center">
+                          {car.cashPrice?.toLocaleString()}
+                          <img src="/icons/Currency.svg" alt="Currency" className="w-4 h-4 ml-1 inline-block" />
                         </span>
                       </td>
                       <td className="p-4">
                         {car.installmentPrice ? (
-                          <span className="text-gray-700">
-                            {car.installmentPrice?.toLocaleString()} {isRTL ? "ريال" : "SAR"}
+                          <span className="text-gray-700 flex items-center">
+                            {car.installmentPrice?.toLocaleString()}
+                            <img src="/icons/Currency.svg" alt="Currency" className="w-3.5 h-3.5 ml-1 inline-block" />
                           </span>
                         ) : (
                           <span className="text-gray-400">-</span>
