@@ -44,6 +44,12 @@ const CompactCarListing = ({ brand_Details }) => {
     return () => clearTimeout(timer)
   }, [car_Details])
 
+  useEffect(() => {
+    if (car_Details?.image) {
+      setCurrentMainImage(car_Details.image)
+    }
+  }, [car_Details])
+
   // Handle color change
   const handleColorChange = (imageUrl) => {
     if (imageUrl) {
@@ -171,7 +177,7 @@ const CompactCarListing = ({ brand_Details }) => {
           <div className="p-4">
             {activePaymentTab === "cash" ? (
               <div className="space-y-4">
-                <div className="text-left">
+                <div className="">
                   <p className="text-brand-primary font-medium mb-2">{isEnglish ? "Cash Price" : "سعر الكاش"}</p>
                   <p className="text-3xl font-bold text-brand-primary mb-1 flex items-center gap-1">
                     <RiyalIcon />
@@ -259,31 +265,7 @@ const CompactCarListing = ({ brand_Details }) => {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-36 py-8">
         {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left Column */}
-          <div className="w-full lg:w-[350px]">
-            <div className="space-y-3">
-              {isLoading ? (
-                <>
-                  <Skeleton className="h-24 w-full rounded-lg" />
-                  <Skeleton className="h-64 w-full rounded-lg" />
-                </>
-              ) : (
-                <>
-                  <PriceCardSimple
-                    car_Details={car_Details}
-                    isEnglish={isEnglish}
-                    onColorChange={handleColorChange}
-                    pdfCarDetails={pdfCarDetails}
-                    isPdfLoading={isPdfLoading}
-                    brandDetails={brand_Details}
-                  />
-                  {renderPaymentCard()}
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Right Column */}
+            {/* Right Column */}
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row gap-4">
               {renderThumbnails()}
@@ -325,6 +307,31 @@ const CompactCarListing = ({ brand_Details }) => {
               )}
             </div>
           </div>
+          {/* Left Column */}
+          <div className="w-full lg:w-[350px]">
+            <div className="space-y-3">
+              {isLoading ? (
+                <>
+                  <Skeleton className="h-24 w-full rounded-lg" />
+                  <Skeleton className="h-64 w-full rounded-lg" />
+                </>
+              ) : (
+                <>
+                  <PriceCardSimple
+                    car_Details={car_Details}
+                    isEnglish={isEnglish}
+                    onColorChange={handleColorChange}
+                    pdfCarDetails={pdfCarDetails}
+                    isPdfLoading={isPdfLoading}
+                    brandDetails={brand_Details}
+                  />
+                  {renderPaymentCard()}
+                </>
+              )}
+            </div>
+          </div>
+
+        
         </div>
       </div>
 

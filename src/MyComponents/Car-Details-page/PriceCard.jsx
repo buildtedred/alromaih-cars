@@ -121,7 +121,7 @@ const PriceCardSimple = ({ car_Details, isEnglish, onColorChange, pdfCarDetails,
           <div className="flex flex-col">
             {car_Details?.brand?.image ? (
               <Image
-                src={car_Details.brand.image || "/placeholder.svg"}
+                src={car_Details?.brand.image || "/placeholder.svg"}
                 alt={getBrandName()}
                 width={60}
                 height={20}

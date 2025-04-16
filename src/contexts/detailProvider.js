@@ -11,9 +11,24 @@ export const useDetailContext = () => {
 };
 
 export const DetailProvider = ({ children }) => {
-  const [car_Details, setcar_Details] = useState('');
+  const [car_Details, setcar_Details] = useState(null);
   const [loading, setLoading] = useState(true);
-  console.log("jjjjjjjjjjjjjjjjjjjj", car_Details);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const storedDetails = localStorage.getItem("car_Details");
+    if (storedDetails) {
+      setcar_Details(JSON.parse(storedDetails));
+    }
+    setLoading(false);
+  }, []);
+
+  // Save to localStorage whenever car_Details changes
+  useEffect(() => {
+    if (car_Details) {
+      localStorage.setItem("car_Details", JSON.stringify(car_Details));
+    }
+  }, [car_Details]);
 
 
   return (
