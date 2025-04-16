@@ -11,6 +11,7 @@ import { PromoSlider } from "../AllCarComponents/promo-slider"
 import { RangeSlider } from "../AllCarComponents/range-slider"
 import { CarGrid } from "../AllCarComponents/car-grid"
 import CarSkeletonUI from "@/app/[locale]/all-cars/CarSkeletonUI"
+import { useDetailContext } from "@/contexts/detailProvider"
 
 // Update the scrollbarStyles to use the exact hex color from Tailwind config
 const scrollbarStyles = `
@@ -53,8 +54,10 @@ const scrollbarStyles = `
 
 // Replace the CarFilterSidebar component with this implementation
 const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
+  const {searchbrands} = useDetailContext()
+  console.log("brands",searchbrands)
   const [expandedBrands, setExpandedBrands] = useState([])
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState(searchbrands?.brand)
   // Add state to track which sections are expanded
   const [expandedSections, setExpandedSections] = useState({
     priceRange: true,
@@ -239,6 +242,8 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
     }
   }
 
+  
+
   return (
     <div className="bg-white rounded-[4px] shadow-md overflow-hidden flex flex-col h-full">
       {/* Fixed header */}
@@ -327,8 +332,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                         <div className="flex items-center gap-2">
                           <Checkbox
                             id={`brand-${brand}`}
-                            checked={areAllModelsSelected(brand)}
+                            checked={areAllModelsSelected(brand) || searchbrands?.brand === brand}
                             onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
+        
                             className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
                           />
                           <Label htmlFor={`brand-${brand}`} className="text-sm font-medium leading-none cursor-pointer">
@@ -355,7 +361,10 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                             <div key={model.id} className="flex items-center gap-2 transition-opacity duration-200">
                               <Checkbox
                                 id={`model-${model.id}`}
-                                checked={filters.selectedModels?.includes(model.id)}
+                                checked={
+                                  filters.selectedModels?.includes(model.id) ||
+                                  searchbrands?.name === model?.name
+                                }
                                 onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
                                 className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
                               />
