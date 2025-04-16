@@ -13,6 +13,7 @@ const carImages = {
   car8: "/images/car8.png",
   car9: "/images/car9.png",
   car10: "/images/car10.png",
+  car11: "/images/car11.png",
 }
 
 // Brand logos - Updated with all brand SVGs
@@ -171,7 +172,7 @@ const carsData = [
       en: "Full Model 2023",
       ar: "الطراز الكامل 2023",
     },
-    cashPrice: 156000,
+    cashPrice: 4000,
     installmentPrice: 2070,
     specs: {
       fuelType: {
@@ -183,8 +184,8 @@ const carsData = [
         ar: "5 مقاعد",
       },
       transmission: {
-        en: "Automatic",
-        ar: "أوتوماتيك",
+        en: "Manual",
+        ar: "يدوي",
       },
       driveType: {
         en: "All-wheel Drive",
@@ -1167,6 +1168,116 @@ const carsData = [
       currency: icons.currency,
     },
   },
+  {
+    id: 11,
+    name: {
+      en: "Toyota Camry",
+      ar: "تويوتا كامري",
+    },
+    brand: "Toyota",
+    brandLogo: brandLogos.toyota,
+    image: carImages.car11, // Make sure to add this image
+    status: "new",
+    modelYear: {
+      en: "Full Model 2022",
+      ar: "الطراز الكامل 2022",
+    },
+    cashPrice: 120000,
+    installmentPrice: 1550,
+    specs: {
+      fuelType: {
+        en: "Gasoline",
+        ar: "بنزين",
+      },
+      seats: {
+        en: "5 Seats",
+        ar: "5 مقاعد",
+      },
+      transmission: {
+        en: "Automatic",
+        ar: "أوتوماتيك",
+      },
+      driveType: {
+        en: "Front-wheel Drive",
+        ar: "دفع أمامي",
+      },
+      year: 2022,
+      engine: {
+        en: "2.5L",
+        ar: "2.5 لتر",
+      },
+      power: {
+        en: "203 HP",
+        ar: "203 حصان",
+      },
+      torque: {
+        en: "250 Nm",
+        ar: "250 نيوتن متر",
+      },
+      acceleration: {
+        en: "7.6 seconds",
+        ar: "7.6 ثانية",
+      },
+      length: {
+        en: "4,885 mm",
+        ar: "4,885 ملم",
+      },
+      width: {
+        en: "1,840 mm",
+        ar: "1,840 ملم",
+      },
+      height: {
+        en: "1,445 mm",
+        ar: "1,445 ملم",
+      },
+      wheelbase: {
+        en: "2,825 mm",
+        ar: "2,825 ملم",
+      },
+      fuelTank: {
+        en: "60 Liters",
+        ar: "60 لتر",
+      },
+      cargoCapacity: {
+        en: "427 Liters",
+        ar: "427 لتر",
+      },
+      airbags: {
+        en: "7 Airbags",
+        ar: "7 وسائد هوائية",
+      },
+      brakes: {
+        en: "Disc Brakes (F/R)",
+        ar: "فرامل قرصية (أمامية/خلفية)",
+      },
+      parkingSensors: {
+        en: "Rear Only",
+        ar: "خلفية فقط",
+      },
+      camera: {
+        en: "Rear Camera",
+        ar: "كاميرا خلفية",
+      },
+    },
+    features: {
+      exterior: true,
+      interior: true,
+      engine: true,
+      exteriorFeatures: true,
+      safety: true,
+      technology: true,
+      entertainment: true,
+      comfort: true,
+    },
+    icons: {
+      fuel: icons.fuel,
+      seats: icons.seats,
+      transmission: icons.transmission,
+      year: icons.year,
+      currency: icons.currency,
+    },
+  }
+  
 ]
 
 // Function to simulate API call with a delay
