@@ -3,8 +3,7 @@ import { useState, useEffect, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import carsData from "@/app/api/mock-data" // Import your existing mock data
-import LoadingUi from "@/MyComponents/LoadingUi/LoadingUi"
-import { Search, ChevronDown, ChevronUp } from "lucide-react"
+import { Search, ChevronDown, ChevronUp, X, Filter, Check, SlidersHorizontal, Sparkles } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { PromoSlider } from "../AllCarComponents/promo-slider"
@@ -12,22 +11,26 @@ import { RangeSlider } from "../AllCarComponents/range-slider"
 import { CarGrid } from "../AllCarComponents/car-grid"
 import CarSkeletonUI from "@/app/[locale]/all-cars/CarSkeletonUI"
 
-// Update the scrollbarStyles to use the exact hex color from Tailwind config
+// Update the scrollbarStyles to use primary color and have a more premium look
 const scrollbarStyles = `
-/* Hide default scrollbar */
+/* Premium scrollbar */
 .custom-scrollbar-container {
   scrollbar-width: thin;
   scrollbar-color: #46194F transparent;
 }
 .custom-scrollbar-container::-webkit-scrollbar {
-  width: 8px;
+  width: 5px;
 }
 .custom-scrollbar-container::-webkit-scrollbar-track {
   background: transparent;
 }
 .custom-scrollbar-container::-webkit-scrollbar-thumb {
   background-color: #46194F;
-  border-radius: 4px;
+  border-radius: 20px;
+}
+.custom-scrollbar-container::-webkit-scrollbar-thumb:hover {
+  background-color: #46194F;
+  opacity: 0.9;
 }
 .flex-1.overflow-hidden.relative {
   overflow: hidden !important;
@@ -46,13 +49,402 @@ const scrollbarStyles = `
   }
 }
 
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(70, 25, 79, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(70, 25, 79, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(70, 25, 79, 0);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out forwards;
 }
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-pulse {
+  animation: pulse 1.5s infinite;
+}
+
+/* Mobile filter overlay */
+.filter-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 40;
+  overflow: hidden;
+  backdrop-filter: blur(3px);
+}
+
+.filter-sidebar-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  z-index: 50;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out forwards;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Premium hover effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(70, 25, 79, 0.1), 0 8px 10px -6px rgba(70, 25, 79, 0.1);
+}
+
+/* Premium filter section */
+.filter-section {
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid rgba(70, 25, 79, 0.08);
+  margin-bottom: 12px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.filter-section:hover {
+  border-color: rgba(70, 25, 79, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.filter-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(to right, rgba(70, 25, 79, 0.02), transparent);
+}
+
+.filter-section-header:hover h4 {
+  color: #46194F;
+}
+
+.filter-section-content {
+  padding: 0 20px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+
+.filter-section.expanded .filter-section-content {
+  max-height: 500px;
+  padding: 0 20px 20px;
+}
+
+.filter-section.expanded {
+  border-color: rgba(70, 25, 79, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Premium button styling */
+.premium-button {
+  position: relative;
+  overflow: hidden;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 15px rgba(70, 25, 79, 0.2);
+  background-size: 200% auto;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.premium-button:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(70, 25, 79, 0.3);
+}
+
+.premium-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(70, 25, 79, 0.2);
+}
+
+.premium-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s ease;
+}
+
+.premium-button:hover::before {
+  left: 100%;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #46194F 0%, #6a2a7a 50%, #46194F 100%);
+  color: white;
+  background-size: 200% auto;
+}
+
+.secondary-button {
+  background: white;
+  color: #46194F;
+  border: 2px solid #46194F;
+}
+
+.secondary-button:hover {
+  background-color: rgba(70, 25, 79, 0.05);
+}
+
+/* Update the filter button styling */
+.filter-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #46194F 0%, #6a2a7a 50%, #46194F 100%);
+  background-size: 200% auto;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 15px rgba(70, 25, 79, 0.2);
+  width: 100%;
+  margin: 16px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s ease;
+}
+
+.filter-button:hover::before {
+  left: 100%;
+}
+
+.filter-button:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(70, 25, 79, 0.3);
+}
+
+.filter-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(70, 25, 79, 0.2);
+}
+
+/* Premium card */
+.premium-card {
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.premium-card:hover {
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Premium checkbox styling */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+}
+
+.checkbox-container:hover {
+  background-color: rgba(70, 25, 79, 0.05);
+}
+
+.checkbox-container.selected {
+  background-color: rgba(70, 25, 79, 0.1);
+  border: 1px solid rgba(70, 25, 79, 0.2);
+}
+
+/* Year button styling */
+.year-button {
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-align: center;
+  border: 1px solid rgba(70, 25, 79, 0.1);
+  background: white;
+}
+
+.year-button:hover {
+  background-color: rgba(70, 25, 79, 0.05);
+  border-color: rgba(70, 25, 79, 0.2);
+}
+
+.year-button.selected {
+  background: linear-gradient(135deg, #46194F 0%, #5a2266 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(70, 25, 79, 0.3);
+  border-color: transparent;
+}
+
+/* Premium input styling */
+.premium-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(70, 25, 79, 0.1);
+  transition: all 0.3s ease;
+  background-color: white;
+  font-size: 15px;
+}
+
+.premium-input:focus {
+  outline: none;
+  border-color: #46194F;
+  box-shadow: 0 0 0 3px rgba(70, 25, 79, 0.1);
+}
+
+.premium-input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* Search input specific styling */
+.search-input {
+  padding-left: 30px; /* Space for the icon */
+}
+
+.search-input::placeholder {
+  padding-left: 5px; /* Add padding to the placeholder text */
+  font-size: 13px;
+}
+
+/* Filter header styling */
+.filter-header {
+  background: linear-gradient(135deg, rgba(70, 25, 79, 0.15) 0%, rgba(70, 25, 79, 0.05) 100%);
+  border-bottom: 1px solid rgba(70, 25, 79, 0.1);
+  padding: 20px;
+  border-radius: 20px 20px 0 0;
+}
+
+/* Filter badge */
+.filter-badge {
+  background: linear-gradient(135deg, #46194F 0%, #6a2a7a 100%);
+  color: white;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(70, 25, 79, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Filter footer */
+.filter-footer {
+  background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
+  backdrop-filter: blur(5px);
+  border-top: 1px solid rgba(70, 25, 79, 0.1);
+  padding: 16px 20px;
+  border-radius: 0 0 20px 20px;
+}
+
+/* Mobile filter header */
+.mobile-filter-header {
+  background: linear-gradient(135deg, #46194F 0%, #5a2266 100%);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* Mobile filter footer */
+.mobile-filter-footer {
+  background: white;
+  border-top: 1px solid rgba(70, 25, 79, 0.1);
+  padding: 16px;
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 12px;
+}
+
+/* Price display */
+.price-display {
+  background: linear-gradient(135deg, rgba(70, 25, 79, 0.1) 0%, rgba(70, 25, 79, 0.05) 100%);
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 500;
+  color: #46194F;
+  display: inline-block;
+  border: 1px solid rgba(70, 25, 79, 0.1);
+}
 `
 
-// Replace the CarFilterSidebar component with this implementation
-const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
+// Update the CarFilterSidebar component with a more premium design
+const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = false, onClose }) => {
   const [expandedBrands, setExpandedBrands] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   // Add state to track which sections are expanded
@@ -239,161 +631,210 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
     }
   }
 
+  // Function to apply filters and close sidebar on mobile
+  const applyFilters = () => {
+    if (isMobile && onClose) {
+      onClose()
+    }
+  }
+
+  // Calculate active filters count
+  const getActiveFiltersCount = () => {
+    let count = 0
+    if (filters.selectedModels?.length > 0) count++
+    if (filters.year) count++
+    if (filters.fuelTypes?.length > 0) count++
+    if (filters.transmission?.length > 0) count++
+    if (filters.seats?.length > 0) count++
+    // Check if price range is different from default
+    if (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice) count++
+    return count
+  }
+
+  const activeFiltersCount = getActiveFiltersCount()
+
   return (
-    <div className="bg-white rounded-[4px] shadow-md overflow-hidden flex flex-col h-full">
-      {/* Fixed header */}
-      <div className="p-4 border-b sticky top-0 bg-white z-10">
-        <h3 className="text-xl font-bold text-brand-primary">{language === "ar" ? "الفلاتر" : "Filters"}</h3>
-      </div>
+    <div className="premium-card h-full flex flex-col">
+      {/* Mobile filter header */}
+      {isMobile ? (
+        <div className="mobile-filter-header">
+          <h3 className="text-xl font-bold flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            {language === "ar" ? "الفلاتر" : "Filters"}
+            {activeFiltersCount > 0 && (
+              <span className="ml-2 bg-white text-brand-primary rounded-full px-2.5 py-0.5 text-xs font-bold">
+                {activeFiltersCount}
+              </span>
+            )}
+          </h3>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full text-white hover:bg-white/20">
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+      ) : (
+        /* Desktop filter header */
+        <div className="filter-header">
+          <h3 className="text-xl font-bold text-brand-primary flex items-center gap-2">
+            <Filter className="h-5 w-5" />
+            {language === "ar" ? "الفلاتر" : "Filters"}
+            {activeFiltersCount > 0 && (
+              <span className="ml-2 filter-badge">
+                <Sparkles className="h-3.5 w-3.5" />
+                {activeFiltersCount}
+              </span>
+            )}
+          </h3>
+        </div>
+      )}
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-auto custom-scrollbar-container">
-        <div className="divide-y">
+      <div className="flex-1 overflow-y-auto custom-scrollbar-container">
+        <div className="p-5 space-y-5">
           {/* Price Range Section */}
-          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <button
-              type="button"
-              onClick={(e) => toggleSection("priceRange", e)}
-              className="flex justify-between items-center mb-2 w-full text-left"
-            >
-              <h4 className="font-medium text-brand-primary text-lg">
+          <div className={`filter-section ${expandedSections.priceRange ? "expanded" : ""}`}>
+            <div className="filter-section-header" onClick={(e) => toggleSection("priceRange", e)}>
+              <h4 className="font-semibold text-brand-primary text-lg">
                 {language === "ar" ? "نطاق السعر" : "Price Range"}
               </h4>
-              <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                  expandedSections.priceRange ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {/* Use the provided RangeSlider component */}
-            {expandedSections.priceRange && (
-              <div className="transition-all duration-300 ease-in-out">
-                <RangeSlider
-                  min={0}
-                  max={maxPrice}
-                  value={filters.priceRange}
-                  onValueChange={handlePriceRangeChange}
-                  onValueCommit={handlePriceRangeChange}
-                  step={10000}
-                  className="mb-2"
+              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
+                <ChevronDown
+                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                    expandedSections.priceRange ? "rotate-180" : ""
+                  }`}
                 />
-
-                {/* Price range display */}
-                <div className="flex justify-between text-sm text-brand-primary mt-4">
-                  <span>{formatPrice(filters.priceRange[0])}</span>
-                  <span>{formatPrice(filters.priceRange[1])}</span>
-                </div>
               </div>
-            )}
+            </div>
+
+            <div className="filter-section-content">
+              <RangeSlider
+                min={0}
+                max={maxPrice}
+                value={filters.priceRange}
+                onValueChange={handlePriceRangeChange}
+                onValueCommit={handlePriceRangeChange}
+                step={10000}
+                className="mb-2 mt-6"
+              />
+
+              {/* Price range display */}
+              <div className="flex justify-between text-sm mt-6 font-medium">
+                <span className="price-display">{formatPrice(filters.priceRange[0])}</span>
+                <span className="price-display">{formatPrice(filters.priceRange[1])}</span>
+              </div>
+            </div>
           </div>
 
           {/* Brands + Models Section */}
-          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <button
-              type="button"
-              onClick={(e) => toggleSection("brandsAndModels", e)}
-              className="flex justify-between items-center mb-4 w-full text-left"
-            >
-              <h4 className="font-medium text-brand-primary text-lg">
+          <div className={`filter-section ${expandedSections.brandsAndModels ? "expanded" : ""}`}>
+            <div className="filter-section-header" onClick={(e) => toggleSection("brandsAndModels", e)}>
+              <h4 className="font-semibold text-brand-primary text-lg">
                 {language === "ar" ? "الماركات + الموديلات" : "Brands + Models"}
               </h4>
-              <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                  expandedSections.brandsAndModels ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
+                <ChevronDown
+                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                    expandedSections.brandsAndModels ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </div>
 
-            {expandedSections.brandsAndModels && (
-              <>
-                {/* Search box */}
-                <div className="relative mb-4 transition-all duration-300 ease-in-out">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <div className="filter-section-content">
+              {/* Search box */}
+              <div className="relative mb-5 mt-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brand-primary h-4 w-4" />
                   <input
                     type="text"
                     placeholder={language === "ar" ? "ابحث عن الماركات والموديلات" : "Search brands and models"}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 border rounded-[4px] focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                    className="premium-input search-input text-sm"
                   />
                 </div>
+              </div>
 
-                {/* Brand list */}
-                <div className="space-y-1 transition-all duration-300 ease-in-out">
-                  {filteredBrands.map((brand) => (
-                    <div key={brand} className="border-b pb-2">
-                      <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-[4px]">
-                        <div className="flex items-center gap-2">
-                          <Checkbox
-                            id={`brand-${brand}`}
-                            checked={areAllModelsSelected(brand)}
-                            onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
-                            className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
-                          />
-                          <Label htmlFor={`brand-${brand}`} className="text-sm font-medium leading-none cursor-pointer">
-                            {brand}
-                          </Label>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={(e) => toggleBrand(brand, e)}
-                          className="transition-all duration-200 hover:bg-gray-100 p-1 rounded-full"
-                        >
-                          {expandedBrands.includes(brand) ? (
-                            <ChevronUp className="h-4 w-4 text-brand-primary transition-transform duration-300" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4 text-brand-primary transition-transform duration-300" />
-                          )}
-                        </button>
+              {/* Brand list */}
+              <div className="space-y-4">
+                {filteredBrands.map((brand) => (
+                  <div key={brand} className="border-b border-gray-100 pb-4">
+                    <div
+                      className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 ${
+                        areAllModelsSelected(brand)
+                          ? "bg-brand-primary/10 border border-brand-primary/30"
+                          : "hover:bg-brand-primary/5"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id={`brand-${brand}`}
+                          checked={areAllModelsSelected(brand)}
+                          onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
+                          className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
+                        />
+                        <Label htmlFor={`brand-${brand}`} className="text-sm font-medium cursor-pointer">
+                          {brand}
+                        </Label>
                       </div>
-
-                      {/* Models under this brand (expandable) */}
-                      {(expandedBrands.includes(brand) || searchTerm) && (
-                        <div className="ml-8 mt-1 space-y-1 transition-all duration-300 ease-in-out">
-                          {modelsByBrand[brand]?.map((model) => (
-                            <div key={model.id} className="flex items-center gap-2 transition-opacity duration-200">
-                              <Checkbox
-                                id={`model-${model.id}`}
-                                checked={filters.selectedModels?.includes(model.id)}
-                                onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
-                                className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
-                              />
-                              <Label
-                                htmlFor={`model-${model.id}`}
-                                className="text-xs font-medium leading-none cursor-pointer"
-                              >
-                                {model.name}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                      <button
+                        type="button"
+                        onClick={(e) => toggleBrand(brand, e)}
+                        className="transition-all duration-200 hover:bg-brand-primary/10 p-2 rounded-full"
+                      >
+                        {expandedBrands.includes(brand) ? (
+                          <ChevronUp className="h-4 w-4 text-brand-primary transition-transform duration-300" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-brand-primary transition-transform duration-300" />
+                        )}
+                      </button>
                     </div>
-                  ))}
-                </div>
-              </>
-            )}
+
+                    {/* Models under this brand (expandable) */}
+                    {(expandedBrands.includes(brand) || searchTerm) && (
+                      <div className="ml-8 mt-3 space-y-2 animate-slideUp">
+                        {modelsByBrand[brand]?.map((model) => (
+                          <div
+                            key={model.id}
+                            className={`flex items-center gap-3 transition-all duration-200 p-2.5 rounded-lg ${
+                              filters.selectedModels?.includes(model.id)
+                                ? "bg-brand-primary/5 border border-brand-primary/20"
+                                : "hover:bg-brand-primary/5"
+                            }`}
+                          >
+                            <Checkbox
+                              id={`model-${model.id}`}
+                              checked={filters.selectedModels?.includes(model.id)}
+                              onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
+                              className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-3.5 w-3.5"
+                            />
+                            <Label htmlFor={`model-${model.id}`} className="text-xs font-medium cursor-pointer">
+                              {model.name}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Year Section */}
-          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <button
-              type="button"
-              onClick={(e) => toggleSection("year", e)}
-              className="flex justify-between items-center mb-4 w-full text-left"
-            >
-              <h4 className="font-medium text-brand-primary text-lg">{language === "ar" ? "السنة" : "Year"}</h4>
-              <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                  expandedSections.year ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+          <div className={`filter-section ${expandedSections.year ? "expanded" : ""}`}>
+            <div className="filter-section-header" onClick={(e) => toggleSection("year", e)}>
+              <h4 className="font-semibold text-brand-primary text-lg">{language === "ar" ? "السنة" : "Year"}</h4>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
+                <ChevronDown
+                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                    expandedSections.year ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </div>
 
-            {/* In the Year Section, update the button onClick handler to toggle selection */}
-            {expandedSections.year && (
-              <div className="space-y-3 transition-all duration-300 ease-in-out">
+            <div className="filter-section-content">
+              <div className="grid grid-cols-3 gap-3 mt-3">
                 {/* Extract unique years from cars data */}
                 {[...new Set(cars.map((car) => car.specs.year))]
                   .sort((a, b) => b - a) // Sort years in descending order
@@ -402,43 +843,32 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                       key={year}
                       type="button"
                       onClick={() => handleYearChange(year)}
-                      className="flex items-center focus:outline-none transition-all duration-200 hover:opacity-80 w-full text-left"
+                      className={`year-button ${filters.year === year.toString() ? "selected" : ""}`}
                     >
-                      <div
-                        className={`w-5 h-5 rounded-full border-2 border-brand-primary flex items-center justify-center transition-colors duration-200 ${
-                          filters.year === year.toString() ? "bg-brand-primary" : "bg-white"
-                        }`}
-                      >
-                        {filters.year === year.toString() && <div className="w-2 h-2 rounded-full bg-white" />}
-                      </div>
-                      <Label className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        {year}
-                      </Label>
+                      <span>{year}</span>
                     </button>
                   ))}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Fuel Type Section */}
-          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <button
-              type="button"
-              onClick={(e) => toggleSection("fuelType", e)}
-              className="flex justify-between items-center mb-4 w-full text-left"
-            >
-              <h4 className="font-medium text-brand-primary text-lg">
+          <div className={`filter-section ${expandedSections.fuelType ? "expanded" : ""}`}>
+            <div className="filter-section-header" onClick={(e) => toggleSection("fuelType", e)}>
+              <h4 className="font-semibold text-brand-primary text-lg">
                 {language === "ar" ? "نوع الوقود" : "Fuel Type"}
               </h4>
-              <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                  expandedSections.fuelType ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
+                <ChevronDown
+                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                    expandedSections.fuelType ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </div>
 
-            {expandedSections.fuelType && (
-              <div className="space-y-3 transition-all duration-300 ease-in-out">
+            <div className="filter-section-content">
+              <div className="grid grid-cols-2 gap-3 mt-3">
                 {/* Extract unique fuel types from cars data */}
                 {[
                   ...new Set(
@@ -452,41 +882,44 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                 ]
                   .filter(Boolean) // Remove any undefined or null values
                   .map((fuelType) => (
-                    <div key={fuelType} className="flex items-center space-x-2">
+                    <div
+                      key={fuelType}
+                      className={`checkbox-container ${
+                        Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType) ? "selected" : ""
+                      }`}
+                    >
                       <Checkbox
                         id={`fuel-${fuelType}`}
                         checked={Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)}
                         onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
-                        className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
                       />
-                      <Label htmlFor={`fuel-${fuelType}`} className="text-sm font-medium leading-none cursor-pointer">
+                      <Label htmlFor={`fuel-${fuelType}`} className="text-sm font-medium cursor-pointer">
                         {fuelType}
                       </Label>
                     </div>
                   ))}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Transmission Section */}
-          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <button
-              type="button"
-              onClick={(e) => toggleSection("transmission", e)}
-              className="flex justify-between items-center mb-4 w-full text-left"
-            >
-              <h4 className="font-medium text-brand-primary text-lg">
+          <div className={`filter-section ${expandedSections.transmission ? "expanded" : ""}`}>
+            <div className="filter-section-header" onClick={(e) => toggleSection("transmission", e)}>
+              <h4 className="font-semibold text-brand-primary text-lg">
                 {language === "ar" ? "ناقل الحركة" : "Transmission"}
               </h4>
-              <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                  expandedSections.transmission ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
+                <ChevronDown
+                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                    expandedSections.transmission ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </div>
 
-            {expandedSections.transmission && (
-              <div className="space-y-3 transition-all duration-300 ease-in-out">
+            <div className="filter-section-content">
+              <div className="grid grid-cols-2 gap-3 mt-3">
                 {/* Extract unique transmission types from cars data */}
                 {[
                   ...new Set(
@@ -500,42 +933,44 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                 ]
                   .filter(Boolean) // Remove any undefined or null values
                   .map((transmission) => (
-                    <div key={transmission} className="flex items-center space-x-2">
+                    <div
+                      key={transmission}
+                      className={`checkbox-container ${
+                        Array.isArray(filters.transmission) && filters.transmission.includes(transmission)
+                          ? "selected"
+                          : ""
+                      }`}
+                    >
                       <Checkbox
                         id={`transmission-${transmission}`}
                         checked={Array.isArray(filters.transmission) && filters.transmission.includes(transmission)}
                         onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
-                        className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
                       />
-                      <Label
-                        htmlFor={`transmission-${transmission}`}
-                        className="text-sm font-medium leading-none cursor-pointer"
-                      >
+                      <Label htmlFor={`transmission-${transmission}`} className="text-sm font-medium cursor-pointer">
                         {transmission}
                       </Label>
                     </div>
                   ))}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Seats Section */}
-          <div className="p-4 group hover:bg-gray-50 rounded-[4px] transition-all duration-200">
-            <button
-              type="button"
-              onClick={(e) => toggleSection("seats", e)}
-              className="flex justify-between items-center mb-4 w-full text-left"
-            >
-              <h4 className="font-medium text-brand-primary text-lg">{language === "ar" ? "المقاعد" : "Seats"}</h4>
-              <ChevronDown
-                className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                  expandedSections.seats ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+          <div className={`filter-section ${expandedSections.seats ? "expanded" : ""}`}>
+            <div className="filter-section-header" onClick={(e) => toggleSection("seats", e)}>
+              <h4 className="font-semibold text-brand-primary text-lg">{language === "ar" ? "المقاعد" : "Seats"}</h4>
+              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
+                <ChevronDown
+                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
+                    expandedSections.seats ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </div>
 
-            {expandedSections.seats && (
-              <div className="space-y-3 transition-all duration-300 ease-in-out">
+            <div className="filter-section-content">
+              <div className="grid grid-cols-2 gap-3 mt-3">
                 {/* Extract unique seat options from cars data */}
                 {[
                   ...new Set(
@@ -549,53 +984,82 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars }) => {
                 ]
                   .filter(Boolean) // Remove any undefined or null values
                   .map((seatOption) => (
-                    <div key={seatOption} className="flex items-center space-x-2">
+                    <div
+                      key={seatOption}
+                      className={`checkbox-container ${filters.seats?.includes(seatOption) ? "selected" : ""}`}
+                    >
                       <Checkbox
                         id={`seats-${seatOption}`}
                         checked={filters.seats?.includes(seatOption)}
                         onCheckedChange={(checked) => handleSeatChange(seatOption, checked)}
-                        className="rounded-[4px] border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white"
+                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
                       />
-                      <Label
-                        htmlFor={`seats-${seatOption}`}
-                        className="text-sm font-medium leading-none cursor-pointer"
-                      >
+                      <Label htmlFor={`seats-${seatOption}`} className="text-sm font-medium cursor-pointer">
                         {seatOption}
                       </Label>
                     </div>
                   ))}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Fixed footer */}
-      <div className="p-4 border-t sticky bottom-0 bg-white z-10">
-        <Button
-          onClick={() => {
-            // Fixed: Improved reset functionality to ensure all filters are properly reset
-            const resetFilters = {
-              priceRange: [0, maxPrice],
-              selectedModels: [],
-              year: "",
-              fuelTypes: [],
-              transmission: [],
-              seats: [],
-            }
-            console.log("Resetting filters to:", resetFilters)
-            onFilterChange(resetFilters)
-          }}
-          variant="outline"
-          className="w-full border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white rounded-[4px]"
-        >
-          {language === "ar" ? "إعادة تعيين الفلاتر" : "Clear All Filters"}
-        </Button>
-      </div>
+      {/* Filter footer */}
+      {isMobile ? (
+        <div className="mobile-filter-footer">
+          <Button
+            onClick={() => {
+              // Reset all filters
+              const resetFilters = {
+                priceRange: [0, maxPrice],
+                selectedModels: [],
+                year: "",
+                fuelTypes: [],
+                transmission: [],
+                seats: [],
+              }
+              console.log("Resetting filters to:", resetFilters)
+              onFilterChange(resetFilters)
+            }}
+            className="premium-button secondary-button flex-1"
+          >
+            <X className="h-4 w-4" />
+            {language === "ar" ? "إعادة تعيين" : "Clear All"}
+          </Button>
+          <Button onClick={applyFilters} className="premium-button primary-button flex-1 py-3 text-lg">
+            <Check className="h-5 w-5" />
+            {language === "ar" ? "تطبيق" : "Apply"}
+          </Button>
+        </div>
+      ) : (
+        <div className="filter-footer">
+          <Button
+            onClick={() => {
+              // Reset all filters
+              const resetFilters = {
+                priceRange: [0, maxPrice],
+                selectedModels: [],
+                year: "",
+                fuelTypes: [],
+                transmission: [],
+                seats: [],
+              }
+              console.log("Resetting filters to:", resetFilters)
+              onFilterChange(resetFilters)
+            }}
+            className="premium-button secondary-button w-full"
+          >
+            <X className="h-4 w-4" />
+            {language === "ar" ? "إعادة تعيين الفلاتر" : "Clear All Filters"}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
 
+// Update the desktop sidebar container to fix scrolling
 const AllCarMainpage = () => {
   const pathname = usePathname()
   const currentLocale = pathname?.startsWith("/ar") ? "ar" : "en"
@@ -616,6 +1080,11 @@ const AllCarMainpage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  // Calculate maxPrice early
+  const maxPrice = useMemo(() => {
+    return Math.max(...(cars.length ? cars.map((car) => car.cashPrice || 0) : [250000]), 250000)
+  }, [cars])
+
   // Use your existing mock data
   useEffect(() => {
     setLoading(true)
@@ -628,6 +1097,19 @@ const AllCarMainpage = () => {
     return () => clearTimeout(timer)
   }, [])
 
+  // Add effect to prevent body scrolling when filter is open on mobile
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+
+    return () => {
+      document.body.style.overflow = "auto"
+    }
+  }, [isSidebarOpen])
+
   const handleFilterChange = useCallback((updatedFilters) => {
     console.log("Updating filters:", updatedFilters)
     setFilters((prevFilters) => ({
@@ -639,12 +1121,9 @@ const AllCarMainpage = () => {
 
   // Fixed: Improved clearAllFilters function to properly reset all filters
   const clearAllFilters = useCallback(() => {
-    // Find the maximum price from the cars data
-    const maxCarPrice = Math.max(...cars.map((car) => car.cashPrice || 0), 250000)
-
     // Define the cleared filters with the same structure as the initial state
     const clearedFilters = {
-      priceRange: [0, maxCarPrice],
+      priceRange: [0, maxPrice],
       selectedModels: [],
       year: "",
       fuelTypes: [],
@@ -659,7 +1138,22 @@ const AllCarMainpage = () => {
 
     // Reset to the first page
     setCurrentPage(1)
-  }, [cars])
+  }, [maxPrice])
+
+  // Calculate active filters count
+  const getActiveFiltersCount = () => {
+    let count = 0
+    if (filters.selectedModels?.length > 0) count++
+    if (filters.year) count++
+    if (filters.fuelTypes?.length > 0) count++
+    if (filters.transmission?.length > 0) count++
+    if (filters.seats?.length > 0) count++
+    // Check if price range is different from default
+    if (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice) count++
+    return count
+  }
+
+  const activeFiltersCount = getActiveFiltersCount()
 
   const handleSortChange = (option) => {
     setSortOption(option)
@@ -786,7 +1280,7 @@ const AllCarMainpage = () => {
   })
 
   if (loading) {
-    return <CarSkeletonUI/>
+    return <CarSkeletonUI />
   }
 
   if (error) {
@@ -802,21 +1296,9 @@ const AllCarMainpage = () => {
       <style>{scrollbarStyles}</style>
       <div className="container m-auto px-2 sm:px-3 md:px-4 lg:px-[5rem] xl:px-[7rem] py-4">
         <div className="relative flex flex-col md:flex-row gap-8">
-          <Button
-            className="md:hidden mb-4 bg-brand-primary hover:bg-brand-dark text-white rounded-[4px] transition-all duration-300 transform hover:scale-105 hover:shadow-md"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            {isSidebarOpen
-              ? currentLocale === "ar"
-                ? "إغلاق الفلاتر"
-                : "Close Filters"
-              : currentLocale === "ar"
-                ? "فتح الفلاتر"
-                : "Open Filters"}
-          </Button>
-
-          <div className={`md:w-80 ${isSidebarOpen ? "block" : "hidden md:block"}`}>
-            <div className="sticky top-20 h-[calc(100vh-5rem)]">
+          {/* Desktop sidebar - Fixed the height and overflow issues */}
+          <div className="md:w-80 hidden md:block">
+            <div className="sticky top-20 h-[calc(100vh-8rem)] overflow-hidden">
               <CarFilterSidebar
                 onFilterChange={handleFilterChange}
                 filters={filters}
@@ -826,11 +1308,44 @@ const AllCarMainpage = () => {
             </div>
           </div>
 
+          {/* Mobile filter overlay */}
+          {isSidebarOpen && (
+            <>
+              <div className="filter-overlay md:hidden" onClick={() => setIsSidebarOpen(false)}></div>
+              <div className="filter-sidebar-mobile md:hidden">
+                <CarFilterSidebar
+                  onFilterChange={handleFilterChange}
+                  filters={filters}
+                  language={currentLocale}
+                  cars={cars}
+                  isMobile={true}
+                  onClose={() => setIsSidebarOpen(false)}
+                />
+              </div>
+            </>
+          )}
+
           <div className="flex-1">
+            {/* Promo Slider */}
             <PromoSlider />
 
+            {/* Mobile Filter Button - Now positioned below the promo slider */}
+            <div className="md:hidden px-2 mt-4">
+              <button className="filter-button" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                <SlidersHorizontal className="h-5 w-5" />
+                <span>
+                  {currentLocale === "ar" ? "الفلاتر" : "Filters"}
+                  {activeFiltersCount > 0 && (
+                    <span className="ml-2 bg-white text-brand-primary rounded-full px-2.5 py-0.5 text-xs font-bold">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </span>
+              </button>
+            </div>
+
             {/* Car Grid */}
-            <div className="mb-8">
+            <div className="mb-8 mt-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 className="text-xl font-bold text-brand-primary">
                   {currentLocale === "ar" ? "السيارات المتاحة" : "Available Cars"}
@@ -842,7 +1357,7 @@ const AllCarMainpage = () => {
                   <select
                     value={sortOption}
                     onChange={(e) => handleSortChange(e.target.value)}
-                    className="p-2 border rounded-[4px] text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary transition-all duration-300 hover:border-brand-primary cursor-pointer"
+                    className="premium-input pl-3 pr-10 py-2.5"
                   >
                     <option value="relevance">{currentLocale === "ar" ? "الصلة" : "Relevance"}</option>
                     <option value="price-low">
@@ -867,10 +1382,10 @@ const AllCarMainpage = () => {
                       <button
                         key={i + 1}
                         onClick={() => paginate(i + 1)}
-                        className={`px-3 py-1 rounded-[4px] transition-all duration-300 transform hover:scale-105 ${
+                        className={`px-4 py-2 rounded-lg transition-all duration-300 hover-lift ${
                           currentPage === i + 1
                             ? "bg-brand-primary text-white shadow-md"
-                            : "bg-white text-brand-primary border border-brand-primary hover:bg-brand-primary/10"
+                            : "bg-white text-brand-primary border border-brand-primary/30 hover:bg-brand-light/50"
                         }`}
                       >
                         {i + 1}
@@ -882,11 +1397,11 @@ const AllCarMainpage = () => {
 
               {/* No Results */}
               {filteredCars.length === 0 && (
-                <div className="text-center py-12 bg-gray-50 rounded-[4px] transition-all duration-500 animate-fadeIn">
+                <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100 transition-all duration-500 animate-fadeIn">
                   <h3 className="text-xl font-medium text-gray-700 mb-2">
                     {currentLocale === "ar" ? "لا توجد سيارات متطابقة" : "No matching cars found"}
                   </h3>
-                  <p className="text-gray-500 mb-4">
+                  <p className="text-gray-500 mb-6">
                     {currentLocale === "ar"
                       ? "حاول تعديل معايير البحث الخاصة بك"
                       : "Try adjusting your search criteria"}
@@ -896,7 +1411,7 @@ const AllCarMainpage = () => {
                       console.log("Reset button clicked")
                       clearAllFilters()
                     }}
-                    className="bg-brand-primary hover:bg-brand-dark text-white rounded-[4px] transition-all duration-300 hover:shadow-lg transform hover:scale-105"
+                    className="premium-button primary-button px-6 py-2.5 inline-flex"
                   >
                     {currentLocale === "ar" ? "إعادة تعيين الفلاتر" : "Reset Filters"}
                   </Button>
