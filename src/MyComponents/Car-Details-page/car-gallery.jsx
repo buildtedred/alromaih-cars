@@ -16,7 +16,7 @@ const CompactCarListing = ({ brand_Details }) => {
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 
-  console.log("object", car_Details)
+  // console.log("object", car_Details)
 
   const [activeImage, setActiveImage] = useState(0)
   const [activePaymentTab, setActivePaymentTab] = useState("cash")
@@ -73,6 +73,23 @@ const CompactCarListing = ({ brand_Details }) => {
     })
   }, [preparePdfCarDetails])
 
+  const renderMainCarGallery = () => (
+    <div className="w-full sm:w-4/5">
+      <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
+        {isLoading ? (
+          <Skeleton className="w-full h-full" />
+        ) : (
+          <Image
+            src={allImages[activeImage] || "/placeholder.svg?height=450&width=800"}
+            alt={`${getBrandName()} ${getModelName()} - ${activeImage === 0 ? "Main view" : `View ${activeImage + 1}`}`}
+            width={800}
+            height={450}
+            className={`${styles.mainImage} object-cover`}
+          />
+        )}
+      </div>
+    </div>
+  )
   const renderThumbnails = () => (
     <div className="w-full sm:w-1/5 h-auto sm:h-[400px] mb-4">
       <div className={`${styles.thumbnailContainer} ${styles.customScrollbar} p-1`}>
@@ -99,23 +116,6 @@ const CompactCarListing = ({ brand_Details }) => {
     </div>
   )
 
-  const renderMainCarGallery = () => (
-    <div className="w-full sm:w-4/5">
-      <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
-        {isLoading ? (
-          <Skeleton className="w-full h-full" />
-        ) : (
-          <Image
-            src={allImages[activeImage] || "/placeholder.svg?height=450&width=800"}
-            alt={`${getBrandName()} ${getModelName()} - ${activeImage === 0 ? "Main view" : `View ${activeImage + 1}`}`}
-            width={800}
-            height={450}
-            className={`${styles.mainImage} object-cover`}
-          />
-        )}
-      </div>
-    </div>
-  )
 
   // Get model name
   const getModelName = () => {
@@ -196,7 +196,7 @@ const CompactCarListing = ({ brand_Details }) => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="text-left">
+                <div className="">
                   <p className="text-brand-primary font-medium mb-2">{isEnglish ? "Monthly Payment" : "يبدأ القسط من"}</p>
                   <p className="text-3xl font-bold text-brand-primary mb-1 flex items-center gap-1">
                     <RiyalIcon />
@@ -268,8 +268,8 @@ const CompactCarListing = ({ brand_Details }) => {
             {/* Right Column */}
           <div className="flex-1">
             <div className="flex flex-col sm:flex-row gap-4">
-              {renderThumbnails()}
               {renderMainCarGallery()}
+              {renderThumbnails()}
             </div>
             <div className="mb-6">
               {isLoading ? (
