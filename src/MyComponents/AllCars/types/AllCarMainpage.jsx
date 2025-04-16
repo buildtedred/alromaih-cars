@@ -446,6 +446,7 @@ const scrollbarStyles = `
 
 // Update the CarFilterSidebar component with a more premium design
 const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = false, onClose }) => {
+  const {searchbrands}=useDetailContext()
   const [expandedBrands, setExpandedBrands] = useState([])
   const [searchTerm, setSearchTerm] = useState(searchbrands?.brand)
   // Add state to track which sections are expanded
