@@ -770,7 +770,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                       <div className="flex items-center gap-3">
                         <Checkbox
                           id={`brand-${brand}`}
-                          checked={areAllModelsSelected(brand)}
+                          checked={areAllModelsSelected(brand) }
                           onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
                           className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
                         />

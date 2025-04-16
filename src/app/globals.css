@@ -22,7 +22,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #71308a;
+  background: #46194F;
   border-radius: 10px;
 }
 
@@ -33,7 +33,7 @@ body {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #71308a rgba(113, 48, 138, 0.05);
+  scrollbar-color: #46194F rgba(113, 48, 138, 0.05);
 }
 
 /* Custom Range Input Styles */
@@ -49,7 +49,7 @@ body {
   height: 24px;
   border-radius: 50%;
   background: #ffffff;
-  border: 2px solid #71308a;
+  border: 2px solid #46194F;
   cursor: pointer;
   margin-top: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -62,7 +62,7 @@ body {
   height: 24px;
   border-radius: 50%;
   background: #ffffff;
-  border: 2px solid #71308a;
+  border: 2px solid #46194F;
   cursor: pointer;
   margin-top: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -143,7 +143,7 @@ body {
 
 /* Brand Colors */
 :root {
-  --brand-primary: #71308a;
+  --brand-primary: #46194F;
   --brand-light: #f5e8fa;
   --brand-dark: #4a1d6e;
 }
@@ -182,7 +182,7 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #71308a;
+  background: #46194F;
   border-radius: 10px;
 }
 
@@ -193,7 +193,7 @@ body {
 /* For Firefox */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #71308a rgba(113, 48, 138, 0.05);
+  scrollbar-color: #46194F rgba(113, 48, 138, 0.05);
 }
 
 /* Specifications container - prevent scrolling */
@@ -220,7 +220,7 @@ nav,
 main,
 header,
 footer {
-  scrollbar-color: #71308a rgba(113, 48, 138, 0.05) !important;
+  scrollbar-color: #46194F rgba(113, 48, 138, 0.05) !important;
 }
 
 html::-webkit-scrollbar-thumb,
@@ -233,7 +233,7 @@ nav::-webkit-scrollbar-thumb,
 main::-webkit-scrollbar-thumb,
 header::-webkit-scrollbar-thumb,
 footer::-webkit-scrollbar-thumb {
-  background: #71308a !important;
+  background: #46194F !important;
   border-radius: 10px;
 }
 
@@ -254,7 +254,7 @@ footer::-webkit-scrollbar-track {
 /* Dialog scrollbar styles */
 .scrollbar-custom {
   scrollbar-width: thin;
-  scrollbar-color: #71308a rgba(113, 48, 138, 0.05);
+  scrollbar-color: #46194F rgba(113, 48, 138, 0.05);
 }
 
 .scrollbar-custom::-webkit-scrollbar {
@@ -267,7 +267,7 @@ footer::-webkit-scrollbar-track {
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: #71308a;
+  background: #46194F;
   border-radius: 10px;
 }
 
