@@ -45,7 +45,7 @@ const Brands = () => {
         )}
       </div>
     </div>
-  )
+  ) 
 }
 
 const BrandCard = ({ brand, isEnglish }) => {
