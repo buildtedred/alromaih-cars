@@ -10,6 +10,8 @@ import { useOdoo } from "@/contexts/OdooContext"
 import { motion, useMotionValueEvent, AnimatePresence } from "framer-motion"
 import { useScroll } from "motion/react"
 import WishlistCounter from "@/app/[locale]/wishlist/wishlist-counter"
+import  logo9 from "../../../../public/images/Alromaih new logo-09.png"
+import Image from "next/image"
 
 
 const Header = () => {
@@ -68,8 +70,8 @@ const Header = () => {
                 <span>
                   <Skeleton className="w-[100px] h-[40px] rounded-full" />
                 </span>
-              ) : (
-                <img src={`${mocData[0]?.avatar}`} alt={"Logo"} className="h-8 md:h-8 w-auto" />
+              ) : (               
+              <Image  src={logo9} height={170} width={170} alt={"Logo"} />
               )}
             </div>
 

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { CarGrid } from "../AllCarComponents/car-grid"
 import { PromoSlider } from "../AllCarComponents/promo-slider"
 import * as SliderPrimitive from "@radix-ui/react-slider"
+import { useDetailContext } from "@/contexts/detailProvider"
 
 // Custom styles for the component
 const scrollbarStyles = `
@@ -412,8 +413,9 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
 
 // Car Filter Sidebar Component
 const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = false, onClose }) => {
+  const {searchbrands}=useDetailContext()
   const [expandedBrands, setExpandedBrands] = useState([])
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState(searchbrands?.brand)
   // Add state to track which sections are expanded
   const [expandedSections, setExpandedSections] = useState({
     priceRange: true,

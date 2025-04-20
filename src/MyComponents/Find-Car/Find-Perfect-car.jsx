@@ -180,7 +180,7 @@ export default function CarFinderModal() {
       </div>
 
       {/* Right side - Process Diagram */}
-      <div className="p-4 sm:p-6 md:p-8 md:w-1/2 flex items-center justify-center">
+      <div className=" p-[50px] sm:p-[50px] md:p-8 md:w-1/2 flex items-center justify-center">
         {/* Circular diagram - make it smaller on mobile */}
         <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64">
           {/* Center circle */}
@@ -211,7 +211,7 @@ export default function CarFinderModal() {
 
           {/* Top circle - Compare & Explore */}
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/4 text-center z-30">
-            <p className="text-xs text-brand-primary font-medium mb-2">
+            <p className="text-xs text-brand-primary font-medium">
               {isArabic ? "قارن واستكشف" : "Compare & Explore"}
             </p>
             <div className="w-16 h-16 rounded-full bg-brand-light mx-auto flex items-center justify-center">
@@ -678,17 +678,15 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
               {/* Tabs for Mobile */}
               <div className="flex border-b border-gray-200 md:hidden">
                 <button
-                  className={`flex-1 py-2 text-sm font-medium ${
-                    activeTab === "specs" ? "text-brand-primary border-b-2 border-brand-primary" : "text-gray-500"
-                  }`}
+                  className={`flex-1 py-2 text-sm font-medium ${activeTab === "specs" ? "text-brand-primary border-b-2 border-brand-primary" : "text-gray-500"
+                    }`}
                   onClick={() => setActiveTab("specs")}
                 >
                   {isArabic ? "المواصفات" : "Specifications"}
                 </button>
                 <button
-                  className={`flex-1 py-2 text-sm font-medium ${
-                    activeTab === "additional" ? "text-brand-primary border-b-2 border-brand-primary" : "text-gray-500"
-                  }`}
+                  className={`flex-1 py-2 text-sm font-medium ${activeTab === "additional" ? "text-brand-primary border-b-2 border-brand-primary" : "text-gray-500"
+                    }`}
                   onClick={() => setActiveTab("additional")}
                 >
                   {isArabic ? "مواصفات إضافية" : "Additional"}
@@ -1033,100 +1031,106 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
       {/* Vertical Steps Indicator for Mobile */}
       <div className="flex flex-col md:flex-row w-full">
         <div
-          className={`p-4 pt-6 w-full md:w-1/4 bg-brand-light/30 border-b md:border-b-0 ${
-            isArabic ? "md:border-l" : "md:border-r"
-          } border-brand-primary/10 ${isArabic ? "md:order-1" : "md:order-1"}`}
+          className={`md:order-1 p-4 pt-6 w-full md:w-1/4 bg-brand-light/30 border-b md:border-b-0 ${isArabic ? "md:border-l" : "md:border-r"
+            } border-brand-primary/10 ${isArabic ? "md:order-1" : "md:order-1"}`}
         >
           {/* Mobile Steps (Horizontal) */}
           <div className="flex md:hidden justify-between items-center w-full px-2 py-3">
             {isArabic
               ? // Arabic - reversed order
-                [...steps]
-                  .reverse()
-                  .map((step, index) => {
-                    const actualIndex = steps.length - 1 - index
-                    return (
-                      <div key={step.id} className="flex flex-col items-center relative">
-                        {/* Step Circle */}
-                        <div
-                          className={`
+              [...steps]
+                .reverse()
+                .map((step, index) => {
+                  const actualIndex = steps.length - 1 - index
+                  return (
+                    <div key={step.id} className="flex flex-col items-center relative">
+                      {/* Step Circle */}
+                      <div
+                        className={`
                 w-8 h-8 rounded-full flex items-center justify-center z-10
-                ${
-                  actualIndex < activeStep || (actualIndex === 2 && showResult && selectedCar)
-                    ? "bg-brand-primary text-white"
-                    : actualIndex === activeStep
-                      ? "bg-brand-primary text-white"
-                      : "bg-gray-200 text-gray-500"
-                }
+                ${actualIndex < activeStep || (actualIndex === 2 && showResult && selectedCar)
+                            ? "bg-brand-primary text-white"
+                            : actualIndex === activeStep
+                              ? "bg-brand-primary text-white"
+                              : "bg-gray-200 text-gray-500"
+                          }
               `}
-                        >
-                          {actualIndex < activeStep || (actualIndex === 2 && showResult && selectedCar) ? (
-                            <Check className="w-4 h-4" />
-                          ) : (
-                            <span>{actualIndex + 1}</span>
-                          )}
-                        </div>
-
-                        {/* Step Label */}
-                        <span
-                          className={`text-xs mt-2 text-center max-w-[80px] px-1 ${
-                            actualIndex === activeStep ? "text-brand-primary font-medium" : "text-gray-500"
-                          }`}
-                        >
-                          {step.title}
-                        </span>
-
-                        {/* Connecting Line */}
-                        {index < steps.length - 1 && (
-                          <div className="absolute top-4 right-[calc(100%_-_8px)] w-[calc(100%_-_16px)] h-0.5 -z-0">
-                            <div
-                              className={`h-full ${actualIndex > activeStep ? "bg-brand-primary" : "bg-gray-200"}`}
-                            ></div>
-                          </div>
+                      >
+                        {actualIndex < activeStep || (actualIndex === 2 && showResult && selectedCar) ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <span>{actualIndex + 1}</span>
                         )}
                       </div>
-                    )
-                  })
-              : // English - normal order
-                steps.map((step, index) => (
-                  <div key={step.id} className="flex flex-col items-center relative">
-                    {/* Step Circle */}
-                    <div
-                      className={`
-            w-8 h-8 rounded-full flex items-center justify-center z-10
-            ${
-              index < activeStep || (index === 2 && showResult && selectedCar)
-                ? "bg-brand-primary text-white"
-                : index === activeStep
-                  ? "bg-brand-primary text-white"
-                  : "bg-gray-200 text-gray-500"
-            }
-          `}
-                    >
-                      {index < activeStep || (index === 2 && showResult && selectedCar) ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        <span>{index + 1}</span>
+
+                      {/* Step Label */}
+                      <span
+                        className={`text-xs mt-2 text-center max-w-[80px] px-1 ${actualIndex === activeStep ? "text-brand-primary font-medium" : "text-gray-500"
+                          }`}
+                      >
+                        {step.title}
+                      </span>
+
+                      {/* Connecting Line */}
+                      {index < steps.length - 1 && (
+                        <div className="absolute top-4 right-[calc(100%_-_8px)] w-[calc(100%_-_16px)] h-0.5 -z-0">
+                       <div
+  className={`relative z-10
+    before:content-[''] before:absolute before:top-4 before:right-full
+    before:w-[80px] before:h-0.5 before:z-[-1]
+    ${actualIndex > activeStep ? "before:bg-gray-200" : " before:bg-brand-primary"}
+  `}
+>
+  {/* Step content */}
+</div>
+                        </div>
                       )}
                     </div>
-
-                    {/* Step Label */}
-                    <span
-                      className={`text-xs mt-2 text-center max-w-[80px] px-1 ${
-                        index === activeStep ? "text-brand-primary font-medium" : "text-gray-500"
-                      }`}
-                    >
-                      {step.title}
-                    </span>
-
-                    {/* Connecting Line */}
-                    {index < steps.length - 1 && (
-                      <div className="absolute top-4 left-[calc(100%_-_8px)] w-[calc(100%_-_16px)] h-0.5 -z-0">
-                        <div className={`h-full ${index < activeStep ? "bg-brand-primary" : "bg-gray-200"}`}></div>
-                      </div>
+                  )
+                })
+              : // English - normal order
+              steps.map((step, index) => (
+                <div key={step.id} className="flex flex-col items-center relative">
+                  {/* Step Circle */}
+                  <div
+                    className={`
+            w-8 h-8 rounded-full flex items-center justify-center z-10
+            ${index < activeStep || (index === 2 && showResult && selectedCar)
+                        ? "bg-brand-primary text-white"
+                        : index === activeStep
+                          ? "bg-brand-primary text-white"
+                          : "bg-gray-200 text-gray-500"
+                      }
+          `}
+                  >
+                    {index < activeStep || (index === 2 && showResult && selectedCar) ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <span>{index + 1}</span>
                     )}
                   </div>
-                ))}
+
+                  {/* Step Label */}
+                  <span
+                    className={`text-sm mt-2 text-center max-w-[80px] px-1 ${index === activeStep ? "text-brand-primary font-medium" : "text-gray-500"
+                      }`}
+                  >
+                    {step.title}
+                  </span>
+
+                  {/* Connecting Line */}
+                  {index < steps.length - 1 && (
+                    <div className=" absolute top-4 left-[80px] w-[95%] h-0.5 z-0">
+                      <div
+                        className={`relative z-10 after:content-[''] after:absolute after:top-4 after:left-[50px] after:w-[95%] after:h-0.5 after:z-[-1] ${index < activeStep ? "after:bg-brand-primary" : "after:bg-gray-200"
+                          }`}
+                      >
+                        {/* Step content here */}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
 
           {/* Desktop Steps (Vertical) */}
@@ -1143,13 +1147,12 @@ function CarFinderContent({ initialPaymentMethod, onClose }) {
                   <div
                     className={`
             w-8 h-8 rounded-full flex items-center justify-center z-10
-            ${
-              index < activeStep || (index === 2 && showResult && selectedCar)
-                ? "bg-brand-primary text-white"
-                : index === activeStep
-                  ? "bg-brand-primary text-white"
-                  : "bg-gray-200 text-gray-500"
-            }
+            ${index < activeStep || (index === 2 && showResult && selectedCar)
+                        ? "bg-brand-primary text-white"
+                        : index === activeStep
+                          ? "bg-brand-primary text-white"
+                          : "bg-gray-200 text-gray-500"
+                      }
           `}
                   >
                     {index < activeStep || (index === 2 && showResult && selectedCar) ? (

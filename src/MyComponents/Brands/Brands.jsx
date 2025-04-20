@@ -1,11 +1,13 @@
 import { useBrands } from "@/contexts/AllDataProvider"
 import { Link } from "@/i18n/routing"
 import { useState } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useOdoo } from "@/contexts/OdooContext"
 import Image from "next/image"
 import LoadingUi from "../LoadingUi/LoadingUi"
+import carsData from "@/app/api/mock-data"
+import { useDetailContext } from "@/contexts/detailProvider"
 
 const Brands = () => {
   const { brand, loadingBrand, } = useOdoo();
@@ -35,7 +37,7 @@ const Brands = () => {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {
-              (isEnglish ? brand?.en_US : brand?.ar_001).map((brand, index) => (
+              (carsData).map((brand, index) => (
                 <BrandCard key={index} brand={brand} isEnglish={isEnglish} />
               ))
             }
@@ -43,14 +45,25 @@ const Brands = () => {
         )}
       </div>
     </div>
-  )
+  ) 
 }
 
 const BrandCard = ({ brand, isEnglish }) => {
+  const {setbrands}=useDetailContext()
   const [isHovered, setIsHovered] = useState(false)
+  
+  const pathname = usePathname()
+  const pathLocale = pathname.startsWith("/ar") ? "ar" : "en"
+  // Use either the detected path locale or the provided locale prop
+  const currentLocale = pathLocale || locale
+  const router = useRouter()
 
+  const handleBrands = () => {
+     router.push(`/${currentLocale}/all-cars`)
+     setbrands(brand)
+  }
   return (
-    <Link href={`/brands/${brand?.name?.en?.slug}`}>
+    <div onClick={handleBrands} >
       <motion.div
         className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-purple-100"
         whileHover={{ y: -5 }}
@@ -60,15 +73,15 @@ const BrandCard = ({ brand, isEnglish }) => {
         <div className="p-4 flex flex-col items-center h-full">
           <div className="w-full h-24 flex items-center justify-center mb-3">
             <Image
-              src={`data:image/png;base64,${brand?.logo}`}
+              src={brand?.brandLogo}
               width={20}
               height={20}
-              alt={brand.name}
+              alt={brand?.brand}
               className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
             />
           </div>
           <h3 className="text-center font-semibold text-sm text-[#71308A] mb-2 truncate w-full">
-            {brand?.name}
+            {brand?.brand}
           </h3>
           <motion.p
             className="text-center text-xs text-gray-600 line-clamp-2 overflow-hidden"
@@ -76,11 +89,11 @@ const BrandCard = ({ brand, isEnglish }) => {
             animate={{ opacity: isHovered ? 1 : 0, height: isHovered ? "auto" : 0 }}
             transition={{ duration: 0.3 }}
           >
-            {isEnglish ? brand?.name?.en?.description : brand?.name?.ar?.description}
+            {/* {isEnglish ? brand?.name?.en?.description : brand?.name?.ar?.description} */}
           </motion.p>
         </div>
       </motion.div>
-    </Link>
+    </div>
   )
 }
 
@@ -102,5 +115,6 @@ const Loader = () => (
   </div>
 )
 
-export default Brands
+export default Brands;
+export { BrandCard };
 

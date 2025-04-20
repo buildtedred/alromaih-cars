@@ -12,6 +12,8 @@ export const useDetailContext = () => {
 
 export const DetailProvider = ({ children }) => {
   const [car_Details, setcar_Details] = useState(null);
+  
+const [searchbrands, setbrands] = useState("")
   const [loading, setLoading] = useState(true);
 
   // Load from localStorage on mount
@@ -32,7 +34,7 @@ export const DetailProvider = ({ children }) => {
 
 
   return (
-    <DetailContext.Provider value={{ car_Details, loading, setcar_Details }}>
+    <DetailContext.Provider value={{ car_Details, loading, setcar_Details,setbrands,searchbrands }}>
       {children}
     </DetailContext.Provider>
   );
