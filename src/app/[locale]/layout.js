@@ -46,7 +46,9 @@ export default async function RootLayout({ children, params }) {
                   <BrandsProvider>
                     <LogoProvider>
                       <Header />
-                      <main>{children}</main>
+                      <main className="p-4 lg:px-[7rem]">
+                      {children}
+                      </main>
                       <Footer />
                     </LogoProvider>
                   </BrandsProvider>

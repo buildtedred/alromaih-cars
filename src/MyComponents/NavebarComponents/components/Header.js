@@ -62,7 +62,7 @@ const Header = () => {
   const headerContent = (
     <>
       <div className="bg-white lg:px-[7rem]">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto ">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
