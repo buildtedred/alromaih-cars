@@ -27,7 +27,7 @@ const PrevArrow = (props) => {
         width: "30px",
         height: "30px",
         zIndex: 1,
-        left: "-15px",
+    
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
       }}
       onClick={onClick}
@@ -52,7 +52,8 @@ const NextArrow = (props) => {
         width: "30px",
         height: "30px",
         zIndex: 1,
-        right: "-15px",
+  
+      
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
       }}
       onClick={onClick}
@@ -88,8 +89,8 @@ function BrandShowcase() {
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: !isMobile,
-    prevArrow: <PrevArrow />,
-    nextArrow: <NextArrow />,
+    prevArrow: isEnglish ? <PrevArrow />:<NextArrow />,
+    nextArrow: isEnglish ? <NextArrow /> : <PrevArrow />,
     responsive: [
       {
         breakpoint: 1280,
@@ -154,7 +155,7 @@ function BrandShowcase() {
 
   return (
     <div className="bg-gray-100 w-full py-10">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto ">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-8 text-right">موزع معتمد</h2>
         <Slider {...settings} className="slider-container">
           {carsData.map((brand, index) => (
