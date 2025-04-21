@@ -1111,7 +1111,7 @@ const AllCarMainpage = () => {
       <style jsx global>
         {scrollbarStyles}
       </style>
-      <div className="container mx-auto px-[7rem] py-8" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="container mx-auto  py-8" dir={isRTL ? "rtl" : "ltr"}>
         {/* Mobile Filter Button - Only shown on mobile */}
         <div className="lg:hidden mb-4">
           <button

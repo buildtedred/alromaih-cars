@@ -40,11 +40,11 @@ export default function ContactPage() {
   const locale = params?.locale || "ar"
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen ">
       {/* Header Section */}
       <div className="relative">
-        <div className="bg-[#F8F2F8] h-[400px]">
-          <div className="max-w-[1300px] mx-auto px-4 pt-20 sm:pt-24 md:pt-28">
+        <div className="bg-brand-light h-[400px] rounded-[10px]">
+          <div className="mx-auto px-4 pt-20 sm:pt-24 md:pt-28">
             <div className="text-center mb-12">
               <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold text-brand-primary mb-6 ${locale === "ar" ? "font-noto" : ""}`}>
                 {locale === "ar" ? "تواصل معنا" : "Contact Us"}
@@ -96,7 +96,7 @@ export default function ContactPage() {
       </div>
 
       {/* Map Section */}
-      <div className="bg-white pt-16 pb-8 md:mt-[8rem]">
+      <div className="bg-white rounded-[10px] pt-16 pb-8 md:mt-[8rem]">
         <div className="max-w-[1300px] mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="w-full lg:w-3/4">
@@ -155,8 +155,8 @@ export default function ContactPage() {
       </div>
 
       {/* Car Image */}
-      <div className="w-full h-[547px] md:h-[100vh] relative">
-        <Image src="/images/main-car.jpg" alt="Car showcase" fill className="object-cover object-center" />
+      <div className="w-full h-[547px] mt-8 md:h-[100vh] relative">
+        <Image src="/images/main-car.jpg" alt="Car showcase" fill className="object-cover object-center rounded-[10px] " />
       </div>
     </main>
   )

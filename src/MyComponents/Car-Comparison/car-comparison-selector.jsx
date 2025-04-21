@@ -132,7 +132,7 @@ const CarComparisonSelector = () => {
 
   // Otherwise, render the car selection form
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm py-2">
+    <div className="max-w-4xl mx-auto bg-white rounded-[20px] shadow-sm  py-2">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-brand-primary">{isRTL ? "قارن بين السيارات" : "Compare Cars"}</h1>
@@ -144,7 +144,7 @@ const CarComparisonSelector = () => {
       {/* Car Selection Panels */}
       <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6 ">
         {/* First Car Panel */}
-        <div className="border border-gray-200 rounded-lg p-4 order-2 md:order-1">
+        <div className=" rounded-lg p-4 order-2 md:order-1">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center">
               <svg className="w-10 h-10 text-brand-primary" viewBox="0 0 24 24" fill="currentColor">
@@ -186,7 +186,7 @@ const CarComparisonSelector = () => {
           <div className="mb-2 relative">
             <button
               onClick={() => toggleDropdown("secondCarModel")}
-              className={`w-full flex items-center justify-between p-2 border rounded-md ${
+              className={`w-full flex items-center justify-between p-2  rounded-md ${
                 secondCar.brand ? "border-gray-200" : "border-gray-200 bg-gray-100 cursor-not-allowed"
               }`}
               disabled={!secondCar.brand}
@@ -240,7 +240,7 @@ const CarComparisonSelector = () => {
         </div>
 
         {/* Second Car Panel */}
-        <div className="border border-gray-200 rounded-lg p-4 order-1 md:order-2">
+        <div className=" rounded-lg p-4 order-1 md:order-2">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center">
               <svg className="w-10 h-10 text-brand-primary" viewBox="0 0 24 24" fill="currentColor">

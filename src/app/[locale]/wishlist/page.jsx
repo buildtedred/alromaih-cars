@@ -224,7 +224,7 @@ export default function WishlistPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4 lg:pl-28 lg:pr-28 min-h-screen">
+      <div className="container mx-auto  min-h-screen">
         {/* Breadcrumb skeleton */}
         <div className="flex items-center mb-6">
           <div className="h-4 bg-gray-200 rounded w-12"></div>
@@ -256,7 +256,7 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 lg:pl-28 lg:pr-28 min-h-screen">
+    <div className="container mx-auto  min-h-screen">
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-gray-500 mb-6">
         <Link href="/" className="hover:text-brand-primary transition-colors">
