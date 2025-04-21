@@ -2,52 +2,45 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
-import carsData from "@/app/api/mock-data" // Import your existing mock data
-import { Search, ChevronDown, ChevronUp, X, Filter, Check, SlidersHorizontal, Sparkles } from "lucide-react"
+import carsData from "@/app/api/mock-data" // Import your mock data with brand SVGs
+import { Search, ChevronDown, ChevronUp, X, Filter, Plus, Minus } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { PromoSlider } from "../AllCarComponents/promo-slider"
-import { RangeSlider } from "../AllCarComponents/range-slider"
 import { CarGrid } from "../AllCarComponents/car-grid"
-import CarSkeletonUI from "@/app/[locale]/all-cars/CarSkeletonUI"
+import { PromoSlider } from "../AllCarComponents/promo-slider"
+import * as SliderPrimitive from "@radix-ui/react-slider"
 import { useDetailContext } from "@/contexts/detailProvider"
 
-// Update the scrollbarStyles to use primary color and have a more premium look
+// Custom styles for the component
 const scrollbarStyles = `
 /* Premium scrollbar */
 .custom-scrollbar-container {
   scrollbar-width: thin;
   scrollbar-color: #46194F transparent;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
 }
 .custom-scrollbar-container::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 .custom-scrollbar-container::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(70, 25, 79, 0.05);
+  border-radius: 20px;
 }
 .custom-scrollbar-container::-webkit-scrollbar-thumb {
   background-color: #46194F;
   border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 .custom-scrollbar-container::-webkit-scrollbar-thumb:hover {
-  background-color: #46194F;
-  opacity: 0.9;
-}
-.flex-1.overflow-hidden.relative {
-  overflow: hidden !important;
-}
-.h-screen {
-  overflow: hidden !important;
+  background-color: #5a2266;
 }
 
 /* Animation keyframes */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
@@ -61,28 +54,12 @@ const scrollbarStyles = `
   }
 }
 
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(70, 25, 79, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(70, 25, 79, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(70, 25, 79, 0);
-  }
-}
-
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
 .animate-slideUp {
   animation: slideUp 0.3s ease-out forwards;
-}
-
-.animate-pulse {
-  animation: pulse 1.5s infinite;
 }
 
 /* Mobile filter overlay */
@@ -112,339 +89,329 @@ const scrollbarStyles = `
 }
 
 @keyframes slideIn {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
-/* Premium hover effects */
-.hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(70, 25, 79, 0.1), 0 8px 10px -6px rgba(70, 25, 79, 0.1);
+/* Custom checkbox styling with brand primary color */
+[data-state="checked"] {
+  background-color: transparent !important;
+  border-color: #46194F !important;
+  color: white !important;
 }
 
-/* Premium filter section */
-.filter-section {
-  border-radius: 16px;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  border: 1px solid rgba(70, 25, 79, 0.08);
-  margin-bottom: 12px;
+/* In checkbox  background colors that might be applied */
+.checkbox-custom[data-state="checked"] {
+  background-color: #46194F !important;
+  border-color: #46194F !important;
+  color: white !important;
+}
+
+/* Make sure all checkboxes have the correct border radius */
+.checkbox-custom {
+  border-radius: 5px !important;
+}
+
+/* Custom radio button styling with brand primary color */
+.custom-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.custom-radio:checked {
+  border-color: #46194F;
   background-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
-.filter-section:hover {
-  border-color: rgba(70, 25, 79, 0.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+.custom-radio:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #46194F;
+}
+
+.custom-radio:focus {
+  box-shadow: 0 0 0 2px rgba(70, 25, 79, 0.2);
+}
+
+/* Price range slider styling */
+.price-slider {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background-color: #e5e7eb;
+  margin: 2rem 0;
+}
+
+.price-slider-range {
+  position: absolute;
+  height: 100%;
+  background-color: #46194F;
+}
+
+.price-slider-thumb {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #46194F;
+  border-radius: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+/* Filter section styling */
+.filter-section {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .filter-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: linear-gradient(to right, rgba(70, 25, 79, 0.02), transparent);
-}
-
-.filter-section-header:hover h4 {
-  color: #46194F;
+  padding: 0.25rem 0;
 }
 
 .filter-section-content {
-  padding: 0 20px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, padding 0.4s ease;
+  padding-top: 0.25rem;
 }
 
-.filter-section.expanded .filter-section-content {
-  max-height: 500px;
-  padding: 0 20px 20px;
+/* Light purple background for the filter sidebar */
+.filter-sidebar {
+  background-color: #f8f5fa;
 }
 
-.filter-section.expanded {
-  border-color: rgba(70, 25, 79, 0.15);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-/* Premium button styling */
-.premium-button {
-  position: relative;
-  overflow: hidden;
-  padding: 14px 24px;
-  border-radius: 14px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: all 0.4s ease;
-  box-shadow: 0 4px 15px rgba(70, 25, 79, 0.2);
-  background-size: 200% auto;
-  border: none;
+/* Price display buttons */
+.price-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
   cursor: pointer;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.premium-button:hover {
-  background-position: right center;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(70, 25, 79, 0.3);
-}
-
-.premium-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(70, 25, 79, 0.2);
-}
-
-.premium-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: all 0.6s ease;
-}
-
-.premium-button:hover::before {
-  left: 100%;
-}
-
-.primary-button {
-  background: linear-gradient(135deg, #46194F 0%, #6a2a7a 50%, #46194F 100%);
-  color: white;
-  background-size: 200% auto;
-}
-
-.secondary-button {
-  background: white;
-  color: #46194F;
-  border: 2px solid #46194F;
-}
-
-.secondary-button:hover {
-  background-color: rgba(70, 25, 79, 0.05);
-}
-
-/* Update the filter button styling */
-.filter-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #46194F 0%, #6a2a7a 50%, #46194F 100%);
-  background-size: 200% auto;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  padding: 16px 20px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: all 0.4s ease;
-  box-shadow: 0 4px 15px rgba(70, 25, 79, 0.2);
-  width: 100%;
-  margin: 16px 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.filter-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: all 0.6s ease;
-}
-
-.filter-button:hover::before {
-  left: 100%;
-}
-
-.filter-button:hover {
-  background-position: right center;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(70, 25, 79, 0.3);
-}
-
-.filter-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(70, 25, 79, 0.2);
-}
-
-/* Premium card */
-.premium-card {
-  background-color: white;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.premium-card:hover {
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
-}
-
-/* Premium checkbox styling */
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 12px;
   transition: all 0.2s ease;
-  margin-bottom: 4px;
 }
 
-.checkbox-container:hover {
-  background-color: rgba(70, 25, 79, 0.05);
-}
-
-.checkbox-container.selected {
+.price-button:hover {
   background-color: rgba(70, 25, 79, 0.1);
-  border: 1px solid rgba(70, 25, 79, 0.2);
 }
 
-/* Year button styling */
-.year-button {
-  padding: 12px;
-  border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  text-align: center;
-  border: 1px solid rgba(70, 25, 79, 0.1);
-  background: white;
-}
-
-.year-button:hover {
-  background-color: rgba(70, 25, 79, 0.05);
-  border-color: rgba(70, 25, 79, 0.2);
-}
-
-.year-button.selected {
-  background: linear-gradient(135deg, #46194F 0%, #5a2266 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(70, 25, 79, 0.3);
-  border-color: transparent;
-}
-
-/* Premium input styling */
-.premium-input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 2px solid rgba(70, 25, 79, 0.1);
-  transition: all 0.3s ease;
-  background-color: white;
-  font-size: 15px;
-}
-
-.premium-input:focus {
-  outline: none;
-  border-color: #46194F;
-  box-shadow: 0 0 0 3px rgba(70, 25, 79, 0.1);
-}
-
-.premium-input::placeholder {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-/* Search input specific styling */
-.search-input {
-  padding-left: 30px; /* Space for the icon */
-}
-
-.search-input::placeholder {
-  padding-left: 5px; /* Add padding to the placeholder text */
-  font-size: 13px;
-}
-
-/* Filter header styling */
-.filter-header {
-  background: linear-gradient(135deg, rgba(70, 25, 79, 0.15) 0%, rgba(70, 25, 79, 0.05) 100%);
-  border-bottom: 1px solid rgba(70, 25, 79, 0.1);
-  padding: 20px;
-  border-radius: 20px 20px 0 0;
-}
-
-/* Filter badge */
-.filter-badge {
-  background: linear-gradient(135deg, #46194F 0%, #6a2a7a 100%);
-  color: white;
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: 0 2px 8px rgba(70, 25, 79, 0.3);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Filter footer */
-.filter-footer {
-  background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
-  backdrop-filter: blur(5px);
-  border-top: 1px solid rgba(70, 25, 79, 0.1);
-  padding: 16px 20px;
-  border-radius: 0 0 20px 20px;
-}
-
-/* Mobile filter header */
-.mobile-filter-header {
-  background: linear-gradient(135deg, #46194F 0%, #5a2266 100%);
-  color: white;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-/* Mobile filter footer */
-.mobile-filter-footer {
-  background: white;
-  border-top: 1px solid rgba(70, 25, 79, 0.1);
-  padding: 16px;
-  position: sticky;
-  bottom: 0;
-  z-index: 20;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  gap: 12px;
-}
-
-/* Price display */
 .price-display {
-  background: linear-gradient(135deg, rgba(70, 25, 79, 0.1) 0%, rgba(70, 25, 79, 0.05) 100%);
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-weight: 500;
-  color: #46194F;
-  display: inline-block;
-  border: 1px solid rgba(70, 25, 79, 0.1);
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  min-width: 100px;
+  justify-content: center;
 }
 `
 
-// Update the CarFilterSidebar component with a more premium design
+// Custom Range Slider Component
+const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true }) => {
+  const safeValue = useMemo(() => {
+    if (!value || !Array.isArray(value) || value.length !== 2) {
+      return [min, max]
+    }
+    return [
+      Math.max(min, Math.min(max, Number(value[0]) || min)),
+      Math.max(min, Math.min(max, Number(value[1]) || max)),
+    ]
+  }, [value, min, max])
+
+  const handleValueChange = (newValue) => {
+    if (Array.isArray(newValue) && newValue.length === 2) {
+      // Ensure left thumb doesn't go beyond right thumb
+      if (newValue[0] >= newValue[1]) {
+        newValue[0] = newValue[1] - step
+      }
+
+      // Strictly clamp values to min/max range
+      const validatedValue = [
+        Math.max(min, Math.min(max, Number(newValue[0]) || min)),
+        Math.max(min, Math.min(max, Number(newValue[1]) || max)),
+      ]
+      onValueChange(validatedValue)
+    }
+  }
+
+  const formatPrice = (price) => {
+    return price.toLocaleString()
+  }
+
+  const incrementMin = () => {
+    const newMin = Math.min(safeValue[0] + step, safeValue[1] - step)
+    handleValueChange([newMin, safeValue[1]])
+  }
+
+  const decrementMin = () => {
+    const newMin = Math.max(safeValue[0] - step, min)
+    handleValueChange([newMin, safeValue[1]])
+  }
+
+  const incrementMax = () => {
+    const newMax = Math.min(safeValue[1] + step, max)
+    handleValueChange([safeValue[0], newMax])
+  }
+
+  const decrementMax = () => {
+    const newMax = Math.max(safeValue[1] - step, safeValue[0] + step)
+    handleValueChange([safeValue[0], newMax])
+  }
+
+  // Calculate positions for car icons based on the actual price values
+  const minPercent = ((safeValue[0] - min) / (max - min)) * 100
+  const maxPercent = ((safeValue[1] - min) / (max - min)) * 100
+
+  // Calculate if cars are close enough to crash/overlap
+  const distance = maxPercent - minPercent
+  const isOverlapping = distance < 15
+
+  // Calculate normalized price values for scaling (0 to 1)
+  const minNormalized = (safeValue[0] - min) / (max - min)
+  const maxNormalized = (safeValue[1] - min) / (max - min)
+
+  // Calculate scale factors based on normalized price values
+  const minScale = 0.8 + minNormalized * 0.4 // Scale from 0.8 to 1.2
+  const maxScale = 1.0 + maxNormalized * 0.6 // Scale from 1.0 to 1.6
+
+  return (
+    <div className="relative pt-1 pb-2 bg-[#f8f5fa] p-1 rounded-lg" dir={isRTL ? "rtl" : "ltr"}>
+      {/* Car icons with slider */}
+      <div className="relative h-16 mb-4">
+        <div className="relative w-full h-full">
+          {/* First car (left/min) */}
+          <div
+            className="absolute transition-all duration-300"
+            style={{
+              left: `${minPercent}%`,
+              top: "5px",
+              transform: isOverlapping
+                ? `translateX(-50%) rotate(-10deg) translateY(-15px) scale(${minScale})`
+                : `translateX(-50%) scale(${minScale})`,
+              transformOrigin: "bottom right",
+              zIndex: isOverlapping ? 2 : 1,
+            }}
+          >
+            <img src="/icons/RangCar.svg" alt="Min price car" width={60} height={40} className="text-brand-primary" />
+          </div>
+
+          {/* Second car (right/max) */}
+          <div
+            className="absolute transition-all duration-300"
+            style={{
+              left: `${maxPercent}%`,
+              top: "5px",
+              transform: isOverlapping
+                ? `translateX(-50%) rotate(10deg) translateY(-15px) scale(${maxScale})`
+                : `translateX(-50%) scale(${maxScale})`,
+              transformOrigin: "bottom left",
+              zIndex: isOverlapping ? 1 : 2,
+            }}
+          >
+            <img src="/icons/RangCar2.svg" alt="Max price car" width={60} height={40} className="text-brand-primary" />
+          </div>
+
+          {/* Slider track and thumbs */}
+          <div className="absolute top-10 left-0 right-0">
+            <SliderPrimitive.Root
+              min={min}
+              max={max}
+              value={safeValue}
+              onValueChange={handleValueChange}
+              step={step}
+              className="relative flex items-center w-full h-5 select-none touch-none"
+              aria-label="Price Range"
+            >
+              <SliderPrimitive.Track className="relative h-[2px] grow rounded-full bg-gray-300">
+                <SliderPrimitive.Range className="absolute h-[2px] rounded-full bg-brand-primary transition-all duration-300" />
+              </SliderPrimitive.Track>
+              <SliderPrimitive.Thumb
+                className="block w-[15px] h-[15px] bg-brand-primary rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-all duration-300"
+                aria-label="Minimum price"
+              />
+              <SliderPrimitive.Thumb
+                className="block w-[15px] h-[15px] bg-brand-primary rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-all duration-300"
+                aria-label="Maximum price"
+              />
+            </SliderPrimitive.Root>
+          </div>
+        </div>
+      </div>
+
+      {/* Price controls with plus/minus buttons - Smaller version */}
+      <div className="flex justify-between mt-4 text-xs">
+        {/* Min price control */}
+        <div className="flex items-center">
+          <button
+            onClick={decrementMin}
+            className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-md bg-white"
+            aria-label="Decrease minimum price"
+          >
+            <Minus size={8} className="text-brand-primary" />
+          </button>
+          <div className="mx-1 px-1 py-0.5 bg-white border border-gray-300 rounded-md text-center">
+            <div className="flex items-center justify-center">
+              <span className="text-brand-primary font-bold text-[10px]">₹{formatPrice(safeValue[0])}</span>
+            </div>
+          </div>
+          <button
+            onClick={incrementMin}
+            className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-md bg-white"
+            aria-label="Increase minimum price"
+          >
+            <Plus size={8} className="text-brand-primary" />
+          </button>
+        </div>
+
+        {/* Max price control */}
+        <div className="flex items-center">
+          <button
+            onClick={decrementMax}
+            className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-md bg-white"
+            aria-label="Decrease maximum price"
+          >
+            <Minus size={8} className="text-brand-primary" />
+          </button>
+          <div className="mx-1 px-1 py-0.5 bg-white border border-gray-300 rounded-md text-center">
+            <div className="flex items-center justify-center">
+              <span className="text-brand-primary font-bold text-[10px]">₹{formatPrice(safeValue[1])}</span>
+            </div>
+          </div>
+          <button
+            onClick={incrementMax}
+            className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-md bg-white"
+            aria-label="Increase maximum price"
+          >
+            <Plus size={8} className="text-brand-primary" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Car Filter Sidebar Component
 const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = false, onClose }) => {
   const {searchbrands}=useDetailContext()
   const [expandedBrands, setExpandedBrands] = useState([])
@@ -453,10 +420,10 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   const [expandedSections, setExpandedSections] = useState({
     priceRange: true,
     brandsAndModels: true,
-    year: true,
-    fuelType: true,
-    transmission: true,
-    seats: true,
+    year: false,
+    fuelType: false,
+    transmission: false,
+    seats: false,
   })
 
   // Get max price for range slider
@@ -568,7 +535,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   )
 
   const formatPrice = (price) => {
-    return language === "ar" ? `${price.toLocaleString()} ريال` : `₹ ${price.toLocaleString()}`
+    return language === "ar" ? `${price.toLocaleString()}` : `₹ ${price.toLocaleString()}`
   }
 
   // Update the handleYearChange function to toggle selection
@@ -620,23 +587,14 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
     onFilterChange({ seats: updatedSeats })
   }
 
-  // Fixed: Improved range slider handling to ensure values are properly validated
+  // Handle price range change
   const handlePriceRangeChange = (newValue) => {
     if (Array.isArray(newValue) && newValue.length === 2) {
-      // Ensure values are numbers and within range
       const validatedValue = [
         Math.max(0, Math.min(maxPrice, Number(newValue[0]) || 0)),
         Math.max(0, Math.min(maxPrice, Number(newValue[1]) || maxPrice)),
       ]
-      console.log("Range slider value changed:", validatedValue)
       onFilterChange({ priceRange: validatedValue })
-    }
-  }
-
-  // Function to apply filters and close sidebar on mobile
-  const applyFilters = () => {
-    if (isMobile && onClose) {
-      onClose()
     }
   }
 
@@ -653,163 +611,146 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
     return count
   }
 
+  // Helper function to get brand logo
+  const getBrandLogo = (brandName) => {
+    // Find a car with this brand
+    const car = cars.find((car) => car.brand?.toLowerCase() === brandName.toLowerCase())
+    // Return the brand logo if found, otherwise return a placeholder
+    return car?.brandLogo || `/placeholder.svg?height=20&width=20`
+  }
+
   const activeFiltersCount = getActiveFiltersCount()
 
   return (
-    <div className="premium-card h-full flex flex-col">
-      {/* Mobile filter header */}
-      {isMobile ? (
-        <div className="mobile-filter-header">
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            {language === "ar" ? "الفلاتر" : "Filters"}
-            {activeFiltersCount > 0 && (
-              <span className="ml-2 bg-white text-brand-primary rounded-full px-2.5 py-0.5 text-xs font-bold">
-                {activeFiltersCount}
-              </span>
-            )}
-          </h3>
+    <div
+      className="filter-sidebar h-full flex flex-col rounded-lg overflow-hidden"
+      dir={language === "ar" ? "rtl" : "ltr"}
+    >
+      {/* Filter header */}
+      <div className="bg-brand-primary text-white p-4 flex justify-between items-center">
+        <h3 className="text-xl font-bold text-center w-full">
+          {language === "ar" ? "فلترة النتائج" : "Filter Results"}
+        </h3>
+        {isMobile && (
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full text-white hover:bg-white/20">
             <X className="h-5 w-5" />
           </Button>
-        </div>
-      ) : (
-        /* Desktop filter header */
-        <div className="filter-header">
-          <h3 className="text-xl font-bold text-brand-primary flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            {language === "ar" ? "الفلاتر" : "Filters"}
-            {activeFiltersCount > 0 && (
-              <span className="ml-2 filter-badge">
-                <Sparkles className="h-3.5 w-3.5" />
-                {activeFiltersCount}
-              </span>
-            )}
-          </h3>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar-container">
-        <div className="p-5 space-y-5">
-          {/* Price Range Section */}
-          <div className={`filter-section ${expandedSections.priceRange ? "expanded" : ""}`}>
-            <div className="filter-section-header" onClick={(e) => toggleSection("priceRange", e)}>
-              <h4 className="font-semibold text-brand-primary text-lg">
-                {language === "ar" ? "نطاق السعر" : "Price Range"}
-              </h4>
-              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
-                <ChevronDown
-                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                    expandedSections.priceRange ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-            </div>
-
-            <div className="filter-section-content">
-              <RangeSlider
-                min={0}
-                max={maxPrice}
-                value={filters.priceRange}
-                onValueChange={handlePriceRangeChange}
-                onValueCommit={handlePriceRangeChange}
-                step={10000}
-                className="mb-2 mt-6"
-              />
-
-              {/* Price range display */}
-              <div className="flex justify-between text-sm mt-6 font-medium">
-                <span className="price-display">{formatPrice(filters.priceRange[0])}</span>
-                <span className="price-display">{formatPrice(filters.priceRange[1])}</span>
-              </div>
+      <div
+        className="flex-1 overflow-y-auto custom-scrollbar-container p-4"
+        style={{ maxHeight: isMobile ? "calc(100vh - 160px)" : "auto" }}
+      >
+        {/* Price Range Section */}
+        <div className="filter-section">
+          <div className="filter-section-header" onClick={(e) => toggleSection("priceRange", e)}>
+            <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "مدى السعر" : "Price Range"}</h4>
+            <div className="h-6 w-6 flex items-center justify-center">
+              {expandedSections.priceRange ? (
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
+              )}
             </div>
           </div>
 
-          {/* Brands + Models Section */}
-          <div className={`filter-section ${expandedSections.brandsAndModels ? "expanded" : ""}`}>
-            <div className="filter-section-header" onClick={(e) => toggleSection("brandsAndModels", e)}>
-              <h4 className="font-semibold text-brand-primary text-lg">
-                {language === "ar" ? "الماركات + الموديلات" : "Brands + Models"}
-              </h4>
-              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
-                <ChevronDown
-                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                    expandedSections.brandsAndModels ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
+          {expandedSections.priceRange && (
+            <div className="filter-section-content">
+              <RangeSlider
+                min={40000}
+                max={250000}
+                value={filters.priceRange}
+                onValueChange={handlePriceRangeChange}
+                step={10000}
+                isRTL={language === "ar"}
+              />
             </div>
+          )}
+        </div>
 
+        {/* Brands + Models Section */}
+        <div className="filter-section">
+          <div className="filter-section-header" onClick={(e) => toggleSection("brandsAndModels", e)}>
+            <h4 className="font-bold text-brand-primary text-base">
+              {language === "ar" ? "اختر العلامة التجارية والطراز المناسب لك" : "Choose Brand & Model"}
+            </h4>
+            <div className="h-6 w-6 flex items-center justify-center">
+              {expandedSections.brandsAndModels ? (
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
+              )}
+            </div>
+          </div>
+
+          {expandedSections.brandsAndModels && (
             <div className="filter-section-content">
               {/* Search box */}
-              <div className="relative mb-5 mt-2">
+              <div className="relative mb-3">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-brand-primary h-4 w-4" />
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
                   <input
                     type="text"
-                    placeholder={language === "ar" ? "ابحث عن الماركات والموديلات" : "Search brands and models"}
+                    placeholder={language === "ar" ? "ابحث..." : "Search..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="premium-input search-input text-sm"
+                    className="w-full border border-gray-300 rounded-md py-1 px-7 text-xs focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   />
                 </div>
               </div>
 
               {/* Brand list */}
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {filteredBrands.map((brand) => (
-                  <div key={brand} className="border-b border-gray-100 pb-4">
-                    <div
-                      className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200 ${
-                        areAllModelsSelected(brand)
-                          ? "bg-brand-primary/10 border border-brand-primary/30"
-                          : "hover:bg-brand-primary/5"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          id={`brand-${brand}`}
-                          checked={areAllModelsSelected(brand) }
-                          onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
-                          className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
+                  <div key={brand} className="mb-4">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id={`brand-${brand}`}
+                        checked={areAllModelsSelected(brand)}
+                        onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
+                        className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-brand-primary checkbox-custom"
+                      />
+                      <Label
+                        htmlFor={`brand-${brand}`}
+                        className="text-xs font-medium cursor-pointer flex items-center gap-1 flex-1"
+                      >
+                        <img
+                          src={getBrandLogo(brand) || "/placeholder.svg"}
+                          alt={brand}
+                          className="h-5 w-5 object-contain"
                         />
-                        <Label htmlFor={`brand-${brand}`} className="text-sm font-medium cursor-pointer">
-                          {brand}
-                        </Label>
-                      </div>
+                        {brand}
+                      </Label>
+                      <div className="text-xs text-gray-500 mr-2">({modelsByBrand[brand]?.length || 0})</div>
                       <button
-                        type="button"
                         onClick={(e) => toggleBrand(brand, e)}
-                        className="transition-all duration-200 hover:bg-brand-primary/10 p-2 rounded-full"
+                        className="h-6 w-6 flex items-center justify-center text-brand-primary"
                       >
                         {expandedBrands.includes(brand) ? (
-                          <ChevronUp className="h-4 w-4 text-brand-primary transition-transform duration-300" />
+                          <ChevronUp className="h-4 w-4" />
                         ) : (
-                          <ChevronDown className="h-4 w-4 text-brand-primary transition-transform duration-300" />
+                          <ChevronDown className="h-4 w-4" />
                         )}
                       </button>
                     </div>
 
-                    {/* Models under this brand (expandable) */}
-                    {(expandedBrands.includes(brand) || searchTerm) && (
-                      <div className="ml-8 mt-3 space-y-2 animate-slideUp">
+                    {/* Models list - shown when brand is expanded */}
+                    {expandedBrands.includes(brand) && (
+                      <div className="ml-6 mt-2 space-y-1 border-l-2 border-brand-primary/20 pl-3">
                         {modelsByBrand[brand]?.map((model) => (
-                          <div
-                            key={model.id}
-                            className={`flex items-center gap-3 transition-all duration-200 p-2.5 rounded-lg ${
-                              filters.selectedModels?.includes(model.id)
-                                ? "bg-brand-primary/5 border border-brand-primary/20"
-                                : "hover:bg-brand-primary/5"
-                            }`}
-                          >
+                          <div key={model.id} className="flex items-center gap-2">
                             <Checkbox
                               id={`model-${model.id}`}
                               checked={filters.selectedModels?.includes(model.id)}
                               onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
-                              className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-3.5 w-3.5"
+                              className="h-3.5 w-3.5 rounded-[5px] border-gray-300 text-brand-primary focus:ring-brand-primary checkbox-custom"
                             />
-                            <Label htmlFor={`model-${model.id}`} className="text-xs font-medium cursor-pointer">
+                            <Label
+                              htmlFor={`model-${model.id}`}
+                              className="text-[10px] font-medium cursor-pointer text-gray-700"
+                            >
                               {model.name}
                             </Label>
                           </div>
@@ -820,256 +761,216 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                 ))}
               </div>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Year Section */}
-          <div className={`filter-section ${expandedSections.year ? "expanded" : ""}`}>
-            <div className="filter-section-header" onClick={(e) => toggleSection("year", e)}>
-              <h4 className="font-semibold text-brand-primary text-lg">{language === "ar" ? "السنة" : "Year"}</h4>
-              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
-                <ChevronDown
-                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                    expandedSections.year ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-            </div>
-
-            <div className="filter-section-content">
-              <div className="grid grid-cols-3 gap-3 mt-3">
-                {/* Extract unique years from cars data */}
-                {[...new Set(cars.map((car) => car.specs.year))]
-                  .sort((a, b) => b - a) // Sort years in descending order
-                  .map((year) => (
-                    <button
-                      key={year}
-                      type="button"
-                      onClick={() => handleYearChange(year)}
-                      className={`year-button ${filters.year === year.toString() ? "selected" : ""}`}
-                    >
-                      <span>{year}</span>
-                    </button>
-                  ))}
-              </div>
+        {/* Year Section */}
+        <div className="filter-section">
+          <div className="filter-section-header" onClick={(e) => toggleSection("year", e)}>
+            <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "السنة" : "Year"}</h4>
+            <div className="h-6 w-6 flex items-center justify-center">
+              {expandedSections.year ? (
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
+              )}
             </div>
           </div>
 
-          {/* Fuel Type Section */}
-          <div className={`filter-section ${expandedSections.fuelType ? "expanded" : ""}`}>
-            <div className="filter-section-header" onClick={(e) => toggleSection("fuelType", e)}>
-              <h4 className="font-semibold text-brand-primary text-lg">
-                {language === "ar" ? "نوع الوقود" : "Fuel Type"}
-              </h4>
-              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
-                <ChevronDown
-                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                    expandedSections.fuelType ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-            </div>
-
+          {expandedSections.year && (
             <div className="filter-section-content">
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                {/* Extract unique fuel types from cars data */}
-                {[
-                  ...new Set(
-                    cars.map((car) => {
-                      // Handle both object and string fuel types
-                      return typeof car.specs.fuelType === "object"
-                        ? car.specs.fuelType[language] || car.specs.fuelType.en
-                        : car.specs.fuelType
-                    }),
-                  ),
-                ]
-                  .filter(Boolean) // Remove any undefined or null values
-                  .map((fuelType) => (
-                    <div
-                      key={fuelType}
-                      className={`checkbox-container ${
-                        Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType) ? "selected" : ""
-                      }`}
-                    >
-                      <Checkbox
-                        id={`fuel-${fuelType}`}
-                        checked={Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)}
-                        onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
-                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
-                      />
-                      <Label htmlFor={`fuel-${fuelType}`} className="text-sm font-medium cursor-pointer">
-                        {fuelType}
-                      </Label>
+              {/* Extract unique years from cars data */}
+              {[...new Set(cars.map((car) => car.specs?.year))]
+                .filter(Boolean)
+                .sort((a, b) => b - a) // Sort years in descending order
+                .map((year) => (
+                  <div key={year} className="flex items-center mb-2">
+                    <div className="flex items-center cursor-pointer" onClick={() => handleYearChange(year)}>
+                      <div
+                        className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                          filters.year === year.toString() ? "border-brand-primary" : "border-gray-300"
+                        }`}
+                      >
+                        {filters.year === year.toString() && <div className="h-2 w-2 rounded-full bg-brand-primary"></div>}
+                      </div>
+                      <label className="ml-2 text-sm font-medium text-gray-700 cursor-pointer">{year}</label>
                     </div>
-                  ))}
-              </div>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
+        {/* Fuel Type Section */}
+        <div className="filter-section">
+          <div className="filter-section-header" onClick={(e) => toggleSection("fuelType", e)}>
+            <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "نوع الوقود" : "Fuel Type"}</h4>
+            <div className="h-6 w-6 flex items-center justify-center">
+              {expandedSections.fuelType ? (
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
+              )}
             </div>
           </div>
 
-          {/* Transmission Section */}
-          <div className={`filter-section ${expandedSections.transmission ? "expanded" : ""}`}>
-            <div className="filter-section-header" onClick={(e) => toggleSection("transmission", e)}>
-              <h4 className="font-semibold text-brand-primary text-lg">
-                {language === "ar" ? "ناقل الحركة" : "Transmission"}
-              </h4>
-              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
-                <ChevronDown
-                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                    expandedSections.transmission ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-            </div>
-
+          {expandedSections.fuelType && (
             <div className="filter-section-content">
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                {/* Extract unique transmission types from cars data */}
-                {[
-                  ...new Set(
-                    cars.map((car) => {
-                      // Handle both object and string transmission types
-                      return typeof car.specs.transmission === "object"
-                        ? car.specs.transmission[language] || car.specs.transmission.en
-                        : car.specs.transmission
-                    }),
-                  ),
-                ]
-                  .filter(Boolean) // Remove any undefined or null values
-                  .map((transmission) => (
-                    <div
-                      key={transmission}
-                      className={`checkbox-container ${
-                        Array.isArray(filters.transmission) && filters.transmission.includes(transmission)
-                          ? "selected"
-                          : ""
-                      }`}
-                    >
-                      <Checkbox
-                        id={`transmission-${transmission}`}
-                        checked={Array.isArray(filters.transmission) && filters.transmission.includes(transmission)}
-                        onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
-                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
-                      />
-                      <Label htmlFor={`transmission-${transmission}`} className="text-sm font-medium cursor-pointer">
-                        {transmission}
-                      </Label>
-                    </div>
-                  ))}
-              </div>
+              {/* Extract unique fuel types from cars data */}
+              {[
+                ...new Set(
+                  cars.map((car) => {
+                    // Handle both object and string fuel types
+                    return typeof car.specs?.fuelType === "object"
+                      ? car.specs.fuelType[language] || car.specs.fuelType.en
+                      : car.specs?.fuelType
+                  }),
+                ),
+              ]
+                .filter(Boolean) // Remove any undefined or null values
+                .map((fuelType) => (
+                  <div key={fuelType} className="flex items-center mb-2">
+                    <Checkbox
+                      id={`fuel-${fuelType}`}
+                      checked={Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)}
+                      onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
+                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-brand-primary checkbox-custom"
+                    />
+                    <Label htmlFor={`fuel-${fuelType}`} className="ml-2 text-sm font-medium text-gray-700">
+                      {fuelType}
+                    </Label>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
+        {/* Transmission Section */}
+        <div className="filter-section">
+          <div className="filter-section-header" onClick={(e) => toggleSection("transmission", e)}>
+            <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "ناقل الحركة" : "Transmission"}</h4>
+            <div className="h-6 w-6 flex items-center justify-center">
+              {expandedSections.transmission ? (
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
+              )}
             </div>
           </div>
 
-          {/* Seats Section */}
-          <div className={`filter-section ${expandedSections.seats ? "expanded" : ""}`}>
-            <div className="filter-section-header" onClick={(e) => toggleSection("seats", e)}>
-              <h4 className="font-semibold text-brand-primary text-lg">{language === "ar" ? "المقاعد" : "Seats"}</h4>
-              <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-primary/10">
-                <ChevronDown
-                  className={`h-5 w-5 text-brand-primary transition-transform duration-300 ${
-                    expandedSections.seats ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-            </div>
-
+          {expandedSections.transmission && (
             <div className="filter-section-content">
-              <div className="grid grid-cols-2 gap-3 mt-3">
-                {/* Extract unique seat options from cars data */}
-                {[
-                  ...new Set(
-                    cars.map((car) => {
-                      // Handle both object and string seats types
-                      return typeof car.specs.seats === "object"
-                        ? car.specs.seats[language] || car.specs.seats.en
-                        : car.specs.seats
-                    }),
-                  ),
-                ]
-                  .filter(Boolean) // Remove any undefined or null values
-                  .map((seatOption) => (
-                    <div
-                      key={seatOption}
-                      className={`checkbox-container ${filters.seats?.includes(seatOption) ? "selected" : ""}`}
-                    >
-                      <Checkbox
-                        id={`seats-${seatOption}`}
-                        checked={filters.seats?.includes(seatOption)}
-                        onCheckedChange={(checked) => handleSeatChange(seatOption, checked)}
-                        className="rounded-sm border-brand-primary text-brand-primary focus:ring-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white h-4 w-4"
-                      />
-                      <Label htmlFor={`seats-${seatOption}`} className="text-sm font-medium cursor-pointer">
-                        {seatOption}
-                      </Label>
-                    </div>
-                  ))}
-              </div>
+              {/* Extract unique transmission types from cars data */}
+              {[
+                ...new Set(
+                  cars.map((car) => {
+                    // Handle both object and string transmission types
+                    return typeof car.specs?.transmission === "object"
+                      ? car.specs.transmission[language] || car.specs.transmission.en
+                      : car.specs?.transmission
+                  }),
+                ),
+              ]
+                .filter(Boolean) // Remove any undefined or null values
+                .map((transmission) => (
+                  <div key={transmission} className="flex items-center mb-2">
+                    <Checkbox
+                      id={`transmission-${transmission}`}
+                      checked={Array.isArray(filters.transmission) && filters.transmission.includes(transmission)}
+                      onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
+                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-brand-primary checkbox-custom"
+                    />
+                    <Label htmlFor={`transmission-${transmission}`} className="ml-2 text-sm font-medium text-gray-700">
+                      {transmission}
+                    </Label>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
+        {/* Seats Section */}
+        <div className="filter-section">
+          <div className="filter-section-header" onClick={(e) => toggleSection("seats", e)}>
+            <h4 className="font-bold text-brand-primary text-base">
+              {language === "ar" ? "عدد المقاعد" : "Number of Seats"}
+            </h4>
+            <div className="h-6 w-6 flex items-center justify-center">
+              {expandedSections.seats ? (
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
+              )}
             </div>
           </div>
+
+          {expandedSections.seats && (
+            <div className="filter-section-content">
+              {/* Extract unique seat options from cars data */}
+              {[
+                ...new Set(
+                  cars.map((car) => {
+                    // Handle both object and string seats types
+                    return typeof car.specs?.seats === "object"
+                      ? car.specs.seats[language] || car.specs.seats.en
+                      : car.specs?.seats
+                  }),
+                ),
+              ]
+                .filter(Boolean) // Remove any undefined or null values
+                .map((seatOption) => (
+                  <div key={seatOption} className="flex items-center mb-2">
+                    <Checkbox
+                      id={`seats-${seatOption}`}
+                      checked={filters.seats?.includes(seatOption)}
+                      onCheckedChange={(checked) => handleSeatChange(seatOption, checked)}
+                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-brand-primary checkbox-custom"
+                    />
+                    <Label htmlFor={`seats-${seatOption}`} className="ml-2 text-sm font-medium text-gray-700">
+                      {language === "ar" ? `${seatOption} مقاعد` : `${seatOption} Seats`}
+                    </Label>
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Filter footer */}
-      {isMobile ? (
-        <div className="mobile-filter-footer">
-          <Button
-            onClick={() => {
-              // Reset all filters
-              const resetFilters = {
-                priceRange: [0, maxPrice],
-                selectedModels: [],
-                year: "",
-                fuelTypes: [],
-                transmission: [],
-                seats: [],
-              }
-              console.log("Resetting filters to:", resetFilters)
-              onFilterChange(resetFilters)
-            }}
-            className="premium-button secondary-button flex-1"
-          >
-            <X className="h-4 w-4" />
-            {language === "ar" ? "إعادة تعيين" : "Clear All"}
-          </Button>
-          <Button onClick={applyFilters} className="premium-button primary-button flex-1 py-3 text-lg">
-            <Check className="h-5 w-5" />
-            {language === "ar" ? "تطبيق" : "Apply"}
-          </Button>
-        </div>
-      ) : (
-        <div className="filter-footer">
-          <Button
-            onClick={() => {
-              // Reset all filters
-              const resetFilters = {
-                priceRange: [0, maxPrice],
-                selectedModels: [],
-                year: "",
-                fuelTypes: [],
-                transmission: [],
-                seats: [],
-              }
-              console.log("Resetting filters to:", resetFilters)
-              onFilterChange(resetFilters)
-            }}
-            className="premium-button secondary-button w-full"
-          >
-            <X className="h-4 w-4" />
-            {language === "ar" ? "إعادة تعيين الفلاتر" : "Clear All Filters"}
-          </Button>
-        </div>
-      )}
+      <div className="bg-white border-t border-gray-200 p-4 rounded-b-lg">
+        <Button
+          onClick={() => {
+            // Reset all filters
+            const resetFilters = {
+              priceRange: [40000, 250000],
+              selectedModels: [],
+              year: "",
+              fuelTypes: [],
+              transmission: [],
+              seats: [],
+            }
+            onFilterChange(resetFilters)
+          }}
+          className="w-full bg-white text-brand-primary border border-brand-primary hover:bg-brand-primary/10"
+        >
+          <X className="h-4 w-4 mr-2" />
+          {language === "ar" ? "إعادة تعيين" : "Reset"}
+        </Button>
+      </div>
     </div>
   )
 }
 
-// Update the desktop sidebar container to fix scrolling
+// Main AllCarMainpage Component
 const AllCarMainpage = () => {
   const pathname = usePathname()
   const currentLocale = pathname?.startsWith("/ar") ? "ar" : "en"
+  const isRTL = currentLocale === "ar"
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [filters, setFilters] = useState({
-    priceRange: [0, 250000],
-    selectedModels: [], // Changed from brands object to selectedModels array
+    priceRange: [40000, 250000],
+    selectedModels: [],
     year: "",
     fuelTypes: [],
     transmission: [],
@@ -1080,12 +981,6 @@ const AllCarMainpage = () => {
   const [carsPerPage] = useState(9)
   const [cars, setCars] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  // Calculate maxPrice early
-  const maxPrice = useMemo(() => {
-    return Math.max(...(cars.length ? cars.map((car) => car.cashPrice || 0) : [250000]), 250000)
-  }, [cars])
 
   // Use your existing mock data
   useEffect(() => {
@@ -1112,318 +1007,272 @@ const AllCarMainpage = () => {
     }
   }, [isSidebarOpen])
 
-  const handleFilterChange = useCallback((updatedFilters) => {
-    console.log("Updating filters:", updatedFilters)
+  // Handle filter changes
+  const handleFilterChange = useCallback((newFilters) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
-      ...updatedFilters,
+      ...newFilters,
     }))
-    setCurrentPage(1)
+    setCurrentPage(1) // Reset to first page when filters change
   }, [])
 
-  // Fixed: Improved clearAllFilters function to properly reset all filters
-  const clearAllFilters = useCallback(() => {
-    // Define the cleared filters with the same structure as the initial state
-    const clearedFilters = {
-      priceRange: [0, maxPrice],
-      selectedModels: [],
-      year: "",
-      fuelTypes: [],
-      transmission: [],
-      seats: [],
-    }
-
-    console.log("Clearing all filters:", clearedFilters)
-
-    // Update the filters state
-    setFilters(clearedFilters)
-
-    // Reset to the first page
-    setCurrentPage(1)
-  }, [maxPrice])
-
-  // Calculate active filters count
-  const getActiveFiltersCount = () => {
-    let count = 0
-    if (filters.selectedModels?.length > 0) count++
-    if (filters.year) count++
-    if (filters.fuelTypes?.length > 0) count++
-    if (filters.transmission?.length > 0) count++
-    if (filters.seats?.length > 0) count++
-    // Check if price range is different from default
-    if (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice) count++
-    return count
+  // Handle sort change
+  const handleSortChange = (e) => {
+    setSortOption(e.target.value)
+    setCurrentPage(1) // Reset to first page when sort changes
   }
 
-  const activeFiltersCount = getActiveFiltersCount()
-
-  const handleSortChange = (option) => {
-    setSortOption(option)
-  }
-
-  // Fixed: Improved filteredCars function to properly handle price range filtering
+  // Apply filters and sort to cars
   const filteredCars = useMemo(() => {
-    return cars.filter((car) => {
-      try {
-        // Price range filter - make sure we have valid numbers
-        const minPrice = Number(filters.priceRange[0]) || 0
-        const maxPrice = Number(filters.priceRange[1]) || Number.MAX_SAFE_INTEGER
-        const carPrice = Number(car.cashPrice) || 0
+    if (!cars.length) return []
 
-        if (carPrice < minPrice || carPrice > maxPrice) return false
-
-        // Year filter
-        if (filters.year && car.specs.year.toString() !== filters.year.toString()) return false
-
-        // Model filter - if any models are selected, only show those models
-        if (filters.selectedModels && filters.selectedModels.length > 0) {
-          if (!filters.selectedModels.includes(car.id)) {
-            return false
-          }
+    return cars
+      .filter((car) => {
+        // Filter by price range
+        if (car.cashPrice < filters.priceRange[0] || car.cashPrice > filters.priceRange[1]) {
+          return false
         }
 
-        // Fuel Type filter
-        if (filters.fuelTypes && filters.fuelTypes.length > 0) {
+        // Filter by selected models
+        if (filters.selectedModels?.length > 0 && !filters.selectedModels.includes(car.id)) {
+          return false
+        }
+
+        // Filter by year
+        if (filters.year && (!car.specs?.year || car.specs.year.toString() !== filters.year)) {
+          return false
+        }
+
+        // Filter by fuel type
+        if (filters.fuelTypes?.length > 0) {
           const carFuelType =
-            typeof car.specs.fuelType === "object"
+            typeof car.specs?.fuelType === "object"
               ? car.specs.fuelType[currentLocale] || car.specs.fuelType.en
-              : car.specs.fuelType
-
-          if (!filters.fuelTypes.includes(carFuelType)) {
+              : car.specs?.fuelType
+          if (!carFuelType || !filters.fuelTypes.includes(carFuelType)) {
             return false
           }
         }
 
-        // Transmission filter
-        if (filters.transmission && filters.transmission.length > 0) {
+        // Filter by transmission
+        if (filters.transmission?.length > 0) {
           const carTransmission =
-            typeof car.specs.transmission === "object"
+            typeof car.specs?.transmission === "object"
               ? car.specs.transmission[currentLocale] || car.specs.transmission.en
-              : car.specs.transmission
-
-          if (!filters.transmission.includes(carTransmission)) {
+              : car.specs?.transmission
+          if (!carTransmission || !filters.transmission.includes(carTransmission)) {
             return false
           }
         }
 
-        // Seats filter
-        if (filters.seats && filters.seats.length > 0) {
+        // Filter by seats
+        if (filters.seats?.length > 0) {
           const carSeats =
-            typeof car.specs.seats === "object" ? car.specs.seats[currentLocale] || car.specs.seats.en : car.specs.seats
-
-          if (!filters.seats.includes(carSeats)) {
+            typeof car.specs?.seats === "object"
+              ? car.specs.seats[currentLocale] || car.specs.seats.en
+              : car.specs?.seats
+          if (!carSeats || !filters.seats.includes(carSeats)) {
             return false
           }
         }
 
         return true
-      } catch (error) {
-        console.error("Error filtering car:", error, car)
-        return false
-      }
+      })
+      .sort((a, b) => {
+        switch (sortOption) {
+          case "price-asc":
+            return a.cashPrice - b.cashPrice
+          case "price-desc":
+            return b.cashPrice - a.cashPrice
+          case "newest":
+            return Number.parseInt(b.specs?.year || 0) - Number.parseInt(a.specs?.year || 0)
+          default:
+            return 0
+        }
+      })
+  }, [cars, filters, sortOption, currentLocale])
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredCars.length / carsPerPage)
+  const currentCars = filteredCars.slice((currentPage - 1) * carsPerPage, currentPage * carsPerPage)
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber)
+    // Scroll to top of results
+    window.scrollTo({
+      top: document.getElementById("results-top")?.offsetTop || 0,
+      behavior: "smooth",
     })
-  }, [cars, filters, currentLocale])
-
-  // Sort cars based on selected option
-  const sortedCars = useMemo(() => {
-    const sorted = [...filteredCars]
-
-    switch (sortOption) {
-      case "price-low":
-        return sorted.sort((a, b) => a.cashPrice - b.cashPrice)
-      case "price-high":
-        return sorted.sort((a, b) => b.cashPrice - a.cashPrice)
-      case "newest":
-        return sorted.sort((a, b) => b.specs.year - a.specs.year)
-      default:
-        return sorted
-    }
-  }, [filteredCars, sortOption])
-
-  // Pagination
-  const indexOfLastCar = currentPage * carsPerPage
-  const indexOfFirstCar = indexOfLastCar - carsPerPage
-  const currentCars = sortedCars.slice(indexOfFirstCar, indexOfLastCar)
-  const totalPages = Math.ceil(sortedCars.length / carsPerPage)
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
-
-  // Process cars to handle localized text objects
-  const processedCars = currentCars.map((car) => {
-    return {
-      ...car,
-      name: typeof car.name === "object" ? car.name[currentLocale] || car.name.en || "" : car.name,
-      modelYear:
-        typeof car.modelYear === "object" ? car.modelYear[currentLocale] || car.modelYear.en || "" : car.modelYear,
-      specs: {
-        ...car.specs,
-        fuelType:
-          typeof car.specs?.fuelType === "object"
-            ? car.specs.fuelType[currentLocale] || car.specs.fuelType.en || ""
-            : car.specs?.fuelType,
-        seats:
-          typeof car.specs?.seats === "object"
-            ? car.specs.seats[currentLocale] || car.specs.seats.en || ""
-            : car.specs?.seats,
-        transmission:
-          typeof car.specs?.transmission === "object"
-            ? car.specs.transmission[currentLocale] || car.specs.transmission.en || ""
-            : car.specs?.transmission,
-        engine:
-          typeof car.specs?.engine === "object"
-            ? car.specs.engine[currentLocale] || car.specs.engine.en || ""
-            : car.specs?.engine,
-        power:
-          typeof car.specs?.power === "object"
-            ? car.specs.power[currentLocale] || car.specs.power.en || ""
-            : car.specs?.power,
-      },
-    }
-  })
-
-  if (loading) {
-    return <CarSkeletonUI />
-  }
-
-  if (error) {
-    return <div className="text-center mt-8 text-red-500">{error}</div>
-  }
-
-  if (cars.length === 0) {
-    return <div className="text-center mt-8">No cars found.</div>
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <style>{scrollbarStyles}</style>
-      <div className="container m-auto px-2 sm:px-3 md:px-4 lg:px-[5rem] xl:px-[7rem] py-4">
-        <div className="relative flex flex-col md:flex-row gap-8">
-          {/* Desktop sidebar - Fixed the height and overflow issues */}
-          <div className="md:w-80 hidden md:block">
-            <div className="sticky top-20 h-[calc(100vh-8rem)] overflow-hidden">
+    <>
+      <style jsx global>
+        {scrollbarStyles}
+      </style>
+      <div className="container mx-auto px-[7rem] py-8" dir={isRTL ? "rtl" : "ltr"}>
+        {/* Mobile Filter Button - Only shown on mobile */}
+        <div className="lg:hidden mb-4">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="w-full bg-brand-primary text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+            aria-label={currentLocale === "ar" ? "فلترة السيارات" : "Filter Cars"}
+          >
+            <Filter className="h-5 w-5" />
+            <span>{currentLocale === "ar" ? "فلترة النتائج" : "Filter Results"}</span>
+          </button>
+        </div>
+
+        {/* Mobile Filter Sidebar - Only shown when active on mobile */}
+        {isSidebarOpen && (
+          <>
+            <div className="filter-overlay" onClick={() => setIsSidebarOpen(false)} />
+            <div className="filter-sidebar-mobile">
               <CarFilterSidebar
                 onFilterChange={handleFilterChange}
                 filters={filters}
                 language={currentLocale}
                 cars={cars}
+                isMobile={true}
+                onClose={() => setIsSidebarOpen(false)}
               />
             </div>
+          </>
+        )}
+
+        {/* Main content grid */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Desktop Sidebar - Only shown on desktop */}
+          <div className="hidden lg:block lg:w-[280px] sticky top-4 self-start">
+            <CarFilterSidebar
+              onFilterChange={handleFilterChange}
+              filters={filters}
+              language={currentLocale}
+              cars={cars}
+              isMobile={false}
+            />
           </div>
 
-          {/* Mobile filter overlay */}
-          {isSidebarOpen && (
-            <>
-              <div className="filter-overlay md:hidden" onClick={() => setIsSidebarOpen(false)}></div>
-              <div className="filter-sidebar-mobile md:hidden">
-                <CarFilterSidebar
-                  onFilterChange={handleFilterChange}
-                  filters={filters}
-                  language={currentLocale}
-                  cars={cars}
-                  isMobile={true}
-                  onClose={() => setIsSidebarOpen(false)}
-                />
-              </div>
-            </>
-          )}
-
+          {/* Main content */}
           <div className="flex-1">
-            {/* Promo Slider */}
-            <PromoSlider />
-
-            {/* Mobile Filter Button - Now positioned below the promo slider */}
-            <div className="md:hidden px-2 mt-4">
-              <button className="filter-button" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-                <SlidersHorizontal className="h-5 w-5" />
-                <span>
-                  {currentLocale === "ar" ? "الفلاتر" : "Filters"}
-                  {activeFiltersCount > 0 && (
-                    <span className="ml-2 bg-white text-brand-primary rounded-full px-2.5 py-0.5 text-xs font-bold">
-                      {activeFiltersCount}
-                    </span>
-                  )}
-                </span>
-              </button>
+            {/* PromoSlider - Added as requested */}
+            <div className="mb-6">
+              <PromoSlider />
             </div>
 
-            {/* Car Grid */}
-            <div className="mb-8 mt-6">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                <h2 className="text-xl font-bold text-brand-primary">
-                  {currentLocale === "ar" ? "السيارات المتاحة" : "Available Cars"}
-                  <span className="ml-2 text-sm font-normal text-gray-500">({filteredCars.length})</span>
+            {/* Available Cars Header */}
+            <div className="bg-white rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center mb-6 shadow-sm">
+              <div>
+                <h2 className="text-xl font-bold text-brand-primary mb-2 md:mb-0 flex items-center gap-2">
+                  <span>{isRTL ? "السيارات المتاحة" : "Available Cars"}</span>
+                  <span className="bg-brand-primary text-white px-2 py-1 rounded-full text-sm">{filteredCars.length}</span>
                 </h2>
-
-                <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-600">{currentLocale === "ar" ? "ترتيب حسب:" : "Sort by:"}</label>
-                  <select
-                    value={sortOption}
-                    onChange={(e) => handleSortChange(e.target.value)}
-                    className="premium-input pl-3 pr-10 py-2.5"
-                  >
-                    <option value="relevance">{currentLocale === "ar" ? "الصلة" : "Relevance"}</option>
-                    <option value="price-low">
-                      {currentLocale === "ar" ? "السعر: من الأقل إلى الأعلى" : "Price: Low to High"}
-                    </option>
-                    <option value="price-high">
-                      {currentLocale === "ar" ? "السعر: من الأعلى إلى الأقل" : "Price: High to Low"}
-                    </option>
-                    <option value="newest">{currentLocale === "ar" ? "الأحدث" : "Newest"}</option>
-                  </select>
-                </div>
               </div>
 
-              {/* Car Cards */}
-              <CarGrid cars={processedCars} loading={loading} locale={currentLocale} />
+              <div className="flex items-center gap-2 mt-4 md:mt-0">
+                <span className="text-sm font-medium text-gray-600">{isRTL ? "الترتيب:" : "Sort:"}</span>
+                <select
+                  className="border border-gray-300 rounded-md py-1 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                  value={sortOption}
+                  onChange={handleSortChange}
+                  aria-label={isRTL ? "رتب حسب" : "Sort by"}
+                >
+                  <option value="relevance">{isRTL ? "الصلة" : "Relevance"}</option>
+                  <option value="price-asc">{isRTL ? "السعر: من الأقل للأعلى" : "Price: Low to High"}</option>
+                  <option value="price-desc">{isRTL ? "السعر: من الأعلى للأقل" : "Price: High to Low"}</option>
+                  <option value="newest">{isRTL ? "الأحدث" : "Newest First"}</option>
+                </select>
+              </div>
+            </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-center mt-8">
-                  <div className="flex gap-2">
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <button
-                        key={i + 1}
-                        onClick={() => paginate(i + 1)}
-                        className={`px-4 py-2 rounded-lg transition-all duration-300 hover-lift ${
-                          currentPage === i + 1
-                            ? "bg-brand-primary text-white shadow-md"
-                            : "bg-white text-brand-primary border border-brand-primary/30 hover:bg-brand-light/50"
-                        }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
+            {/* Results Section */}
+            <div id="results-top" className="animate-fadeIn">
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <p className="text-brand-primary font-medium">{isRTL ? "جارٍ التحميل..." : "Loading..."}</p>
                 </div>
-              )}
-
-              {/* No Results */}
-              {filteredCars.length === 0 && (
-                <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-100 transition-all duration-500 animate-fadeIn">
-                  <h3 className="text-xl font-medium text-gray-700 mb-2">
-                    {currentLocale === "ar" ? "لا توجد سيارات متطابقة" : "No matching cars found"}
-                  </h3>
-                  <p className="text-gray-500 mb-6">
-                    {currentLocale === "ar"
-                      ? "حاول تعديل معايير البحث الخاصة بك"
-                      : "Try adjusting your search criteria"}
+              ) : currentCars.length === 0 ? (
+                <div className="bg-white rounded-lg p-8 text-center shadow-md border border-gray-100">
+                  <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <X className="h-8 w-8 text-red-500" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">{isRTL ? "لم يتم العثور على سيارات" : "No Cars Found"}</h3>
+                  <p className="text-gray-600 mb-6">
+                    {isRTL
+                      ? "لم نتمكن من العثور على أي سيارات تطابق معايير البحث الخاصة بك. يرجى تعديل الفلاتر والمحاولة مرة أخرى."
+                      : "We couldn't find any cars matching your search criteria. Please adjust your filters and try again."}
                   </p>
                   <Button
                     onClick={() => {
-                      console.log("Reset button clicked")
-                      clearAllFilters()
+                      // Reset all filters
+                      const resetFilters = {
+                        priceRange: [40000, 250000],
+                        selectedModels: [],
+                        year: "",
+                        fuelTypes: [],
+                        transmission: [],
+                        seats: [],
+                      }
+                      setFilters(resetFilters)
                     }}
-                    className="premium-button primary-button px-6 py-2.5 inline-flex"
+                    className="bg-brand-primary text-white hover:bg-brand-primary/90"
                   >
-                    {currentLocale === "ar" ? "إعادة تعيين الفلاتر" : "Reset Filters"}
+                    {isRTL ? "إعادة تعيين الفلاتر" : "Reset Filters"}
                   </Button>
                 </div>
+              ) : (
+                <>
+                  <CarGrid cars={currentCars} loading={false} locale={currentLocale} />
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-center mt-8">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          className="w-10 h-10 rounded-full flex items-center justify-center border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
+                          aria-label={isRTL ? "الصفحة السابقة" : "Previous Page"}
+                        >
+                          <ChevronDown className={`h-5 w-5 ${isRTL ? "rotate-90" : "-rotate-90"}`} />
+                        </Button>
+
+                        {Array.from({ length: totalPages }, (_, i) => (
+                          <Button
+                            key={i + 1}
+                            onClick={() => handlePageChange(i + 1)}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center p-0 ${
+                              currentPage === i + 1
+                                ? "bg-brand-primary text-white"
+                                : "border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10"
+                            }`}
+                            aria-label={`${isRTL ? "الصفحة" : "Page"} ${i + 1}`}
+                            aria-current={currentPage === i + 1 ? "page" : undefined}
+                          >
+                            {i + 1}
+                          </Button>
+                        ))}
+
+                        <Button
+                          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                          disabled={currentPage === totalPages}
+                          className="w-10 h-10 rounded-full flex items-center justify-center border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
+                          aria-label={isRTL ? "الصفحة التالية" : "Next Page"}
+                        >
+                          <ChevronDown className={`h-5 w-5 ${isRTL ? "-rotate-90" : "rotate-90"}`} />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
