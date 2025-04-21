@@ -163,7 +163,7 @@ function BrandShowcase() {
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.8 }}
               key={index}
-              className="px-2"
+              className="px-2 "
             >
               <BrandCard brand={brand} />
             </motion.div>
