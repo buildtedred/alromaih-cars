@@ -10,7 +10,7 @@ import { useOdoo } from "@/contexts/OdooContext"
 import { motion, useMotionValueEvent, AnimatePresence } from "framer-motion"
 import { useScroll } from "motion/react"
 import WishlistCounter from "@/app/[locale]/wishlist/wishlist-counter"
-import  logo9 from "../../../../public/images/Alromaih new logo-09.png"
+import  logo9 from "../../../../public/images/logo 2.png"
 import Image from "next/image"
 
 
