@@ -175,7 +175,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
 
           <div className="grid grid-cols-2 gap-0">
             <div className="px-3">
-              <p className="text-xs text-brand-primary mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</p>
+              <p className="text-xs flex justify-start text-brand-primary mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</p>
               <div className="font-bold text-brand-primary flex items-center">
                 <span className="mr-1 flex-shrink-0">
                   <Image src={car.icons?.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />

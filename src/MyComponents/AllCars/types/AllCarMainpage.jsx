@@ -313,7 +313,7 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
               zIndex: isOverlapping ? 2 : 1,
             }}
           >
-            <img src="/icons/RangCar.svg" alt="Min price car" width={60} height={40} className="text-[#46194F]" />
+            <img src="/icons/RangCar.svg" alt="Min price car" width={60} height={40} className="text-brand-primary" />
           </div>
 
           {/* Second car (right/max) */}
@@ -329,7 +329,7 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
               zIndex: isOverlapping ? 1 : 2,
             }}
           >
-            <img src="/icons/RangCar2.svg" alt="Max price car" width={60} height={40} className="text-[#46194F]" />
+            <img src="/icons/RangCar2.svg" alt="Max price car" width={60} height={40} className="text-brand-primary" />
           </div>
 
           {/* Slider track and thumbs */}
@@ -344,14 +344,14 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
               aria-label="Price Range"
             >
               <SliderPrimitive.Track className="relative h-[2px] grow rounded-full bg-gray-300">
-                <SliderPrimitive.Range className="absolute h-[2px] rounded-full bg-[#46194F] transition-all duration-300" />
+                <SliderPrimitive.Range className="absolute h-[2px] rounded-full bg-brand-primary transition-all duration-300" />
               </SliderPrimitive.Track>
               <SliderPrimitive.Thumb
-                className="block w-[15px] h-[15px] bg-[#46194F] rounded-full focus:outline-none focus:ring-2 focus:ring-[#46194F] focus:ring-offset-2 transition-all duration-300"
+                className="block w-[15px] h-[15px] bg-brand-primary rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-all duration-300"
                 aria-label="Minimum price"
               />
               <SliderPrimitive.Thumb
-                className="block w-[15px] h-[15px] bg-[#46194F] rounded-full focus:outline-none focus:ring-2 focus:ring-[#46194F] focus:ring-offset-2 transition-all duration-300"
+                className="block w-[15px] h-[15px] bg-brand-primary rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-all duration-300"
                 aria-label="Maximum price"
               />
             </SliderPrimitive.Root>
@@ -368,11 +368,11 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
             className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-md bg-white"
             aria-label="Decrease minimum price"
           >
-            <Minus size={8} className="text-[#46194F]" />
+            <Minus size={8} className="text-brand-primary" />
           </button>
           <div className="mx-1 px-1 py-0.5 bg-white border border-gray-300 rounded-md text-center">
             <div className="flex items-center justify-center">
-              <span className="text-[#46194F] font-bold text-[10px]">₹{formatPrice(safeValue[0])}</span>
+              <span className="text-brand-primary font-bold text-[10px]">₹{formatPrice(safeValue[0])}</span>
             </div>
           </div>
           <button
@@ -380,7 +380,7 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
             className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-md bg-white"
             aria-label="Increase minimum price"
           >
-            <Plus size={8} className="text-[#46194F]" />
+            <Plus size={8} className="text-brand-primary" />
           </button>
         </div>
 
@@ -391,11 +391,11 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
             className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-md bg-white"
             aria-label="Decrease maximum price"
           >
-            <Minus size={8} className="text-[#46194F]" />
+            <Minus size={8} className="text-brand-primary" />
           </button>
           <div className="mx-1 px-1 py-0.5 bg-white border border-gray-300 rounded-md text-center">
             <div className="flex items-center justify-center">
-              <span className="text-[#46194F] font-bold text-[10px]">₹{formatPrice(safeValue[1])}</span>
+              <span className="text-brand-primary font-bold text-[10px]">₹{formatPrice(safeValue[1])}</span>
             </div>
           </div>
           <button
@@ -403,7 +403,7 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
             className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-md bg-white"
             aria-label="Increase maximum price"
           >
-            <Plus size={8} className="text-[#46194F]" />
+            <Plus size={8} className="text-brand-primary" />
           </button>
         </div>
       </div>
@@ -627,7 +627,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
       dir={language === "ar" ? "rtl" : "ltr"}
     >
       {/* Filter header */}
-      <div className="bg-[#46194F] text-white p-4 flex justify-between items-center">
+      <div className="bg-brand-primary text-white p-4 flex justify-between items-center">
         <h3 className="text-xl font-bold text-center w-full">
           {language === "ar" ? "فلترة النتائج" : "Filter Results"}
         </h3>
@@ -646,12 +646,12 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         {/* Price Range Section */}
         <div className="filter-section">
           <div className="filter-section-header" onClick={(e) => toggleSection("priceRange", e)}>
-            <h4 className="font-bold text-[#46194F] text-base">{language === "ar" ? "مدى السعر" : "Price Range"}</h4>
+            <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "مدى السعر" : "Price Range"}</h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.priceRange ? (
-                <ChevronUp className="h-5 w-5 text-[#46194F]" />
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-[#46194F]" />
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
               )}
             </div>
           </div>
@@ -673,14 +673,14 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         {/* Brands + Models Section */}
         <div className="filter-section">
           <div className="filter-section-header" onClick={(e) => toggleSection("brandsAndModels", e)}>
-            <h4 className="font-bold text-[#46194F] text-base">
+            <h4 className="font-bold text-brand-primary text-base">
               {language === "ar" ? "اختر العلامة التجارية والطراز المناسب لك" : "Choose Brand & Model"}
             </h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.brandsAndModels ? (
-                <ChevronUp className="h-5 w-5 text-[#46194F]" />
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-[#46194F]" />
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
               )}
             </div>
           </div>
@@ -696,7 +696,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                     placeholder={language === "ar" ? "ابحث..." : "Search..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md py-1 px-7 text-xs focus:outline-none focus:ring-1 focus:ring-[#46194F]"
+                    className="w-full border border-gray-300 rounded-md py-1 px-7 text-xs focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   />
                 </div>
               </div>
@@ -710,7 +710,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                         id={`brand-${brand}`}
                         checked={areAllModelsSelected(brand)}
                         onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
-                        className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-[#46194F] checkbox-custom"
+                        className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-brand-primary checkbox-custom"
                       />
                       <Label
                         htmlFor={`brand-${brand}`}
@@ -726,7 +726,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                       <div className="text-xs text-gray-500 mr-2">({modelsByBrand[brand]?.length || 0})</div>
                       <button
                         onClick={(e) => toggleBrand(brand, e)}
-                        className="h-6 w-6 flex items-center justify-center text-[#46194F]"
+                        className="h-6 w-6 flex items-center justify-center text-brand-primary"
                       >
                         {expandedBrands.includes(brand) ? (
                           <ChevronUp className="h-4 w-4" />
@@ -738,14 +738,14 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
 
                     {/* Models list - shown when brand is expanded */}
                     {expandedBrands.includes(brand) && (
-                      <div className="ml-6 mt-2 space-y-1 border-l-2 border-[#46194F]/20 pl-3">
+                      <div className="ml-6 mt-2 space-y-1 border-l-2 border-brand-primary/20 pl-3">
                         {modelsByBrand[brand]?.map((model) => (
                           <div key={model.id} className="flex items-center gap-2">
                             <Checkbox
                               id={`model-${model.id}`}
                               checked={filters.selectedModels?.includes(model.id)}
                               onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
-                              className="h-3.5 w-3.5 rounded-[5px] border-gray-300 text-[#46194F] focus:ring-[#46194F] checkbox-custom"
+                              className="h-3.5 w-3.5 rounded-[5px] border-gray-300 text-brand-primary focus:ring-brand-primary checkbox-custom"
                             />
                             <Label
                               htmlFor={`model-${model.id}`}
@@ -767,12 +767,12 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         {/* Year Section */}
         <div className="filter-section">
           <div className="filter-section-header" onClick={(e) => toggleSection("year", e)}>
-            <h4 className="font-bold text-[#46194F] text-base">{language === "ar" ? "السنة" : "Year"}</h4>
+            <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "السنة" : "Year"}</h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.year ? (
-                <ChevronUp className="h-5 w-5 text-[#46194F]" />
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-[#46194F]" />
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
               )}
             </div>
           </div>
@@ -788,10 +788,10 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                     <div className="flex items-center cursor-pointer" onClick={() => handleYearChange(year)}>
                       <div
                         className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
-                          filters.year === year.toString() ? "border-[#46194F]" : "border-gray-300"
+                          filters.year === year.toString() ? "border-brand-primary" : "border-gray-300"
                         }`}
                       >
-                        {filters.year === year.toString() && <div className="h-2 w-2 rounded-full bg-[#46194F]"></div>}
+                        {filters.year === year.toString() && <div className="h-2 w-2 rounded-full bg-brand-primary"></div>}
                       </div>
                       <label className="ml-2 text-sm font-medium text-gray-700 cursor-pointer">{year}</label>
                     </div>
@@ -804,12 +804,12 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         {/* Fuel Type Section */}
         <div className="filter-section">
           <div className="filter-section-header" onClick={(e) => toggleSection("fuelType", e)}>
-            <h4 className="font-bold text-[#46194F] text-base">{language === "ar" ? "نوع الوقود" : "Fuel Type"}</h4>
+            <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "نوع الوقود" : "Fuel Type"}</h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.fuelType ? (
-                <ChevronUp className="h-5 w-5 text-[#46194F]" />
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-[#46194F]" />
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
               )}
             </div>
           </div>
@@ -834,7 +834,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                       id={`fuel-${fuelType}`}
                       checked={Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)}
                       onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
-                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-[#46194F] checkbox-custom"
+                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-brand-primary checkbox-custom"
                     />
                     <Label htmlFor={`fuel-${fuelType}`} className="ml-2 text-sm font-medium text-gray-700">
                       {fuelType}
@@ -848,12 +848,12 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         {/* Transmission Section */}
         <div className="filter-section">
           <div className="filter-section-header" onClick={(e) => toggleSection("transmission", e)}>
-            <h4 className="font-bold text-[#46194F] text-base">{language === "ar" ? "ناقل الحركة" : "Transmission"}</h4>
+            <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "ناقل الحركة" : "Transmission"}</h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.transmission ? (
-                <ChevronUp className="h-5 w-5 text-[#46194F]" />
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-[#46194F]" />
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
               )}
             </div>
           </div>
@@ -878,7 +878,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                       id={`transmission-${transmission}`}
                       checked={Array.isArray(filters.transmission) && filters.transmission.includes(transmission)}
                       onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
-                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-[#46194F] checkbox-custom"
+                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-brand-primary checkbox-custom"
                     />
                     <Label htmlFor={`transmission-${transmission}`} className="ml-2 text-sm font-medium text-gray-700">
                       {transmission}
@@ -892,14 +892,14 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         {/* Seats Section */}
         <div className="filter-section">
           <div className="filter-section-header" onClick={(e) => toggleSection("seats", e)}>
-            <h4 className="font-bold text-[#46194F] text-base">
+            <h4 className="font-bold text-brand-primary text-base">
               {language === "ar" ? "عدد المقاعد" : "Number of Seats"}
             </h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.seats ? (
-                <ChevronUp className="h-5 w-5 text-[#46194F]" />
+                <ChevronUp className="h-5 w-5 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-[#46194F]" />
+                <ChevronDown className="h-5 w-5 text-brand-primary" />
               )}
             </div>
           </div>
@@ -924,7 +924,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                       id={`seats-${seatOption}`}
                       checked={filters.seats?.includes(seatOption)}
                       onCheckedChange={(checked) => handleSeatChange(seatOption, checked)}
-                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-[#46194F] checkbox-custom"
+                      className="h-4 w-4 rounded-[5px] border-gray-300 focus:ring-brand-primary checkbox-custom"
                     />
                     <Label htmlFor={`seats-${seatOption}`} className="ml-2 text-sm font-medium text-gray-700">
                       {language === "ar" ? `${seatOption} مقاعد` : `${seatOption} Seats`}
@@ -951,7 +951,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
             }
             onFilterChange(resetFilters)
           }}
-          className="w-full bg-white text-[#46194F] border border-[#46194F] hover:bg-[#46194F]/10"
+          className="w-full bg-white text-brand-primary border border-brand-primary hover:bg-brand-primary/10"
         >
           <X className="h-4 w-4 mr-2" />
           {language === "ar" ? "إعادة تعيين" : "Reset"}
@@ -1116,7 +1116,7 @@ const AllCarMainpage = () => {
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="w-full bg-[#46194F] text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+            className="w-full bg-brand-primary text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2"
             aria-label={currentLocale === "ar" ? "فلترة السيارات" : "Filter Cars"}
           >
             <Filter className="h-5 w-5" />
@@ -1164,16 +1164,16 @@ const AllCarMainpage = () => {
             {/* Available Cars Header */}
             <div className="bg-white rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center mb-6 shadow-sm">
               <div>
-                <h2 className="text-xl font-bold text-[#46194F] mb-2 md:mb-0 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-brand-primary mb-2 md:mb-0 flex items-center gap-2">
                   <span>{isRTL ? "السيارات المتاحة" : "Available Cars"}</span>
-                  <span className="bg-[#46194F] text-white px-2 py-1 rounded-full text-sm">{filteredCars.length}</span>
+                  <span className="bg-brand-primary text-white px-2 py-1 rounded-full text-sm">{filteredCars.length}</span>
                 </h2>
               </div>
 
               <div className="flex items-center gap-2 mt-4 md:mt-0">
                 <span className="text-sm font-medium text-gray-600">{isRTL ? "الترتيب:" : "Sort:"}</span>
                 <select
-                  className="border border-gray-300 rounded-md py-1 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#46194F]"
+                  className="border border-gray-300 rounded-md py-1 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   value={sortOption}
                   onChange={handleSortChange}
                   aria-label={isRTL ? "رتب حسب" : "Sort by"}
@@ -1190,8 +1190,8 @@ const AllCarMainpage = () => {
             <div id="results-top" className="animate-fadeIn">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <div className="w-12 h-12 border-4 border-[#46194F] border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-[#46194F] font-medium">{isRTL ? "جارٍ التحميل..." : "Loading..."}</p>
+                  <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <p className="text-brand-primary font-medium">{isRTL ? "جارٍ التحميل..." : "Loading..."}</p>
                 </div>
               ) : currentCars.length === 0 ? (
                 <div className="bg-white rounded-lg p-8 text-center shadow-md border border-gray-100">
@@ -1217,7 +1217,7 @@ const AllCarMainpage = () => {
                       }
                       setFilters(resetFilters)
                     }}
-                    className="bg-[#46194F] text-white hover:bg-[#46194F]/90"
+                    className="bg-brand-primary text-white hover:bg-brand-primary/90"
                   >
                     {isRTL ? "إعادة تعيين الفلاتر" : "Reset Filters"}
                   </Button>
@@ -1233,7 +1233,7 @@ const AllCarMainpage = () => {
                         <Button
                           onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                           disabled={currentPage === 1}
-                          className="w-10 h-10 rounded-full flex items-center justify-center border border-[#46194F] bg-white text-[#46194F] hover:bg-[#46194F]/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
+                          className="w-10 h-10 rounded-full flex items-center justify-center border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
                           aria-label={isRTL ? "الصفحة السابقة" : "Previous Page"}
                         >
                           <ChevronDown className={`h-5 w-5 ${isRTL ? "rotate-90" : "-rotate-90"}`} />
@@ -1245,8 +1245,8 @@ const AllCarMainpage = () => {
                             onClick={() => handlePageChange(i + 1)}
                             className={`w-10 h-10 rounded-full flex items-center justify-center p-0 ${
                               currentPage === i + 1
-                                ? "bg-[#46194F] text-white"
-                                : "border border-[#46194F] bg-white text-[#46194F] hover:bg-[#46194F]/10"
+                                ? "bg-brand-primary text-white"
+                                : "border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10"
                             }`}
                             aria-label={`${isRTL ? "الصفحة" : "Page"} ${i + 1}`}
                             aria-current={currentPage === i + 1 ? "page" : undefined}
@@ -1258,7 +1258,7 @@ const AllCarMainpage = () => {
                         <Button
                           onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                           disabled={currentPage === totalPages}
-                          className="w-10 h-10 rounded-full flex items-center justify-center border border-[#46194F] bg-white text-[#46194F] hover:bg-[#46194F]/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
+                          className="w-10 h-10 rounded-full flex items-center justify-center border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
                           aria-label={isRTL ? "الصفحة التالية" : "Next Page"}
                         >
                           <ChevronDown className={`h-5 w-5 ${isRTL ? "-rotate-90" : "rotate-90"}`} />
