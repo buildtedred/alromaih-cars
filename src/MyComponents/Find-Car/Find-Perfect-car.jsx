@@ -213,18 +213,18 @@ export default function CarFinderModal() {
       </div>
 
       {/* Right side - Process Diagram */}
-      <div className=" flex items-center justify-center w-full h-full p-2">
+      <div className=" flex items-center justify-center w-full min-h-[200px] p-2">
         {isArabic ? (
           <img
             src="/icons/findCar-Arbic.svg"
             alt="Line from Discover to Compare"
-            className="max-w-full h-auto object-contain"
+            className="max-w-[50%] h-auto object-contain"
           />
         ) : (
           <img
             src="/icons/findCar-English.svg"
             alt="Line from Discover to Compare"
-            className="max-w-full h-auto object-contain"
+            className="max-w-[50%] h-auto object-contain"
           />
         )}
       </div>

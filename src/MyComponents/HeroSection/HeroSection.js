@@ -72,7 +72,7 @@ export const HeroSection = () => {
   }
 
   return (
-    <div className="relative py-6 px-4 ">
+    <div className="relative container mx-auto">
       <div className="relative aspect-[25/9] w-full overflow-hidden rounded-[10px] md:rounded-[20px]">
         <AnimatePresence mode="wait">
           <motion.div

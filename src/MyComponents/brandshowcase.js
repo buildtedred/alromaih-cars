@@ -154,8 +154,8 @@ function BrandShowcase() {
   }, [])
 
   return (
-    <div className="bg-gray-100 w-full py-10">
-      <div className="max-w-7xl mx-auto ">
+    <div className="container mx-auto  bg-gray-100 w-full py-10">
+      <div className=" ">
         <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-8 text-right">موزع معتمد</h2>
         <Slider {...settings} className="slider-container">
           {carsData.map((brand, index) => (

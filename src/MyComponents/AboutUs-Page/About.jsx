@@ -8,7 +8,7 @@ export default function Home() {
   const locale = params?.locale || "ar" // Default to Arabic if locale not found
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="container mx-auto min-h-screen bg-gray-100">
       {/* Hero Image */}
       <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px]">
         <Image
@@ -21,7 +21,7 @@ export default function Home() {
       </div>
 
       {/* Content Section - Now positioned below the image */}
-      <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto p-4 sm:p-6 bg-white mt-8 rounded-xl shadow-md">
+      <div className=" container mx-auto p-4 sm:p-6 bg-white mt-8 rounded-xl shadow-md">
         <h1
           className={`mt-6 text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-brand-primary ${locale === "ar" ? "rtl font-noto" : ""}`}
         >
@@ -147,7 +147,7 @@ export default function Home() {
       </div>
 
       {/* Features Section */}
-      <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto p-3 sm:p-4 mt-6 sm:mt-8 rounded-xl mb-8">
+      <div className="container mx-auto p-3 sm:p-4 mt-6 sm:mt-8 rounded-xl mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 max-w-[90%] mx-auto">
           {/* Map Location Card */}
           <div className="bg-brand-light rounded-xl h-[180px] sm:h-[200px] md:h-[220px] overflow-hidden p-3 sm:p-4">
@@ -302,7 +302,7 @@ export default function Home() {
       </div>
 
       {/* Vision Section */}
-      <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto pt-6 sm:pt-8 pb-8 sm:pb-12 pr-0 sm:pr-6 bg-white mt-8 rounded-xl shadow-md mb-8 overflow-hidden relative min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
+      <div className="container mx-auto pt-6 sm:pt-8 pb-8 sm:pb-12 pr-0 sm:pr-6 bg-white mt-8 rounded-xl shadow-md mb-8 overflow-hidden relative min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
         <div className="flex flex-col lg:flex-row items-start justify-between h-full">
           {/* Text Content - Always on the right side */}
           <div className="w-full lg:w-2/3 p-4 sm:p-6 flex flex-col justify-center h-full lg:ml-auto">
@@ -361,7 +361,7 @@ export default function Home() {
       </div>
 
       {/* Map Section */}
-      <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto mt-8 mb-8">
+      <div className="container mx-auto mt-8 mb-8">
         <div className="flex flex-col md:flex-row gap-4 justify-center items-center max-w-[90%] mx-auto">
           {/* Arar Location */}
           <div className="relative w-full md:w-1/2 h-[314px] rounded-xl overflow-hidden">
