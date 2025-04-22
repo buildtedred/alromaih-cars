@@ -39,7 +39,7 @@ export function PromoSlider() {
       <CarouselContent>
         {slides.map((slide, index) => (
           <CarouselItem key={index} className="md:basis-1/2 sm:basis-full">
-            <div className="relative h-[200px] w-full rounded-lg overflow-hidden">
+            <div className="relative h-[200px] w-full rounded-[10px] overflow-hidden">
               <Image src={slide.src || "/placeholder.svg"} alt={slide.title} fill className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
               <div className="absolute bottom-8 left-8 text-white">
@@ -50,8 +50,8 @@ export function PromoSlider() {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="left-4" />
-      <CarouselNext className="right-4" />
+      <CarouselPrevious className="left-4 bg-brand-light/10 border-white  border-2 text-white" />
+      <CarouselNext className="right-4 bg-brand-light/10 border-white  border-2 text-white" />
     </Carousel>
   )
 }

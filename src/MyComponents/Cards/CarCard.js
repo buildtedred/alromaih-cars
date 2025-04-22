@@ -94,7 +94,7 @@ const CarCard = ({
 
   return (
     <div
-      className="rounded-[20px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl"
+      className="rounded-[10px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -214,10 +214,10 @@ const CarCard = ({
             </div>
 
             <div className="px-3">
-              <p className="text-xs text-brand-primary mb-1 truncate max-w-[100px] block">
+              <p className="text-xs text-brand-primary mb-1 truncate max-w-[110px] block">
                 {isRTL
                   ? "أقساط من"
-                  : "Installments from a very long text that needs to be truncated"}
+                  : "Installments from"}
               </p>
 
               <div className="font-bold text-brand-primary flex items-center">
