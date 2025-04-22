@@ -274,3 +274,15 @@ footer::-webkit-scrollbar-track {
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
   background: #4a1d6e;
 }
+
+.ReactTags__tag {
+  background-color: #4b225f;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: white;
+}
+.ReactTags__remove {
+  margin-left: 5px;
+  cursor: pointer;
+}

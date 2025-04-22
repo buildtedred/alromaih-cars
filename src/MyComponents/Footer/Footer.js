@@ -10,7 +10,7 @@ export default function Footer() {
   const locale = params?.locale || "ar" // Default to Arabic if locale not found
 
   return (
-    <div className="w-full bg-white">
+    <div className="container mx-auto bg-white">
       {/* Top border line with padding and adjusted width */}
       <div className="max-w-[98%] mx-auto h-[2px] bg-brand-primary mt-8"></div>
 

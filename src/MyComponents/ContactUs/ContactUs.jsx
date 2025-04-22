@@ -40,7 +40,7 @@ export default function ContactPage() {
   const locale = params?.locale || "ar"
 
   return (
-    <main className="min-h-screen ">
+    <main className="container mx-auto ">
       {/* Header Section */}
       <div className="relative">
         <div className="bg-brand-light h-[400px] rounded-[10px]">
@@ -155,7 +155,7 @@ export default function ContactPage() {
       </div>
 
       {/* Car Image */}
-      <div className="w-full h-[547px] mt-8 md:h-[100vh] relative">
+      <div className="container mx-auto h-[547px] mt-8 md:h-[100vh] relative">
         <Image src="/images/main-car.jpg" alt="Car showcase" fill className="object-cover object-center rounded-[10px] " />
       </div>
     </main>
