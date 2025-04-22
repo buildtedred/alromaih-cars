@@ -1,108 +1,29 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, X, Car, ChevronDown, ChevronUp, Star, ArrowLeft } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
-import { Link } from "@/i18n/routing"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog"
-
-// Minimal mock data with just 2 brands
-const mockBrands = {
-  data: [
-    {
-      id: 1,
-      name: {
-        en: {
-          name: "Toyota",
-          slug: "toyota"
-        }
-      },
-      image_url: "/brands/toyota.png",
-      car_models: [
-        {
-          id: 101,
-          name: {
-            en: {
-              name: "Camry 2023",
-              slug: "camry-2023",
-              condition: "Excellent",
-              transmission: "automatic"
-            }
-          },
-          image_url: "/cars/toyota-camry-2023.jpg",
-          price: 65,
-          year_of_manufacture: 2023,
-          seating_capacity: 5,
-          vehicle_fuel_types: [
-            {
-              fuel_type: {
-                en: "Petrol"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: 2,
-      name: {
-        en: {
-          name: "Honda",
-          slug: "honda"
-        }
-      },
-      image_url: "/brands/honda.png",
-      car_models: [
-        {
-          id: 201,
-          name: {
-            en: {
-              name: "Civic 2023",
-              slug: "civic-2023",
-              condition: "Excellent",
-              transmission: "automatic"
-            }
-          },
-          image_url: "/cars/honda-civic-2023.jpg",
-          price: 60,
-          year_of_manufacture: 2023,
-          seating_capacity: 5,
-          vehicle_fuel_types: [
-            {
-              fuel_type: {
-                en: "Petrol"
-              }
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-
+import { Dialog } from "@/components/ui/dialog"
+import carsData from "@/app/api/mock-data"
 
 export default function SearchComponent({ isVisible, onClose }) {
   const [searchQuery, setSearchQuery] = useState("")
-  const [brands, setBrands] = useState([])
+  const [cars, setCars] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [selectedCar, setSelectedCar] = useState(null)
-  const [expandedBrands, setExpandedBrands] = useState([])
   const [isMobile, setIsMobile] = useState(false)
   const [showCarDetails, setShowCarDetails] = useState(false)
+  const [tags, setTags] = useState([])
+  const [inputValue, setInputValue] = useState("")
+
+  const KeyCodes = {
+    comma: 188,
+    enter: 13,
+  }
+
+  const delimiters = [KeyCodes.comma, KeyCodes.enter]
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -111,175 +32,94 @@ export default function SearchComponent({ isVisible, onClose }) {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && inputValue.trim()) {
+      addTag(inputValue)
+      setInputValue("")
+    }
+  }
+
+  const addTag = (text) => {
+    const newTag = {
+      id: Date.now().toString(),
+      text: text.trim(),
+    }
+    setTags([...tags, newTag])
+  }
+
+  const removeTag = (id) => {
+    setTags(tags.filter((tag) => tag.id !== id))
+  }
+
   useEffect(() => {
     if (isVisible) {
       setIsLoading(true)
       setTimeout(() => {
-        setBrands(mockBrands.data)
+        setCars(carsData)
         setIsLoading(false)
       }, 500)
     }
   }, [isVisible])
 
-  const filteredBrands = brands.filter(
-    (brand) =>
-      brand.name.en.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      brand.car_models.some((model) =>
-        model.name.en.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-  )
-
-  const toggleBrandExpansion = (brandId) => {
-    setExpandedBrands((prev) =>
-      prev.includes(brandId)
-        ? prev.filter((id) => id !== brandId)
-        : [...prev, brandId]
+  const filteredCars = cars.filter((car) => {
+    return tags.every(
+      (tag) =>
+        car.name.en.toLowerCase().includes(tag.text.toLowerCase()) ||
+        car.brand.toLowerCase().includes(tag.text.toLowerCase()),
     )
-  }
+  })
 
   const handleCarSelect = (car) => {
     setSelectedCar(car)
-    if (isMobile) {
-      setShowCarDetails(true)
-    }
+    if (isMobile) setShowCarDetails(true)
   }
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value)
-    if (isMobile && showCarDetails && e.target.value !== "") {
-      setShowCarDetails(false)
-      setSelectedCar(null)
-    }
-  }
-
-  const handleSearchClear = () => {
-    setSearchQuery("")
-  }
-
-  const renderCarDetails = (car) => (
-    <div className="space-y-6">
-      <div className="relative w-full h-48 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center text-gray-500">
-        Car Image
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">Brand</div>
-          <div>
-            <p className="font-semibold text-sm">{car.brandName}</p>
-            <div className="flex items-center">
-              {[...Array(4)].map((_, i) => (
-                <Star key={i} className="h-3 w-3 text-yellow-400 fill-current" />
-              ))}
-              <Star className="h-3 w-3 text-gray-300 fill-current" />
-              <span className="text-xs text-gray-600 ml-1">(4.0)</span>
-            </div>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-xs text-gray-500">Price per day</p>
-          <p className="text-lg font-bold text-brand-primary">${car.price}</p>
-        </div>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <Badge variant="secondary" className="text-xs">
-          {car.name.en.condition}
-        </Badge>
-        <Badge variant="secondary" className="text-xs">
-          {car.name.en.transmission}
-        </Badge>
-        <Badge variant="secondary" className="text-xs">
-          {car.seating_capacity} seats
-        </Badge>
-        <Badge variant="secondary" className="text-xs">
-          {car.vehicle_fuel_types[0]?.fuel_type.en || "N/A"}
-        </Badge>
-      </div>
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview" className="text-xs">Overview</TabsTrigger>
-          <TabsTrigger value="features" className="text-xs">Features</TabsTrigger>
-          <TabsTrigger value="reviews" className="text-xs">Reviews</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview" className="mt-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-xs text-gray-500">Year</p>
-              <p className="font-medium">{car.year_of_manufacture}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Transmission</p>
-              <p className="font-medium capitalize">{car.name.en.transmission}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Fuel Type</p>
-              <p className="font-medium capitalize">{car.vehicle_fuel_types[0]?.fuel_type.en || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">Seating</p>
-              <p className="font-medium">{car.seating_capacity} seats</p>
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="features">
-          <ul className="text-xs space-y-1 list-disc list-inside">
-            <li>Air Conditioning</li>
-            <li>Bluetooth</li>
-            <li>Navigation</li>
-          </ul>
-        </TabsContent>
-        <TabsContent value="reviews">
-          <p className="text-xs text-gray-600">No reviews yet.</p>
-        </TabsContent>
-      </Tabs>
-      <Link href={`/car-details/${car.name.en.slug}`}>
-        <Button onClick={onClose} className="border-4 w-full bg-brand-primary hover:bg-brand-dark text-white text-sm">
-          Show Details
-        </Button>
-      </Link>
-    </div>
-  )
 
   return (
-    <Dialog open={isVisible} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl w-full p-0 overflow-hidden rounded-xl" >
+    <Dialog className="" open={isVisible} onOpenChange={(open) => !open && onClose()}>
+      <div
+        className="fixed inset-0 md:h-[70vh] container mx-auto z-[1000] bg-white"
+   
+      >
+        <div className="cursor-pointer absolute top-3 right-3 z-50 w-7 h-7 flex items-center justify-center rounded-full transition-all duration-300 border border-brand-primary/20 hover:bg-brand-light">
+          <X className="h-4 w-4" onClick={onClose} />
+          <span className="sr-only">Close</span>
+        </div>
         <div className="flex flex-col">
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-            {isMobile && showCarDetails && (
-              <Button variant="ghost" size="icon" onClick={() => setShowCarDetails(false)} className="mr-2">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            )}
-            <DialogHeader>
-              <DialogTitle className="text-lg font-semibold text-gray-900">Find Your Perfect Ride</DialogTitle>
-            </DialogHeader>
-            
-          </div>
+          <div className="p-4 border-b border-gray-200 mt-10">
+            <div className="relative flex justify-center">
+              <div className="relative w-full md:w-[600px] lg:w-[871px] bg-white rounded-[10px] border border-gray-200 flex items-center px-3 py-2">
+                <Search className="text-gray-400 w-4 h-4 mr-2 shrink-0" />
 
-          <div className="p-4 border-b border-gray-200">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                type="text"
-                placeholder="Search brands or models..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="pl-9 pr-9 w-full bg-gray-100 border-transparent focus:ring-brand-primary focus:ring-0 text-sm"
-              />
-              {searchQuery && (
-                <button
-                  onClick={handleSearchClear}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+                <div className="flex flex-wrap gap-2 items-center flex-1">
+                  {tags.map((tag) => (
+                    <div
+                      key={tag.id}
+                      className="flex items-center gap-1 bg-purple-700 text-white px-2 py-1 rounded-md text-sm"
+                    >
+                      <span>{tag.text}</span>
+                      <button onClick={() => removeTag(tag.id)} className="hover:bg-purple-800 rounded-full p-0.5">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="flex-1 outline-none border-none bg-transparent min-w-[120px]"
+                    placeholder={tags.length === 0 ? "Search brands or models..." : ""}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex-1 flex overflow-hidden">
+          <div className="">
             {(!isMobile || (isMobile && !showCarDetails)) && (
-              <ScrollArea className="w-full md:w-1/2 border-r border-gray-200">
-                <div className="p-4 space-y-4">
+              <ScrollArea>
+                <div className="p-4 grid sm:grid-cols-2 md:grid-cols-4 gap-3">
                   {isLoading ? (
                     <div className="flex justify-center items-center h-32">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary" />
@@ -287,81 +127,43 @@ export default function SearchComponent({ isVisible, onClose }) {
                   ) : error ? (
                     <div className="text-center text-red-500 p-4 bg-red-50 rounded-lg text-sm">
                       <p>{error}</p>
-                      <Button onClick={() => setBrands(mockBrands.data)} className="mt-2 text-xs">Retry</Button>
+                      <Button onClick={() => setCars(carsData)} className="mt-2 text-xs">
+                        Retry
+                      </Button>
                     </div>
-                  ) : filteredBrands.length === 0 && searchQuery ? (
+                  ) : filteredCars.length === 0 && searchQuery ? (
                     <p className="text-center text-gray-500 p-4 bg-gray-50 rounded-lg text-sm">No results found.</p>
                   ) : (
-                    filteredBrands.map((brand) => (
-                      <div key={brand.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                        <div className="p-3 cursor-pointer hover:bg-gray-50" onClick={() => toggleBrandExpansion(brand.id)}>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                {brand.name.en.name.charAt(0)}
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-sm text-gray-900">{brand.name.en.name}</h3>
-                                <p className="text-xs text-gray-500">{brand.car_models.length} models</p>
-                              </div>
-                            </div>
-                            {expandedBrands.includes(brand.id) ? (
-                              <ChevronUp className="h-4 w-4 text-gray-400" />
-                            ) : (
-                              <ChevronDown className="h-4 w-4 text-gray-400" />
-                            )}
-                          </div>
+                    filteredCars.map((car,index) => (
+                      <div
+                        key={car.id}
+                        className={`rounded-[10px] flex items-center gap-2 p-2 cursor-pointer transition-colors text-sm ${
+                          selectedCar?.id === car.id
+                            ? "bg-brand-primary/10"
+                            : "hover:bg-gray-50 hover:border-[1px] border-brand-primary"
+                        }`}
+                        onClick={() => handleCarSelect(car)}
+                      >
+                        <img
+                          src={car.brandLogo || "/placeholder.svg"}
+                          alt={car.name.en}
+                          className="h-[72px] w-[72px] border-2 border-brand-primary rounded-full p-2"
+                        />
+
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-medium truncate text-brand-primary">{car.brand}</h4>
+                          <p className="text-xs text-brand-primary truncate">{index}</p>
+
                         </div>
-                        {expandedBrands.includes(brand.id) && (
-                          <div className="bg-gray-50 px-3 py-2">
-                            {brand.car_models.map((model) => (
-                              <div
-                                key={model.id}
-                                className={`flex items-center gap-2 p-2 cursor-pointer transition-colors rounded-md text-sm ${
-                                  selectedCar?.id === model.id ? "bg-brand-primary/10" : "hover:bg-white"
-                                }`}
-                                onClick={() =>
-                                  handleCarSelect({
-                                    ...model,
-                                    brandName: brand.name.en.name,
-                                    brandLogo: brand.image_url,
-                                  })
-                                }
-                              >
-                                <Car className="h-4 w-4 text-brand-primary flex-shrink-0" />
-                                <div className="min-w-0 flex-1">
-                                  <h4 className="font-medium text-gray-900 truncate">{model.name.en.name}</h4>
-                                  <p className="text-xs text-gray-500 truncate">${model.price}/day</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     ))
                   )}
                 </div>
               </ScrollArea>
             )}
-
-            {(!isMobile || (isMobile && showCarDetails)) && (
-              <div className="w-full md:w-1/2 bg-gray-50">
-                <ScrollArea className="h-full">
-                  <div className="p-4">
-                    {selectedCar ? (
-                      renderCarDetails(selectedCar)
-                    ) : (
-                      <div className="h-full flex items-center justify-center text-gray-500 text-sm">
-                        <p>Select a car to view details</p>
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
-              </div>
-            )}
           </div>
         </div>
-      </DialogContent>
+      </div>
     </Dialog>
   )
 }

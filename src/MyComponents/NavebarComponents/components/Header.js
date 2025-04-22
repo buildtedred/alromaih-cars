@@ -114,7 +114,11 @@ const Header = () => {
         </div>
 
         {/* Search Component */}
-        {isSearchVisible && <SearchComponent isVisible={isSearchVisible} onClose={toggleSearch} />}
+        {isSearchVisible && (
+  <div >
+    <SearchComponent isVisible={isSearchVisible} onClose={toggleSearch} />
+  </div>
+)}
 
         {/* Navigation for desktop */}
         <Nav isMobile={false} setIsMobileMenuOpen={setIsMobileMenuOpen} />
