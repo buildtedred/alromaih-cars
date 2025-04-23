@@ -302,7 +302,7 @@ export default function SearchComponent({ isVisible, onClose }) {
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-50 w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 border border-brand-primary hover:bg-brand-primary hover:text-white"
+          className={`${isEnglish? "right-3":"left-3"} absolute top-3  z-50 w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 border border-brand-primary hover:bg-brand-primary hover:text-white`}
           aria-label="Close search"
         >
           <X className="h-4 w-4" />
@@ -375,8 +375,9 @@ export default function SearchComponent({ isVisible, onClose }) {
                 <div className="space-y-6">
                   {brandGroups.map((group) => (
                     <div key={group.brand} className="bg-white  rounded-lg p-4 border-brand-primary/10">
-                      <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4 ">
                         {/* Brand card */}
+                        <div className="shadow-lg rounded-[10px]">
                         <BrandCard
                           brand={group.brand}
                           count={group.cars.length}
@@ -386,6 +387,7 @@ export default function SearchComponent({ isVisible, onClose }) {
                           isEnglish={isEnglish}
                           arrow="/icons/arrow.svg"
                         />
+                         </div>
 
                         {/* Cars grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
