@@ -89,9 +89,9 @@ const CarCard = ({ car, onClick, isEnglish }) => (
 )
 
 // Brand card component with fixed dimensions to prevent shaking
-const BrandCard = ({ brand, count, logo, isSelected, onClick }) => (
+const BrandCard = ({ brand, count, logo, isSelected, onClick,arrow,isEnglish }) => (
   <div
-    className={`shadow-lg h-[100px] rounded-[10px] flex items-center gap-2 p-2 cursor-pointer transition-all duration-200 text-sm overflow-hidden transform-gpu hover:scale-[1.02] ${
+    className={` h-[100px] rounded-[10px] flex items-center gap-2 p-2 cursor-pointer transition-all duration-200 text-sm overflow-hidden transform-gpu hover:scale-[1.02] ${
       isSelected
         ? "bg-brand-primary/10 border-2 border-brand-primary"
         : "hover:bg-gray-50 border border-transparent hover:border-brand-primary"
@@ -109,7 +109,10 @@ const BrandCard = ({ brand, count, logo, isSelected, onClick }) => (
     <div className="min-w-0 flex-1">
       <h4 className="font-medium truncate text-brand-primary">{brand}</h4>
       <p className="text-xs text-brand-primary truncate">{count} cars</p>
+
     </div>
+    {arrow && <img src={arrow} alt="arrow" className={`w-4 h-4 mt-1 ${isEnglish ? 'rotate-180' : ''}`}
+ />}
   </div>
 )
 
@@ -324,11 +327,11 @@ export default function SearchComponent({ isVisible, onClose }) {
                     onKeyDown={handleKeyDown}
                     className="flex-1 outline-none border-none bg-transparent min-w-[120px] text-brand-primary placeholder-brand-primary/60"
                     placeholder={
-                      tags.length === 0
-                        ? isEnglish
+                    
+                        isEnglish
                           ? "Search for cars or brands..."
-                          : "البحث عن السيارات أو العلامات التجارية..."
-                        : ""
+                          : "اختر الموديل..."
+                      
                     }
                     autoFocus
                   />
@@ -371,7 +374,7 @@ export default function SearchComponent({ isVisible, onClose }) {
               hasResults ? (
                 <div className="space-y-6">
                   {brandGroups.map((group) => (
-                    <div key={group.brand} className="bg-white shadow-sm rounded-lg p-4 border border-brand-primary/10">
+                    <div key={group.brand} className="bg-white  rounded-lg p-4 border-brand-primary/10">
                       <div className="grid grid-cols-1 md:grid-cols-[250px_1fr] gap-4">
                         {/* Brand card */}
                         <BrandCard
@@ -380,6 +383,8 @@ export default function SearchComponent({ isVisible, onClose }) {
                           logo={group.brandLogo}
                           isSelected={selectedCar?.brand === group.brand}
                           onClick={() => handleCarSelect(group)}
+                          isEnglish={isEnglish}
+                          arrow="/icons/arrow.svg"
                         />
 
                         {/* Cars grid */}
@@ -417,6 +422,7 @@ export default function SearchComponent({ isVisible, onClose }) {
                     logo={car.brandLogo}
                     isSelected={selectedCar?.brand === car.brand}
                     onClick={() => handleCarSelect(car)}
+                    
                   />
                 ))}
               </div>
