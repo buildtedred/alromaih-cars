@@ -131,7 +131,7 @@ const Header = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3, delay: 0.1 }}
-              className="md:hidden absolute top-full left-0 right-0 bg-white border-t shadow-lg z-50"
+              className="md:hidden  bg-white border-t shadow-lg z-50"
             >
               {/* Navigation for mobile */}
               <Nav isMobile={true} setIsMobileMenuOpen={setIsMobileMenuOpen} />

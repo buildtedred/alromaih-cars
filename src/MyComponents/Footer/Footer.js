@@ -10,9 +10,9 @@ export default function Footer() {
   const locale = params?.locale || "ar" // Default to Arabic if locale not found
 
   return (
-    <div className="container mx-auto bg-white">
+    <div className=" bg-white">
       {/* Top border line with padding and adjusted width */}
-      <div className="max-w-[98%] mx-auto h-[2px] bg-brand-primary mt-8"></div>
+      <div className="max-w-[100%] mx-auto h-[2px] bg-brand-primary mt-8"></div>
 
       {/* White Section with Logo and Links */}
       <div className="bg-white pt-8 relative">

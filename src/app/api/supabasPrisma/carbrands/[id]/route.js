@@ -6,6 +6,9 @@ export async function GET(request, { params }) {
     const { id } = params;
     const brand = await prisma.carBrand.findUnique({
       where: { id },
+      
+        include: { cars: true },
+      
     });
 
     if (!brand) {

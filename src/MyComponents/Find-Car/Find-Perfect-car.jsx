@@ -142,11 +142,11 @@ export default function CarFinderModal() {
                     className="text-brand-primary"
                   />
                 </div>
-                <div className=" max-w-[120px]">
-                  <span className="text-brand-primary text-start font-bold text-sm block">
+                <div className=" max-w-[120px] text-start">
+                  <span className="text-brand-primary  font-bold text-sm block">
                     {isArabic ? "نقدي" : "Cash Payment"}
                   </span>
-                  <span className="text-gray-500 text-xs line-clamp-1">
+                  <span className="text-gray-500 text-xs  line-clamp-1">
                     {isArabic
                       ? "دفع كامل المبلغ مرة واحدة"
                       : "Pay the full amount at once"}
@@ -192,8 +192,8 @@ export default function CarFinderModal() {
                     className="text-brand-primary"
                   />
                 </div>
-                <div className="max-w-[120px]">
-                  <span className="text-brand-primary font-bold text-sm block text-start">
+                <div className="max-w-[120px] text-start">
+                  <span className="text-brand-primary font-bold text-sm block">
                     {isArabic ? "تمويل" : "Finance Options"}
                   </span>
                   <span className="text-gray-500 text-xs line-clamp-1">
