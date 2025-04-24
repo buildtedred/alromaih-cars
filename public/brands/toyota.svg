@@ -1,19 +1,22 @@
 <?xml version="1.0"?>
-<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
- <title>Toyota icon</title>
- <defs>
-  <!-- Inner shadow (optional subtle depth) -->
-  <filter height="200%" id="innerShadowBlack" width="200%" x="-50%" y="-50%">
-   <feOffset dx="0" dy="0"/>
-   <feGaussianBlur result="blur" stdDeviation="0.5"/>
-   <feComposite in="SourceGraphic" in2="blur" operator="arithmetic" result="shadowDiff"/>
-   <feFlood flood-color="#000000" flood-opacity="0.15"/>
-   <feComposite in2="shadowDiff" operator="in"/>
-   <feComposite in2="SourceGraphic" operator="over"/>
-  </filter>
- </defs>
- <g class="layer">
-  <title>Layer 1</title>
-  <path d="m13.44,8.54c-4.51,0 -8.16,2.36 -8.16,5.27c0,2.92 3.65,5.27 8.16,5.27s8.16,-2.36 8.16,-5.27s-3.65,-5.27 -8.16,-5.27zm0,8.28c-0.67,0 -1.22,-1.32 -1.25,-2.98a14.33,14.33 0 0 0 2.5,0c-0.03,1.66 -0.58,2.98 -1.25,2.98zm-1.17,-4.3c0.18,-1.18 0.64,-2.01 1.17,-2.01s0.99,0.84 1.17,2.01a13.21,13.21 0 0 1 -2.34,0zm1.17,-3.23c-0.88,0 -1.62,1.31 -1.9,3.14c-1.66,-0.26 -2.81,-0.85 -2.81,-1.54c0,-0.92 2.11,-1.67 4.71,-1.67c2.6,0 4.71,0.75 4.71,1.67c0,0.69 -1.16,1.28 -2.81,1.54c-0.28,-1.83 -1.02,-3.14 -1.9,-3.14zm-6.99,4.32c0,-0.9 0.35,-1.73 0.94,-2.45c-0.01,0.05 -0.01,0.1 -0.01,0.15c0,1.13 1.69,2.09 4.05,2.44c-0.01,0.08 -0.01,0.17 -0.01,0.25c0,2.1 0.59,3.87 1.41,4.48c-3.57,-0.22 -6.38,-2.31 -6.38,-4.87zm7.59,4.87c0.82,-0.6 1.41,-2.38 1.41,-4.48c0,-0.09 0,-0.17 -0.01,-0.25c2.36,-0.35 4.05,-1.31 4.05,-2.44c0,-0.05 -0.01,-0.1 -0.01,-0.15c0.6,0.72 0.94,1.56 0.94,2.45c0,2.56 -2.81,4.65 -6.38,4.87z" fill="#000000" filter="url(#innerShadowBlack)" id="svg_1"/>
- </g>
+<svg  viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg">
+  <title>Toyota icon</title>
+  <defs>
+    <!-- Inner shadow (optional subtle depth) -->
+    <filter id="innerShadowBlack" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset dx="0" dy="0" />
+      <feGaussianBlur result="blur" stdDeviation="0.5" />
+      <feComposite in="SourceGraphic" in2="blur" operator="arithmetic" result="shadowDiff" />
+      <feFlood flood-color="#000000" flood-opacity="0.15" />
+      <feComposite in2="shadowDiff" operator="in" />
+      <feComposite in2="SourceGraphic" operator="over" />
+    </filter>
+  </defs>
+  <g>
+    <path
+      d="m13.44,8.54c-4.51,0 -8.16,2.36 -8.16,5.27c0,2.92 3.65,5.27 8.16,5.27s8.16,-2.36 8.16,-5.27s-3.65,-5.27 -8.16,-5.27zm0,8.28c-0.67,0 -1.22,-1.32 -1.25,-2.98a14.33,14.33 0 0 0 2.5,0c-0.03,1.66 -0.58,2.98 -1.25,2.98zm-1.17,-4.3c0.18,-1.18 0.64,-2.01 1.17,-2.01s0.99,0.84 1.17,2.01a13.21,13.21 0 0 1 -2.34,0zm1.17,-3.23c-0.88,0 -1.62,1.31 -1.9,3.14c-1.66,-0.26 -2.81,-0.85 -2.81,-1.54c0,-0.92 2.11,-1.67 4.71,-1.67c2.6,0 4.71,0.75 4.71,1.67c0,0.69 -1.16,1.28 -2.81,1.54c-0.28,-1.83 -1.02,-3.14 -1.9,-3.14zm-6.99,4.32c0,-0.9 0.35,-1.73 0.94,-2.45c-0.01,0.05 -0.01,0.1 -0.01,0.15c0,1.13 1.69,2.09 4.05,2.44c-0.01,0.08 -0.01,0.17 -0.01,0.25c0,2.1 0.59,3.87 1.41,4.48c-3.57,-0.22 -6.38,-2.31 -6.38,-4.87zm7.59,4.87c0.82,-0.6 1.41,-2.38 1.41,-4.48c0,-0.09 0,-0.17 -0.01,-0.25c2.36,-0.35 4.05,-1.31 4.05,-2.44c0,-0.05 -0.01,-0.1 -0.01,-0.15c0.6,0.72 0.94,1.56 0.94,2.45c0,2.56 -2.81,4.65 -6.38,4.87z"
+      fill="#000000"
+      filter="url(#innerShadowBlack)"
+    />
+  </g>
 </svg>

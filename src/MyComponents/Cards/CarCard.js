@@ -94,7 +94,7 @@ const CarCard = ({
 
   return (
     <div
-      className="rounded-[10px] border-2 border-brand-primary bg-white overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl"
+      className="rounded-[10px] border-2 border-brand-primary bg-brand-light/40 overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

@@ -483,21 +483,40 @@ const CarFilterSidebar = ({
       className="h-full flex flex-col rounded-xl overflow-hidden bg-brand-light shadow-md"
       dir={language === "ar" ? "rtl" : "ltr"}
     >
-      {/* Filter header */}
-      <div className=" text-brand-primary p-4 flex justify-between items-center rounded-t-xl">
-        <h3 className="text-xl font-bold w-full">
-          {language === "ar" ? "فلترة النتائج" : "Filter Results"}
-        </h3>
+      <div className="flex items-center justify-end text-brand-primary hover:text-brand-primary bg-brand-light p-3 border-b border-brand-primary/25 sm:p-0 sm:border-0">
         {isMobile && (
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="rounded-full text-white hover:bg-white/20"
+            className="h-6 w-6 rounded-full p-0 hover:bg-transparent hover:text-brand-primary hover:border-brand-primary hover:border"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
         )}
+      </div>
+
+      {/* Filter header */}
+      <div className="text-brand-primary p-4 flex justify-between items-center rounded-t-xl border-b border-brand-primary/25">
+        <h3 className="text-xl font-bold text-brand-primary">
+          {language === "ar" ? "فلترة النتائج" : "Filter Results"}
+        </h3>
+        <button
+          onClick={() => {
+            const resetFilters = {
+              priceRange: [40000, 250000],
+              selectedModels: [],
+              year: "",
+              fuelTypes: [],
+              transmission: [],
+              seats: [],
+            };
+            onFilterChange(resetFilters);
+          }}
+          className="text-brand-primary font-medium text-sm hover:underline"
+        >
+          <span>{language === "ar" ? "إعادة تعيين" : "Reset"}</span>
+        </button>
       </div>
 
       {/* Scrollable content */}
@@ -930,24 +949,7 @@ const CarFilterSidebar = ({
         className="bg-brand-light border-t border-gray-200 p-4 rounded-b-xl shadow-sm"
         style={{ boxShadow: "0 -2px 6px rgba(0, 0, 0, 0.05)" }}
       >
-        <Button
-          onClick={() => {
-            const resetFilters = {
-              priceRange: [40000, 250000],
-              selectedModels: [],
-              year: "",
-              fuelTypes: [],
-              transmission: [],
-              seats: [],
-            };
-            onFilterChange(resetFilters);
-          }}
-          className="w-full bg-gradient-to-r from-brand-primary to-[#6A2D7A] text-white hover:from-[#6A2D7A] hover:to-brand-primary rounded-[5px] transition-all duration-300 flex items-center justify-center py-3 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 font-medium"
-        >
-          <span>
-            {language === "ar" ? "إعادة تعيين الفلاتر" : "Reset All Filters"}
-          </span>
-        </Button>
+        {/* Footer content without reset button */}
       </div>
     </div>
   );
@@ -1177,39 +1179,42 @@ const AllCarMainpage = () => {
           </div>
 
           {/* Available Cars Header */}
-          <div className="bg-white rounded-[10px] p-4 flex flex-col md:flex-row justify-between items-start md:items-center mb-6 shadow-sm">
+          <div className="bg-brand-light rounded-[10px] p-4 flex flex-col md:flex-row justify-between items-start md:items-center mb-6 shadow-sm">
             <div>
               <h2 className="text-xl font-bold text-brand-primary mb-2 md:mb-0 flex items-center gap-2">
                 <span>{isRTL ? "السيارات المتاحة" : "Available Cars"}</span>
-                <span className="bg-brand-primary text-white px-2 py-1 rounded-full text-sm">
+                <span className="bg-brand-primary text-brand-light px-2 py-1 rounded-full text-sm">
                   {filteredCars.length}
                 </span>
               </h2>
             </div>
 
             <div className="flex items-center gap-2 mt-4 md:mt-0">
-              <span className="text-sm  font-medium text-gray-600">
+              <span className="text-sm  font-medium text-brand-primary">
                 {isRTL ? "الترتيب:" : "Sort:"}
               </span>
-              <select
-                className="border border-gray-300 rounded-[5px] py-1 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary"
-                value={sortOption}
-                onChange={handleSortChange}
-                aria-label={isRTL ? "رتب حسب" : "Sort by"}
-              >
-                <option value="relevance">
-                  {isRTL ? "الصلة" : "Relevance"}
-                </option>
-                <option value="price-asc">
-                  {isRTL ? "السعر: من الأقل للأعلى" : "Price: Low to High"}
-                </option>
-                <option value="price-desc">
-                  {isRTL ? "السعر: من الأعلى للأقل" : "Price: High to Low"}
-                </option>
-                <option value="newest">
-                  {isRTL ? "الأحدث" : "Newest First"}
-                </option>
-              </select>
+              <div className="relative">
+                <select
+                  className="border bg-brand-light border-brand-primary text-brand-primary rounded-[5px] py-1 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary appearance-none"
+                  value={sortOption}
+                  onChange={handleSortChange}
+                  aria-label={isRTL ? "رتب حسب" : "Sort by"}
+                >
+                  <option value="relevance">
+                    {isRTL ? "الصلة" : "Relevance"}
+                  </option>
+                  <option value="price-asc">
+                    {isRTL ? "السعر: من الأقل للأعلى" : "Price: Low to High"}
+                  </option>
+                  <option value="price-desc">
+                    {isRTL ? "السعر: من الأعلى للأقل" : "Price: High to Low"}
+                  </option>
+                  <option value="newest">
+                    {isRTL ? "الأحدث" : "Newest First"}
+                  </option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
+              </div>
             </div>
           </div>
 
