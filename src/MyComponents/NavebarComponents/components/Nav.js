@@ -8,13 +8,13 @@ import { useTranslation } from "react-i18next"
 import { motion, AnimatePresence } from "framer-motion"
 
 const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
-  const pathname = usePathname()
+  const pathname = usePathname() || ""
   const [isClient, setIsClient] = useState(false)
   const { t } = useTranslation()
   // Get locale from URL params
   const params = useParams()
   // Get current locale from the pathname (assuming the locale is the first part of the path)
-  const locale = pathname.startsWith("/ar") ? "ar" : "en"
+  const locale = pathname &&  pathname?.startsWith("/ar") ? "ar" : "en"
   // Create a translation function that works with your structure
   const getTranslation = (key) => {
     // Define hardcoded fallbacks for when translations fail
@@ -38,7 +38,7 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
       }
 
       // Otherwise use our fallbacks based on the current locale
-      const currentLocale = pathname.startsWith("/ar") ? "ar" : "en"
+      const currentLocale = pathname &&  pathname?.startsWith("/ar") ? "ar" : "en"
       if (currentLocale === "ar") {
         const arFallbacks = {
           home: "الرئيسية",
