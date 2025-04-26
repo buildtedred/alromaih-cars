@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronDown, Check, Car, ArrowRight, ArrowLeft, Plus, Minus } from "lucide-react"
+import { Car, ArrowRight, ArrowLeft, Plus, Minus, ChevronRight } from "lucide-react"
 import { usePathname } from "next/navigation"
 import CarComparisonResults from "./car-comparison-results"
 import carsData from "@/app/api/mock-data"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const CarComparisonSelector = () => {
   const pathname = usePathname()
@@ -16,6 +17,7 @@ const CarComparisonSelector = () => {
   const [selectedCarIds, setSelectedCarIds] = useState({ car1: null, car2: null, car3: null })
   const [cars, setCars] = useState([])
   const [showThirdCar, setShowThirdCar] = useState(false)
+  const [activeCarIndex, setActiveCarIndex] = useState(0) // For mobile tab navigation
 
   useEffect(() => {
     // Set cars from the imported data
@@ -60,26 +62,6 @@ const CarComparisonSelector = () => {
     year: null,
   })
 
-  // State for dropdown visibility
-  const [openDropdowns, setOpenDropdowns] = useState({
-    firstCarBrand: false,
-    firstCarModel: false,
-    firstCarYear: false,
-    secondCarBrand: false,
-    secondCarModel: false,
-    secondCarYear: false,
-    thirdCarBrand: false,
-    thirdCarModel: false,
-    thirdCarYear: false,
-  })
-
-  const toggleDropdown = (dropdown) => {
-    setOpenDropdowns({
-      ...openDropdowns,
-      [dropdown]: !openDropdowns[dropdown],
-    })
-  }
-
   const selectBrand = (car, brand) => {
     if (car === "first") {
       setFirstCar({ ...firstCar, brand, model: null })
@@ -88,7 +70,6 @@ const CarComparisonSelector = () => {
     } else if (car === "third") {
       setThirdCar({ ...thirdCar, brand, model: null })
     }
-    toggleDropdown(car === "first" ? "firstCarBrand" : car === "second" ? "secondCarBrand" : "thirdCarBrand")
   }
 
   const selectModel = (car, model) => {
@@ -99,7 +80,6 @@ const CarComparisonSelector = () => {
     } else if (car === "third") {
       setThirdCar({ ...thirdCar, model })
     }
-    toggleDropdown(car === "first" ? "firstCarModel" : car === "second" ? "secondCarModel" : "thirdCarModel")
   }
 
   const selectYear = (car, year) => {
@@ -110,7 +90,6 @@ const CarComparisonSelector = () => {
     } else if (car === "third") {
       setThirdCar({ ...thirdCar, year })
     }
-    toggleDropdown(car === "first" ? "firstCarYear" : car === "second" ? "secondCarYear" : "thirdCarYear")
   }
 
   const getText = (textObj) => {
@@ -163,353 +142,374 @@ const CarComparisonSelector = () => {
     )
   }
 
-  // Otherwise, render the car selection form
   return (
-    <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-md p-8">
+    <div className=" max-w-6xl mx-auto bg-white rounded-3xl shadow-md p-4 md:p-8">
       {/* Header */}
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-brand-primary mb-2">{isRTL ? "قارن بين السيارات" : "Compare Cars"}</h1>
+      <div className="text-center mb-6 md:mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold text-brand-primary mb-2">
+          {isRTL ? "قارن بين السيارات" : "Compare Cars"}
+        </h1>
         <p className="text-gray-600">
           {isRTL ? "اختر سيارتين أو ثلاث للمقارنة بينهم الآن" : "Select two or three cars to compare them now"}
         </p>
       </div>
 
-      {/* Car Selection Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+      {/* Car Selection Tabs - Only visible on small screens */}
+      <div className="flex md:hidden rounded-xl bg-gray-100 p-1 mb-6 shadow-sm overflow-x-auto">
+        <button
+          onClick={() => setActiveCarIndex(0)}
+          className={`flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-300 ${
+            activeCarIndex === 0
+              ? "bg-white text-brand-primary shadow-sm"
+              : "text-gray-600 hover:bg-white hover:bg-opacity-50"
+          }`}
+        >
+          <div className="flex flex-col items-center">
+            <Car className="w-5 h-5 mb-1" />
+            <span>{isRTL ? "السيارة 1" : "Car 1"}</span>
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveCarIndex(1)}
+          className={`flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-300 ${
+            activeCarIndex === 1
+              ? "bg-white text-brand-primary shadow-sm"
+              : "text-gray-600 hover:bg-white hover:bg-opacity-50"
+          }`}
+        >
+          <div className="flex flex-col items-center">
+            <Car className="w-5 h-5 mb-1" />
+            <span>{isRTL ? "السيارة 2" : "Car 2"}</span>
+          </div>
+        </button>
+        {showThirdCar && (
+          <button
+            onClick={() => setActiveCarIndex(2)}
+            className={`flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-300 ${
+              activeCarIndex === 2
+                ? "bg-white text-brand-primary shadow-sm"
+                : "text-gray-600 hover:bg-white hover:bg-opacity-50"
+            }`}
+          >
+            <div className="flex flex-col items-center">
+              <Car className="w-5 h-5 mb-1" />
+              <span>{isRTL ? "السيارة 3" : "Car 3"}</span>
+            </div>
+          </button>
+        )}
+      </div>
+
+      {/* Car Selection Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* First Car Panel */}
-        <div className="bg-gradient-to-b from-[#f8f6f9] to-[#f0ebf1] rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center">
-              <Car className="w-10 h-10 text-brand-primary" />
+        <div
+          className={`bg-gradient-to-b from-[#f8f6f9] to-[#f0ebf1] rounded-xl p-5 shadow-md ${activeCarIndex === 0 ? "block" : "hidden md:block"}`}
+        >
+          <div className="hidden md:flex md:justify-center mb-6">
+            <div className="w-16 h-16 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center">
+              <Car className="w-8 h-8 text-brand-primary" />
             </div>
           </div>
-          <h3 className="text-center text-brand-primary text-xl font-bold mb-6">
+
+          <h3 className="text-xl font-bold text-brand-primary mb-5 md:text-center">
             {isRTL ? "السيارة الأولى" : "First Car"}
           </h3>
 
           {/* Brand Dropdown */}
-          <div className="mb-4 relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{isRTL ? "الشركة المصنعة" : "Brand"}</label>
-            <button
-              onClick={() => toggleDropdown("firstCarBrand")}
-              className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-xl bg-white hover:border-brand-primary transition-colors"
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-gray-700 mb-2">{isRTL ? "الشركة المصنعة" : "Brand"}</label>
+            <Select
+              value={firstCar.brand ? firstCar.brand.id : ""}
+              onValueChange={(value) => {
+                const selectedBrand = brands.find((brand) => brand.id === value)
+                selectBrand("first", selectedBrand)
+              }}
             >
-              <span>
-                {firstCar.brand ? getText(firstCar.brand.name) : isRTL ? "اختر الشركة المصنعة" : "Select Brand"}
-              </span>
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            </button>
-            {openDropdowns.firstCarBrand && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
+              <SelectTrigger className="w-full p-3 border border-brand-primary rounded-xl bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none">
+                <SelectValue placeholder={isRTL ? "اختر الشركة المصنعة" : "Select Brand"} />
+              </SelectTrigger>
+              <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                 {brands.map((brand) => (
-                  <div
-                    key={brand.id}
-                    className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                    onClick={() => selectBrand("first", brand)}
-                  >
-                    <span>{getText(brand.name)}</span>
-                    {firstCar.brand && firstCar.brand.id === brand.id && (
-                      <Check className="h-5 w-5 text-brand-primary" />
-                    )}
-                  </div>
+                  <SelectItem key={brand.id} value={brand.id}>
+                    {getText(brand.name)}
+                  </SelectItem>
                 ))}
-              </div>
-            )}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Model Dropdown */}
-          <div className="mb-4 relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{isRTL ? "الطراز" : "Model"}</label>
-            <button
-              onClick={() => toggleDropdown("firstCarModel")}
-              className={`w-full flex items-center justify-between p-3 border rounded-xl ${
-                firstCar.brand
-                  ? "border-gray-200 bg-white hover:border-brand-primary"
-                  : "border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400"
-              } transition-colors`}
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-gray-700 mb-2">{isRTL ? "الطراز" : "Model"}</label>
+            <Select
+              value={firstCar.model ? firstCar.model.id.toString() : ""}
+              onValueChange={(value) => {
+                const selectedModel = firstCar.brand
+                  ? models[firstCar.brand.id]?.find((model) => model.id.toString() === value)
+                  : null
+                selectModel("first", selectedModel)
+              }}
               disabled={!firstCar.brand}
             >
-              <span>{firstCar.model ? getText(firstCar.model.name) : isRTL ? "اختر الطراز" : "Select Model"}</span>
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            </button>
-            {openDropdowns.firstCarModel && firstCar.brand && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
-                {models[firstCar.brand.id]?.map((model) => (
-                  <div
-                    key={model.id}
-                    className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                    onClick={() => selectModel("first", model)}
-                  >
-                    <span>{getText(model.name)}</span>
-                    {firstCar.model && firstCar.model.id === model.id && (
-                      <Check className="h-5 w-5 text-brand-primary" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+              <SelectTrigger
+                className={`w-full p-3 border rounded-xl ${
+                  firstCar.brand
+                    ? "border-brand-primary bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none"
+                    : "border-gray-300 bg-gray-50 cursor-not-allowed text-gray-400"
+                }`}
+              >
+                <SelectValue placeholder={isRTL ? "اختر الطراز" : "Select Model"} />
+              </SelectTrigger>
+              <SelectContent className="border border-brand-light shadow-lg rounded-lg">
+                {firstCar.brand &&
+                  models[firstCar.brand.id]?.map((model) => (
+                    <SelectItem key={model.id} value={model.id.toString()}>
+                      {getText(model.name)}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Year Dropdown */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{isRTL ? "السنة" : "Year"}</label>
-            <button
-              onClick={() => toggleDropdown("firstCarYear")}
-              className={`w-full flex items-center justify-between p-3 border rounded-xl ${
-                firstCar.model
-                  ? "border-gray-200 bg-white hover:border-brand-primary"
-                  : "border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400"
-              } transition-colors`}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{isRTL ? "السنة" : "Year"}</label>
+            <Select
+              value={firstCar.year || ""}
+              onValueChange={(value) => selectYear("first", value)}
               disabled={!firstCar.model}
             >
-              <span>{firstCar.year || (isRTL ? "اختر السنة" : "Select Year")}</span>
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            </button>
-            {openDropdowns.firstCarYear && firstCar.model && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
+              <SelectTrigger
+                className={`w-full p-3 border rounded-xl ${
+                  firstCar.model
+                    ? "border-brand-primary bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none"
+                    : "border-gray-300 bg-gray-50 cursor-not-allowed text-gray-400"
+                }`}
+              >
+                <SelectValue placeholder={isRTL ? "اختر السنة" : "Select Year"} />
+              </SelectTrigger>
+              <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                 {years.map((year) => (
-                  <div
-                    key={year}
-                    className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                    onClick={() => selectYear("first", year)}
-                  >
-                    <span>{year}</span>
-                    {firstCar.year === year && <Check className="h-5 w-5 text-brand-primary" />}
-                  </div>
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
                 ))}
-              </div>
-            )}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Second Car Panel */}
-        <div className="bg-gradient-to-b from-[#f8f6f9] to-[#f0ebf1] rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center">
-              <Car className="w-10 h-10 text-brand-primary" />
+        <div
+          className={`bg-gradient-to-b from-[#f8f6f9] to-[#f0ebf1] rounded-xl p-5 shadow-md ${activeCarIndex === 1 ? "block" : "hidden md:block"}`}
+        >
+          <div className="hidden md:flex md:justify-center mb-6">
+            <div className="w-16 h-16 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center">
+              <Car className="w-8 h-8 text-brand-primary" />
             </div>
           </div>
-          <h3 className="text-center text-brand-primary text-xl font-bold mb-6">
+
+          <h3 className="text-xl font-bold text-brand-primary mb-5 md:text-center">
             {isRTL ? "السيارة الثانية" : "Second Car"}
           </h3>
 
           {/* Brand Dropdown */}
-          <div className="mb-4 relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{isRTL ? "الشركة المصنعة" : "Brand"}</label>
-            <button
-              onClick={() => toggleDropdown("secondCarBrand")}
-              className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-xl bg-white hover:border-brand-primary transition-colors"
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-gray-700 mb-2">{isRTL ? "الشركة المصنعة" : "Brand"}</label>
+            <Select
+              value={secondCar.brand ? secondCar.brand.id : ""}
+              onValueChange={(value) => {
+                const selectedBrand = brands.find((brand) => brand.id === value)
+                selectBrand("second", selectedBrand)
+              }}
             >
-              <span>
-                {secondCar.brand ? getText(secondCar.brand.name) : isRTL ? "اختر الشركة المصنعة" : "Select Brand"}
-              </span>
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            </button>
-            {openDropdowns.secondCarBrand && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
+              <SelectTrigger className="w-full p-3 border border-brand-primary rounded-xl bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none">
+                <SelectValue placeholder={isRTL ? "اختر الشركة المصنعة" : "Select Brand"} />
+              </SelectTrigger>
+              <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                 {brands.map((brand) => (
-                  <div
-                    key={brand.id}
-                    className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                    onClick={() => selectBrand("second", brand)}
-                  >
-                    <span>{getText(brand.name)}</span>
-                    {secondCar.brand && secondCar.brand.id === brand.id && (
-                      <Check className="h-5 w-5 text-brand-primary" />
-                    )}
-                  </div>
+                  <SelectItem key={brand.id} value={brand.id}>
+                    {getText(brand.name)}
+                  </SelectItem>
                 ))}
-              </div>
-            )}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Model Dropdown */}
-          <div className="mb-4 relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{isRTL ? "الطراز" : "Model"}</label>
-            <button
-              onClick={() => toggleDropdown("secondCarModel")}
-              className={`w-full flex items-center justify-between p-3 border rounded-xl ${
-                secondCar.brand
-                  ? "border-gray-200 bg-white hover:border-brand-primary"
-                  : "border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400"
-              } transition-colors`}
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-gray-700 mb-2">{isRTL ? "الطراز" : "Model"}</label>
+            <Select
+              value={secondCar.model ? secondCar.model.id.toString() : ""}
+              onValueChange={(value) => {
+                const selectedModel = secondCar.brand
+                  ? models[secondCar.brand.id]?.find((model) => model.id.toString() === value)
+                  : null
+                selectModel("second", selectedModel)
+              }}
               disabled={!secondCar.brand}
             >
-              <span>{secondCar.model ? getText(secondCar.model.name) : isRTL ? "اختر الطراز" : "Select Model"}</span>
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            </button>
-            {openDropdowns.secondCarModel && secondCar.brand && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
-                {models[secondCar.brand.id]?.map((model) => (
-                  <div
-                    key={model.id}
-                    className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                    onClick={() => selectModel("second", model)}
-                  >
-                    <span>{getText(model.name)}</span>
-                    {secondCar.model && secondCar.model.id === model.id && (
-                      <Check className="h-5 w-5 text-brand-primary" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+              <SelectTrigger
+                className={`w-full p-3 border rounded-xl ${
+                  secondCar.brand
+                    ? "border-brand-primary bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none"
+                    : "border-gray-300 bg-gray-50 cursor-not-allowed text-gray-400"
+                }`}
+              >
+                <SelectValue placeholder={isRTL ? "اختر الطراز" : "Select Model"} />
+              </SelectTrigger>
+              <SelectContent className="border border-brand-light shadow-lg rounded-lg">
+                {secondCar.brand &&
+                  models[secondCar.brand.id]?.map((model) => (
+                    <SelectItem key={model.id} value={model.id.toString()}>
+                      {getText(model.name)}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Year Dropdown */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 mb-1">{isRTL ? "السنة" : "Year"}</label>
-            <button
-              onClick={() => toggleDropdown("secondCarYear")}
-              className={`w-full flex items-center justify-between p-3 border rounded-xl ${
-                secondCar.model
-                  ? "border-gray-200 bg-white hover:border-brand-primary"
-                  : "border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400"
-              } transition-colors`}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{isRTL ? "السنة" : "Year"}</label>
+            <Select
+              value={secondCar.year || ""}
+              onValueChange={(value) => selectYear("second", value)}
               disabled={!secondCar.model}
             >
-              <span>{secondCar.year || (isRTL ? "اختر السنة" : "Select Year")}</span>
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            </button>
-            {openDropdowns.secondCarYear && secondCar.model && (
-              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
+              <SelectTrigger
+                className={`w-full p-3 border rounded-xl ${
+                  secondCar.model
+                    ? "border-brand-primary bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none"
+                    : "border-gray-300 bg-gray-50 cursor-not-allowed text-gray-400"
+                }`}
+              >
+                <SelectValue placeholder={isRTL ? "اختر السنة" : "Select Year"} />
+              </SelectTrigger>
+              <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                 {years.map((year) => (
-                  <div
-                    key={year}
-                    className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                    onClick={() => selectYear("second", year)}
-                  >
-                    <span>{year}</span>
-                    {secondCar.year === year && <Check className="h-5 w-5 text-brand-primary" />}
-                  </div>
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
                 ))}
-              </div>
-            )}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        {/* Third Car Panel (conditionally rendered) */}
+        {/* Third Car Panel or Add Third Car Button */}
         {showThirdCar ? (
-          <div className="bg-gradient-to-b from-[#f8f6f9] to-[#f0ebf1] rounded-2xl p-6 shadow-sm relative">
-            {/* Remove Third Car Button */}
+          <div
+            className={`bg-gradient-to-b from-[#f8f6f9] to-[#f0ebf1] rounded-xl p-5 shadow-md relative ${activeCarIndex === 2 ? "block" : "hidden md:block"}`}
+          >
             <button
               onClick={toggleThirdCar}
-              className="absolute top-3 right-3 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-500 hover:bg-red-200 transition-colors"
+              className="absolute top-3 right-3 w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-500"
               aria-label={isRTL ? "إزالة السيارة الثالثة" : "Remove third car"}
             >
               <Minus className="w-4 h-4" />
             </button>
 
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center">
-                <Car className="w-10 h-10 text-brand-primary" />
+            <div className="hidden md:flex md:justify-center mb-6">
+              <div className="w-16 h-16 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center">
+                <Car className="w-8 h-8 text-brand-primary" />
               </div>
             </div>
-            <h3 className="text-center text-brand-primary text-xl font-bold mb-6">
+
+            <h3 className="text-xl font-bold text-brand-primary mb-5 md:text-center">
               {isRTL ? "السيارة الثالثة" : "Third Car"}
             </h3>
 
             {/* Brand Dropdown */}
-            <div className="mb-4 relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 {isRTL ? "الشركة المصنعة" : "Brand"}
               </label>
-              <button
-                onClick={() => toggleDropdown("thirdCarBrand")}
-                className="w-full flex items-center justify-between p-3 border border-gray-200 rounded-xl bg-white hover:border-brand-primary transition-colors"
+              <Select
+                value={thirdCar.brand ? thirdCar.brand.id : ""}
+                onValueChange={(value) => {
+                  const selectedBrand = brands.find((brand) => brand.id === value)
+                  selectBrand("third", selectedBrand)
+                }}
               >
-                <span>
-                  {thirdCar.brand ? getText(thirdCar.brand.name) : isRTL ? "اختر الشركة المصنعة" : "Select Brand"}
-                </span>
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </button>
-              {openDropdowns.thirdCarBrand && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
+                <SelectTrigger className="w-full p-3 border border-brand-primary rounded-xl bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none">
+                  <SelectValue placeholder={isRTL ? "اختر الشركة المصنعة" : "Select Brand"} />
+                </SelectTrigger>
+                <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                   {brands.map((brand) => (
-                    <div
-                      key={brand.id}
-                      className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                      onClick={() => selectBrand("third", brand)}
-                    >
-                      <span>{getText(brand.name)}</span>
-                      {thirdCar.brand && thirdCar.brand.id === brand.id && (
-                        <Check className="h-5 w-5 text-brand-primary" />
-                      )}
-                    </div>
+                    <SelectItem key={brand.id} value={brand.id}>
+                      {getText(brand.name)}
+                    </SelectItem>
                   ))}
-                </div>
-              )}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Model Dropdown */}
-            <div className="mb-4 relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">{isRTL ? "الطراز" : "Model"}</label>
-              <button
-                onClick={() => toggleDropdown("thirdCarModel")}
-                className={`w-full flex items-center justify-between p-3 border rounded-xl ${
-                  thirdCar.brand
-                    ? "border-gray-200 bg-white hover:border-brand-primary"
-                    : "border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400"
-                } transition-colors`}
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">{isRTL ? "الطراز" : "Model"}</label>
+              <Select
+                value={thirdCar.model ? thirdCar.model.id.toString() : ""}
+                onValueChange={(value) => {
+                  const selectedModel = thirdCar.brand
+                    ? models[thirdCar.brand.id]?.find((model) => model.id.toString() === value)
+                    : null
+                  selectModel("third", selectedModel)
+                }}
                 disabled={!thirdCar.brand}
               >
-                <span>{thirdCar.model ? getText(thirdCar.model.name) : isRTL ? "اختر الطراز" : "Select Model"}</span>
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </button>
-              {openDropdowns.thirdCarModel && thirdCar.brand && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
-                  {models[thirdCar.brand.id]?.map((model) => (
-                    <div
-                      key={model.id}
-                      className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                      onClick={() => selectModel("third", model)}
-                    >
-                      <span>{getText(model.name)}</span>
-                      {thirdCar.model && thirdCar.model.id === model.id && (
-                        <Check className="h-5 w-5 text-brand-primary" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+                <SelectTrigger
+                  className={`w-full p-3 border rounded-xl ${
+                    thirdCar.brand
+                      ? "border-brand-primary bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none"
+                      : "border-gray-300 bg-gray-50 cursor-not-allowed text-gray-400"
+                  }`}
+                >
+                  <SelectValue placeholder={isRTL ? "اختر الطراز" : "Select Model"} />
+                </SelectTrigger>
+                <SelectContent className="border border-brand-light shadow-lg rounded-lg">
+                  {thirdCar.brand &&
+                    models[thirdCar.brand.id]?.map((model) => (
+                      <SelectItem key={model.id} value={model.id.toString()}>
+                        {getText(model.name)}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Year Dropdown */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">{isRTL ? "السنة" : "Year"}</label>
-              <button
-                onClick={() => toggleDropdown("thirdCarYear")}
-                className={`w-full flex items-center justify-between p-3 border rounded-xl ${
-                  thirdCar.model
-                    ? "border-gray-200 bg-white hover:border-brand-primary"
-                    : "border-gray-200 bg-gray-50 cursor-not-allowed text-gray-400"
-                } transition-colors`}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{isRTL ? "السنة" : "Year"}</label>
+              <Select
+                value={thirdCar.year || ""}
+                onValueChange={(value) => selectYear("third", value)}
                 disabled={!thirdCar.model}
               >
-                <span>{thirdCar.year || (isRTL ? "اختر السنة" : "Select Year")}</span>
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </button>
-              {openDropdowns.thirdCarYear && thirdCar.model && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-auto">
+                <SelectTrigger
+                  className={`w-full p-3 border rounded-xl ${
+                    thirdCar.model
+                      ? "border-brand-primary bg-white focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus-visible:outline-none"
+                      : "border-gray-300 bg-gray-50 cursor-not-allowed text-gray-400"
+                  }`}
+                >
+                  <SelectValue placeholder={isRTL ? "اختر السنة" : "Select Year"} />
+                </SelectTrigger>
+                <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                   {years.map((year) => (
-                    <div
-                      key={year}
-                      className="p-3 hover:bg-brand-light cursor-pointer flex items-center justify-between"
-                      onClick={() => selectYear("third", year)}
-                    >
-                      <span>{year}</span>
-                      {thirdCar.year === year && <Check className="h-5 w-5 text-brand-primary" />}
-                    </div>
+                    <SelectItem key={year} value={year}>
+                      {year}
+                    </SelectItem>
                   ))}
-                </div>
-              )}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center">
+          <div className="hidden md:flex md:items-center md:justify-center">
             <button
               onClick={toggleThirdCar}
-              className="h-full w-full border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center p-6 hover:border-brand-primary hover:bg-brand-light bg-opacity-30 transition-colors"
+              className="h-full w-full border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center p-6 hover:border-brand-primary hover:bg-brand-light hover:bg-opacity-30 transition-colors"
             >
               <div className="w-16 h-16 bg-brand-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
                 <Plus className="w-8 h-8 text-brand-primary" />
@@ -522,11 +522,86 @@ const CarComparisonSelector = () => {
         )}
       </div>
 
+      {/* Car Summary Cards - Only visible on mobile */}
+      <div className="md:hidden mt-6 mb-6">
+        {(firstCar.model || secondCar.model || (showThirdCar && thirdCar.model)) && (
+          <>
+            <h3 className="text-lg font-medium text-gray-700 mb-3">{isRTL ? "السيارات المختارة" : "Selected Cars"}</h3>
+
+            <div className="space-y-3">
+              {/* First Car Summary */}
+              {firstCar.model && (
+                <div
+                  className="p-4 border border-gray-200 rounded-lg flex justify-between items-center bg-white shadow-sm"
+                  onClick={() => setActiveCarIndex(0)}
+                >
+                  <div className="flex items-center">
+                    <Car className="w-5 h-5 text-brand-primary mr-2" />
+                    <div>
+                      <p className="font-medium">{getText(firstCar.model.name)}</p>
+                      {firstCar.brand && <p className="text-sm text-gray-500">{getText(firstCar.brand.name)}</p>}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </div>
+              )}
+
+              {/* Second Car Summary */}
+              {secondCar.model && (
+                <div
+                  className="p-4 border border-gray-200 rounded-lg flex justify-between items-center bg-white shadow-sm"
+                  onClick={() => setActiveCarIndex(1)}
+                >
+                  <div className="flex items-center">
+                    <Car className="w-5 h-5 text-brand-primary mr-2" />
+                    <div>
+                      <p className="font-medium">{getText(secondCar.model.name)}</p>
+                      {secondCar.brand && <p className="text-sm text-gray-500">{getText(secondCar.brand.name)}</p>}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </div>
+              )}
+
+              {/* Third Car Summary (if enabled) */}
+              {showThirdCar && thirdCar.model && (
+                <div
+                  className="p-4 border border-gray-200 rounded-lg flex justify-between items-center bg-white shadow-sm"
+                  onClick={() => setActiveCarIndex(2)}
+                >
+                  <div className="flex items-center">
+                    <Car className="w-5 h-5 text-brand-primary mr-2" />
+                    <div>
+                      <p className="font-medium">{getText(thirdCar.model.name)}</p>
+                      {thirdCar.brand && <p className="text-sm text-gray-500">{getText(thirdCar.brand.name)}</p>}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Add Third Car Button - Only visible on mobile */}
+      {!showThirdCar && (
+        <button
+          onClick={toggleThirdCar}
+          className="md:hidden w-full p-4 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-white mb-6"
+        >
+          <Plus className="w-5 h-5 text-brand-primary mr-2" />
+          <span className="text-brand-primary font-medium">
+            {isRTL ? "إضافة سيارة ثالثة للمقارنة" : "Add a third car"}
+          </span>
+        </button>
+      )}
+
       {/* Compare Button */}
-      <div className="flex justify-center">
+      <div className="flex justify-center mt-6">
         <button
           onClick={handleCompare}
-          className={`bg-brand-primary text-white px-10 py-4 rounded-full hover:bg-opacity-90 transition-colors text-lg font-medium shadow-md flex items-center gap-2 ${
+          className={`bg-brand-primary text-white px-6 py-4 md:px-10 md:py-4 rounded-lg md:rounded-full text-lg font-medium flex items-center gap-2 w-full md:w-auto md:shadow-md justify-center md:justify-start ${
             !canCompare ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={!canCompare}

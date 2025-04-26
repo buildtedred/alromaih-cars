@@ -21,7 +21,7 @@ export function PromoSlider() {
       subtitle: "Buy comfortably from your home",
     },
     {
-      src: "https://images.unsplash.com/photo-1605559424849-330b1f3d9d82?w=1600&h=600&fit=crop",
+      src: "https://images.unsplash.com/photo-1726379805742-3b7620126dc5?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       title: "Exclusive Discounts",
       subtitle: "Save big on your next car",
     },
