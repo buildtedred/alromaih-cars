@@ -160,10 +160,9 @@ function BrandShowcase() {
         <Slider {...settings} className="slider-container">
           {carsData.map((brand, index) => (
             <motion.div
-              whileHover={{ scale: 1.2 }}
-              whileTap={{ scale: 0.8 }}
+      
               key={index}
-              className="px-2 "
+              className="px-2 py-4"
             >
               <BrandCard brand={brand} />
             </motion.div>

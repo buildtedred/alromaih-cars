@@ -3,10 +3,8 @@ import { useState, useEffect, useCallback } from "react"
 import { Phone, Menu, X, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Nav from "./Nav"
-import { Skeleton } from "@/components/ui/skeleton"
 import LanguageToggle from "./LanguageToggle"
 import SearchComponent from "./search/SearchComponent"
-import { useOdoo } from "@/contexts/OdooContext"
 import { motion, useMotionValueEvent, AnimatePresence } from "framer-motion"
 import { useScroll } from "motion/react"
 import WishlistCounter from "@/app/[locale]/wishlist/wishlist-counter"
@@ -15,11 +13,8 @@ import Image from "next/image"
 
 const Header = () => {
   const { t } = useTranslation()
-  const { logo, loading } = useOdoo()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchVisible, setIsSearchVisible] = useState(false)
-  const [mocData, setMocData] = useState([])
-  const [loadingMocData, setLoadingMocData] = useState(true)
   const [mounted, setMounted] = useState(false)
   const [scroll, setScroll] = useState(0)
   const { scrollY } = useScroll()
@@ -27,24 +22,6 @@ const Header = () => {
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScroll(latest)
   })
-
-  const fetchSliderData = useCallback(() => {
-    setLoadingMocData(true)
-    fetch("https://67c7bf7cc19eb8753e7a9248.mockapi.io/api/logo")
-      .then((response) => response.json())
-      .then((data) => {
-        setMocData(data)
-        setLoadingMocData(false)
-      })
-      .catch((error) => {
-        console.error("Error fetching brands:", error)
-        setLoadingMocData(false)
-      })
-  }, [])
-
-  useEffect(() => {
-    fetchSliderData()
-  }, [fetchSliderData])
 
   useEffect(() => {
     setMounted(true)
@@ -66,13 +43,9 @@ const Header = () => {
             <div className="flex items-center justify-between h-16">
               {/* Logo */}
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                {loading ? (
-                  <span>
-                    <Skeleton className="w-[100px] h-[40px] rounded-full" />
-                  </span>
-                ) : (
+           
                   <Image src={logo9 || "/placeholder.svg"} height={170} width={170} alt={"Logo"} />
-                )}
+                
               </div>
 
               {/* Desktop Navigation */}

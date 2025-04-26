@@ -65,7 +65,7 @@ const BrandCard = ({ brand, isEnglish }) => {
   return (
     <div onClick={handleBrands} >
       <motion.div
-        className="rounded-xl bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-purple-100"
+        className=" bg-brand-light rounded-[10px] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-purple-100"
         whileHover={{ y: -5 }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
