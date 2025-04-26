@@ -67,7 +67,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
     try {
       // Import the PDF component and generate the PDF
-      const { generatePDF } = await import("@/components/car-comparison-pdf")
+      const { generatePDF } = await import("./car-comparison-pdf")
       const pdfBlob = await generatePDF(
         {
           car1,
