@@ -201,4 +201,3 @@ const PriceCardSimple = ({ car_Details, isEnglish, onColorChange, pdfCarDetails,
 }
 
 export default PriceCardSimple
-

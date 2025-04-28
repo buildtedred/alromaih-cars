@@ -4,16 +4,60 @@
 // Car images - Updated with numbered image names
 const carImages = {
   car1: "/images/car1.png",
+  car1_1: "/images/car1.png",
+  car1_2: "/images/car1.png",
+  car1_3: "/images/car1.png",
+  car1_4: "/images/car1.png",
   car2: "/images/car2.png",
+  car2_1: "/images/car2.png",
+  car2_2: "/images/car2.png",
+  car2_3: "/images/car2.png",
+  car2_4: "/images/car2.png",
   car3: "/images/car3.png",
+  car3_1: "/images/car3.png",
+  car3_2: "/images/car3.png",
+  car3_3: "/images/car3.png",
+  car3_4: "/images/car3.png",
   car4: "/images/car4.png",
+  car4_1: "/images/car4.png",
+  car4_2: "/images/car4.png",
+  car4_3: "/images/car4.png",
+  car4_4: "/images/car4.png",
   car5: "/images/car5.png",
+  car5_1: "/images/car5.png",
+  car5_2: "/images/car5.png",
+  car5_3: "/images/car5.png",
+  car5_4: "/images/car5.png",
   car6: "/images/car6.png",
+  car6_1: "/images/car6.png",
+  car6_2: "/images/car6.png",
+  car6_3: "/images/car6.png",
+  car6_4: "/images/car6.png",
   car7: "/images/car7.png",
+  car7_1: "/images/car7.png",
+  car7_2: "/images/car7.png",
+  car7_3: "/images/car7.png",
+  car7_4: "/images/car7.png",
   car8: "/images/car8.png",
+  car8_1: "/images/car8.png",
+  car8_2: "/images/car8.png",
+  car8_3: "/images/car8.png",
+  car8_4: "/images/car8.png",
   car9: "/images/car9.png",
+  car9_1: "/images/car9.png",
+  car9_2: "/images/car9.png",
+  car9_3: "/images/car9.png",
+  car9_4: "/images/car9.png",
   car10: "/images/car10.png",
+  car10_1: "/images/car10.png",
+  car10_2: "/images/car10.png",
+  car10_3: "/images/car10.png",
+  car10_4: "/images/car10.png",
   car11: "/images/car11.png",
+  car11_1: "/images/car11.png",
+  car11_2: "/images/car11.png",
+  car11_3: "/images/car11.png",
+  car11_4: "/images/car11.png",
 }
 
 // Brand logos - Updated with all brand SVGs
@@ -97,6 +141,61 @@ const specCategories = [
     icon: "/icons/safety.svg",
     specs: ["airbags", "brakes", "parkingSensors", "camera"],
   },
+]
+
+// Overview data structure for car information section
+const overviewCategories = [
+  [
+    {
+      key: "year",
+      icon: "calendar",
+      label: { en: "Manufacturing Year", ar: "سنة الصنع" },
+    },
+    {
+      key: "torque",
+      icon: "gaugeCircle",
+      label: { en: "Torque", ar: "عزم الدوران" },
+    },
+    {
+      key: "power",
+      icon: "gauge",
+      label: { en: "Power", ar: "القوة" },
+    },
+  ],
+  [
+    {
+      key: "fuelTank",
+      icon: "fuel",
+      label: { en: "Fuel Tank Capacity", ar: "سعة خزان الوقود" },
+    },
+    {
+      key: "brand",
+      icon: "car",
+      label: { en: "Manufactured", ar: "الشركة المصنعة" },
+    },
+    {
+      key: "engine",
+      icon: "settings",
+      label: { en: "Engine", ar: "المحرك" },
+    },
+  ],
+  [
+    {
+      key: "fuelType",
+      icon: "fuel",
+      label: { en: "Fuel Type", ar: "نوع الوقود" },
+    },
+    {
+      key: "transmission",
+      icon: "wrench",
+      label: { en: "Transmission", ar: "ناقل الحركة" },
+    },
+    {
+      key: "seats",
+      icon: "users",
+      label: { en: "Seating Capacity", ar: "سعة المقاعد" },
+    },
+  ],
 ]
 
 // Mock car data with bilingual content - Updated with mixed brands
@@ -213,6 +312,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car1_1, carImages.car1_2, carImages.car1_3, carImages.car1_4],
   },
   {
     id: 2,
@@ -326,6 +426,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car2_1, carImages.car2_2, carImages.car2_3, carImages.car2_4],
   },
   {
     id: 3,
@@ -439,6 +540,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car3_1, carImages.car3_2, carImages.car3_3, carImages.car3_4],
   },
   {
     id: 4,
@@ -552,6 +654,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car4_1, carImages.car4_2, carImages.car4_3, carImages.car4_4],
   },
   {
     id: 5,
@@ -665,6 +768,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car5_1, carImages.car5_2, carImages.car5_3, carImages.car5_4],
   },
   {
     id: 6,
@@ -778,6 +882,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car6_1, carImages.car6_2, carImages.car6_3, carImages.car6_4],
   },
   {
     id: 7,
@@ -891,6 +996,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car7_1, carImages.car7_2, carImages.car7_3, carImages.car7_4],
   },
   {
     id: 8,
@@ -1004,6 +1110,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car8_1, carImages.car8_2, carImages.car8_3, carImages.car8_4],
   },
   {
     id: 9,
@@ -1117,6 +1224,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car9_1, carImages.car9_2, carImages.car9_3, carImages.car9_4],
   },
   {
     id: 10,
@@ -1230,6 +1338,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car10_1, carImages.car10_2, carImages.car10_3, carImages.car10_4],
   },
   {
     id: 11,
@@ -1343,6 +1452,7 @@ const carsData = [
       year: icons.year,
       currency: icons.currency,
     },
+    additional_images: [carImages.car11_1, carImages.car11_2, carImages.car11_3, carImages.car11_4],
   },
 ]
 
@@ -1357,4 +1467,4 @@ export const fetchCars = () => {
 
 // Export all the data for use in components
 export default carsData
-export { specNames, specCategories }
+export { specNames, specCategories, overviewCategories }

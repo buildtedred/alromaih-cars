@@ -1,7 +1,7 @@
 "use client"
 import { useState, useCallback, useEffect } from "react"
 import Image from "next/image"
-import { X } from 'lucide-react'
+import { X } from "lucide-react"
 import styles from "./CompactCarListing.module.css"
 import { FinanceCalculator } from "./FinanceCalculator"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -12,7 +12,7 @@ import PriceCardSimple from "./PriceCard"
 import { useDetailContext } from "@/contexts/detailProvider"
 
 const CompactCarListing = ({ brand_Details }) => {
-    const {car_Details, loading } = useDetailContext();
+  const { car_Details, loading } = useDetailContext()
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
 
@@ -116,7 +116,6 @@ const CompactCarListing = ({ brand_Details }) => {
     </div>
   )
 
-
   // Get model name
   const getModelName = () => {
     if (car_Details?.model?.name) {
@@ -167,7 +166,9 @@ const CompactCarListing = ({ brand_Details }) => {
             <button
               onClick={() => setActivePaymentTab("cash")}
               className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                activePaymentTab === "cash" ? "bg-brand-primary text-white" : "bg-white text-brand-primary hover:bg-brand-light"
+                activePaymentTab === "cash"
+                  ? "bg-brand-primary text-white"
+                  : "bg-white text-brand-primary hover:bg-brand-light"
               }`}
             >
               {isEnglish ? "Cash" : "كاش"}
@@ -197,7 +198,9 @@ const CompactCarListing = ({ brand_Details }) => {
             ) : (
               <div className="space-y-4">
                 <div className="">
-                  <p className="text-brand-primary font-medium mb-2">{isEnglish ? "Monthly Payment" : "يبدأ القسط من"}</p>
+                  <p className="text-brand-primary font-medium mb-2">
+                    {isEnglish ? "Monthly Payment" : "يبدأ القسط من"}
+                  </p>
                   <p className="text-3xl font-bold text-brand-primary mb-1 flex items-center gap-1">
                     <RiyalIcon />
                     <span>{formatPrice(car_Details?.pricing?.monthly_installment || 1940)}</span>
@@ -265,12 +268,9 @@ const CompactCarListing = ({ brand_Details }) => {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-36 py-8">
         {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-6">
-            {/* Right Column */}
+          {/* Right Column */}
           <div className="flex-1">
-            <div className="flex flex-col sm:flex-row gap-4">
-              {renderMainCarGallery()}
-              {renderThumbnails()}
-            </div>
+            <CarGallery carDetails={car_Details} isLoading={isLoading} />
             <div className="mb-6">
               {isLoading ? (
                 <div className="space-y-2">
@@ -330,8 +330,6 @@ const CompactCarListing = ({ brand_Details }) => {
               )}
             </div>
           </div>
-
-        
         </div>
       </div>
 
@@ -355,3 +353,97 @@ const CompactCarListing = ({ brand_Details }) => {
 }
 
 export default CompactCarListing
+
+const CarGallery = ({ carDetails, isLoading = false }) => {
+  const pathname = usePathname()
+  const isEnglish = pathname.startsWith("/en")
+  const [activeImage, setActiveImage] = useState(0)
+  const [currentMainImage, setCurrentMainImage] = useState(carDetails?.image || "")
+
+  // Process gallery images
+  const additionalImages = carDetails?.additional_images || []
+
+  // Combine main image with additional images
+  const allImages = [...(currentMainImage ? [currentMainImage] : []), ...additionalImages]
+
+  useEffect(() => {
+    if (carDetails?.image) {
+      setCurrentMainImage(carDetails.image)
+      setActiveImage(0) // Reset active image when car details change
+    }
+  }, [carDetails])
+
+  // Handle color change
+  const handleColorChange = (imageUrl) => {
+    if (imageUrl) {
+      setCurrentMainImage(imageUrl)
+      setActiveImage(0) // Reset to first image which will be the new color image
+    }
+  }
+
+  // Get model name
+  const getModelName = () => {
+    if (carDetails?.name) {
+      return isEnglish ? carDetails.name.en : carDetails.name.ar
+    }
+    return "N/A"
+  }
+
+  // Get brand name
+  const getBrandName = () => {
+    return carDetails?.brand || ""
+  }
+
+  const renderMainCarGallery = () => (
+    <div className="w-full sm:w-4/5">
+      <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
+        {isLoading ? (
+          <Skeleton className="w-full h-full" />
+        ) : (
+          <Image
+            src={allImages[activeImage] || "/placeholder.svg?height=450&width=800"}
+            alt={`${getBrandName()} ${getModelName()} - ${activeImage === 0 ? "Main view" : `View ${activeImage + 1}`}`}
+            width={800}
+            height={450}
+            className="object-cover w-full h-full"
+          />
+        )}
+      </div>
+    </div>
+  )
+
+  const renderThumbnails = () => (
+    <div className="w-full sm:w-1/5 h-auto sm:h-[400px] mb-4">
+      <div className="flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-y-auto sm:h-full p-1">
+        {isLoading
+          ? Array(5)
+              .fill(0)
+              .map((_, index) => <Skeleton key={index} className="w-20 h-20 sm:w-full aspect-square rounded-lg mb-2" />)
+          : allImages.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveImage(index)}
+                className={`flex-shrink-0 rounded-[5px] overflow-hidden border-2 ${
+                  activeImage === index ? "border-brand-primary" : "border-transparent"
+                }`}
+              >
+                <Image
+                  src={image || "/placeholder.svg?height=80&width=80"}
+                  alt={`${getBrandName()} ${getModelName()} thumbnail ${index + 1}`}
+                  width={80}
+                  height={80}
+                  className="rounded-md object-cover w-20 h-20 sm:w-full sm:h-auto"
+                />
+              </button>
+            ))}
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="flex flex-col sm:flex-row gap-4">
+      {renderMainCarGallery()}
+      {renderThumbnails()}
+    </div>
+  )
+}
