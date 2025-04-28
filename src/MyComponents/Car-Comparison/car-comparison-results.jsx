@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Check, X, Heart, Share2, Printer, Download, BarChart3, Gauge, Fuel, Sparkles, Award, Zap, Shield, Maximize, Users, TrendingUp, TrendingDown, Minus, ArrowLeft, ArrowRight } from 'lucide-react'
 import carsData, { specNames, specCategories } from "@/app/api/mock-data"
 import { toggleWishlistItem, isInWishlist } from "@/lib/wishlist-utils"
+import ShareDialog from "./share-dialog"
 
 // Print styles
 const printStyles = `
@@ -558,13 +559,21 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
               <span>{isRTL ? "طباعة" : "Print"}</span>
             </button>
             <button
-              onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors backdrop-blur-sm"
-              style={{ borderRadius: "5px" }}
-            >
-              <Share2 className="w-4 h-4" />
-              <span>{isRTL ? "مشاركة" : "Share"}</span>
-            </button>
+  onClick={handleShare}
+  className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors backdrop-blur-sm"
+  style={{ borderRadius: "5px" }}
+>
+  <Share2 className="w-4 h-4" />
+  <span>{isRTL ? "مشاركة" : "Share"}</span>
+</button>
+            {isShareDialogOpen && (
+  <ShareDialog
+    isOpen={isShareDialogOpen}
+    onClose={() => setIsShareDialogOpen(false)}
+    carData={{ car1, car2, car3: hasThirdCar ? car3 : null }}
+    currentLocale={currentLocale}
+  />
+)}
             <button
               onClick={handleDownload}
               disabled={isGeneratingPDF}
