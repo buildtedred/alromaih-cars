@@ -1,26 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import axios from "axios"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { createClient } from "@supabase/supabase-js"
-import { Trash2, Upload, Palette, AlertCircle } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { Palette, AlertCircle, ImageIcon, X, Save, Loader2, ArrowLeft } from "lucide-react"
 import { HexColorPicker, HexColorInput } from "react-colorful"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
-import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import ImageGallery from "../../../images-gallery/image-gallery"
 
-// Initialize Supabase
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 export default function EditVariationForm() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const variationId = searchParams.get("id")
-  const router = useRouter()
 
   const [variation, setVariation] = useState({
     name: "",
@@ -30,113 +29,94 @@ export default function EditVariationForm() {
     images: [],
   })
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [isUploading, setIsUploading] = useState(false)
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
 
   useEffect(() => {
     if (variationId) fetchVariation()
   }, [variationId])
 
-  // Fetch existing variation
   const fetchVariation = async () => {
     try {
       setLoading(true)
+      setError(null)
       const response = await axios.get(`/api/supabasPrisma/othervariations/${variationId}`)
-      const fetchedVariation = response.data
 
-      // Ensure images are formatted correctly
-      const formattedImages = Array.isArray(fetchedVariation.images)
-        ? fetchedVariation.images.map((img) =>
-            typeof img === "string" ? { url: img, name: img.split("/").pop() } : img,
-          )
-        : []
+      // Format the data for the form
+      const data = response.data
+
+      // Format images to match our component's expected structure
+      const formattedImages =
+        data.images?.map((url) => ({
+          url,
+          name: url.split("/").pop(), // Extract filename from URL
+        })) || []
 
       setVariation({
-        ...fetchedVariation,
+        name: data.name || "",
+        colorName: data.colorName || "",
+        colorHex: data.colorHex || "#000000",
+        price: data.price?.toString() || "",
         images: formattedImages,
-        colorHex: fetchedVariation.colorHex || "#000000", // Ensure colorHex has a default value
       })
     } catch (error) {
       console.error("Error fetching variation:", error)
-      setError("Failed to load variation. Please try again.")
+      setError("Failed to fetch variation data. Please try again.")
     } finally {
       setLoading(false)
     }
   }
 
-  // Handle input changes
   const handleVariationChange = (field, value) => {
     setVariation((prev) => ({ ...prev, [field]: value }))
   }
 
-  // Upload new images to Supabase
-  const uploadImages = async (files) => {
-    if (!files.length) return
+  // Handle selecting images from the gallery
+  const handleSelectMultipleImages = (selectedImages) => {
+    // Add the selected images to the variation
+    setVariation((prev) => {
+      // Create a map of existing image URLs to prevent duplicates
+      const existingUrls = new Set(prev.images.map((img) => img.url))
 
-    setIsUploading(true)
-    setUploadProgress(0)
+      // Filter out any images that are already selected
+      const newImages = selectedImages.filter((img) => !existingUrls.has(img.url))
 
-    const totalFiles = files.length
-    let completedFiles = 0
+      return {
+        ...prev,
+        images: [...prev.images, ...newImages],
+      }
+    })
 
-    const uploadedImages = await Promise.all(
-      [...files].map(async (file) => {
-        const fileName = `cars/${Date.now()}_${file.name}`
-        const { error } = await supabase.storage.from("Alromaih").upload(fileName, file)
+    setIsGalleryOpen(false)
+  }
 
-        completedFiles++
-        setUploadProgress(Math.round((completedFiles / totalFiles) * 100))
-
-        if (error) {
-          console.error("Upload error:", error)
-          return null
-        }
-
-        return {
-          url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${fileName}`,
-          name: fileName,
-        }
-      }),
-    )
-
+  // Remove an image from the selection
+  const removeImage = (imageIndex) => {
     setVariation((prev) => ({
       ...prev,
-      images: [...prev.images, ...uploadedImages.filter((img) => img !== null)],
+      images: prev.images.filter((_, i) => i !== imageIndex),
     }))
-
-    setIsUploading(false)
   }
 
-  // Remove image from Supabase storage
-  const removeImage = async (imageIndex, fileName) => {
-    if (!confirm("Are you sure you want to delete this image?")) return
-
-    setLoading(true)
-    try {
-      // Extract the path from the full URL if needed
-      const path =
-        typeof fileName === "string" && fileName.includes("Alromaih/") ? fileName.split("Alromaih/")[1] : fileName
-
-      await supabase.storage.from("Alromaih").remove([path])
-
-      setVariation((prev) => ({
-        ...prev,
-        images: prev.images.filter((_, i) => i !== imageIndex),
-      }))
-    } catch (error) {
-      console.error("Error removing image:", error)
-      setError("Failed to remove image. Please try again.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Submit updated variation
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
+
+    // Validate form
+    if (
+      !variationId ||
+      !variation.name ||
+      !variation.colorName ||
+      !variation.colorHex ||
+      variation.images.length === 0 ||
+      !variation.price
+    ) {
+      setError("All fields are required, including at least one image.")
+      return
+    }
+
+    setSubmitting(true)
     setError(null)
 
     try {
@@ -144,26 +124,84 @@ export default function EditVariationForm() {
       const formattedVariation = {
         ...variation,
         price: Number.parseFloat(variation.price),
-        images: variation.images.map((img) => (typeof img === "string" ? img : img.url)),
+        images: variation.images.map((img) => img.url),
       }
 
       await axios.put(`/api/supabasPrisma/othervariations/${variationId}`, formattedVariation)
 
       alert("Variation updated successfully!")
-      // router.push("/dashboard/cars")
+      router.back()
     } catch (error) {
-      console.error("Update error:", error)
-      setError("Failed to update variation. Please check your inputs and try again.")
+      console.error("Error updating variation:", error)
+      setError("Failed to update variation. Please try again.")
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
+  // Render skeleton loading state
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 space-y-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <Skeleton className="h-8 w-48 mb-2" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+          <Skeleton className="h-10 w-20" />
+        </div>
+
+        {/* Form skeleton */}
+        <div className="border p-6 rounded-lg shadow-sm space-y-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <div className="flex gap-2">
+                <Skeleton className="h-10 flex-1" />
+                <Skeleton className="h-10 w-10" />
+              </div>
+            </div>
+          </div>
+
+          <Skeleton className="h-0.5 w-full" />
+
+          <div className="space-y-4">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-32 w-full rounded-lg" />
+          </div>
+
+          <div className="flex justify-end">
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto p-4">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Edit Variation</h1>
+        <div>
+          <h1 className="text-2xl font-bold">Edit Variation</h1>
+          <p className="text-muted-foreground">Update variation details</p>
+        </div>
         <Button variant="outline" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
       </div>
@@ -176,7 +214,7 @@ export default function EditVariationForm() {
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6 border p-6 rounded-lg shadow-sm bg-card">
+      <form onSubmit={handleSubmit} className="space-y-6 border p-6 rounded-lg shadow-sm bg-card mb-8">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="name">Variation Name</Label>
@@ -186,19 +224,25 @@ export default function EditVariationForm() {
               value={variation.name}
               onChange={(e) => handleVariationChange("name", e.target.value)}
               required
+              disabled={submitting}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="price">Price</Label>
-            <Input
-              id="price"
-              type="number"
-              placeholder="0.00"
-              value={variation.price}
-              onChange={(e) => handleVariationChange("price", e.target.value)}
-              required
-            />
+            <div className="relative">
+              <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="price"
+                type="number"
+                placeholder="0.00"
+                value={variation.price}
+                onChange={(e) => handleVariationChange("price", e.target.value)}
+                className="pl-8"
+                required
+                disabled={submitting}
+              />
+            </div>
           </div>
         </div>
 
@@ -211,6 +255,7 @@ export default function EditVariationForm() {
               value={variation.colorName}
               onChange={(e) => handleVariationChange("colorName", e.target.value)}
               required
+              disabled={submitting}
             />
           </div>
 
@@ -233,18 +278,21 @@ export default function EditVariationForm() {
                   placeholder="#000000"
                   className="pl-10"
                   required
+                  disabled={submitting}
                 />
               </div>
 
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    type="button"
                     variant="outline"
                     className="w-10 p-0 border-2"
                     style={{
                       backgroundColor: variation.colorHex || "#ffffff",
                       borderColor: variation.colorHex ? "transparent" : undefined,
                     }}
+                    disabled={submitting}
                   >
                     <span className="sr-only">Pick a color</span>
                   </Button>
@@ -273,85 +321,77 @@ export default function EditVariationForm() {
 
         <Separator />
 
-        <div className="space-y-4">
-          <Label>Variation Images</Label>
-
-          <div className="flex items-center justify-center border-2 border-dashed rounded-lg p-6 relative">
-            <input
-              type="file"
-              multiple
-              onChange={(e) => uploadImages(e.target.files)}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              disabled={isUploading}
-            />
-            <div className="text-center">
-              <Upload className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-              <p className="text-sm font-medium mb-1">Drag & drop images here or click to browse</p>
-              <p className="text-xs text-muted-foreground">Supported formats: JPG, PNG, WebP</p>
-
-              {isUploading && (
-                <div className="mt-4 w-full">
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-xs mt-1 text-center">{uploadProgress}% uploaded</p>
-                </div>
-              )}
-            </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">
+              Variation Images <span className="text-destructive">*</span>
+            </h3>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => setIsGalleryOpen(true)}
+              disabled={submitting}
+            >
+              <ImageIcon className="h-3 w-3 mr-1" />
+              Select from Gallery
+            </Button>
           </div>
 
-          {/* Display existing images */}
-          {variation.images && variation.images.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
-              {variation.images.map((img, imgIndex) => (
-                <Card key={imgIndex} className="overflow-hidden">
-                  <div className="relative aspect-square">
-                    <img
-                      src={typeof img === "string" ? img : img.url}
-                      alt={`Variation image ${imgIndex + 1}`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = "/placeholder.svg?height=100&width=100"
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 h-8 w-8 rounded-full"
-                      onClick={() => removeImage(imgIndex, typeof img === "string" ? img : img.name)}
-                    >
-                      <Trash2 size={16} />
-                      <span className="sr-only">Remove image</span>
-                    </Button>
-                  </div>
-                  <CardContent className="p-2">
-                    <p className="text-xs truncate text-muted-foreground">Image {imgIndex + 1}</p>
-                  </CardContent>
-                </Card>
-              ))}
+          {variation.images.length === 0 ? (
+            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+              <div className="flex flex-col items-center justify-center">
+                <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-xs text-muted-foreground mb-2">No images selected</p>
+                <p className="text-xs text-muted-foreground">Select images from gallery</p>
+              </div>
             </div>
           ) : (
-            <div className="text-center p-4 border rounded-md bg-muted/10">
-              <p className="text-muted-foreground">No images uploaded yet</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {variation.images.map((image, index) => (
+                <div key={index} className="relative group">
+                  <div className="aspect-square rounded-md overflow-hidden border">
+                    <img
+                      src={image.url || "/placeholder.svg"}
+                      alt={`Image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    disabled={submitting}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
+
+          {/* Gallery Modal */}
+          <Dialog open={isGalleryOpen} onOpenChange={setIsGalleryOpen}>
+            <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-xl">Select Images from Gallery</DialogTitle>
+                <DialogDescription>Choose multiple images from your gallery for this variation.</DialogDescription>
+              </DialogHeader>
+              <div className="mt-4">
+                <ImageGallery onSelectMultiple={handleSelectMultipleImages} multiSelect={true} />
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={() => router.back()} disabled={loading}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Updating..." : "Update Variation"}
+        <div className="flex justify-end pt-4">
+          <Button type="submit" disabled={submitting} className="gap-2">
+            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            Update Variation
           </Button>
         </div>
       </form>
     </div>
   )
 }
-

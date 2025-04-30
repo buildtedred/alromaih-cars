@@ -179,15 +179,50 @@ export function AppSidebar() {
                   </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActive("/dashboard/maintenance")}>
-                  <Link href="/dashboard/maintenance">
-                    <Wrench className="h-4 w-4" />
-                    <span>Maintenance</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {/* /////////////////////////////// */}
+              <Collapsible defaultOpen className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      isActive={isChildActive([
+                        "/dashboard/cars",
+                        "/dashboard/car-variations",
+                        // "/dashboard/cars/featured",
+                        // "/dashboard/cars/inventory",
+                      ])}
+                    >
+                      <Wrench className="h-4 w-4" />
+                      <span>Maintenance</span>
+                      <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/cars")}>
+                          <Link href="/dashboard/images-gallery">Images Gallery</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      {/* <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild isActive={isActive("/dashboard/car-variations")}>
+                          <Link href="/dashboard/car-variations">All Cars Variations</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem> */}
+                      <SidebarMenuSubItem>
+                        {/* <SidebarMenuSubButton asChild isActive={isActive("/dashboard/cars/featured")}>
+                          <Link href="/dashboard/cars/featured">Featured Cars</Link>
+                        </SidebarMenuSubButton> */}
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        {/* <SidebarMenuSubButton asChild isActive={isActive("/dashboard/cars/inventory")}>
+                          <Link href="/dashboard/cars/inventory">Inventory</Link>
+                        </SidebarMenuSubButton> */}
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+              {/* /////////////////////////////// */}
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isActive("/dashboard/parts")}>

@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { createClient } from "@supabase/supabase-js"
 import axios from "axios"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
-import { Trash2, Edit, Upload, Palette, AlertCircle, Plus, DollarSign, Loader2 } from "lucide-react"
+import { Trash2, Edit, Palette, AlertCircle, Plus, DollarSign, Loader2, ImageIcon, X } from 'lucide-react'
 import { HexColorPicker, HexColorInput } from "react-colorful"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -23,9 +22,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import ImageGallery from "@/app/(dashboard)/dashboard/images-gallery/image-gallery"
 
-// Initialize Supabase
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 export default function AddOtherVariationForm() {
   const { id: carId } = useParams()
@@ -43,10 +41,9 @@ export default function AddOtherVariationForm() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [variationToDelete, setVariationToDelete] = useState(null)
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
 
   useEffect(() => {
     if (carId) fetchCarData()
@@ -70,69 +67,31 @@ export default function AddOtherVariationForm() {
     setVariation((prev) => ({ ...prev, [field]: value }))
   }
 
-  const uploadImages = async (files) => {
-    if (!files.length) return
-
-    setIsUploading(true)
-    setUploadProgress(0)
-
-    const totalFiles = files.length
-    let completedFiles = 0
-
-    try {
-      const uploadedImages = await Promise.all(
-        [...files].map(async (file) => {
-          const fileName = `cars/${Date.now()}_${file.name}`
-          const { error } = await supabase.storage.from("Alromaih").upload(fileName, file)
-
-          completedFiles++
-          setUploadProgress(Math.round((completedFiles / totalFiles) * 100))
-
-          if (error) {
-            console.error("Upload error:", error)
-            return null
-          }
-
-          return {
-            url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Alromaih/${fileName}`,
-            name: fileName,
-          }
-        }),
-      )
-
-      setVariation((prev) => ({
+  // Handle selecting images from the gallery
+  const handleSelectMultipleImages = (selectedImages) => {
+    // Add the selected images to the variation
+    setVariation((prev) => {
+      // Create a map of existing image URLs to prevent duplicates
+      const existingUrls = new Set(prev.images.map(img => img.url))
+      
+      // Filter out any images that are already selected
+      const newImages = selectedImages.filter(img => !existingUrls.has(img.url))
+      
+      return {
         ...prev,
-        images: [...prev.images, ...uploadedImages.filter((img) => img !== null)],
-      }))
-    } catch (error) {
-      console.error("Error uploading images:", error)
-      setError("Failed to upload images. Please try again.")
-    } finally {
-      setIsUploading(false)
-    }
+        images: [...prev.images, ...newImages]
+      }
+    })
+    
+    setIsGalleryOpen(false)
   }
 
-  const removeImage = async (imageIndex, fileName) => {
-    if (!confirm("Are you sure you want to delete this image?")) return
-
-    setLoading(true)
-    try {
-      // Extract the path from the full URL if needed
-      const path =
-        typeof fileName === "string" && fileName.includes("Alromaih/") ? fileName.split("Alromaih/")[1] : fileName
-
-      await supabase.storage.from("Alromaih").remove([path])
-
-      setVariation((prev) => ({
-        ...prev,
-        images: prev.images.filter((_, i) => i !== imageIndex),
-      }))
-    } catch (error) {
-      console.error("Error removing image:", error)
-      setError("Failed to remove image. Please try again.")
-    } finally {
-      setLoading(false)
-    }
+  // Remove an image from the selection
+  const removeImage = (imageIndex) => {
+    setVariation((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== imageIndex),
+    }))
   }
 
   const handleSubmit = async (e) => {
@@ -160,7 +119,7 @@ export default function AddOtherVariationForm() {
         carId,
         ...variation,
         price: Number.parseFloat(variation.price),
-        images: variation.images.map((img) => (typeof img === "string" ? img : img.url)),
+        images: variation.images.map((img) => img.url),
       }
 
       await axios.post("/api/supabasPrisma/othervariations", formattedVariation)
@@ -197,19 +156,7 @@ export default function AddOtherVariationForm() {
 
     try {
       await axios.delete(`/api/supabasPrisma/othervariations/${variationToDelete.id}`)
-
-      // If the variation has images, delete them from storage
-      if (variationToDelete.images && variationToDelete.images.length > 0) {
-        const imagePaths = variationToDelete.images.map((img) => {
-          if (typeof img === "string" && img.includes("Alromaih/")) {
-            return img.split("Alromaih/")[1]
-          }
-          return img
-        })
-
-        await supabase.storage.from("Alromaih").remove(imagePaths)
-      }
-
+      
       // Refresh data
       fetchCarData()
     } catch (error) {
@@ -441,78 +388,72 @@ export default function AddOtherVariationForm() {
 
         <Separator />
 
-        <div className="space-y-4">
-          <Label>Variation Images</Label>
-
-          <div className="flex items-center justify-center border-2 border-dashed rounded-lg p-6 relative">
-            <input
-              type="file"
-              multiple
-              onChange={(e) => uploadImages(e.target.files)}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              disabled={isUploading || submitting}
-            />
-            <div className="text-center">
-              <Upload className="mx-auto h-10 w-10 text-muted-foreground mb-2" />
-              <p className="text-sm font-medium mb-1">Drag & drop images here or click to browse</p>
-              <p className="text-xs text-muted-foreground">Supported formats: JPG, PNG, WebP</p>
-
-              {isUploading && (
-                <div className="mt-4 w-full">
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-xs mt-1 text-center">{uploadProgress}% uploaded</p>
-                </div>
-              )}
-            </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">
+              Variation Images <span className="text-destructive">*</span>
+            </h3>
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => setIsGalleryOpen(true)}
+              disabled={submitting}
+            >
+              <ImageIcon className="h-3 w-3 mr-1" />
+              Select from Gallery
+            </Button>
           </div>
 
-          {/* Display uploaded images */}
-          {variation.images && variation.images.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
-              {variation.images.map((img, imgIndex) => (
-                <Card key={imgIndex} className="overflow-hidden">
-                  <div className="relative aspect-square">
-                    <img
-                      src={typeof img === "string" ? img : img.url}
-                      alt={`Variation image ${imgIndex + 1}`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = "/placeholder.svg?height=100&width=100"
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 h-8 w-8 rounded-full"
-                      onClick={() => removeImage(imgIndex, typeof img === "string" ? img : img.name)}
-                      disabled={submitting}
-                    >
-                      <Trash2 size={16} />
-                      <span className="sr-only">Remove image</span>
-                    </Button>
-                  </div>
-                  <CardContent className="p-2">
-                    <p className="text-xs truncate text-muted-foreground">Image {imgIndex + 1}</p>
-                  </CardContent>
-                </Card>
-              ))}
+          {variation.images.length === 0 ? (
+            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+              <div className="flex flex-col items-center justify-center">
+                <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-xs text-muted-foreground mb-2">No images selected</p>
+                <p className="text-xs text-muted-foreground">Select images from gallery</p>
+              </div>
             </div>
           ) : (
-            <div className="text-center p-4 border rounded-md bg-muted/10">
-              <p className="text-muted-foreground">No images uploaded yet</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {variation.images.map((image, index) => (
+                <div key={index} className="relative group">
+                  <div className="aspect-square rounded-md overflow-hidden border">
+                    <img
+                      src={image.url || "/placeholder.svg"}
+                      alt={`Image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    disabled={submitting}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
+
+          {/* Gallery Modal */}
+          <Dialog open={isGalleryOpen} onOpenChange={setIsGalleryOpen}>
+            <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-xl">Select Images from Gallery</DialogTitle>
+                <DialogDescription>Choose multiple images from your gallery for this variation.</DialogDescription>
+              </DialogHeader>
+              <div className="mt-4">
+                <ImageGallery onSelectMultiple={handleSelectMultipleImages} multiSelect={true} />
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={submitting || isUploading} className="gap-2">
+          <Button type="submit" disabled={submitting} className="gap-2">
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             Add Variation
           </Button>
@@ -647,4 +588,3 @@ export default function AddOtherVariationForm() {
     </div>
   )
 }
-

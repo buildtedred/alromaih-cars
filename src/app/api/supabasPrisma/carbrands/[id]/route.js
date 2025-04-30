@@ -4,11 +4,16 @@ import prisma from "@/lib/prisma";
 export async function GET(request, { params }) {
   try {
     const { id } = params;
+
     const brand = await prisma.carBrand.findUnique({
       where: { id },
-      
-        include: { cars: true },
-      
+      include: {
+        cars: {
+          include: {
+            otherVariations: true, // Includes variations for each car
+          },
+        },
+      },
     });
 
     if (!brand) {
@@ -17,7 +22,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(brand, { status: 200 });
   } catch (error) {
-    console.error("Error fetching brand:", error);
+    console.error("❌ Error fetching brand:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
