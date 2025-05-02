@@ -7,6 +7,7 @@ import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Check, X, Heart, Sha
 import carsData, { specNames, specCategories } from "@/app/api/mock-data"
 import { toggleWishlistItem, isInWishlist } from "@/lib/wishlist-utils"
 import ShareDialog from "./share-dialog"
+import { Breadcrumb } from "../breadcrumb"
 
 // Print styles
 const printStyles = `
@@ -534,8 +535,42 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
   const lowestPrice = Math.min(car1.cashPrice, car2.cashPrice, car3?.cashPrice || Number.POSITIVE_INFINITY)
   const priceDifference = highestPrice - lowestPrice
 
+  // Generate breadcrumb items
+  const getBreadcrumbItems = () => {
+    const items = [
+      {
+        label: isRTL ? "المقارنات" : "Comparisons",
+        href: `/${currentLocale}/compare-cars`,
+      },
+    ]
+
+    // Add car names if they're loaded
+    if (car1 && car2) {
+      const car1Name = getText(car1.name)
+      const car2Name = getText(car2.name)
+
+      if (hasThirdCar && car3) {
+        items.push({
+          label: `${car1Name} vs ${car2Name} vs ${getText(car3.name)}`,
+        })
+      } else {
+        items.push({
+          label: `${car1Name} vs ${car2Name}`,
+        })
+      }
+    }
+
+    return items
+  }
+
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="max-w-7xl mx-auto" ref={contentRef}>
+      {/* Breadcrumb Navigation */}
+      <div
+      onClick={onCompareAgain} 
+       className="mb-4 px-4 sm:px-0">
+        <Breadcrumb  items={getBreadcrumbItems()} className="text-sm" />
+      </div>
       {/* Header with Gradient Background */}
       <div className="relative mb-10 overflow-hidden rounded-2xl">
         <div className="absolute inset-0 bg-gradient-to-r from-brand-primary to-[#2D0F33]"></div>
@@ -559,21 +594,21 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
               <span>{isRTL ? "طباعة" : "Print"}</span>
             </button>
             <button
-  onClick={handleShare}
-  className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors backdrop-blur-sm"
-  style={{ borderRadius: "5px" }}
->
-  <Share2 className="w-4 h-4" />
-  <span>{isRTL ? "مشاركة" : "Share"}</span>
-</button>
+              onClick={handleShare}
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors backdrop-blur-sm"
+              style={{ borderRadius: "5px" }}
+            >
+              <Share2 className="w-4 h-4" />
+              <span>{isRTL ? "مشاركة" : "Share"}</span>
+            </button>
             {isShareDialogOpen && (
-  <ShareDialog
-    isOpen={isShareDialogOpen}
-    onClose={() => setIsShareDialogOpen(false)}
-    carData={{ car1, car2, car3: hasThirdCar ? car3 : null }}
-    currentLocale={currentLocale}
-  />
-)}
+              <ShareDialog
+                isOpen={isShareDialogOpen}
+                onClose={() => setIsShareDialogOpen(false)}
+                carData={{ car1, car2, car3: hasThirdCar ? car3 : null }}
+                currentLocale={currentLocale}
+              />
+            )}
             <button
               onClick={handleDownload}
               disabled={isGeneratingPDF}
@@ -1766,418 +1801,418 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             </div>
 
             {/* Mobile Price View */}
-            
-<div className="md:hidden p-4 space-y-6">
-  {/* Mobile Price Cards */}
-  <div className="space-y-4">
-    {/* Car 1 Price Card */}
-    <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
-      <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-            <div className="w-8 h-8 relative">
-              <Image
-                src={car1.brandLogo || "/placeholder.svg?height=24&width=24"}
-                alt={car1.brand}
-                fill
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-          </div>
-          <span className="text-white font-medium text-sm md:text-base">{getText(car1.name)}</span>
-        </div>
-        {getStatusBadge(car1.status)}
-      </div>
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
-          <span className="text-lg font-bold text-brand-primary flex items-center">
-            <Image
-              src={car1.icons.currency || "/placeholder.svg"}
-              alt="Currency"
-              width={16}
-              height={16}
-              className="inline mr-1"
-            />
-            {car1.cashPrice.toLocaleString()}
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
-          <span className="text-base font-semibold text-brand-primary flex items-center">
-            <Image
-              src={car1.icons.currency || "/placeholder.svg"}
-              alt="Currency"
-              width={14}
-              height={14}
-              className="inline mr-1"
-            />
-            {car1.installmentPrice.toLocaleString()}
-            <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-          </span>
-        </div>
-      </div>
-    </div>
+            <div className="md:hidden p-4 space-y-6">
+              {/* Mobile Price Cards */}
+              <div className="space-y-4">
+                {/* Car 1 Price Card */}
+                <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
+                  <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 relative">
+                          <Image
+                            src={car1.brandLogo || "/placeholder.svg?height=24&width=24"}
+                            alt={car1.brand}
+                            fill
+                            style={{ objectFit: "contain" }}
+                          />
+                        </div>
+                      </div>
+                      <span className="text-white font-medium text-sm md:text-base">{getText(car1.name)}</span>
+                    </div>
+                    {getStatusBadge(car1.status)}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
+                      <span className="text-lg font-bold text-brand-primary flex items-center">
+                        <Image
+                          src={car1.icons.currency || "/placeholder.svg"}
+                          alt="Currency"
+                          width={16}
+                          height={16}
+                          className="inline mr-1"
+                        />
+                        {car1.cashPrice.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
+                      <span className="text-base font-semibold text-brand-primary flex items-center">
+                        <Image
+                          src={car1.icons.currency || "/placeholder.svg"}
+                          alt="Currency"
+                          width={14}
+                          height={14}
+                          className="inline mr-1"
+                        />
+                        {car1.installmentPrice.toLocaleString()}
+                        <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-    {/* Car 2 Price Card */}
-    <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
-      <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-            <div className="w-8 h-8 relative">
-              <Image
-                src={car2.brandLogo || "/placeholder.svg?height=24&width=24"}
-                alt={car2.brand}
-                fill
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-          </div>
-          <span className="text-white font-medium text-sm md:text-base">{getText(car2.name)}</span>
-        </div>
-        {getStatusBadge(car2.status)}
-      </div>
-      <div className="p-4">
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
-          <span className="text-lg font-bold text-brand-primary flex items-center">
-            <Image
-              src={car2.icons.currency || "/placeholder.svg"}
-              alt="Currency"
-              width={16}
-              height={16}
-              className="inline mr-1"
-            />
-            {car2.cashPrice.toLocaleString()}
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
-          <span className="text-base font-semibold text-brand-primary flex items-center">
-            <Image
-              src={car2.icons.currency || "/placeholder.svg"}
-              alt="Currency"
-              width={14}
-              height={14}
-              className="inline mr-1"
-            />
-            {car2.installmentPrice.toLocaleString()}
-            <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-          </span>
-        </div>
-      </div>
-    </div>
+                {/* Car 2 Price Card */}
+                <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
+                  <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 relative">
+                          <Image
+                            src={car2.brandLogo || "/placeholder.svg?height=24&width=24"}
+                            alt={car2.brand}
+                            fill
+                            style={{ objectFit: "contain" }}
+                          />
+                        </div>
+                      </div>
+                      <span className="text-white font-medium text-sm md:text-base">{getText(car2.name)}</span>
+                    </div>
+                    {getStatusBadge(car2.status)}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
+                      <span className="text-lg font-bold text-brand-primary flex items-center">
+                        <Image
+                          src={car2.icons.currency || "/placeholder.svg"}
+                          alt="Currency"
+                          width={16}
+                          height={16}
+                          className="inline mr-1"
+                        />
+                        {car2.cashPrice.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
+                      <span className="text-base font-semibold text-brand-primary flex items-center">
+                        <Image
+                          src={car2.icons.currency || "/placeholder.svg"}
+                          alt="Currency"
+                          width={14}
+                          height={14}
+                          className="inline mr-1"
+                        />
+                        {car2.installmentPrice.toLocaleString()}
+                        <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-    {/* Car 3 Price Card (if present) */}
-    {hasThirdCar && (
-      <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
-        <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <div className="w-8 h-8 relative">
-                <Image
-                  src={car3.brandLogo || "/placeholder.svg?height=24&width=24"}
-                  alt={car3.brand}
-                  fill
-                  style={{ objectFit: "contain" }}
-                />
+                {/* Car 3 Price Card (if present) */}
+                {hasThirdCar && (
+                  <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
+                    <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 relative">
+                            <Image
+                              src={car3.brandLogo || "/placeholder.svg?height=24&width=24"}
+                              alt={car3.brand}
+                              fill
+                              style={{ objectFit: "contain" }}
+                            />
+                          </div>
+                        </div>
+                        <span className="text-white font-medium text-sm md:text-base">{getText(car3.name)}</span>
+                      </div>
+                      {getStatusBadge(car3.status)}
+                    </div>
+                    <div className="p-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
+                        <span className="text-lg font-bold text-brand-primary flex items-center">
+                          <Image
+                            src={car3.icons.currency || "/placeholder.svg"}
+                            alt="Currency"
+                            width={16}
+                            height={16}
+                            className="inline mr-1"
+                          />
+                          {car3.cashPrice.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
+                        <span className="text-base font-semibold text-brand-primary flex items-center">
+                          <Image
+                            src={car3.icons.currency || "/placeholder.svg"}
+                            alt="Currency"
+                            width={14}
+                            height={14}
+                            className="inline mr-1"
+                          />
+                          {car3.installmentPrice.toLocaleString()}
+                          <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Price Comparison Summary - Mobile */}
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-brand-light">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <div className="w-5 h-5 mr-2 relative">
+                    <Image
+                      src={car1.icons.currency || "/placeholder.svg"}
+                      alt="Currency"
+                      width={20}
+                      height={20}
+                      className="text-brand-primary"
+                    />
+                  </div>
+                  {isRTL ? "ملخص المقارنة السعرية" : "Price Comparison Summary"}
+                </h3>
+
+                <div className="space-y-3">
+                  {/* Highest Price */}
+                  <div className="bg-white rounded-lg p-3 border border-brand-light">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="text-sm font-medium text-gray-600 flex items-center">
+                        <TrendingUp className="w-4 h-4 text-brand-primary mr-1" />
+                        {isRTL ? "أعلى سعر" : "Highest Price"}
+                      </div>
+                      <div className="flex items-center">
+                        <Image
+                          src={car1.icons.currency || "/placeholder.svg"}
+                          alt="Currency"
+                          width={14}
+                          height={14}
+                          className="mr-1"
+                        />
+                        <span className="font-bold text-brand-primary">{highestPrice.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500 pl-5">
+                      {car1.cashPrice === highestPrice
+                        ? getText(car1.name)
+                        : car2.cashPrice === highestPrice
+                          ? getText(car2.name)
+                          : getText(car3?.name || "")}
+                    </div>
+                  </div>
+
+                  {/* Lowest Price */}
+                  <div className="bg-white rounded-lg p-3 border border-brand-light">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="text-sm font-medium text-gray-600 flex items-center">
+                        <TrendingDown className="w-4 h-4 text-brand-primary mr-1" />
+                        {isRTL ? "أقل سعر" : "Lowest Price"}
+                      </div>
+                      <div className="flex items-center">
+                        <Image
+                          src={car1.icons.currency || "/placeholder.svg"}
+                          alt="Currency"
+                          width={14}
+                          height={14}
+                          className="mr-1"
+                        />
+                        <span className="font-bold text-brand-primary">{lowestPrice.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500 pl-5">
+                      {car1.cashPrice === lowestPrice
+                        ? getText(car1.name)
+                        : car2.cashPrice === lowestPrice
+                          ? getText(car2.name)
+                          : getText(car3?.name || "")}
+                    </div>
+                  </div>
+
+                  {/* Price Difference */}
+                  <div className="bg-white rounded-lg p-3 border border-brand-light">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="text-sm font-medium text-gray-600">
+                        {isRTL ? "الفرق السعري" : "Price Difference"}
+                      </div>
+                      <div className="flex items-center">
+                        <Image
+                          src={car1.icons.currency || "/placeholder.svg"}
+                          alt="Currency"
+                          width={14}
+                          height={14}
+                          className="mr-1"
+                        />
+                        <span className="font-bold text-brand-primary">{priceDifference.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500 text-right">
+                      {Math.round((priceDifference / lowestPrice) * 100)}%{" "}
+                      {isRTL ? "من السعر الأقل" : "of lowest price"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Price Comparison Table */}
+              <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
+                <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-3">
+                  <h3 className="text-base font-medium">{isRTL ? "جدول مقارنة الأسعار" : "Price Comparison Table"}</h3>
+                </div>
+
+                <div className="divide-y divide-gray-100">
+                  {/* Car 1 */}
+                  <div className="p-3">
+                    <div className="flex items-center mb-2">
+                      <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
+                        <Image
+                          src={car1.image || "/placeholder.svg?height=40&width=40"}
+                          alt={getText(car1.name)}
+                          width={36}
+                          height={36}
+                          style={{ objectFit: "contain" }}
+                        />
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">{getText(car1.name)}</div>
+                        <div className="text-xs text-gray-500">{car1.brand}</div>
+                      </div>
+                      <div className="ml-auto">{getStatusBadge(car1.status)}</div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div className="bg-gray-50 p-2 rounded-md">
+                        <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
+                        <div className="flex items-center text-sm font-medium">
+                          <Image
+                            src={car1.icons.currency || "/placeholder.svg"}
+                            alt="Currency"
+                            width={12}
+                            height={12}
+                            className="mr-1"
+                          />
+                          {car1.cashPrice.toLocaleString()}
+                          {getPriceComparisonIcon(car1, lowestPrice, highestPrice)}
+                        </div>
+                      </div>
+
+                      <div className="bg-gray-50 p-2 rounded-md">
+                        <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
+                        <div className="flex items-center text-sm">
+                          <Image
+                            src={car1.icons.currency || "/placeholder.svg"}
+                            alt="Currency"
+                            width={12}
+                            height={12}
+                            className="mr-1"
+                          />
+                          {car1.installmentPrice.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Car 2 */}
+                  <div className="p-3">
+                    <div className="flex items-center mb-2">
+                      <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
+                        <Image
+                          src={car2.image || "/placeholder.svg?height=40&width=40"}
+                          alt={getText(car2.name)}
+                          width={36}
+                          height={36}
+                          style={{ objectFit: "contain" }}
+                        />
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">{getText(car2.name)}</div>
+                        <div className="text-xs text-gray-500">{car2.brand}</div>
+                      </div>
+                      <div className="ml-auto">{getStatusBadge(car2.status)}</div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div className="bg-gray-50 p-2 rounded-md">
+                        <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
+                        <div className="flex items-center text-sm font-medium">
+                          <Image
+                            src={car2.icons.currency || "/placeholder.svg"}
+                            alt="Currency"
+                            width={12}
+                            height={12}
+                            className="mr-1"
+                          />
+                          {car2.cashPrice.toLocaleString()}
+                          {getPriceComparisonIcon(car2, lowestPrice, highestPrice)}
+                        </div>
+                      </div>
+
+                      <div className="bg-gray-50 p-2 rounded-md">
+                        <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
+                        <div className="flex items-center text-sm">
+                          <Image
+                            src={car2.icons.currency || "/placeholder.svg"}
+                            alt="Currency"
+                            width={12}
+                            height={12}
+                            className="mr-1"
+                          />
+                          {car2.installmentPrice.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Car 3 (if present) */}
+                  {hasThirdCar && (
+                    <div className="p-3">
+                      <div className="flex items-center mb-2">
+                        <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
+                          <Image
+                            src={car3.image || "/placeholder.svg?height=40&width=40"}
+                            alt={getText(car3.name)}
+                            width={36}
+                            height={36}
+                            style={{ objectFit: "contain" }}
+                          />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{getText(car3.name)}</div>
+                          <div className="text-xs text-gray-500">{car3.brand}</div>
+                        </div>
+                        <div className="ml-auto">{getStatusBadge(car3.status)}</div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <div className="bg-gray-50 p-2 rounded-md">
+                          <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
+                          <div className="flex items-center text-sm font-medium">
+                            <Image
+                              src={car3.icons.currency || "/placeholder.svg"}
+                              alt="Currency"
+                              width={12}
+                              height={12}
+                              className="mr-1"
+                            />
+                            {car3.cashPrice.toLocaleString()}
+                            {getPriceComparisonIcon(car3, lowestPrice, highestPrice)}
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 p-2 rounded-md">
+                          <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
+                          <div className="flex items-center text-sm">
+                            <Image
+                              src={car3.icons.currency || "/placeholder.svg"}
+                              alt="Currency"
+                              width={12}
+                              height={12}
+                              className="mr-1"
+                            />
+                            {car3.installmentPrice.toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <span className="text-white font-medium text-sm md:text-base">{getText(car3.name)}</span>
-          </div>
-          {getStatusBadge(car3.status)}
-        </div>
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
-            <span className="text-lg font-bold text-brand-primary flex items-center">
-              <Image
-                src={car3.icons.currency || "/placeholder.svg"}
-                alt="Currency"
-                width={16}
-                height={16}
-                className="inline mr-1"
-              />
-              {car3.cashPrice.toLocaleString()}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
-            <span className="text-base font-semibold text-brand-primary flex items-center">
-              <Image
-                src={car3.icons.currency || "/placeholder.svg"}
-                alt="Currency"
-                width={14}
-                height={14}
-                className="inline mr-1"
-              />
-              {car3.installmentPrice.toLocaleString()}
-              <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-            </span>
-          </div>
-        </div>
-      </div>
-    )}
-  </div>
-
-  {/* Price Comparison Summary - Mobile */}
-  <div className="bg-white rounded-xl p-4 shadow-sm border border-brand-light">
-    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-      <div className="w-5 h-5 mr-2 relative">
-        <Image
-          src={car1.icons.currency || "/placeholder.svg"}
-          alt="Currency"
-          width={20}
-          height={20}
-          className="text-brand-primary"
-        />
-      </div>
-      {isRTL ? "ملخص المقارنة السعرية" : "Price Comparison Summary"}
-    </h3>
-    
-    <div className="space-y-3">
-      {/* Highest Price */}
-      <div className="bg-white rounded-lg p-3 border border-brand-light">
-        <div className="flex items-center justify-between mb-1">
-          <div className="text-sm font-medium text-gray-600 flex items-center">
-            <TrendingUp className="w-4 h-4 text-brand-primary mr-1" />
-            {isRTL ? "أعلى سعر" : "Highest Price"}
-          </div>
-          <div className="flex items-center">
-            <Image
-              src={car1.icons.currency || "/placeholder.svg"}
-              alt="Currency"
-              width={14}
-              height={14}
-              className="mr-1"
-            />
-            <span className="font-bold text-brand-primary">{highestPrice.toLocaleString()}</span>
-          </div>
-        </div>
-        <div className="text-xs text-gray-500 pl-5">
-          {car1.cashPrice === highestPrice
-            ? getText(car1.name)
-            : car2.cashPrice === highestPrice
-              ? getText(car2.name)
-              : getText(car3?.name || "")}
-        </div>
-      </div>
-      
-      {/* Lowest Price */}
-      <div className="bg-white rounded-lg p-3 border border-brand-light">
-        <div className="flex items-center justify-between mb-1">
-          <div className="text-sm font-medium text-gray-600 flex items-center">
-            <TrendingDown className="w-4 h-4 text-brand-primary mr-1" />
-            {isRTL ? "أقل سعر" : "Lowest Price"}
-          </div>
-          <div className="flex items-center">
-            <Image
-              src={car1.icons.currency || "/placeholder.svg"}
-              alt="Currency"
-              width={14}
-              height={14}
-              className="mr-1"
-            />
-            <span className="font-bold text-brand-primary">{lowestPrice.toLocaleString()}</span>
-          </div>
-        </div>
-        <div className="text-xs text-gray-500 pl-5">
-          {car1.cashPrice === lowestPrice
-            ? getText(car1.name)
-            : car2.cashPrice === lowestPrice
-              ? getText(car2.name)
-              : getText(car3?.name || "")}
-        </div>
-      </div>
-      
-      {/* Price Difference */}
-      <div className="bg-white rounded-lg p-3 border border-brand-light">
-        <div className="flex items-center justify-between mb-1">
-          <div className="text-sm font-medium text-gray-600">
-            {isRTL ? "الفرق السعري" : "Price Difference"}
-          </div>
-          <div className="flex items-center">
-            <Image
-              src={car1.icons.currency || "/placeholder.svg"}
-              alt="Currency"
-              width={14}
-              height={14}
-              className="mr-1"
-            />
-            <span className="font-bold text-brand-primary">{priceDifference.toLocaleString()}</span>
-          </div>
-        </div>
-        <div className="text-xs text-gray-500 text-right">
-          {Math.round((priceDifference / lowestPrice) * 100)}% {isRTL ? "من السعر الأقل" : "of lowest price"}
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* Mobile Price Comparison Table */}
-  <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
-    <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-3">
-      <h3 className="text-base font-medium">{isRTL ? "جدول مقارنة الأسعار" : "Price Comparison Table"}</h3>
-    </div>
-    
-    <div className="divide-y divide-gray-100">
-      {/* Car 1 */}
-      <div className="p-3">
-        <div className="flex items-center mb-2">
-          <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
-            <Image
-              src={car1.image || "/placeholder.svg?height=40&width=40"}
-              alt={getText(car1.name)}
-              width={36}
-              height={36}
-              style={{ objectFit: "contain" }}
-            />
-          </div>
-          <div>
-            <div className="font-medium text-sm">{getText(car1.name)}</div>
-            <div className="text-xs text-gray-500">{car1.brand}</div>
-          </div>
-          <div className="ml-auto">{getStatusBadge(car1.status)}</div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-2 mt-2">
-          <div className="bg-gray-50 p-2 rounded-md">
-            <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
-            <div className="flex items-center text-sm font-medium">
-              <Image
-                src={car1.icons.currency || "/placeholder.svg"}
-                alt="Currency"
-                width={12}
-                height={12}
-                className="mr-1"
-              />
-              {car1.cashPrice.toLocaleString()}
-              {getPriceComparisonIcon(car1, lowestPrice, highestPrice)}
-            </div>
-          </div>
-          
-          <div className="bg-gray-50 p-2 rounded-md">
-            <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
-            <div className="flex items-center text-sm">
-              <Image
-                src={car1.icons.currency || "/placeholder.svg"}
-                alt="Currency"
-                width={12}
-                height={12}
-                className="mr-1"
-              />
-              {car1.installmentPrice.toLocaleString()}
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Car 2 */}
-      <div className="p-3">
-        <div className="flex items-center mb-2">
-          <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
-            <Image
-              src={car2.image || "/placeholder.svg?height=40&width=40"}
-              alt={getText(car2.name)}
-              width={36}
-              height={36}
-              style={{ objectFit: "contain" }}
-            />
-          </div>
-          <div>
-            <div className="font-medium text-sm">{getText(car2.name)}</div>
-            <div className="text-xs text-gray-500">{car2.brand}</div>
-          </div>
-          <div className="ml-auto">{getStatusBadge(car2.status)}</div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-2 mt-2">
-          <div className="bg-gray-50 p-2 rounded-md">
-            <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
-            <div className="flex items-center text-sm font-medium">
-              <Image
-                src={car2.icons.currency || "/placeholder.svg"}
-                alt="Currency"
-                width={12}
-                height={12}
-                className="mr-1"
-              />
-              {car2.cashPrice.toLocaleString()}
-              {getPriceComparisonIcon(car2, lowestPrice, highestPrice)}
-            </div>
-          </div>
-          
-          <div className="bg-gray-50 p-2 rounded-md">
-            <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
-            <div className="flex items-center text-sm">
-              <Image
-                src={car2.icons.currency || "/placeholder.svg"}
-                alt="Currency"
-                width={12}
-                height={12}
-                className="mr-1"
-              />
-              {car2.installmentPrice.toLocaleString()}
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Car 3 (if present) */}
-      {hasThirdCar && (
-        <div className="p-3">
-          <div className="flex items-center mb-2">
-            <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
-              <Image
-                src={car3.image || "/placeholder.svg?height=40&width=40"}
-                alt={getText(car3.name)}
-                width={36}
-                height={36}
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-            <div>
-              <div className="font-medium text-sm">{getText(car3.name)}</div>
-              <div className="text-xs text-gray-500">{car3.brand}</div>
-            </div>
-            <div className="ml-auto">{getStatusBadge(car3.status)}</div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            <div className="bg-gray-50 p-2 rounded-md">
-              <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
-              <div className="flex items-center text-sm font-medium">
-                <Image
-                  src={car3.icons.currency || "/placeholder.svg"}
-                  alt="Currency"
-                  width={12}
-                  height={12}
-                  className="mr-1"
-                />
-                {car3.cashPrice.toLocaleString()}
-                {getPriceComparisonIcon(car3, lowestPrice, highestPrice)}
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 p-2 rounded-md">
-              <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
-              <div className="flex items-center text-sm">
-                <Image
-                  src={car3.icons.currency || "/placeholder.svg"}
-                  alt="Currency"
-                  width={12}
-                  height={12}
-                  className="mr-1"
-                />
-                {car3.installmentPrice.toLocaleString()}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
           </div>
         </div>
       )}

@@ -1,96 +1,109 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { Heart } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { toggleWishlistItem, isInWishlist } from "@/lib/wishlist-utils";
-import { useDetailContext } from "@/contexts/detailProvider";
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import { Heart } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { toggleWishlistItem, isInWishlist } from "@/lib/wishlist-utils"
+import { useDetailContext } from "@/contexts/detailProvider"
 
-const CarCard = ({
-  car,
-  onFavoriteToggle,
-  isFavorite: initialIsFavorite,
-  locale,
-}) => {
-  const router = useRouter();
-  const pathname = usePathname();
+const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale }) => {
+  const router = useRouter()
+  const pathname = usePathname()
   // Detect language from URL path
-  const { setcar_Details, loading } = useDetailContext();
-  const pathLocale = pathname.startsWith("/ar") ? "ar" : "en";
+  const { setcar_Details, loading } = useDetailContext()
+  const pathLocale = pathname.startsWith("/ar") ? "ar" : "en"
   // Use either the detected path locale or the provided locale prop
-  const currentLocale = pathLocale || locale;
-  const isRTL = currentLocale === "ar";
-  const [isFavorite, setIsFavorite] = useState(initialIsFavorite || false);
-  const [isHovered, setIsHovered] = useState(false);
+  const currentLocale = pathLocale || locale
+  const isRTL = currentLocale === "ar"
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite || false)
+  const [isHovered, setIsHovered] = useState(false)
 
   // This useEffect is important to keep the favorite state in sync with props
   useEffect(() => {
-    setIsFavorite(initialIsFavorite || false);
-  }, [initialIsFavorite]);
+    setIsFavorite(initialIsFavorite || false)
+  }, [initialIsFavorite])
 
   // Check localStorage on component mount
   useEffect(() => {
-    setIsFavorite(isInWishlist(car.id));
-  }, [car.id]);
+    setIsFavorite(isInWishlist(car.id))
+  }, [car.id])
 
   const handleFavoriteClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
     // Toggle in localStorage
-    toggleWishlistItem(car);
+    toggleWishlistItem(car)
 
     // Update local state
-    const newFavoriteState = !isFavorite;
-    setIsFavorite(newFavoriteState);
+    const newFavoriteState = !isFavorite
+    setIsFavorite(newFavoriteState)
 
     // Call parent callback if provided
     if (onFavoriteToggle) {
-      onFavoriteToggle(car.id);
+      onFavoriteToggle(car.id)
     }
-  };
+  }
 
   // Badge text mapping with language support
   const getBadgeText = (status) => {
     switch (status) {
       case "new":
-        return isRTL ? "جديد" : "New";
+        return isRTL ? "جديد" : "New"
       case "unavailable":
-        return isRTL ? "غير متوفر" : "Unavailable";
+        return isRTL ? "غير متوفر" : "Unavailable"
       case "discount":
-        return isRTL ? "خصم" : "Discount";
+        return isRTL ? "خصم" : "Discount"
       default:
-        return "";
+        return ""
     }
-  };
+  }
 
   // Badge color mapping
   const getBadgeColor = (status) => {
     switch (status) {
       case "new":
-        return "bg-brand-light text-brand-primary";
+        return "bg-brand-light text-brand-primary"
       case "unavailable":
-        return "bg-brand-light text-brand-primary";
+        return "bg-brand-light text-brand-primary"
       case "discount":
-        return "bg-brand-primary text-white";
+        return "bg-brand-primary text-white"
       default:
-        return "bg-gray-200";
+        return "bg-gray-200"
     }
-  };
+  }
 
   // Get text based on current locale - fixed to always return a string
   const getText = (textObj) => {
-    if (!textObj) return "";
-    return typeof textObj === "object"
-      ? textObj[currentLocale] || textObj.en || ""
-      : String(textObj);
-  };
+    if (!textObj) return ""
+    return typeof textObj === "object" ? textObj[currentLocale] || textObj.en || "" : String(textObj)
+  }
 
   const handleViewDetails = () => {
-    router.push(`/${currentLocale}/car-details/${car.id}`);
-    setcar_Details(car);
-  };
+    // Ensure we're setting complete car details with proper structure
+    const enhancedCarDetails = {
+      ...car,
+      // Make sure model is properly set
+      model: car.model || getText(car.name).split(" ").slice(1).join(" "),
+      // Make sure brand is properly set
+      brand: car.brand || getText(car.name).split(" ")[0],
+      // Ensure we have a proper name structure
+      name:
+        typeof car.name === "object"
+          ? car.name
+          : {
+              en: getText(car.name),
+              ar: getText(car.name),
+            },
+    }
+
+    // Set the enhanced car details in context
+    setcar_Details(enhancedCarDetails)
+
+    // Navigate to the car details page
+    router.push(`/${currentLocale}/car-details/${car.id}`)
+  }
 
   return (
     <div
@@ -102,7 +115,7 @@ const CarCard = ({
       {car.status && (
         <div
           className={`absolute ${getBadgeColor(
-            car.status
+            car.status,
           )} px-2 py-1 border-2 border-brand-primary border-l-0 text-sm font-medium z-20`}
           style={{
             top: "24px",
@@ -142,9 +155,7 @@ const CarCard = ({
         >
           <Heart
             className={`w-6 h-6 transition-all duration-300 ${
-              isFavorite
-                ? "fill-brand-primary text-brand-primary scale-110"
-                : "text-brand-primary hover:scale-110"
+              isFavorite ? "fill-brand-primary text-brand-primary scale-110" : "text-brand-primary hover:scale-110"
             }`}
           />
         </button>
@@ -165,11 +176,7 @@ const CarCard = ({
               />
             </div>
           </div>
-          <div
-            className={`${
-              isRTL ? "text-right" : "text-left"
-            } flex-1 min-w-0 flex flex-col justify-center`}
-          >
+          <div className={`${isRTL ? "text-right" : "text-left"} flex-1 min-w-0 flex flex-col justify-center`}>
             <h3
               className="text-lg font-bold text-brand-primary overflow-hidden whitespace-nowrap transition-all duration-300"
               style={{
@@ -195,39 +202,23 @@ const CarCard = ({
 
           <div className="grid grid-cols-2 gap-0">
             <div className="px-3">
-              <p className="text-xs flex justify-start text-brand-primary mb-1">
-                {isRTL ? "سعر الكاش" : "Cash Price"}
-              </p>
+              <p className="text-xs flex justify-start text-brand-primary mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</p>
               <div className="font-bold text-brand-primary flex items-center">
                 <span className="mr-1 flex-shrink-0">
-                  <Image
-                    src={car.icons?.currency || "/icons/Currency.svg"}
-                    alt="Currency"
-                    width={12}
-                    height={12}
-                  />
+                  <Image src={car.icons?.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
                 </span>
-                <span className="text-base">
-                  {car.cashPrice?.toLocaleString()}
-                </span>
+                <span className="text-base">{car.cashPrice?.toLocaleString()}</span>
               </div>
             </div>
 
             <div className="px-3">
               <p className="text-xs text-brand-primary mb-1 truncate max-w-[110px] block">
-                {isRTL
-                  ? "أقساط من"
-                  : "Installments from"}
+                {isRTL ? "أقساط من" : "Installments from"}
               </p>
 
               <div className="font-bold text-brand-primary flex items-center">
                 <span className="mr-1 flex-shrink-0">
-                  <Image
-                    src={car.icons?.currency || "/icons/Currency.svg"}
-                    alt="Currency"
-                    width={12}
-                    height={12}
-                  />
+                  <Image src={car.icons?.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
                 </span>
                 <span className="text-base">{car.installmentPrice}</span>
               </div>
@@ -247,9 +238,7 @@ const CarCard = ({
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary text-center">
-              {car.specs?.year}
-            </span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{car.specs?.year}</span>
           </div>
 
           <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
@@ -262,9 +251,7 @@ const CarCard = ({
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary text-center">
-              {getText(car.specs?.transmission)}
-            </span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs?.transmission)}</span>
           </div>
 
           <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
@@ -277,9 +264,7 @@ const CarCard = ({
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary text-center">
-              {getText(car.specs?.seats)}
-            </span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs?.seats)}</span>
           </div>
 
           <div className="flex flex-col items-center transition-all duration-300 hover:transform hover:scale-110">
@@ -292,18 +277,12 @@ const CarCard = ({
                 className="text-brand-primary"
               />
             </div>
-            <span className="text-[8px] mt-1 text-brand-primary text-center">
-              {getText(car.specs?.fuelType)}
-            </span>
+            <span className="text-[8px] mt-1 text-brand-primary text-center">{getText(car.specs?.fuelType)}</span>
           </div>
         </div>
 
         {/* View Details Link */}
-        <div
-          className={`flex ${
-            isRTL ? "justify-start" : "justify-end"
-          } px-3 py-2 mx-2`}
-        >
+        <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-3 py-2 mx-2`}>
           <div
             onClick={handleViewDetails}
             className="cursor-pointer text-brand-primary text-sm flex items-center transition-all duration-300 hover:translate-x-1 hover:font-medium"
@@ -333,7 +312,7 @@ const CarCard = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CarCard;
+export default CarCard

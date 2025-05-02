@@ -27,7 +27,7 @@ export const FinanceCalculator = ({ carPrice }) => {
           id="downPayment"
           value={downPayment}
           onChange={(e) => setDownPayment(Number(e.target.value))}
-          className="w-full px-3 py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#71308A]"
+          className="w-full px-3 py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-primary"
         />
       </div>
       <div>
@@ -39,7 +39,7 @@ export const FinanceCalculator = ({ carPrice }) => {
           id="loanTerm"
           value={loanTerm}
           onChange={(e) => setLoanTerm(Number(e.target.value))}
-          className="w-full px-3 py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#71308A]"
+          className="w-full px-3 py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-primary"
         />
       </div>
       <div>
@@ -51,11 +51,11 @@ export const FinanceCalculator = ({ carPrice }) => {
           id="interestRate"
           value={interestRate}
           onChange={(e) => setInterestRate(Number(e.target.value))}
-          className="w-full px-3 py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#71308A]"
+          className="w-full px-3 py-2 text-base sm:text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-brand-primary"
         />
       </div>
       <div className="bg-gray-100 p-4 rounded-lg">
-        <h4 className="text-base sm:text-lg font-semibold mb-2 text-[#71308A]">القسط الشهري المقدر</h4>
+        <h4 className="text-base sm:text-lg font-semibold mb-2 text-brand-primary">القسط الشهري المقدر</h4>
         <p className="text-2xl sm:text-3xl font-bold">{calculateMonthlyPayment} ريال</p>
       </div>
     </div>

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import CarComparisonResults from "./car-comparison-results"
 import carsData from "@/app/api/mock-data"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Breadcrumb } from "../breadcrumb"
 
 const CarComparisonSelector = () => {
   const pathname = usePathname()
@@ -30,18 +31,11 @@ const CarComparisonSelector = () => {
     name: { en: brandName, ar: brandName },
   }))
 
-  // Group models by brand
-  const models = brands.reduce((acc, brand) => {
-    acc[brand.id] = cars
-      .filter((car) => car.brand.toLowerCase() === brand.id)
-      .map((car) => ({
-        id: car.id,
-        name: car.name,
-      }))
-    return acc
-  }, {})
-
-  const years = ["2024", "2023", "2022", "2021", "2020"]
+  // Extract unique years from cars data
+  const years = [...new Set(cars.map((car) => car.specs?.year))]
+    .filter(Boolean)
+    .sort((a, b) => b - a) // Sort years in descending order
+    .map(String) // Convert to string
 
   // State for selected values
   const [firstCar, setFirstCar] = useState({
@@ -61,6 +55,27 @@ const CarComparisonSelector = () => {
     model: null,
     year: null,
   })
+
+  // Get available models for a brand, excluding already selected models
+  const getAvailableModels = (brandId, currentSelection) => {
+    if (!brandId) return []
+
+    // Get all models for this brand
+    const allModels = cars
+      .filter((car) => car.brand.toLowerCase() === brandId)
+      .map((car) => ({
+        id: car.id,
+        name: car.name,
+      }))
+
+    // Get IDs of already selected models (excluding the current selection)
+    const selectedModelIds = [firstCar.model?.id, secondCar.model?.id, thirdCar.model?.id].filter(
+      (id) => id !== null && id !== currentSelection?.id,
+    )
+
+    // Filter out already selected models
+    return allModels.filter((model) => !selectedModelIds.includes(model.id))
+  }
 
   const selectBrand = (car, brand) => {
     if (car === "first") {
@@ -128,6 +143,19 @@ const CarComparisonSelector = () => {
   // Check if we can compare (at least 2 cars selected)
   const canCompare = firstCar.model && secondCar.model && (!showThirdCar || !thirdCar.model || thirdCar.model)
 
+  // Generate breadcrumb items
+  const getBreadcrumbItems = () => {
+    return [
+      {
+        label: isRTL ? "الرئيسية" : "Home",
+        href: `/${currentLocale}`,
+      },
+      {
+        label: isRTL ? "المقارنات" : "Comparisons",
+      },
+    ]
+  }
+
   // If showing results, render the comparison results component
   if (showResults) {
     return (
@@ -143,7 +171,12 @@ const CarComparisonSelector = () => {
   }
 
   return (
-    <div className=" max-w-6xl mx-auto bg-white rounded-3xl shadow-md p-4 md:p-8">
+    <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-md p-4 md:p-8">
+      {/* Breadcrumb Navigation */}
+      <div className="mb-4 px-4 sm:px-0">
+        <Breadcrumb items={getBreadcrumbItems()} className="text-sm" />
+      </div>
+
       {/* Header */}
       <div className="text-center mb-6 md:mb-10">
         <h1 className="text-3xl md:text-4xl font-bold text-brand-primary mb-2">
@@ -244,9 +277,9 @@ const CarComparisonSelector = () => {
             <Select
               value={firstCar.model ? firstCar.model.id.toString() : ""}
               onValueChange={(value) => {
-                const selectedModel = firstCar.brand
-                  ? models[firstCar.brand.id]?.find((model) => model.id.toString() === value)
-                  : null
+                const selectedModel = getAvailableModels(firstCar.brand?.id, firstCar.model).find(
+                  (model) => model.id.toString() === value,
+                )
                 selectModel("first", selectedModel)
               }}
               disabled={!firstCar.brand}
@@ -262,7 +295,7 @@ const CarComparisonSelector = () => {
               </SelectTrigger>
               <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                 {firstCar.brand &&
-                  models[firstCar.brand.id]?.map((model) => (
+                  getAvailableModels(firstCar.brand.id, firstCar.model).map((model) => (
                     <SelectItem key={model.id} value={model.id.toString()}>
                       {getText(model.name)}
                     </SelectItem>
@@ -342,9 +375,9 @@ const CarComparisonSelector = () => {
             <Select
               value={secondCar.model ? secondCar.model.id.toString() : ""}
               onValueChange={(value) => {
-                const selectedModel = secondCar.brand
-                  ? models[secondCar.brand.id]?.find((model) => model.id.toString() === value)
-                  : null
+                const selectedModel = getAvailableModels(secondCar.brand?.id, secondCar.model).find(
+                  (model) => model.id.toString() === value,
+                )
                 selectModel("second", selectedModel)
               }}
               disabled={!secondCar.brand}
@@ -360,7 +393,7 @@ const CarComparisonSelector = () => {
               </SelectTrigger>
               <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                 {secondCar.brand &&
-                  models[secondCar.brand.id]?.map((model) => (
+                  getAvailableModels(secondCar.brand.id, secondCar.model).map((model) => (
                     <SelectItem key={model.id} value={model.id.toString()}>
                       {getText(model.name)}
                     </SelectItem>
@@ -451,9 +484,9 @@ const CarComparisonSelector = () => {
               <Select
                 value={thirdCar.model ? thirdCar.model.id.toString() : ""}
                 onValueChange={(value) => {
-                  const selectedModel = thirdCar.brand
-                    ? models[thirdCar.brand.id]?.find((model) => model.id.toString() === value)
-                    : null
+                  const selectedModel = getAvailableModels(thirdCar.brand?.id, thirdCar.model).find(
+                    (model) => model.id.toString() === value,
+                  )
                   selectModel("third", selectedModel)
                 }}
                 disabled={!thirdCar.brand}
@@ -469,7 +502,7 @@ const CarComparisonSelector = () => {
                 </SelectTrigger>
                 <SelectContent className="border border-brand-light shadow-lg rounded-lg">
                   {thirdCar.brand &&
-                    models[thirdCar.brand.id]?.map((model) => (
+                    getAvailableModels(thirdCar.brand.id, thirdCar.model).map((model) => (
                       <SelectItem key={model.id} value={model.id.toString()}>
                         {getText(model.name)}
                       </SelectItem>

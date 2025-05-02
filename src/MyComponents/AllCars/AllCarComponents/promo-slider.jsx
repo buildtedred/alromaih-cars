@@ -29,7 +29,7 @@ export function PromoSlider() {
 
   return (
     <Carousel
-      className="w-full mb-8"
+      className="w-full"
       opts={{
         align: "start",
         loop: true,
@@ -50,8 +50,8 @@ export function PromoSlider() {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="left-4 bg-brand-light/10 border-white  border-2 text-white" />
-      <CarouselNext className="right-4 bg-brand-light/10 border-white  border-2 text-white" />
+      <CarouselPrevious className="left-4 bg-brand-light/10 border-white border-2 text-white" />
+      <CarouselNext className="right-4 bg-brand-light/10 border-white border-2 text-white" />
     </Carousel>
   )
 }

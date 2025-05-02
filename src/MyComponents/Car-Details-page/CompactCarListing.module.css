@@ -1,4 +1,4 @@
-.customScrollbar {
+/* .customScrollbar {
   scrollbar-width: thin;
   scrollbar-color: #71308a #f1f1f1;
   max-height: 100%;
@@ -23,7 +23,7 @@
 
 .customScrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #5f2873;
-}
+} */
 
 .thumbnailContainer {
   display: flex;

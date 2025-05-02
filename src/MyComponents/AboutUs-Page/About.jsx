@@ -1,27 +1,42 @@
 "use client"
 import Image from "next/image"
-import { useParams } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
+import { Breadcrumb } from "../breadcrumb"
 
 export default function Home() {
   // Get locale from URL params
   const params = useParams()
   const locale = params?.locale || "ar" // Default to Arabic if locale not found
+  const pathname = usePathname()
+  const isEnglish = !pathname.startsWith("/ar")
+
+  // Generate breadcrumb items
+  const getBreadcrumbItems = () => {
+    return [
+      {
+        label: isEnglish ? "Home" : "الرئيسية",
+        href: `/${locale}`,
+      },
+      {
+        label: isEnglish ? "About Us" : "من نحن",
+      },
+    ]
+  }
 
   return (
-    <main className="container mx-auto min-h-screen bg-gray-100">
+    <main className="container mx-auto min-h-screen">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Breadcrumb items={getBreadcrumbItems()} />
+        </div>
       {/* Hero Image */}
       <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px]">
-        <Image
-          src="/images/main-car.jpg"
-          alt="Car image"
-          fill
-          className="object-cover object-center"
-          priority
-        />
+        <Image src="/images/main-car.jpg" alt="Car image" fill className="object-cover object-center rounded-[10px]" priority />
       </div>
 
       {/* Content Section - Now positioned below the image */}
-      <div className=" container mx-auto p-4 sm:p-6 bg-white mt-8 rounded-xl shadow-md">
+      <div className="container mx-auto p-4 sm:p-6 bg-white mt-8 rounded-xl shadow-md">
+
         <h1
           className={`mt-6 text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-brand-primary ${locale === "ar" ? "rtl font-noto" : ""}`}
         >
@@ -82,10 +97,8 @@ export default function Home() {
           </div>
         </div>
 
-
         {/* for mobile  */}
         <div className="md:hidden">
-
           {/* Center Content */}
           <div className={`  flex-1  max-w-xl px-2 sm:px-4 ${locale === "ar" ? "rtl" : ""}`}>
             <p
@@ -98,7 +111,6 @@ export default function Home() {
           </div>
 
           <div className="flex  justify-between gap-4 mb-8">
-
             {/* 1996 Location */}
             <div className="flex flex-col items-center">
               <Image
@@ -106,7 +118,7 @@ export default function Home() {
                 alt="Location pin"
                 width={30}
                 height={30}
-              // className="w-24 sm:w-28 md:w-32 lg:w-36 h-24 sm:h-28 md:h-32 lg:h-36"
+                // className="w-24 sm:w-28 md:w-32 lg:w-36 h-24 sm:h-28 md:h-32 lg:h-36"
               />
               <div className="bg-brand-light/30 px-4 sm:px-6 py-2 rounded-[5px] text-center mt-2">
                 <div className="font-bold text-lg sm:text-xl font-noto">1996</div>
@@ -121,7 +133,7 @@ export default function Home() {
                 alt="Car illustration"
                 width={130}
                 height={30}
-              // className="w-[180px] sm:w-[220px] md:w-[271px] h-auto"
+                // className="w-[180px] sm:w-[220px] md:w-[271px] h-auto"
               />
             </div>
 
@@ -132,7 +144,7 @@ export default function Home() {
                 alt="Location pin"
                 width={30}
                 height={30}
-              // className="w-24 sm:w-28 md:w-32 lg:w-36 h-24 sm:h-28 md:h-32 lg:h-36"
+                // className="w-24 sm:w-28 md:w-32 lg:w-36 h-24 sm:h-28 md:h-32 lg:h-36"
               />
               <div className="bg-brand-light/30 px-4 sm:px-6 py-2 rounded-[5px] text-center mt-2">
                 <div className="font-bold text-lg sm:text-xl font-noto">2023</div>
@@ -142,8 +154,6 @@ export default function Home() {
           </div>
         </div>
         {/* for mobile  */}
-
-
       </div>
 
       {/* Features Section */}
@@ -457,4 +467,3 @@ export default function Home() {
     </main>
   )
 }
-

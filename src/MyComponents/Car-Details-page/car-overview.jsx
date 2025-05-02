@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import {
@@ -145,7 +144,7 @@ const CarOverview = ({ carId = 1 }) => {
       </style>
 
       {/* Car Information Section */}
-      <div className="bg-white rounded-[20px] border border-gray-200 overflow-hidden">
+      <div className="bg-brand-light/30 rounded-[5px] border border-gray-200 overflow-hidden">
         <div className="p-4">
           <h2 className={`text-xl font-semibold text-brand-primary mb-4 ${!isEnglish ? "text-right" : ""}`}>
             {isEnglish ? "Car Information" : "معلومات السيارة"}
@@ -169,7 +168,7 @@ const CarOverview = ({ carId = 1 }) => {
       </div>
 
       {/* Car Specifications Section */}
-      <div className="bg-white rounded-[20px] border border-gray-200 overflow-hidden">
+      <div className="bg-brand-light/30 rounded-[5px] border border-gray-200 overflow-hidden">
         <div className="p-4">
           <h2 className={`text-xl font-semibold text-brand-primary mb-4 ${!isEnglish ? "text-right" : ""}`}>
             {isEnglish ? "Car Specifications" : "صفات السيارة"}

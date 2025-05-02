@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { X, ChevronRight, ChevronLeft, User, Mail, Phone, FileText, Check, Download } from "lucide-react"
+import { X, ChevronRight, ChevronLeft, User, Mail, Phone, FileText, Check, Download } from 'lucide-react'
 import { motion, AnimatePresence } from "framer-motion"
 import { PDFDownloadLink } from "@react-pdf/renderer"
-import { OrderPDF } from "./orderPDF"
-import { fetchImageAsBase64 } from "./fetch-image"
+import { OrderPDF } from "./orderPDF.jsx"
+import { fetchImageAsBase64 } from "./fetch-image.jsx"
 import { usePathname } from "next/navigation"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons"
@@ -48,7 +48,6 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
   const [pdfReady, setPdfReady] = useState(false)
 
   // Add translation mappings for dropdown values
-  // Add this after the state declarations, before the useEffect hooks
   const translations = {
     // Job Sector translations
     "قطاع حكومي": "Government Sector",
@@ -428,9 +427,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
   }
 
   // Order PDF component rendering optimization
-  const OrderPDFDocument = pdfReady ? (
-    <OrderPDF formData={formData} carDetails={car_Details} carImage={carImage} isEnglish={isEnglish} />
-  ) : null
+  
 
   // Function to render the correct button based on step
   const renderActionButton = () => {
@@ -442,7 +439,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         <button
           type="submit"
           disabled={isLoading}
-          className="py-2 sm:py-3 px-6 sm:px-8 bg-[#46194F] text-white rounded-xl text-sm font-medium hover:bg-[#3b1442] focus:outline-none focus:ring-2 focus:ring-[#46194F] focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="py-2 sm:py-3 px-6 sm:px-8 bg-brand-primary text-white rounded-xl text-sm font-medium hover:bg-[#3b1442] focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <span className="flex items-center justify-center">
@@ -475,7 +472,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
       <button
         type="button"
         onClick={handleNext}
-        className="py-2 sm:py-3 px-6 sm:px-8 bg-[#46194F] text-white rounded-xl text-sm font-medium hover:bg-[#3b1442] focus:outline-none focus:ring-2 focus:ring-[#46194F] focus:ring-opacity-50 transition-colors"
+        className="py-2 sm:py-3 px-6 sm:px-8 bg-brand-primary text-white rounded-xl text-sm font-medium hover:bg-[#3b1442] focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 transition-colors"
       >
         {isEnglish ? "Next" : "التالي"}
       </button>
@@ -484,16 +481,16 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
 
   const renderSummary = () => (
     <div className="bg-purple-50 p-4 sm:p-6 rounded-xl h-full shadow-sm">
-      <div className="inline-flex items-center justify-center bg-[#46194F] text-white w-6 h-6 sm:w-8 sm:h-8 rounded-full mb-3 sm:mb-4">
+      <div className="inline-flex items-center justify-center bg-brand-primary text-white w-6 h-6 sm:w-8 sm:h-8 rounded-full mb-3 sm:mb-4">
         <span className="text-sm sm:text-base">a</span>
       </div>
-      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-[#46194F]">
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-brand-primary">
         {isEnglish ? "Summary" : "ملخص"}
       </h3>
       <div className="space-y-2 sm:space-y-3 text-sm">
         {formData.type && (
           <div className="flex items-center">
-            <User className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <User className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish
                 ? `Buyer Type: ${formData.type === "individual" ? "Individual" : "Company"}`
@@ -503,7 +500,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.paymentMethod && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish
                 ? `Payment: ${formData.paymentMethod === "cash" ? "Cash" : "Finance"}`
@@ -513,7 +510,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.firstName && (
           <div className="flex items-center">
-            <User className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <User className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish ? `Name: ${formData.firstName}` : `الاسم: ${formData.firstName}`}
             </span>
@@ -521,7 +518,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.nationalId && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish ? `National ID: ${formData.nationalId}` : `رقم الهوية الوطنية: ${formData.nationalId}`}
             </span>
@@ -529,7 +526,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.email && (
           <div className="flex items-center">
-            <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish ? `Email: ${formData.email}` : `البريد الإلكتروني: ${formData.email}`}
             </span>
@@ -537,7 +534,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.phone && (
           <div className="flex items-center">
-            <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish ? `Phone: ${formData.phone}` : `رقم الهاتف: ${formData.phone}`}
               {formData.hasWhatsapp && <FontAwesomeIcon icon={faWhatsapp} className="text-green-500 w-3 h-3 ml-2" />}
@@ -546,7 +543,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.paymentMethod === "finance" && formData.jobSector && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish ? `Job Sector: ${translateValue(formData.jobSector)}` : `الوظيفة: ${formData.jobSector}`}
             </span>
@@ -554,7 +551,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.paymentMethod === "finance" && formData.salary && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish ? `Salary: ${formData.salary}` : `الراتب: ${formData.salary}`}
             </span>
@@ -562,7 +559,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.paymentMethod === "finance" && formData.bankName && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish ? `Bank: ${translateValue(formData.bankName)}` : `البنك: ${formData.bankName}`}
             </span>
@@ -570,7 +567,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.paymentMethod === "finance" && formData.existingLoans && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish
                 ? `Existing Obligations: ${formData.existingLoans === "yes" ? "Yes" : "No"}`
@@ -580,7 +577,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.paymentMethod === "finance" && formData.existingLoans === "yes" && formData.personalLoanAmount && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish
                 ? `Personal Obligation: ${formData.personalLoanAmount}`
@@ -590,7 +587,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.paymentMethod === "finance" && formData.existingLoans === "yes" && formData.propertyLoanAmount && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish
                 ? `Property Obligation: ${formData.propertyLoanAmount}`
@@ -600,7 +597,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
         )}
         {formData.paymentMethod === "finance" && formData.jobSector === "قطاع خاص" && formData.bankVerified && (
           <div className="flex items-center">
-            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-[#46194F] mr-2 flex-shrink-0" />
+            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-2 flex-shrink-0" />
             <span className="text-gray-600">
               {isEnglish
                 ? `Bank Verified: ${translateValue(formData.bankVerified)}`
@@ -613,9 +610,9 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
       {getFormStepContent() === "confirmation" && isAllDataFilled() && (
         <div className="mt-6">
           <PDFDownloadLink
-            document={OrderPDFDocument}
+            document={<OrderPDF formData={formData} carDetails={car_Details} carImage={carImage} isEnglish={isEnglish} />}
             fileName={`car-order-${formData.firstName}-${new Date().toISOString().split("T")[0]}.pdf`}
-            className="inline-flex items-center px-4 py-2 rounded-xl bg-[#46194F] text-white text-xs hover:bg-[#3b1442] transition-colors"
+            className="inline-flex items-center px-4 py-2 rounded-xl bg-brand-primary text-white text-xs hover:bg-[#3b1442] transition-colors"
           >
             {({ blob, url, loading, error }) =>
               loading ? (
@@ -659,7 +656,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
       >
         {/* Header */}
         <div className="px-3 sm:px-8 pt-4 sm:pt-6 pb-2 flex items-center justify-between border-b sticky top-0 bg-white z-10">
-          <h2 id="modal-title" className="text-lg sm:text-2xl font-bold text-[#46194F] flex items-center">
+          <h2 id="modal-title" className="text-lg sm:text-2xl font-bold text-brand-primary flex items-center">
             {!isEnglish && <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 ml-2" />}
             {isEnglish && <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />}
 
@@ -700,7 +697,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                 {/* Dynamic Step Indicators */}
                 <div className="flex flex-col items-center mx-2">
                   <div
-                    className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 1 ? "bg-[#46194F] text-white" : "border-2 border-gray-300 text-gray-400"}`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 1 ? "bg-brand-primary text-white" : "border-2 border-gray-300 text-gray-400"}`}
                   >
                     1
                   </div>
@@ -712,11 +709,11 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                 {activePaymentMethod ? (
                   // If payment method is pre-selected
                   <>
-                    <div className={`flex-1 h-0.5 mx-1 ${step >= 2 ? "bg-[#46194F]" : "bg-gray-300"}`}></div>
+                    <div className={`flex-1 h-0.5 mx-1 ${step >= 2 ? "bg-brand-primary" : "bg-gray-300"}`}></div>
 
                     <div className="flex flex-col items-center mx-2">
                       <div
-                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 2 ? "bg-[#46194F] text-white" : "border-2 border-gray-300 text-gray-400"}`}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 2 ? "bg-brand-primary text-white" : "border-2 border-gray-300 text-gray-400"}`}
                       >
                         2
                       </div>
@@ -725,11 +722,11 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                       </span>
                     </div>
 
-                    <div className={`flex-1 h-0.5 mx-1 ${step >= 3 ? "bg-[#46194F]" : "bg-gray-300"}`}></div>
+                    <div className={`flex-1 h-0.5 mx-1 ${step >= 3 ? "bg-brand-primary" : "bg-gray-300"}`}></div>
 
                     <div className="flex flex-col items-center mx-2">
                       <div
-                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 3 ? "bg-[#46194F] text-white" : "border-2 border-gray-300 text-gray-400"}`}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 3 ? "bg-brand-primary text-white" : "border-2 border-gray-300 text-gray-400"}`}
                       >
                         3
                       </div>
@@ -746,11 +743,11 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
 
                     {activePaymentMethod === "finance" && (
                       <>
-                        <div className={`flex-1 h-0.5 mx-1 ${step >= 4 ? "bg-[#46194F]" : "bg-gray-300"}`}></div>
+                        <div className={`flex-1 h-0.5 mx-1 ${step >= 4 ? "bg-brand-primary" : "bg-gray-300"}`}></div>
 
                         <div className="flex flex-col items-center mx-2">
                           <div
-                            className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 4 ? "bg-[#46194F] text-white" : "border-2 border-gray-300 text-gray-400"}`}
+                            className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 4 ? "bg-brand-primary text-white" : "border-2 border-gray-300 text-gray-400"}`}
                           >
                             4
                           </div>
@@ -764,11 +761,11 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                 ) : (
                   // No pre-selected payment method, show complete step flow
                   <>
-                    <div className={`flex-1 h-0.5 mx-1 ${step >= 2 ? "bg-[#46194F]" : "bg-gray-300"}`}></div>
+                    <div className={`flex-1 h-0.5 mx-1 ${step >= 2 ? "bg-brand-primary" : "bg-gray-300"}`}></div>
 
                     <div className="flex flex-col items-center mx-2">
                       <div
-                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 2 ? "bg-[#46194F] text-white" : "border-2 border-gray-300 text-gray-400"}`}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 2 ? "bg-brand-primary text-white" : "border-2 border-gray-300 text-gray-400"}`}
                       >
                         2
                       </div>
@@ -777,11 +774,11 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                       </span>
                     </div>
 
-                    <div className={`flex-1 h-0.5 mx-1 ${step >= 3 ? "bg-[#46194F]" : "bg-gray-300"}`}></div>
+                    <div className={`flex-1 h-0.5 mx-1 ${step >= 3 ? "bg-brand-primary" : "bg-gray-300"}`}></div>
 
                     <div className="flex flex-col items-center mx-2">
                       <div
-                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 3 ? "bg-[#46194F] text-white" : "border-2 border-gray-300 text-gray-400"}`}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 3 ? "bg-brand-primary text-white" : "border-2 border-gray-300 text-gray-400"}`}
                       >
                         3
                       </div>
@@ -790,11 +787,11 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                       </span>
                     </div>
 
-                    <div className={`flex-1 h-0.5 mx-1 ${step >= 4 ? "bg-[#46194F]" : "bg-gray-300"}`}></div>
+                    <div className={`flex-1 h-0.5 mx-1 ${step >= 4 ? "bg-brand-primary" : "bg-gray-300"}`}></div>
 
                     <div className="flex flex-col items-center mx-2">
                       <div
-                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 4 ? "bg-[#46194F] text-white" : "border-2 border-gray-300 text-gray-400"}`}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 4 ? "bg-brand-primary text-white" : "border-2 border-gray-300 text-gray-400"}`}
                       >
                         4
                       </div>
@@ -811,11 +808,11 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
 
                     {formData.paymentMethod === "finance" && (
                       <>
-                        <div className={`flex-1 h-0.5 mx-1 ${step >= 5 ? "bg-[#46194F]" : "bg-gray-300"}`}></div>
+                        <div className={`flex-1 h-0.5 mx-1 ${step >= 5 ? "bg-brand-primary" : "bg-gray-300"}`}></div>
 
                         <div className="flex flex-col items-center mx-2">
                           <div
-                            className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 5 ? "bg-[#46194F] text-white" : "border-2 border-gray-300 text-gray-400"}`}
+                            className={`w-8 h-8 flex items-center justify-center rounded-full ${step >= 5 ? "bg-brand-primary text-white" : "border-2 border-gray-300 text-gray-400"}`}
                           >
                             5
                           </div>
@@ -846,7 +843,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                     >
                       {getFormStepContent() === "buyerType" && (
                         <div className="space-y-3 sm:space-y-4">
-                          <h3 className="text-lg sm:text-xl font-semibold text-[#46194F] mb-4 sm:mb-6 flex items-center">
+                          <h3 className="text-lg sm:text-xl font-semibold text-brand-primary mb-4 sm:mb-6 flex items-center">
                             <User className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"}`} />
                             {isEnglish ? "Buyer Type" : "نوع المشتري"}
                           </h3>
@@ -857,7 +854,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                             {["individual", "company"].map((type) => (
                               <label
                                 key={type}
-                                className={`flex items-center ${isEnglish ? "justify-between" : "justify-between"} py-3 px-4 sm:px-6 border ${formData.type === type ? "border-[#46194F] bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
+                                className={`flex items-center ${isEnglish ? "justify-between" : "justify-between"} py-3 px-4 sm:px-6 border ${formData.type === type ? "border-brand-primary bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
                               >
                                 <span className="text-gray-700 capitalize">
                                   {isEnglish ? type : type === "individual" ? "للأفراد" : "للشركات"}
@@ -872,7 +869,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     className="sr-only"
                                   />
                                   <div
-                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.type === type ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} transition-colors duration-200`}
+                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.type === type ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} transition-colors duration-200`}
                                   >
                                     {formData.type === type && (
                                       <motion.div
@@ -895,7 +892,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
 
                       {getFormStepContent() === "paymentMethod" && (
                         <div className="space-y-3 sm:space-y-4">
-                          <h3 className="text-lg sm:text-xl font-semibold text-[#46194F] mb-4 sm:mb-6 flex items-center">
+                          <h3 className="text-lg sm:text-xl font-semibold text-brand-primary mb-4 sm:mb-6 flex items-center">
                             <FileText
                               className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"}`}
                             />
@@ -908,7 +905,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                             {["cash", "finance"].map((method) => (
                               <label
                                 key={method}
-                                className={`flex items-center justify-between py-3 px-6 border ${formData.paymentMethod === method ? "border-[#46194F] bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
+                                className={`flex items-center justify-between py-3 px-6 border ${formData.paymentMethod === method ? "border-brand-primary bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
                               >
                                 <span className="text-gray-700 capitalize">
                                   {isEnglish
@@ -929,7 +926,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     className="sr-only"
                                   />
                                   <div
-                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.paymentMethod === method ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} transition-colors duration-200`}
+                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.paymentMethod === method ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} transition-colors duration-200`}
                                   >
                                     {formData.paymentMethod === method && (
                                       <motion.div
@@ -952,7 +949,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
 
                       {getFormStepContent() === "financialInfo" && (
                         <div className="space-y-3 sm:space-y-4">
-                          <h3 className="text-lg sm:text-xl font-semibold text-[#46194F] mb-4 sm:mb-6 flex items-center">
+                          <h3 className="text-lg sm:text-xl font-semibold text-brand-primary mb-4 sm:mb-6 flex items-center">
                             <FileText
                               className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"}`}
                             />
@@ -970,13 +967,13 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 <div
                                   className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                 >
-                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                 </div>
                                 <select
                                   name="jobSector"
                                   value={formData.jobSector}
                                   onChange={handleInputChange}
-                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm appearance-none bg-white focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm appearance-none bg-white focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                 >
                                   <option value="">{isEnglish ? "Select job sector" : "اختر قطاع العمل"}</option>
                                   <option value="قطاع حكومي">{isEnglish ? "Government Sector" : "قطاع حكومي"}</option>
@@ -1008,19 +1005,19 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                   className={`block mb-4 sm:mb-6 ${isEnglish ? "text-left" : "text-right"} flex items-center text-gray-700 font-medium text-sm sm:text-base`}
                                 >
                                   <FileText
-                                    className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"} text-[#46194F]`}
+                                    className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"} text-brand-primary`}
                                   />
                                   {isEnglish ? "Is your bank verified?" : "هل البنك معتمد؟"}
                                   <span className="text-red-500 ml-1">*</span>
                                 </label>
                                 <div className={`flex ${isEnglish ? "flex-row" : "flex-row-reverse"} gap-4`}>
                                   <label
-                                    className={`flex items-center ${isEnglish ? "" : "flex-row-reverse"} py-3 px-6 border ${formData.bankVerified === "معتمد" ? "border-[#46194F] bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
+                                    className={`flex items-center ${isEnglish ? "" : "flex-row-reverse"} py-3 px-6 border ${formData.bankVerified === "معتمد" ? "border-brand-primary bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
                                   >
                                     {isEnglish ? (
                                       <>
                                         <div
-                                          className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.bankVerified === "معتمد" ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} mr-4 transition-colors duration-200`}
+                                          className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.bankVerified === "معتمد" ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} mr-4 transition-colors duration-200`}
                                         >
                                           {formData.bankVerified === "معتمد" && (
                                             <motion.div
@@ -1039,7 +1036,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                       <>
                                         <span className="text-gray-700">معتمد</span>
                                         <div
-                                          className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.bankVerified === "معتمد" ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} mr-0 ml-4 transition-colors duration-200`}
+                                          className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.bankVerified === "معتمد" ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} mr-0 ml-4 transition-colors duration-200`}
                                         >
                                           {formData.bankVerified === "معتمد" && (
                                             <motion.div
@@ -1065,12 +1062,12 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     />
                                   </label>
                                   <label
-                                    className={`flex items-center ${isEnglish ? "" : "flex-row-reverse"} py-3 px-6 border ${formData.bankVerified === "غير معتمد" ? "border-[#46194F] bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
+                                    className={`flex items-center ${isEnglish ? "" : "flex-row-reverse"} py-3 px-6 border ${formData.bankVerified === "غير معتمد" ? "border-brand-primary bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
                                   >
                                     {isEnglish ? (
                                       <>
                                         <div
-                                          className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.bankVerified === "غير معتمد" ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} mr-4 transition-colors duration-200`}
+                                          className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.bankVerified === "غير معتمد" ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} mr-4 transition-colors duration-200`}
                                         >
                                           {formData.bankVerified === "غير معتمد" && (
                                             <motion.div
@@ -1089,7 +1086,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                       <>
                                         <span className="text-gray-700">غير معتمد</span>
                                         <div
-                                          className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.bankVerified === "غير معتمد" ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} mr-0 ml-4 transition-colors duration-200`}
+                                          className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.bankVerified === "غير معتمد" ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} mr-0 ml-4 transition-colors duration-200`}
                                         >
                                           {formData.bankVerified === "غير معتمد" && (
                                             <motion.div
@@ -1134,7 +1131,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 <div
                                   className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                 >
-                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                 </div>
                                 <input
                                   type="number"
@@ -1142,7 +1139,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                   placeholder={isEnglish ? "Enter your monthly salary" : "مبلغ الراتب"}
                                   value={formData.salary}
                                   onChange={handleInputChange}
-                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                 />
                                 {errors.salary && (
                                   <p className={`text-red-500 text-xs mt-1 ${isEnglish ? "text-left" : "text-right"}`}>
@@ -1163,13 +1160,13 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 <div
                                   className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                 >
-                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                 </div>
                                 <select
                                   name="bankName"
                                   value={formData.bankName}
                                   onChange={handleInputChange}
-                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm appearance-none bg-white focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm appearance-none bg-white focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                 >
                                   <option value="">{isEnglish ? "Select bank" : "اختر البنك"}</option>
                                   <option value="الراجحي">{isEnglish ? "Al Rajhi Bank" : "الراجحي"}</option>
@@ -1203,19 +1200,19 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 className={`block mb-4 sm:mb-6 ${isEnglish ? "text-left" : "text-right"} flex items-center text-gray-700 font-medium text-sm sm:text-base`}
                               >
                                 <FileText
-                                  className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"} text-[#46194F]`}
+                                  className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"} text-brand-primary`}
                                 />
                                 {isEnglish ? "Do you have existing obligations?" : "هل لديك التزامات حالية؟"}
                                 <span className="text-red-500 ml-1">*</span>
                               </label>
                               <div className={`flex ${isEnglish ? "flex-row" : "flex-row-reverse"} gap-4`}>
                                 <label
-                                  className={`flex items-center ${isEnglish ? "" : "flex-row-reverse"} py-3 px-6 border ${formData.existingLoans === "yes" ? "border-[#46194F] bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
+                                  className={`flex items-center ${isEnglish ? "" : "flex-row-reverse"} py-3 px-6 border ${formData.existingLoans === "yes" ? "border-brand-primary bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
                                 >
                                   {isEnglish ? (
                                     <>
                                       <div
-                                        className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.existingLoans === "yes" ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} mr-4 transition-colors duration-200`}
+                                        className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.existingLoans === "yes" ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} mr-4 transition-colors duration-200`}
                                       >
                                         {formData.existingLoans === "yes" && (
                                           <motion.div
@@ -1234,7 +1231,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     <>
                                       <span className="text-gray-700">نعم</span>
                                       <div
-                                        className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.existingLoans === "yes" ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} mr-0 ml-4 transition-colors duration-200`}
+                                        className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.existingLoans === "yes" ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} mr-0 ml-4 transition-colors duration-200`}
                                       >
                                         {formData.existingLoans === "yes" && (
                                           <motion.div
@@ -1260,12 +1257,12 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                   />
                                 </label>
                                 <label
-                                  className={`flex items-center ${isEnglish ? "" : "flex-row-reverse"} py-3 px-6 border ${formData.existingLoans === "no" ? "border-[#46194F] bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
+                                  className={`flex items-center ${isEnglish ? "" : "flex-row-reverse"} py-3 px-6 border ${formData.existingLoans === "no" ? "border-brand-primary bg-purple-50 shadow-md" : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/30"} rounded-xl transition-all duration-200 cursor-pointer`}
                                 >
                                   {isEnglish ? (
                                     <>
                                       <div
-                                        className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.existingLoans === "no" ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} mr-4 transition-colors duration-200`}
+                                        className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.existingLoans === "no" ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} mr-4 transition-colors duration-200`}
                                       >
                                         {formData.existingLoans === "no" && (
                                           <motion.div
@@ -1284,7 +1281,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     <>
                                       <span className="text-gray-700">لا</span>
                                       <div
-                                        className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.existingLoans === "no" ? "border-[#46194F] bg-[#46194F] shadow-sm" : "border-gray-300"} mr-0 ml-4 transition-colors duration-200`}
+                                        className={`relative w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${formData.existingLoans === "no" ? "border-brand-primary bg-brand-primary shadow-sm" : "border-gray-300"} mr-0 ml-4 transition-colors duration-200`}
                                       >
                                         {formData.existingLoans === "no" && (
                                           <motion.div
@@ -1320,7 +1317,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                             {formData.existingLoans === "yes" && (
                               <div className="space-y-6 bg-purple-50 p-3 sm:p-4 rounded-xl mb-6">
                                 <h4
-                                  className={`font-medium text-[#46194F] ${isEnglish ? "text-left" : "text-right"} text-sm sm:text-base mb-4`}
+                                  className={`font-medium text-brand-primary ${isEnglish ? "text-left" : "text-right"} text-sm sm:text-base mb-4`}
                                 >
                                   {isEnglish ? "Obligation Details" : "تفاصيل الالتزامات"}
                                 </h4>
@@ -1335,7 +1332,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     <div
                                       className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                     >
-                                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                     </div>
                                     <input
                                       type="number"
@@ -1345,7 +1342,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                       }
                                       value={formData.personalLoanAmount}
                                       onChange={handleInputChange}
-                                      className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                      className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                     />
                                   </div>
                                 </div>
@@ -1360,7 +1357,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     <div
                                       className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                     >
-                                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                     </div>
                                     <input
                                       type="number"
@@ -1370,7 +1367,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                       }
                                       value={formData.propertyLoanAmount}
                                       onChange={handleInputChange}
-                                      className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                      className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                     />
                                   </div>
                                 </div>
@@ -1388,7 +1385,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
 
                       {getFormStepContent() === "personalInfo" && (
                         <div className="space-y-3 sm:space-y-4">
-                          <h3 className="text-lg sm:text-xl font-semibold text-[#46194F] mb-4 sm:mb-6 flex items-center">
+                          <h3 className="text-lg sm:text-xl font-semibold text-brand-primary mb-4 sm:mb-6 flex items-center">
                             <User className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"}`} />
                             {isEnglish ? "Personal Information" : "المعلومات الشخصية"}
                           </h3>
@@ -1404,7 +1401,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 <div
                                   className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                 >
-                                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                  <User className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                 </div>
                                 <input
                                   type="text"
@@ -1412,7 +1409,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                   placeholder={isEnglish ? "Name" : "الاسم"}
                                   value={formData.firstName}
                                   onChange={handleInputChange}
-                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                 />
                                 {errors.firstName && (
                                   <p className={`text-red-500 text-xs mt-1 ${isEnglish ? "text-left" : "text-right"}`}>
@@ -1433,7 +1430,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 <div
                                   className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                 >
-                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                 </div>
                                 <input
                                   type="text"
@@ -1441,7 +1438,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                   placeholder={isEnglish ? "National ID" : "رقم الهوية الوطنية"}
                                   value={formData.nationalId}
                                   onChange={handleInputChange}
-                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                 />
                                 {errors.nationalId && (
                                   <p className={`text-red-500 text-xs mt-1 ${isEnglish ? "text-left" : "text-right"}`}>
@@ -1461,7 +1458,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 <div
                                   className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                 >
-                                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                 </div>
                                 <input
                                   type="email"
@@ -1469,7 +1466,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                   placeholder={isEnglish ? "Email Address" : "البريد الإلكتروني"}
                                   value={formData.email}
                                   onChange={handleInputChange}
-                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                  className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                   dir="ltr"
                                 />
                                 {errors.email && (
@@ -1491,7 +1488,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 <div
                                   className={`absolute inset-y-0 ${isEnglish ? "left-3" : "right-3"} flex items-center pointer-events-none`}
                                 >
-                                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-[#46194F]" />
+                                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />
                                 </div>
                                 <div className="relative">
                                   <input
@@ -1500,18 +1497,18 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     placeholder={isEnglish ? "Phone Number" : "رقم الهاتف"}
                                     value={formData.phone}
                                     onChange={handleInputChange}
-                                    className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                                    className={`w-full p-2 sm:p-3 ${isEnglish ? "pl-10 sm:pl-12 text-left" : "pr-10 sm:pr-12 text-right"} border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                                     dir="ltr"
                                   />
                                   {formData.hasWhatsapp && (
                                     <div
-                                      className={`absolute ${isEnglish ? "right-3" : "left-3"} top-1/2 -translate-y-1/2`}
+                                      className={`absolute ${isEnglish ? "right-3" : "left-3"} top-1/2 -translate-y-1/2 flex items-center justify-center`}
                                     >
-                                      <FontAwesomeIcon
-                                        icon={faWhatsapp}
-                                        className="text-green-500 w-5 h-5"
-                                        title={isEnglish ? "WhatsApp available" : "واتساب متاح"}
-                                      />
+                                      <span className="text-green-500" title={isEnglish ? "WhatsApp available" : "واتساب متاح"}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                                        </svg>
+                                      </span>
                                     </div>
                                   )}
                                 </div>
@@ -1535,7 +1532,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                     className="sr-only"
                                   />
                                   <div
-                                    className={`w-5 h-5 cursor-pointer flex items-center justify-center border-2 ${formData.hasWhatsapp ? "border-[#46194F] bg-[#46194F]" : "border-gray-300"} rounded transition-colors duration-200`}
+                                    className={`w-5 h-5 cursor-pointer flex items-center justify-center border-2 ${formData.hasWhatsapp ? "border-brand-primary bg-brand-primary" : "border-gray-300"} rounded transition-colors duration-200`}
                                     onClick={() =>
                                       handleInputChange({
                                         target: {
@@ -1560,7 +1557,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 </div>
                                 <label
                                   htmlFor="hasWhatsapp"
-                                  className="mx-3 text-sm text-gray-700 flex items-center group hover:text-[#46194F] transition-colors duration-200 cursor-pointer"
+                                  className="mx-3 text-sm text-gray-700 flex items-center group hover:text-brand-primary transition-colors duration-200 cursor-pointer"
                                 >
                                   {isEnglish ? "This number has WhatsApp" : "هذا الرقم لديه واتساب"}
                                   <span className="ml-1 group-hover:text-green-600 transition-colors duration-200">
@@ -1575,7 +1572,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
 
                       {getFormStepContent() === "confirmation" && (
                         <div className="space-y-3 sm:space-y-4">
-                          <h3 className="text-lg sm:text-xl font-semibold text-[#46194F] mb-4 sm:mb-6 flex items-center">
+                          <h3 className="text-lg sm:text-xl font-semibold text-brand-primary mb-4 sm:mb-6 flex items-center">
                             <FileText
                               className={`w-4 h-4 sm:w-5 sm:h-5 ${isEnglish ? "mr-1 sm:mr-2" : "ml-1 sm:ml-2"}`}
                             />
@@ -1595,7 +1592,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                                 className="sr-only"
                               />
                               <div
-                                className={`w-5 h-5 cursor-pointer flex items-center justify-center border-2 ${formData.acceptTerms ? "border-[#46194F] bg-[#46194F]" : "border-gray-300"} rounded transition-colors duration-200`}
+                                className={`w-5 h-5 cursor-pointer flex items-center justify-center border-2 ${formData.acceptTerms ? "border-brand-primary bg-brand-primary" : "border-gray-300"} rounded transition-colors duration-200`}
                                 onClick={() =>
                                   handleInputChange({
                                     target: { name: "acceptTerms", type: "checkbox", checked: !formData.acceptTerms },
@@ -1616,7 +1613,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                             </div>
                             <label
                               htmlFor="acceptTerms"
-                              className="mx-3 text-sm text-gray-700 hover:text-[#46194F] transition-colors duration-200 cursor-pointer"
+                              className="mx-3 text-sm text-gray-700 hover:text-brand-primary transition-colors duration-200 cursor-pointer"
                             >
                               {isEnglish ? "I accept the terms and conditions" : "أوافق على الشروط والأحكام"}
                             </label>
@@ -1639,7 +1636,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                               onChange={handleInputChange}
                               placeholder={isEnglish ? "Additional notes or questions" : "ملاحظات أو أسئلة إضافية"}
                               rows={4}
-                              className={`w-full p-2 sm:p-3 text-gray-700 ${isEnglish ? "text-left" : "text-right"} bg-white border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-[#46194F] focus:border-[#46194F] focus:outline-none transition-all duration-200`}
+                              className={`w-full p-2 sm:p-3 text-gray-700 ${isEnglish ? "text-left" : "text-right"} bg-white border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-brand-primary focus:border-brand-primary focus:outline-none transition-all duration-200`}
                             />
                           </div>
                         </div>
@@ -1652,7 +1649,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                       <button
                         type="button"
                         onClick={handleBack}
-                        className="py-2 sm:py-3 px-4 sm:px-12 bg-transparent border border-[#46194F] text-[#46194F] rounded-xl text-sm font-medium hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-[#46194F] focus:ring-opacity-50 transition-colors"
+                        className="py-2 sm:py-3 px-4 sm:px-12 bg-transparent border border-brand-primary text-brand-primary rounded-xl text-sm font-medium hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 transition-colors"
                       >
                         {isEnglish ? "Back" : "رجوع"}
                       </button>
@@ -1666,15 +1663,15 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
               {/* Mobile Summary - Only shown on the last step */}
               {getFormStepContent() === "confirmation" && (
                 <div className="mt-6 lg:hidden w-full p-2 sm:p-4 bg-purple-50 rounded-xl shadow-sm">
-                  <h3 className="text-base font-semibold mb-3 text-[#46194F] flex items-center">
-                    <FileText className="w-4 h-4 mr-1 text-[#46194F]" />
+                  <h3 className="text-base font-semibold mb-3 text-brand-primary flex items-center">
+                    <FileText className="w-4 h-4 mr-1 text-brand-primary" />
                     {isEnglish ? "Summary" : "ملخص"}
                   </h3>
                   <div className="space-y-2 text-sm">
                     {/* Show only essential information in mobile summary */}
                     {formData.firstName && (
                       <div className="flex items-center">
-                        <User className="w-3 h-3 text-[#46194F] mr-2 flex-shrink-0" />
+                        <User className="w-3 h-3 text-brand-primary mr-2 flex-shrink-0" />
                         <span className="text-gray-600">
                           {isEnglish ? `Name: ${formData.firstName}` : `الاسم: ${formData.firstName}`}
                         </span>
@@ -1682,7 +1679,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                     )}
                     {formData.nationalId && (
                       <div className="flex items-center">
-                        <FileText className="w-3 h-3 text-[#46194F] mr-2 flex-shrink-0" />
+                        <FileText className="w-3 h-3 text-brand-primary mr-2 flex-shrink-0" />
                         <span className="text-gray-600">
                           {isEnglish
                             ? `National ID: ${formData.nationalId}`
@@ -1692,7 +1689,7 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                     )}
                     {formData.phone && (
                       <div className="flex items-center">
-                        <Phone className="w-3 h-3 text-[#46194F] mr-2 flex-shrink-0" />
+                        <Phone className="w-3 h-3 text-brand-primary mr-2 flex-shrink-0" />
                         <span className="text-gray-600">
                           {isEnglish ? `Phone: ${formData.phone}` : `رقم الهاتف: ${formData.phone}`}
                           {formData.hasWhatsapp && (
@@ -1704,9 +1701,9 @@ export function MultiStepPopup({ isOpen, onClose, car_Details, activePaymentMeth
                     {isAllDataFilled() && (
                       <div className="mt-4">
                         <PDFDownloadLink
-                          document={OrderPDFDocument}
+                          document={<OrderPDF formData={formData} carDetails={car_Details} carImage={carImage} isEnglish={isEnglish} />}
                           fileName={`car-order-${formData.firstName}-${new Date().toISOString().split("T")[0]}.pdf`}
-                          className="inline-flex items-center px-4 py-2 rounded-xl bg-[#46194F] text-white text-xs hover:bg-[#3b1442] transition-colors"
+                          className="inline-flex items-center px-4 py-2 rounded-xl bg-brand-primary text-white text-xs hover:bg-[#3b1442] transition-colors"
                         >
                           {({ blob, url, loading, error }) =>
                             loading ? (

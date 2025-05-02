@@ -114,7 +114,7 @@ const PriceCardSimple = ({ car_Details, isEnglish, onColorChange, pdfCarDetails,
   }
 
   return (
-    <div className="bg-white rounded-[20px] border-2 border-brand-primary p-4">
+    <div className="bg-brand-light/30 rounded-[10px] border-2 border-brand-primary p-4">
       {/* Header */}
       <div className="flex justify-between items-start mb-3">
         <div>

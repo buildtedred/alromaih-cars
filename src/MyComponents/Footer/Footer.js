@@ -67,7 +67,6 @@ export default function Footer() {
             <div
               className={`col-span-full lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-8 order-2 ${locale === "ar" ? "lg:order-2" : "lg:order-2"}`}
             >
-              
               {/* Cars Column */}
               <div className={`text-center sm:${locale === "ar" ? "text-right" : "text-left"}`}>
                 <h3 className={`text-brand-600 text-xl font-medium mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
@@ -174,7 +173,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      href="#"
+                      href={`/${locale}/contact-us`}
                       className={`text-gray-600 hover:text-brand-600 transition-colors ${locale === "ar" ? "font-noto" : ""}`}
                     >
                       {locale === "ar" ? "تواصل معنا" : "Contact Us"}
@@ -186,7 +185,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    
+
       {/* Purple Section with Contact Info */}
       <div className="bg-brand-primary">
         <div className="max-w-[1300px] mx-auto px-4 py-6">
@@ -279,4 +278,3 @@ export default function Footer() {
     </div>
   )
 }
-

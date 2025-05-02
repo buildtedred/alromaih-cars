@@ -1,5 +1,4 @@
-import { useBrands } from "@/contexts/AllDataProvider"
-import { Link } from "@/i18n/routing"
+"use client"
 import { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
@@ -8,11 +7,26 @@ import Image from "next/image"
 import LoadingUi from "../LoadingUi/LoadingUi"
 import carsData from "@/app/api/mock-data"
 import { useDetailContext } from "@/contexts/detailProvider"
+import { Breadcrumb } from "../breadcrumb"
 
 const Brands = () => {
-  const { brand, loadingBrand, } = useOdoo();
+  const { brand, loadingBrand } = useOdoo()
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
+  const currentLocale = isEnglish ? "en" : "ar"
+
+  // Generate breadcrumb items
+  const getBreadcrumbItems = () => {
+    return [
+      {
+        label: isEnglish ? "Home" : "الرئيسية",
+        href: `/${currentLocale}`,
+      },
+      {
+        label: isEnglish ? "Brands" : "العلامات التجارية",
+      },
+    ]
+  }
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
@@ -29,6 +43,11 @@ const Brands = () => {
         ></path>
       </svg>
       <div className="container mx-auto px-4 py-12 lg:px-36 relative z-10">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Breadcrumb items={getBreadcrumbItems()} />
+        </div>
+
         <h1 className="text-3xl md:text-4xl font-bold text-center mb-10 text-[#71308A]">
           {isEnglish ? "Our Exclusive Brands" : "علاماتنا التجارية الحصرية"}
         </h1>
@@ -36,34 +55,32 @@ const Brands = () => {
           <LoadingUi />
         ) : (
           <div className=" grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {
-              (carsData).map((brand, index) => (
-                <BrandCard key={index} brand={brand} isEnglish={isEnglish} />
-              ))
-            }
+            {carsData.map((brand, index) => (
+              <BrandCard key={index} brand={brand} isEnglish={isEnglish} />
+            ))}
           </div>
         )}
       </div>
     </div>
-  ) 
+  )
 }
 
 const BrandCard = ({ brand, isEnglish }) => {
-  const {setbrands}=useDetailContext()
+  const { setbrands } = useDetailContext()
   const [isHovered, setIsHovered] = useState(false)
-  
+
   const pathname = usePathname()
   const pathLocale = pathname.startsWith("/ar") ? "ar" : "en"
   // Use either the detected path locale or the provided locale prop
-  const currentLocale = pathLocale || locale
+  const currentLocale = pathLocale
   const router = useRouter()
 
   const handleBrands = () => {
-     router.push(`/${currentLocale}/all-cars`)
-     setbrands(brand)
+    router.push(`/${currentLocale}/all-cars`)
+    setbrands(brand)
   }
   return (
-    <div onClick={handleBrands} >
+    <div onClick={handleBrands}>
       <motion.div
         className=" bg-brand-light rounded-[10px] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-purple-100"
         whileHover={{ y: -5 }}
@@ -73,16 +90,14 @@ const BrandCard = ({ brand, isEnglish }) => {
         <div className="p-4 flex flex-col items-center h-full">
           <div className="w-full h-24 flex items-center justify-center mb-3">
             <Image
-              src={brand?.brandLogo}
+              src={brand?.brandLogo || "/placeholder.svg"}
               width={20}
               height={20}
               alt={brand?.brand}
               className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
             />
           </div>
-          <h3 className="text-center font-semibold text-sm text-[#71308A] mb-2 truncate w-full">
-            {brand?.brand}
-          </h3>
+          <h3 className="text-center font-semibold text-sm text-[#71308A] mb-2 truncate w-full">{brand?.brand}</h3>
           <motion.p
             className="text-center text-xs text-gray-600 line-clamp-2 overflow-hidden"
             initial={{ opacity: 0, height: 0 }}
@@ -115,6 +130,5 @@ const Loader = () => (
   </div>
 )
 
-export default Brands;
-export { BrandCard };
-
+export default Brands
+export { BrandCard }

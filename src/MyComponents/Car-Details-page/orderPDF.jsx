@@ -99,8 +99,18 @@ const styles = StyleSheet.create({
 })
 
 export const OrderPDF = ({ formData, carDetails, carImage, isEnglish }) => {
+  if (!formData) {
+    return (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <Text>Error: Missing form data</Text>
+        </Page>
+      </Document>
+    )
+  }
+
   // Format date for display
-  const formatDate = (dateString) => {
+  const formatDate = () => {
     const date = new Date()
     return date.toLocaleDateString(isEnglish ? "en-US" : "ar-SA", {
       year: "numeric",
@@ -111,17 +121,17 @@ export const OrderPDF = ({ formData, carDetails, carImage, isEnglish }) => {
 
   // Get car model and brand
   const getModelName = () => {
-    if (carDetails?.model?.name) {
+    if (carDetails && carDetails.model && carDetails.model.name) {
       return carDetails.model.name
     }
-    return carDetails?.model || "N/A"
+    return carDetails && carDetails.model ? carDetails.model : "N/A"
   }
 
   const getBrandName = () => {
-    if (carDetails?.brand?.name) {
+    if (carDetails && carDetails.brand && carDetails.brand.name) {
       return carDetails.brand.name
     }
-    return carDetails?.brand || "N/A"
+    return carDetails && carDetails.brand ? carDetails.brand : "N/A"
   }
 
   // Format price
@@ -135,6 +145,21 @@ export const OrderPDF = ({ formData, carDetails, carImage, isEnglish }) => {
   // Text style based on language
   const textStyle = isEnglish ? styles.ltrText : styles.rtlText
 
+  // Get price from car details
+  const getPrice = () => {
+    if (!carDetails) return "N/A"
+
+    if (carDetails.price) {
+      return formatPrice(carDetails.price)
+    }
+
+    if (carDetails.pricing && carDetails.pricing.base_price) {
+      return formatPrice(carDetails.pricing.base_price)
+    }
+
+    return "N/A"
+  }
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -146,7 +171,7 @@ export const OrderPDF = ({ formData, carDetails, carImage, isEnglish }) => {
           </Text>
           <Text style={styles.orderDate}>
             {isEnglish ? "Order Date: " : "تاريخ الطلب: "}
-            {formatDate(new Date().toISOString())}
+            {formatDate()}
           </Text>
         </View>
 
@@ -167,16 +192,16 @@ export const OrderPDF = ({ formData, carDetails, carImage, isEnglish }) => {
             <Text style={[styles.value, textStyle]}>{getModelName()}</Text>
           </View>
 
-          <View style={styles.row}>
-            <Text style={[styles.label, textStyle]}>{isEnglish ? "Year" : "السنة"}</Text>
-            <Text style={[styles.value, textStyle]}>{carDetails?.year || "N/A"}</Text>
-          </View>
+          {carDetails && carDetails.year && (
+            <View style={styles.row}>
+              <Text style={[styles.label, textStyle]}>{isEnglish ? "Year" : "السنة"}</Text>
+              <Text style={[styles.value, textStyle]}>{carDetails.year}</Text>
+            </View>
+          )}
 
           <View style={styles.row}>
             <Text style={[styles.label, textStyle]}>{isEnglish ? "Price" : "السعر"}</Text>
-            <Text style={[styles.value, textStyle]}>
-              {formatPrice(carDetails?.price || carDetails?.pricing?.base_price)} SAR
-            </Text>
+            <Text style={[styles.value, textStyle]}>{getPrice()} SAR</Text>
           </View>
 
           <View style={styles.row}>
@@ -198,7 +223,7 @@ export const OrderPDF = ({ formData, carDetails, carImage, isEnglish }) => {
           <Text style={styles.sectionTitle}>{isEnglish ? "Customer Details" : "بيانات العميل"}</Text>
 
           <View style={styles.row}>
-            <Text style={[styles.label, textStyle]}>{isEnglish ? "Name" : "الاس��"}</Text>
+            <Text style={[styles.label, textStyle]}>{isEnglish ? "Name" : "الاسم"}</Text>
             <Text style={[styles.value, textStyle]}>{formData.firstName}</Text>
           </View>
 
@@ -239,4 +264,3 @@ export const OrderPDF = ({ formData, carDetails, carImage, isEnglish }) => {
     </Document>
   )
 }
-

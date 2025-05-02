@@ -2,7 +2,7 @@
 import { useState, useCallback, useEffect } from "react"
 import Image from "next/image"
 import { X } from "lucide-react"
-import styles from "./CompactCarListing.module.css"
+// import styles from "./CompactCarListing.module.css"
 import { FinanceCalculator } from "./FinanceCalculator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { usePathname } from "next/navigation"
@@ -10,11 +10,13 @@ import CarOverview from "./car-overview"
 import { MultiStepPopup } from "./MultiStepPopup"
 import PriceCardSimple from "./PriceCard"
 import { useDetailContext } from "@/contexts/detailProvider"
+import { Breadcrumb } from "../breadcrumb"
 
 const CompactCarListing = ({ brand_Details }) => {
   const { car_Details, loading } = useDetailContext()
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
+  const currentLocale = isEnglish ? "en" : "ar"
 
   // console.log("object", car_Details)
 
@@ -73,63 +75,53 @@ const CompactCarListing = ({ brand_Details }) => {
     })
   }, [preparePdfCarDetails])
 
-  const renderMainCarGallery = () => (
-    <div className="w-full sm:w-4/5">
-      <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
-        {isLoading ? (
-          <Skeleton className="w-full h-full" />
-        ) : (
-          <Image
-            src={allImages[activeImage] || "/placeholder.svg?height=450&width=800"}
-            alt={`${getBrandName()} ${getModelName()} - ${activeImage === 0 ? "Main view" : `View ${activeImage + 1}`}`}
-            width={800}
-            height={450}
-            className={`${styles.mainImage} object-cover`}
-          />
-        )}
-      </div>
-    </div>
-  )
-  const renderThumbnails = () => (
-    <div className="w-full sm:w-1/5 h-auto sm:h-[400px] mb-4">
-      <div className={`${styles.thumbnailContainer} ${styles.customScrollbar} p-1`}>
-        {isLoading
-          ? Array(6)
-              .fill(0)
-              .map((_, index) => <Skeleton key={index} className="w-full aspect-square rounded-lg mb-2" />)
-          : allImages.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => setActiveImage(index)}
-                className={`${styles.thumbnailButton} ${activeImage === index ? "ring-2 ring-brand-primary" : ""}`}
-              >
-                <Image
-                  src={image || "/placeholder.svg?height=80&width=80"}
-                  alt={`${getBrandName()} ${getModelName()} thumbnail ${index + 1}`}
-                  width={80}
-                  height={80}
-                  className="rounded-md object-cover"
-                />
-              </button>
-            ))}
-      </div>
-    </div>
-  )
-
-  // Get model name
+  // Get model name - Improved to handle different data structures
   const getModelName = () => {
     if (car_Details?.model?.name) {
       return car_Details.model.name
     }
-    return car_Details?.model || "N/A"
+
+    // Check if model is directly available
+    if (car_Details?.model && typeof car_Details.model === "string" && car_Details.model !== "N/A") {
+      return car_Details.model
+    }
+
+    // Try to get from name if it's an object with language keys
+    if (car_Details?.name && typeof car_Details.name === "object") {
+      // Extract model from name (assuming format is "Brand Model")
+      const fullName = isEnglish ? car_Details.name.en : car_Details.name.ar
+      if (fullName && fullName.includes(" ")) {
+        const parts = fullName.split(" ")
+        if (parts.length > 1) {
+          // Return everything after the first word (which is likely the brand)
+          return parts.slice(1).join(" ")
+        }
+      }
+    }
+
+    return ""
   }
 
-  // Get brand name
+  // Get brand name - Improved to handle different data structures
   const getBrandName = () => {
     if (car_Details?.brand?.name) {
       return car_Details.brand.name
     }
-    return car_Details?.brand || ""
+
+    if (car_Details?.brand && typeof car_Details.brand === "string") {
+      return car_Details.brand
+    }
+
+    // Try to extract from name
+    if (car_Details?.name && typeof car_Details.name === "object") {
+      const fullName = isEnglish ? car_Details.name.en : car_Details.name.ar
+      if (fullName && fullName.includes(" ")) {
+        // First word is likely the brand
+        return fullName.split(" ")[0]
+      }
+    }
+
+    return ""
   }
 
   // Format price
@@ -141,6 +133,27 @@ const CompactCarListing = ({ brand_Details }) => {
     }).format(price)
   }
 
+  // Generate breadcrumb items based on car details - updated to include Home link
+  const getBreadcrumbItems = () => {
+    const items = [
+      {
+        label: isEnglish ? "Home" : "الرئيسية",
+        href: `/${currentLocale}`,
+      },
+    ]
+
+    const modelName = getModelName()
+
+    // Only add model if available
+    if (modelName) {
+      items.push({
+        label: modelName,
+      })
+    }
+
+    return items
+  }
+
   const renderPaymentCard = () => {
     if (isLoading) {
       return <Skeleton className="h-64 w-full rounded-lg" />
@@ -148,7 +161,7 @@ const CompactCarListing = ({ brand_Details }) => {
 
     return (
       <div className="space-y-3">
-        <div className="border-2 border-brand-primary rounded-[10px] overflow-hidden bg-white">
+        <div className="border-2 border-brand-primary rounded-[10px] overflow-hidden bg-brand-light/30">
           <div className="text-sm text-center p-2 text-brand-primary border-b border-brand-primary">
             {isEnglish ? "Choose the best payment method" : "اختر الطريقة المناسبة لشراء هذه السيارة؟"}
           </div>
@@ -158,7 +171,7 @@ const CompactCarListing = ({ brand_Details }) => {
               className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
                 activePaymentTab === "finance"
                   ? "bg-brand-primary text-white"
-                  : "bg-white text-brand-primary hover:bg-brand-light"
+                  : "bg-brand-light text-brand-primary hover:bg-brand-light"
               }`}
             >
               {isEnglish ? "Finance" : "التمويل"}
@@ -168,7 +181,7 @@ const CompactCarListing = ({ brand_Details }) => {
               className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
                 activePaymentTab === "cash"
                   ? "bg-brand-primary text-white"
-                  : "bg-white text-brand-primary hover:bg-brand-light"
+                  : "bg-brand-light text-brand-primary hover:bg-brand-light"
               }`}
             >
               {isEnglish ? "Cash" : "كاش"}
@@ -264,8 +277,13 @@ const CompactCarListing = ({ brand_Details }) => {
   )
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-36 py-8">
+    <div className="min-h-screen">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-8">
+        {/* Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Breadcrumb items={getBreadcrumbItems()} />
+        </div>
+
         {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Right Column */}
@@ -357,6 +375,7 @@ export default CompactCarListing
 const CarGallery = ({ carDetails, isLoading = false }) => {
   const pathname = usePathname()
   const isEnglish = pathname.startsWith("/en")
+  const currentLocale = isEnglish ? "en" : "ar"
   const [activeImage, setActiveImage] = useState(0)
   const [currentMainImage, setCurrentMainImage] = useState(carDetails?.image || "")
 
@@ -395,19 +414,23 @@ const CarGallery = ({ carDetails, isLoading = false }) => {
   }
 
   const renderMainCarGallery = () => (
-    <div className="w-full sm:w-4/5">
-      <div className="relative aspect-[16/9] rounded-lg overflow-hidden">
-        {isLoading ? (
-          <Skeleton className="w-full h-full" />
-        ) : (
-          <Image
-            src={allImages[activeImage] || "/placeholder.svg?height=450&width=800"}
-            alt={`${getBrandName()} ${getModelName()} - ${activeImage === 0 ? "Main view" : `View ${activeImage + 1}`}`}
-            width={800}
-            height={450}
-            className="object-cover w-full h-full"
-          />
-        )}
+    <div className="w-full sm:w-4/8">
+      <div className="relative aspect-[16/9] rounded-[5px] bg-brand-light overflow-hidden border-[1px] border-brand-primary p-2">
+        <div className="w-full h-full rounded-md overflow-hidden flex items-center justify-center">
+          {isLoading ? (
+            <Skeleton className="w-full h-full" />
+          ) : (
+            <Image
+              src={allImages[activeImage] || "/placeholder.svg?height=450&width=800" || "/placeholder.svg"}
+              alt={`${getBrandName()} ${getModelName()} - ${
+                activeImage === 0 ? "Main view" : `View ${activeImage + 1}`
+              }`}
+              width={800}
+              height={450}
+              className="object-contain w-full h-full"
+            />
+          )}
+        </div>
       </div>
     </div>
   )
@@ -424,7 +447,9 @@ const CarGallery = ({ carDetails, isLoading = false }) => {
                 key={index}
                 onClick={() => setActiveImage(index)}
                 className={`flex-shrink-0 rounded-[5px] overflow-hidden border-2 ${
-                  activeImage === index ? "border-brand-primary" : "border-transparent"
+                  activeImage === index
+                    ? "border-brand-primary bg-brand-primary"
+                    : "border-brand-primary/20 bg-brand-light"
                 }`}
               >
                 <Image
