@@ -1,7 +1,7 @@
 import React from 'react'
 import CarGallery from '@/MyComponents/Car-Details-page/car-gallery.jsx';
 import { NextIntlClientProvider } from 'next-intl'
-import BrandDynomicData from '@/MyComponents/BrandDynomicData/BrandDynomicData';
+// import BrandDynomicData from '@/MyComponents/BrandDynomicData/BrandDynomicData';
 
 
 // Fetch car details
@@ -28,11 +28,11 @@ const page = async ({ params }) => {
   const carDetails = await fetchCarBrands(slug);
   const  locale  = (await params).locale;
   
-  console.log(" slug from brands", carDetails)
+  // console.log(" slug from brands", carDetails)
   return (
     <div>
       <NextIntlClientProvider locale={locale}>
-   <BrandDynomicData carDetails={carDetails}/>
+   {/* <BrandDynomicData carDetails={carDetails}/> */}
   
       </NextIntlClientProvider>
     </div>
