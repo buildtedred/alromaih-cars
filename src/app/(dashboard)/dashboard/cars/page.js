@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
   Plus,
   Pencil,
   Trash2,
   Car,
   Search,
-  MoreHorizontal,
   Loader2,
   AlertTriangle,
   Filter,
@@ -21,14 +19,6 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -42,17 +32,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function AllCarsPage() {
-  const router = useRouter()
   const [cars, setCars] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState(null)
   const [selectedCars, setSelectedCars] = useState([])
-  const [viewMode, setViewMode] = useState("table")
   const [sortField, setSortField] = useState("model")
   const [sortDirection, setSortDirection] = useState("asc")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -89,16 +76,17 @@ export default function AllCarsPage() {
   async function deleteCar(id) {
     setDeleteDialogOpen(false)
     setIsDeleting(true)
+
     try {
-      const response = await fetch(`/api/supabasPrisma/cars/${id}`, { method: "DELETE" })
+      // Delete the car from DB
+      const deleteRes = await fetch(`/api/supabasPrisma/cars/${id}`, { method: "DELETE" })
+      if (!deleteRes.ok) throw new Error("Failed to delete car")
 
-      if (!response.ok) throw new Error("Failed to delete car")
-
-      // Update the local state instead of reloading
-      setCars(cars.filter((car) => car.id !== id))
-      setSelectedCars(selectedCars.filter((carId) => carId !== id))
+      // Update UI state
+      setCars((prev) => prev.filter((car) => car.id !== id))
+      setSelectedCars((prev) => prev.filter((carId) => carId !== id))
     } catch (error) {
-      console.error("Error deleting car:", error)
+      console.error("Error deleting car:", error.message)
     } finally {
       setIsDeleting(false)
     }
@@ -107,19 +95,21 @@ export default function AllCarsPage() {
   async function deleteMultipleCars(ids) {
     setDeleteDialogOpen(false)
     setIsDeleting(true)
+
     try {
-      // In a real app, you might want to use a batch delete endpoint
-      // For now, we'll delete them one by one
+      // Delete all cars
       for (const id of ids) {
-        const response = await fetch(`/api/supabasPrisma/cars/${id}`, { method: "DELETE" })
+        const response = await fetch(`/api/supabasPrisma/cars/${id}`, {
+          method: "DELETE",
+        })
         if (!response.ok) throw new Error(`Failed to delete car ${id}`)
       }
 
-      // Update the local state
-      setCars(cars.filter((car) => !ids.includes(car.id)))
+      // Update UI
+      setCars((prev) => prev.filter((car) => !ids.includes(car.id)))
       setSelectedCars([])
     } catch (error) {
-      console.error("Error deleting cars:", error)
+      console.error("Error deleting multiple cars:", error.message)
     } finally {
       setIsDeleting(false)
       setCarsToDelete([])
@@ -184,8 +174,11 @@ export default function AllCarsPage() {
     setDeleteDialogOpen(true)
   }
 
-
   // Render the content based on loading and data state
+  // Placeholder image for brands without images
+  const placeholderImage =
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgZmlsbD0iIzZiNzI4MCIgZHk9Ii4xZW0iPkJyYW5kIEltYWdlPC90ZXh0Pjwvc3ZnPg=="
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -194,13 +187,13 @@ export default function AllCarsPage() {
             <Skeleton className="h-8 w-64" />
             <Skeleton className="h-10 w-32" />
           </div>
-          <div className="border rounded-md">
+          <div className="border rounded-[5px]">
             <div className="p-4 space-y-4">
               {Array(5)
                 .fill(0)
                 .map((_, i) => (
                   <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-12 w-12 rounded-md" />
+                    <Skeleton className="h-12 w-12 rounded-[5px]" />
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-48" />
                       <Skeleton className="h-4 w-24" />
@@ -224,7 +217,11 @@ export default function AllCarsPage() {
               : "Add your first car to get started"}
           </p>
           {!searchTerm && filterBrand === "all" && (
-            <Button asChild className="mt-4">
+            <Button
+              asChild
+              className="mt-4 bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
+              disabled={isDeleting}
+            >
               <Link href="/dashboard/cars/new">
                 <Plus className="mr-2 h-4 w-4" /> Add New Car
               </Link>
@@ -235,195 +232,142 @@ export default function AllCarsPage() {
     }
 
     return (
-      <Tabs value={viewMode} onValueChange={setViewMode} className="w-full">
-        <div className="flex justify-end mb-4">
-          <TabsList className="grid w-[180px] grid-cols-2">
-            <TabsTrigger value="table">Table</TabsTrigger>
-            <TabsTrigger value="grid">Grid</TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="table">
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">
-                    <Checkbox
-                      checked={selectedCars.length === filteredCars.length && filteredCars.length > 0}
-                      onCheckedChange={handleSelectAll}
-                      aria-label="Select all cars"
-                    />
-                  </TableHead>
-                  <TableHead className="w-[80px]">Image</TableHead>
-                  <TableHead className="cursor-pointer" onClick={() => handleSort("model")}>
-                    <div className="flex items-center gap-1">
-                      Model
-                      {sortField === "model" &&
-                        (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                    </div>
-                  </TableHead>
-                  <TableHead className="cursor-pointer" onClick={() => handleSort("year")}>
-                    <div className="flex items-center gap-1">
-                      Year
-                      {sortField === "year" &&
-                        (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                    </div>
-                  </TableHead>
-                  <TableHead className="cursor-pointer" onClick={() => handleSort("brand")}>
-                    <div className="flex items-center gap-1">
-                      Brand
-                      {sortField === "brand" &&
-                        (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCars.map((car) => (
-                  <TableRow key={car.id} className={selectedCars.includes(car.id) ? "bg-muted/50" : ""}>
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedCars.includes(car.id)}
-                        onCheckedChange={() => handleSelectCar(car.id)}
-                        aria-label={`Select ${car.model}`}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-10 w-10 rounded-md overflow-hidden bg-muted">
-                        <img
-                          src={car?.images?.[0] || "/placeholder.svg"}
-                          alt={car?.model}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null
-                            e.target.src = "/placeholder.svg"
-                          }}
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">{car.model}</TableCell>
-                    <TableCell>{car.year}</TableCell>
-                    <TableCell>
-                      {car?.brand?.name ? (
-                        <Badge variant="outline">{car.brand.name}</Badge>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">Unknown</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/dashboard/cars/car-details/${car.id}`}>
-                            <Eye className="h-4 w-4" />
-                            <span className="sr-only">View</span>
-                          </Link>
-                        </Button>
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/dashboard/cars/${car.id}/edit`}>
-                            <Pencil className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => confirmDelete(car.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
-          
-                      
-                      </div>
-                     
-                    </TableCell>
-                   
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="grid">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="rounded-[5px] border shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-brand-light/50 sticky top-0">
+            <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={selectedCars.length === filteredCars.length && filteredCars.length > 0}
+                  onCheckedChange={handleSelectAll}
+                  aria-label="Select all cars"
+                  disabled={isDeleting}
+                  className="rounded-[5px]"
+                />
+              </TableHead>
+              <TableHead className="w-[80px]">Image</TableHead>
+              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("model")}>
+                <div className="flex items-center gap-1">
+                  Model
+                  {sortField === "model" &&
+                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                </div>
+              </TableHead>
+              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("year")}>
+                <div className="flex items-center gap-1">
+                  Year
+                  {sortField === "year" &&
+                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                </div>
+              </TableHead>
+              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("brand")}>
+                <div className="flex items-center gap-1">
+                  Brand
+                  {sortField === "brand" &&
+                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                </div>
+              </TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filteredCars.map((car) => (
-              <Card
+              <TableRow
                 key={car.id}
-                className={`overflow-hidden ${selectedCars.includes(car.id) ? "ring-2 ring-primary" : ""}`}
+                className={selectedCars.includes(car.id) ? "bg-brand-light/50" : "hover:bg-brand-light/30"}
               >
-                <div className="relative">
-                  <div className="absolute top-2 left-2 z-10">
-                    <Checkbox
-                      checked={selectedCars.includes(car.id)}
-                      onCheckedChange={() => handleSelectCar(car.id)}
-                      aria-label={`Select ${car.model}`}
-                      className="bg-background/80 backdrop-blur-sm"
-                    />
-                  </div>
-                  <div className="relative h-48 bg-muted">
+                <TableCell>
+                  <Checkbox
+                    checked={selectedCars.includes(car.id)}
+                    onCheckedChange={() => handleSelectCar(car.id)}
+                    aria-label={`Select ${car.model}`}
+                    disabled={isDeleting}
+                    className="rounded-[5px]"
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="flex justify-center items-center h-10 w-10 rounded-[5px] overflow-hidden bg-muted">
                     <img
-                      src={car?.images?.[0] || "/placeholder.svg"}
+                      src={car?.images?.[0] || placeholderImage}
                       alt={car?.model}
-                      className="w-full h-full object-cover"
+                      className="object-cover"
                       onError={(e) => {
                         e.target.onerror = null
-                        e.target.src = "/placeholder.svg"
+                        e.target.src = placeholderImage
                       }}
                     />
                   </div>
-                </div>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-lg">{car.model}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline">{car.year}</Badge>
-                        {car?.brand?.name && <Badge variant="secondary">{car.brand.name}</Badge>}
-                      </div>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="-mt-1 -mr-2">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Actions</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/cars/${car.id}`}>
-                            <Eye className="mr-2 h-4 w-4" /> View
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/cars/${car.id}/edit`}>
-                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive focus:text-destructive"
-                          onClick={() => confirmDelete(car.id)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                </TableCell>
+                <TableCell className="font-medium">{car.model}</TableCell>
+                <TableCell>{car.year}</TableCell>
+                <TableCell>
+                  {car?.brand?.name ? (
+                    <Badge variant="outline" className="rounded-[5px]">
+                      {car.brand.name}
+                    </Badge>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">Unknown</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      disabled={isDeleting}
+                      className="rounded-[5px] hover:text-brand-primary"
+                    >
+                      <Link href={`/dashboard/cars/car-details/${car.id}`}>
+                        <Eye className="h-4 w-4" />
+                        <span className="sr-only">View</span>
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      disabled={isDeleting}
+                      className="rounded-[5px] hover:text-brand-primary"
+                    >
+                      <Link href={`/dashboard/cars/${car.id}/edit`}>
+                        <Pencil className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive rounded-[5px]"
+                      onClick={() => confirmDelete(car.id)}
+                      disabled={isDeleting}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Delete</span>
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </TableCell>
+              </TableRow>
             ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+          </TableBody>
+        </Table>
+      </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 relative">
+      {/* Full page overlay when deleting */}
+      {isDeleting && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card p-6 rounded-[5px] shadow-lg text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-brand-primary" />
+            <h3 className="font-medium text-lg mb-1">{carsToDelete.length > 1 ? "Deleting Cars" : "Deleting Car"}</h3>
+            <p className="text-sm text-muted-foreground">Please wait while the operation completes...</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">All Cars</h1>
@@ -431,12 +375,17 @@ export default function AllCarsPage() {
         </div>
         <div className="flex gap-2">
           {selectedCars.length > 0 && (
-            <Button variant="destructive" onClick={confirmDeleteMultiple} disabled={isDeleting} className="gap-1">
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteMultiple}
+              disabled={isDeleting}
+              className="gap-1 rounded-[5px]"
+            >
               {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               Delete Selected ({selectedCars.length})
             </Button>
           )}
-          <Button asChild>
+          <Button asChild disabled={isDeleting} className="bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]">
             <Link href="/dashboard/cars/new">
               <Plus className="mr-2 h-4 w-4" /> Add New Car
             </Link>
@@ -451,23 +400,26 @@ export default function AllCarsPage() {
             <Input
               type="search"
               placeholder="Search cars..."
-              className="pl-8"
+              className="pl-8 rounded-[5px] border-gray-300"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              disabled={isDeleting}
             />
           </div>
 
-          <Select value={filterBrand} onValueChange={setFilterBrand}>
-            <SelectTrigger className="w-full sm:w-[180px]">
+          <Select value={filterBrand} onValueChange={setFilterBrand} disabled={isDeleting}>
+            <SelectTrigger className="w-full sm:w-[180px] rounded-[5px] border-gray-300">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
                 <SelectValue placeholder="Filter by brand" />
               </div>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Brands</SelectItem>
+            <SelectContent className="rounded-[5px]">
+              <SelectItem value="all" className="rounded-[5px]">
+                All Brands
+              </SelectItem>
               {brands.map((brand) => (
-                <SelectItem key={brand} value={brand}>
+                <SelectItem key={brand} value={brand} className="rounded-[5px]">
                   {brand}
                 </SelectItem>
               ))}
@@ -475,20 +427,26 @@ export default function AllCarsPage() {
           </Select>
         </div>
 
-        <Button variant="outline" size="sm" onClick={fetchCars} disabled={loading} className="gap-1 w-full sm:w-auto">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={fetchCars}
+          disabled={loading || isDeleting}
+          className="gap-1 w-full sm:w-auto rounded-[5px] border-gray-300 hover:bg-brand-light hover:text-brand-primary"
+        >
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           <span className="hidden sm:inline">Refresh</span>
         </Button>
       </div>
 
       {error && (
-        <div className="bg-destructive/15 p-4 rounded-md text-destructive">
+        <div className="bg-destructive/15 p-4 rounded-[5px] text-destructive">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5" />
             <p className="font-medium">Error loading cars</p>
           </div>
           <p className="text-sm mb-2">{error}</p>
-          <Button variant="outline" size="sm" onClick={fetchCars}>
+          <Button variant="outline" size="sm" onClick={fetchCars} disabled={isDeleting} className="rounded-[5px]">
             Try Again
           </Button>
         </div>
@@ -496,8 +454,8 @@ export default function AllCarsPage() {
 
       {renderContent()}
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
+      <Dialog open={deleteDialogOpen} onOpenChange={(open) => !isDeleting && setDeleteDialogOpen(open)}>
+        <DialogContent className="rounded-[5px]">
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
@@ -507,13 +465,19 @@ export default function AllCarsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+              className="rounded-[5px]"
+            >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={() => (carsToDelete.length > 1 ? deleteMultipleCars(carsToDelete) : deleteCar(carsToDelete[0]))}
               disabled={isDeleting}
+              className="rounded-[5px]"
             >
               {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
               {carsToDelete.length > 1 ? `Delete ${carsToDelete.length} cars` : "Delete car"}
@@ -524,4 +488,3 @@ export default function AllCarsPage() {
     </div>
   )
 }
-

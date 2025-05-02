@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, Car, Image, Settings, Info, Check } from "lucide-react"
+import { ArrowLeft, Loader2, Car, ImageIcon, Settings, Info, Check } from "lucide-react"
 import Link from "next/link"
-import { createClient } from "@supabase/supabase-js"
 import axios from "axios"
 
 import { Input } from "@/components/ui/input"
@@ -14,14 +13,12 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Skeleton } from "@/components/ui/skeleton"
 import MultipleImages from "./multipleImages/MultipleImages"
 import AddSpecifications from "./AddSpecifications/AddSpecifications"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 // Predefined options for dropdowns
 const FUEL_TYPES = ["Petrol", "Diesel", "Hybrid", "Electric", "LPG", "CNG", "Other"]
@@ -105,7 +102,6 @@ export default function AddCarForm() {
   const [brandsLoading, setBrandsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [uploadStatus, setUploadStatus] = useState(null)
-  const [loadingIndex, setLoadingIndex] = useState(null)
   const [formProgress, setFormProgress] = useState(0)
 
   useEffect(() => {
@@ -152,59 +148,6 @@ export default function AddCarForm() {
     images,
   ])
 
-  // Handle multiple image change
-  const handleMultipleImageChange = (e) => {
-    const files = Array.from(e.target.files).map((file) => ({
-      file,
-      url: URL.createObjectURL(file), // Show preview instantly
-      name: null,
-    }))
-    setImages((prev) => [...prev, ...files])
-  }
-
-  // Upload multiple images
-  const uploadImage = async (image, index) => {
-    setLoadingIndex(index)
-    const fileName = `cars/${Date.now()}-${image.file.name}`
-    const { error } = await supabase.storage.from("Alromaih").upload(fileName, image.file)
-
-    if (error) {
-      console.error("Upload error:", error.message)
-      alert("Failed to upload image")
-    } else {
-      const { data: publicUrl } = supabase.storage.from("Alromaih").getPublicUrl(fileName)
-      setImages((prev) => {
-        const newImages = [...prev]
-        newImages[index] = {
-          ...image,
-          url: publicUrl.publicUrl,
-          name: fileName,
-        }
-        return newImages
-      })
-    }
-    setLoadingIndex(null)
-  }
-
-  // Delete image
-  const deleteImage = async (fileName, index) => {
-    setLoadingIndex(index)
-    const { error } = await supabase.storage.from("Alromaih").remove([fileName])
-
-    if (error) {
-      console.error("Delete error:", error.message)
-      alert("Failed to delete image")
-    } else {
-      setImages((prev) => prev.filter((_, i) => i !== index))
-      alert("Image deleted successfully")
-    }
-    setLoadingIndex(null)
-  }
-
-  const removePreview = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index))
-  }
-
   // Specifications management
   const addSpecification = () => {
     setSpecifications([...specifications, { title: "", details: [] }])
@@ -242,12 +185,6 @@ export default function AddCarForm() {
   async function handleSubmit(e) {
     e.preventDefault()
 
-    // Check if any image URL is still a blob (not uploaded yet)
-    if (images.some((img) => img.url.includes("blob"))) {
-      alert("Please upload all images before submitting")
-      return
-    }
-
     setError(null)
     setUploadStatus(null)
     setLoading(true)
@@ -259,13 +196,17 @@ export default function AddCarForm() {
     }
 
     try {
+      // Extract image URLs for submission
+      const imageUrls = images.map((image) => image.url)
+
+      // Submit the form with all image URLs
       const response = await axios.post("/api/supabasPrisma/cars", {
         model,
         year,
         brandId,
         description,
         price: price ? Number.parseFloat(price) : null,
-        images: images.map((img) => img.url),
+        images: imageUrls,
         specifications,
         mileage: mileage ? Number.parseInt(mileage) : null,
         fuelType,
@@ -310,7 +251,7 @@ export default function AddCarForm() {
       }, 1000)
     } catch (error) {
       console.error("Error adding car:", error)
-      setError(error.message)
+      setError(error.response?.data?.error || error.message || "Failed to add car")
     } finally {
       setLoading(false)
     }
@@ -322,11 +263,13 @@ export default function AddCarForm() {
     else if (activeTab === "technical") setActiveTab("features")
     else if (activeTab === "features") setActiveTab("additional")
     else if (activeTab === "additional") setActiveTab("images")
+    else if (activeTab === "images") setActiveTab("specifications")
   }
 
   // Navigate to previous tab
   const goToPrevTab = () => {
-    if (activeTab === "images") setActiveTab("additional")
+    if (activeTab === "specifications") setActiveTab("images")
+    else if (activeTab === "images") setActiveTab("additional")
     else if (activeTab === "additional") setActiveTab("features")
     else if (activeTab === "features") setActiveTab("technical")
     else if (activeTab === "technical") setActiveTab("basic")
@@ -389,7 +332,7 @@ export default function AddCarForm() {
     <div className="container mx-auto py-4">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <Button variant="ghost" asChild className="mb-1 h-8">
+          <Button variant="ghost" asChild className="mb-1 h-8" disabled={loading}>
             <Link href="/dashboard/cars">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Cars
             </Link>
@@ -427,28 +370,41 @@ export default function AddCarForm() {
       )}
 
       <form onSubmit={handleSubmit} className="h-[calc(100vh-160px)] flex flex-col">
+        {loading && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-card p-6 rounded-lg shadow-lg text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+              <h3 className="font-medium text-lg mb-1">Submitting Car Details</h3>
+              <p className="text-sm text-muted-foreground">Please wait while we save your car data...</p>
+            </div>
+          </div>
+        )}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <div className="sticky top-0 z-10 bg-background pt-1 pb-2 border-b">
-            <TabsList className="w-full grid grid-cols-5 h-auto p-1">
-              <TabsTrigger value="basic" className="py-1.5 flex gap-1 items-center text-xs">
+            <TabsList className="w-full grid grid-cols-6 h-auto p-1" disabled={loading}>
+              <TabsTrigger value="basic" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
                 <Car className="h-3 w-3" />
                 <span>Basic Info</span>
               </TabsTrigger>
-              <TabsTrigger value="technical" className="py-1.5 flex gap-1 items-center text-xs">
+              <TabsTrigger value="technical" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
                 <Settings className="h-3 w-3" />
                 <span>Technical</span>
               </TabsTrigger>
-              <TabsTrigger value="features" className="py-1.5 flex gap-1 items-center text-xs">
+              <TabsTrigger value="features" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
                 <Check className="h-3 w-3" />
                 <span>Features</span>
               </TabsTrigger>
-              <TabsTrigger value="additional" className="py-1.5 flex gap-1 items-center text-xs">
+              <TabsTrigger value="additional" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
                 <Info className="h-3 w-3" />
                 <span>Additional</span>
               </TabsTrigger>
-              <TabsTrigger value="images" className="py-1.5 flex gap-1 items-center text-xs">
-                <Image className="h-3 w-3" />
-                <span>Images & Specs</span>
+              <TabsTrigger value="specifications" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
+                <Settings className="h-3 w-3" />
+                <span>Specs</span>
+              </TabsTrigger>
+              <TabsTrigger value="images" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
+                <ImageIcon className="h-3 w-3" />
+                <span>Images</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -474,6 +430,7 @@ export default function AddCarForm() {
                         onChange={(e) => setModel(e.target.value)}
                         required
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -481,7 +438,7 @@ export default function AddCarForm() {
                       <Label htmlFor="brand" className="text-xs">
                         Brand <span className="text-destructive">*</span>
                       </Label>
-                      <Select onValueChange={setBrandId} value={brandId} required>
+                      <Select onValueChange={setBrandId} value={brandId} required disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select a brand" />
                         </SelectTrigger>
@@ -499,7 +456,7 @@ export default function AddCarForm() {
                       <Label htmlFor="year" className="text-xs">
                         Year <span className="text-destructive">*</span>
                       </Label>
-                      <Select onValueChange={setYear} value={year} required>
+                      <Select onValueChange={setYear} value={year} required disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select year" />
                         </SelectTrigger>
@@ -524,6 +481,7 @@ export default function AddCarForm() {
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -537,6 +495,7 @@ export default function AddCarForm() {
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -544,7 +503,7 @@ export default function AddCarForm() {
                       <Label htmlFor="condition" className="text-xs">
                         Condition
                       </Label>
-                      <Select onValueChange={setCondition} value={condition}>
+                      <Select onValueChange={setCondition} value={condition} disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select condition" />
                         </SelectTrigger>
@@ -562,7 +521,7 @@ export default function AddCarForm() {
                       <Label htmlFor="bodyType" className="text-xs">
                         Body Type
                       </Label>
-                      <Select onValueChange={setBodyType} value={bodyType}>
+                      <Select onValueChange={setBodyType} value={bodyType} disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select body type" />
                         </SelectTrigger>
@@ -588,11 +547,12 @@ export default function AddCarForm() {
                       onChange={(e) => setDescription(e.target.value)}
                       rows={3}
                       className="text-sm resize-none"
+                      disabled={loading}
                     />
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end py-3">
-                  <Button type="button" onClick={goToNextTab} size="sm">
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
                     Next: Technical Specifications
                   </Button>
                 </CardFooter>
@@ -619,6 +579,7 @@ export default function AddCarForm() {
                         value={mileage}
                         onChange={(e) => setMileage(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -626,7 +587,7 @@ export default function AddCarForm() {
                       <Label htmlFor="fuelType" className="text-xs">
                         Fuel Type
                       </Label>
-                      <Select onValueChange={setFuelType} value={fuelType}>
+                      <Select onValueChange={setFuelType} value={fuelType} disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select fuel type" />
                         </SelectTrigger>
@@ -651,6 +612,7 @@ export default function AddCarForm() {
                         value={fuelTankCapacity}
                         onChange={(e) => setFuelTankCapacity(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -658,7 +620,7 @@ export default function AddCarForm() {
                       <Label htmlFor="transmission" className="text-xs">
                         Transmission
                       </Label>
-                      <Select onValueChange={setTransmission} value={transmission}>
+                      <Select onValueChange={setTransmission} value={transmission} disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select transmission" />
                         </SelectTrigger>
@@ -684,6 +646,7 @@ export default function AddCarForm() {
                         value={engineSize}
                         onChange={(e) => setEngineSize(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -698,6 +661,7 @@ export default function AddCarForm() {
                         value={horsepower}
                         onChange={(e) => setHorsepower(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -712,6 +676,7 @@ export default function AddCarForm() {
                         value={torque}
                         onChange={(e) => setTorque(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -719,7 +684,7 @@ export default function AddCarForm() {
                       <Label htmlFor="wheelDrive" className="text-xs">
                         Wheel Drive
                       </Label>
-                      <Select onValueChange={setWheelDrive} value={wheelDrive}>
+                      <Select onValueChange={setWheelDrive} value={wheelDrive} disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select wheel drive" />
                         </SelectTrigger>
@@ -744,6 +709,7 @@ export default function AddCarForm() {
                         value={topSpeed}
                         onChange={(e) => setTopSpeed(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -759,6 +725,7 @@ export default function AddCarForm() {
                         value={acceleration}
                         onChange={(e) => setAcceleration(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -774,15 +741,16 @@ export default function AddCarForm() {
                         value={fuelEconomy}
                         onChange={(e) => setFuelEconomy(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm">
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
                     Next: Features & Comfort
                   </Button>
                 </CardFooter>
@@ -813,6 +781,7 @@ export default function AddCarForm() {
                             value={seats}
                             onChange={(e) => setSeats(e.target.value)}
                             className="h-8 text-sm"
+                            disabled={loading}
                           />
                         </div>
 
@@ -827,6 +796,7 @@ export default function AddCarForm() {
                             value={doors}
                             onChange={(e) => setDoors(e.target.value)}
                             className="h-8 text-sm"
+                            disabled={loading}
                           />
                         </div>
                       </div>
@@ -841,6 +811,7 @@ export default function AddCarForm() {
                           value={infotainment}
                           onChange={(e) => setInfotainment(e.target.value)}
                           className="h-8 text-sm"
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -849,7 +820,13 @@ export default function AddCarForm() {
                       <h3 className="text-xs font-medium">Features</h3>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="flex items-center space-x-2">
-                          <Checkbox id="gps" checked={gps} onCheckedChange={setGps} className="h-3.5 w-3.5" />
+                          <Checkbox
+                            id="gps"
+                            checked={gps}
+                            onCheckedChange={setGps}
+                            className="h-3.5 w-3.5"
+                            disabled={loading}
+                          />
                           <Label htmlFor="gps" className="cursor-pointer text-xs">
                             GPS Navigation
                           </Label>
@@ -861,6 +838,7 @@ export default function AddCarForm() {
                             checked={sunroof}
                             onCheckedChange={setSunroof}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="sunroof" className="cursor-pointer text-xs">
                             Sunroof
@@ -873,6 +851,7 @@ export default function AddCarForm() {
                             checked={parkingSensors}
                             onCheckedChange={setParkingSensors}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="parkingSensors" className="cursor-pointer text-xs">
                             Parking Sensors
@@ -885,6 +864,7 @@ export default function AddCarForm() {
                             checked={cruiseControl}
                             onCheckedChange={setCruiseControl}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="cruiseControl" className="cursor-pointer text-xs">
                             Cruise Control
@@ -897,6 +877,7 @@ export default function AddCarForm() {
                             checked={leatherSeats}
                             onCheckedChange={setLeatherSeats}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="leatherSeats" className="cursor-pointer text-xs">
                             Leather Seats
@@ -909,6 +890,7 @@ export default function AddCarForm() {
                             checked={heatedSeats}
                             onCheckedChange={setHeatedSeats}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="heatedSeats" className="cursor-pointer text-xs">
                             Heated Seats
@@ -921,6 +903,7 @@ export default function AddCarForm() {
                             checked={bluetooth}
                             onCheckedChange={setBluetooth}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="bluetooth" className="cursor-pointer text-xs">
                             Bluetooth
@@ -933,6 +916,7 @@ export default function AddCarForm() {
                             checked={climateControl}
                             onCheckedChange={setClimateControl}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="climateControl" className="cursor-pointer text-xs">
                             Climate Control
@@ -945,6 +929,7 @@ export default function AddCarForm() {
                             checked={keylessEntry}
                             onCheckedChange={setKeylessEntry}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="keylessEntry" className="cursor-pointer text-xs">
                             Keyless Entry
@@ -957,6 +942,7 @@ export default function AddCarForm() {
                             checked={rearCamera}
                             onCheckedChange={setRearCamera}
                             className="h-3.5 w-3.5"
+                            disabled={loading}
                           />
                           <Label htmlFor="rearCamera" className="cursor-pointer text-xs">
                             Rear Camera
@@ -967,10 +953,10 @@ export default function AddCarForm() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm">
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
                     Next: Additional Information
                   </Button>
                 </CardFooter>
@@ -996,6 +982,7 @@ export default function AddCarForm() {
                         value={manufactured}
                         onChange={(e) => setManufactured(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -1003,7 +990,7 @@ export default function AddCarForm() {
                       <Label htmlFor="safetyRating" className="text-xs">
                         Safety Rating
                       </Label>
-                      <Select onValueChange={setSafetyRating} value={safetyRating}>
+                      <Select onValueChange={setSafetyRating} value={safetyRating} disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select safety rating" />
                         </SelectTrigger>
@@ -1027,6 +1014,7 @@ export default function AddCarForm() {
                         value={warranty}
                         onChange={(e) => setWarranty(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -1040,6 +1028,7 @@ export default function AddCarForm() {
                         value={registration}
                         onChange={(e) => setRegistration(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -1054,6 +1043,7 @@ export default function AddCarForm() {
                         value={ownerCount}
                         onChange={(e) => setOwnerCount(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
 
@@ -1061,7 +1051,7 @@ export default function AddCarForm() {
                       <Label htmlFor="insuranceStatus" className="text-xs">
                         Insurance Status
                       </Label>
-                      <Select onValueChange={setInsuranceStatus} value={insuranceStatus}>
+                      <Select onValueChange={setInsuranceStatus} value={insuranceStatus} disabled={loading}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select insurance status" />
                         </SelectTrigger>
@@ -1085,61 +1075,72 @@ export default function AddCarForm() {
                         value={taxValidity}
                         onChange={(e) => setTaxValidity(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={loading}
                       />
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm">
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
                     Next: Images & Specifications
                   </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
 
-            {/* Images & Specifications Tab */}
+            
+            {/* Specifications Tab */}
+            <TabsContent value="specifications" className="mt-2 h-full">
+              <Card className="h-full">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-lg">Detailed Specifications</CardTitle>
+                  <CardDescription className="text-xs">Add detailed specifications for the car</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 py-2 overflow-auto" >
+                  <AddSpecifications
+                    specifications={specifications}
+                    addSpecDetail={addSpecDetail}
+                    handleSpecDetailChange={handleSpecDetailChange}
+                    removeSpecDetail={removeSpecDetail}
+                    handleSpecTitleChange={handleSpecTitleChange}
+                    addSpecification={addSpecification}
+                    removeSpecification={removeSpecification}
+                    disabled={loading}
+                  />
+                </CardContent>
+                <CardFooter className="flex justify-between py-3">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
+                    Back
+                  </Button>
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
+                    Next: images
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+
+            {/* Images Tab */}
             <TabsContent value="images" className="mt-2 h-full">
               <Card className="h-full">
                 <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Images & Specifications</CardTitle>
-                  <CardDescription className="text-xs">Upload images and add detailed specifications</CardDescription>
+                  <CardTitle className="text-lg">Car Images</CardTitle>
+                  <CardDescription className="text-xs">Upload and manage car images</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 py-2 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
                   <div className="space-y-3">
-                    <h3 className="text-xs font-medium">
-                      Car Images <span className="text-destructive">*</span>
-                    </h3>
-                    <MultipleImages
-                      handleSpecTitleChange={handleSpecTitleChange}
-                      uploadImage={uploadImage}
-                      removePreview={removePreview}
-                      loadingIndex={loadingIndex}
-                      images={images}
-                      handleMultipleImageChange={handleMultipleImageChange}
-                      deleteImage={deleteImage}
-                    />
-                  </div>
-
-                  <Separator className="my-2" />
-
-                  <div className="space-y-3">
-                    <h3 className="text-xs font-medium">Detailed Specifications</h3>
-                    <AddSpecifications
-                      specifications={specifications}
-                      addSpecDetail={addSpecDetail}
-                      handleSpecDetailChange={handleSpecDetailChange}
-                      removeSpecDetail={removeSpecDetail}
-                      handleSpecTitleChange={handleSpecTitleChange}
-                      addSpecification={addSpecification}
-                      removeSpecification={removeSpecification}
-                    />
+                    <MultipleImages images={images} setImages={setImages} disabled={loading} />
                   </div>
                 </CardContent>
+              
+
+
+
+
                 <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
                     Back
                   </Button>
                   <Button type="submit" disabled={loading} className="gap-2" size="sm">
@@ -1149,10 +1150,10 @@ export default function AddCarForm() {
                 </CardFooter>
               </Card>
             </TabsContent>
+
           </div>
         </Tabs>
       </form>
     </div>
   )
 }
-

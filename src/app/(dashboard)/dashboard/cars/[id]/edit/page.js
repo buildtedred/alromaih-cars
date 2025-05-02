@@ -2,27 +2,23 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { createClient } from "@supabase/supabase-js"
-import { ArrowLeft, Loader2, Car, Image, Settings, Info, Check, AlertCircle } from "lucide-react"
+import { ArrowLeft, Loader2, Car, ImageIcon, Settings, Info, Check, AlertCircle, FileText } from "lucide-react"
 import Link from "next/link"
 import axios from "axios"
 
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
-import Multipleimages from "./updateMultipleImage/Multipleimages"
-import EditeSpecifications from "./editSpecifications/EditeSpecifications"
 
-// Initialize Supabase client
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+import UpdateMultipleImages from "./updateMultipleImage/Multipleimages"
+import EditeSpecifications from "./editSpecifications/EditeSpecifications"
 
 // Predefined options for dropdowns
 const FUEL_TYPES = ["Petrol", "Diesel", "Hybrid", "Electric", "LPG", "CNG", "Other"]
@@ -43,9 +39,9 @@ const BODY_TYPES = [
 ]
 const SAFETY_RATINGS = ["5 Stars", "4 Stars", "3 Stars", "2 Stars", "1 Star", "Not Rated"]
 const INSURANCE_STATUS = ["Fully Insured", "Third Party", "Expired", "None"]
-const YEARS = Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i)
+const YEARS = Array.from({ length: 55 }, (_, i) => new Date().getFullYear() - i)
 
-export default function EditCarPage() {
+export default function UpdateCarForm() {
   const router = useRouter()
   const { id } = useParams()
   const [activeTab, setActiveTab] = useState("basic")
@@ -101,24 +97,20 @@ export default function EditCarPage() {
   // Images & Specifications
   const [images, setImages] = useState([])
   const [specifications, setSpecifications] = useState([])
-  const [variations, setVariations] = useState([])
 
   // Form State
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [uploadStatus, setUploadStatus] = useState(null)
-  const [loadingIndex, setLoadingIndex] = useState(null)
   const [formProgress, setFormProgress] = useState(0)
-  const [originalData, setOriginalData] = useState(null)
 
-  // Fetch car details and brands on component mount
   useEffect(() => {
     async function fetchCar() {
       try {
+        setLoading(true)
         const response = await axios.get(`/api/supabasPrisma/cars/${id}`)
         const data = response.data
-        setOriginalData(data)
 
         // Basic Information
         setModel(data.model || "")
@@ -167,18 +159,22 @@ export default function EditCarPage() {
         setInsuranceStatus(data.insuranceStatus || "")
         setTaxValidity(data.taxValidity || "")
 
-        // Ensure images are structured correctly for preview
+        // Format images for the component
         const formattedImages =
-          data.images?.map((imgUrl) => ({
-            url: imgUrl,
-            name: imgUrl.split("/").pop(), // Extract filename for deletion
-          })) || []
+          data.images?.map((imgUrl) => {
+            // Extract the filename from the URL
+            const fileName = imgUrl.split("/").pop()
+            return {
+              url: imgUrl,
+              name: fileName, // Store the filename for reference
+            }
+          }) || []
 
         setImages(formattedImages)
         setSpecifications(data.spacification || [])
-        setVariations(data.variations || [])
       } catch (error) {
-        setError(error.message)
+        console.error("Error fetching car:", error)
+        setError("Failed to load car data")
       } finally {
         setLoading(false)
       }
@@ -226,59 +222,24 @@ export default function EditCarPage() {
     images,
   ])
 
-  // Handle multiple image change
-  const handleMultipleImageChange = (e) => {
-    const files = Array.from(e.target.files).map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      name: null,
-    }))
-    setImages((prev) => [...prev, ...files])
-  }
-
-  // Upload multiple images
-  const uploadImage = async (image, index) => {
-    setLoadingIndex(index)
-    const fileName = `cars/${Date.now()}-${image.file.name}`
-    const { error } = await supabase.storage.from("Alromaih").upload(fileName, image.file)
-
-    if (error) {
-      console.error("Upload error:", error.message)
-      alert("Failed to upload image")
-    } else {
-      const { data: publicUrl } = supabase.storage.from("Alromaih").getPublicUrl(fileName)
-      setImages((prev) => {
-        const newImages = [...prev]
-        newImages[index] = {
-          ...image,
-          url: publicUrl.publicUrl,
-          name: fileName,
-        }
-        return newImages
-      })
-    }
-    setLoadingIndex(null)
-  }
-
-  // Delete image
-  const deleteImage = async (fileName, index) => {
-    setLoadingIndex(index)
-    const { error } = await supabase.storage.from("Alromaih").remove([fileName])
-
-    if (error) {
-      console.error("Delete error:", error.message)
-      alert("Failed to delete image")
-    } else {
-      setImages((prev) => prev.filter((_, i) => i !== index))
-      alert("Image deleted successfully")
-    }
-    setLoadingIndex(null)
-  }
-
   // Specifications management
+  const addSpecification = () => {
+    setSpecifications([...specifications, { title: "", details: [] }])
+  }
+
+  const removeSpecification = (index) => {
+    setSpecifications(specifications.filter((_, i) => i !== index))
+  }
+
   const handleSpecTitleChange = (index, value) => {
     const updatedSpecs = [...specifications]
     updatedSpecs[index].title = value
+    setSpecifications(updatedSpecs)
+  }
+
+  const addSpecDetail = (index) => {
+    const updatedSpecs = [...specifications]
+    updatedSpecs[index].details.push({ label: "", value: "" })
     setSpecifications(updatedSpecs)
   }
 
@@ -288,24 +249,10 @@ export default function EditCarPage() {
     setSpecifications(updatedSpecs)
   }
 
-  const addSpecification = () => {
-    setSpecifications([...specifications, { title: "", details: [] }])
-  }
-
-  const addSpecDetail = (specIndex) => {
-    const updatedSpecs = [...specifications]
-    updatedSpecs[specIndex].details.push({ label: "", value: "" })
-    setSpecifications(updatedSpecs)
-  }
-
   const removeSpecDetail = (specIndex, detailIndex) => {
     const updatedSpecs = [...specifications]
     updatedSpecs[specIndex].details = updatedSpecs[specIndex].details.filter((_, i) => i !== detailIndex)
     setSpecifications(updatedSpecs)
-  }
-
-  const removeSpecification = (specIndex) => {
-    setSpecifications(specifications.filter((_, i) => i !== specIndex))
   }
 
   // Navigate to next tab
@@ -314,11 +261,13 @@ export default function EditCarPage() {
     else if (activeTab === "technical") setActiveTab("features")
     else if (activeTab === "features") setActiveTab("additional")
     else if (activeTab === "additional") setActiveTab("images")
+    else if (activeTab === "images") setActiveTab("specifications")
   }
 
   // Navigate to previous tab
   const goToPrevTab = () => {
-    if (activeTab === "images") setActiveTab("additional")
+    if (activeTab === "specifications") setActiveTab("images")
+    else if (activeTab === "images") setActiveTab("additional")
     else if (activeTab === "additional") setActiveTab("features")
     else if (activeTab === "features") setActiveTab("technical")
     else if (activeTab === "technical") setActiveTab("basic")
@@ -328,39 +277,29 @@ export default function EditCarPage() {
   async function handleSubmit(e) {
     e.preventDefault()
 
-    // Check if any image URL is still a blob (not uploaded yet)
-    if (images.some((img) => img.url.includes("blob"))) {
-      alert("Please upload all images before submitting")
-      return
-    }
-
     setError(null)
     setUploadStatus(null)
     setSubmitting(true)
 
-    try {
-      // Validate Specifications Before Sending
-      const formattedSpecifications = specifications
-        .filter((spec) => spec?.title) // Skip invalid entries
-        .map((spec) => ({
-          title: spec.title?.trim() || "", // Ensure title is string
-          details: spec.details
-            .filter((detail) => detail?.label && detail?.value) // Skip empty details
-            .map((detail) => ({
-              label: detail.label?.trim() || "",
-              value: detail.value?.trim() || "",
-            })),
-        }))
+    if (!model || !year || !brandId || images.length === 0) {
+      setError("Model, year, brand and at least one image are required")
+      setSubmitting(false)
+      return
+    }
 
+    try {
+      // Extract image URLs for submission
+      const imageUrls = images.map((image) => image.url)
+
+      // Submit the form with all image URLs
       const response = await axios.put(`/api/supabasPrisma/cars/${id}`, {
         model,
         year,
         brandId,
         description,
         price: price ? Number.parseFloat(price) : null,
-        images: images.map((img) => img.url), // Ensure only URLs are sent
-        specifications: formattedSpecifications,
-        variations,
+        images: imageUrls,
+        specifications,
         mileage: mileage ? Number.parseInt(mileage) : null,
         fuelType,
         fuelTankCapacity,
@@ -397,10 +336,6 @@ export default function EditCarPage() {
         rearCamera,
       })
 
-      if (response.status !== 200) {
-        throw new Error("Failed to update car")
-      }
-
       setUploadStatus("Car updated successfully! Redirecting...")
       setTimeout(() => {
         router.push("/dashboard/cars")
@@ -408,13 +343,13 @@ export default function EditCarPage() {
       }, 1500)
     } catch (error) {
       console.error("Error updating car:", error)
-      setError(error.response?.data?.error || "Failed to update car")
+      setError(error.response?.data?.error || error.message || "Failed to update car")
     } finally {
       setSubmitting(false)
     }
   }
 
-  // Render skeleton loading state
+  // Render skeleton loading state for brands
   if (loading) {
     return (
       <div className="container mx-auto py-4">
@@ -429,8 +364,8 @@ export default function EditCarPage() {
 
         <div className="border rounded-md p-4 mb-4">
           <Skeleton className="h-8 w-full mb-4" />
-          <div className="grid grid-cols-5 gap-2 mb-4">
-            {Array(5)
+          <div className="grid grid-cols-6 gap-2 mb-4">
+            {Array(6)
               .fill(0)
               .map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
@@ -471,12 +406,12 @@ export default function EditCarPage() {
     <div className="container mx-auto py-4">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <Button variant="ghost" asChild className="mb-1 h-8">
+          <Button variant="ghost" asChild className="mb-1 h-8" disabled={submitting}>
             <Link href="/dashboard/cars">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Cars
             </Link>
           </Button>
-          <h1 className="text-xl font-bold tracking-tight">Edit Car</h1>
+          <h1 className="text-xl font-bold tracking-tight">Update Car</h1>
           <p className="text-sm text-muted-foreground">Update the details for {model}</p>
         </div>
 
@@ -510,28 +445,45 @@ export default function EditCarPage() {
       )}
 
       <form onSubmit={handleSubmit} className="h-[calc(100vh-160px)] flex flex-col">
+        {submitting && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-card p-6 rounded-lg shadow-lg text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+              <h3 className="font-medium text-lg mb-1">Updating Car Details</h3>
+              <p className="text-sm text-muted-foreground">Please wait while we save your changes...</p>
+            </div>
+          </div>
+        )}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <div className="sticky top-0 z-10 bg-background pt-1 pb-2 border-b">
-            <TabsList className="w-full grid grid-cols-5 h-auto p-1">
-              <TabsTrigger value="basic" className="py-1.5 flex gap-1 items-center text-xs">
+            <TabsList className="w-full grid grid-cols-6 h-auto p-1" disabled={submitting}>
+              <TabsTrigger value="basic" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
                 <Car className="h-3 w-3" />
                 <span>Basic Info</span>
               </TabsTrigger>
-              <TabsTrigger value="technical" className="py-1.5 flex gap-1 items-center text-xs">
+              <TabsTrigger value="technical" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
                 <Settings className="h-3 w-3" />
                 <span>Technical</span>
               </TabsTrigger>
-              <TabsTrigger value="features" className="py-1.5 flex gap-1 items-center text-xs">
+              <TabsTrigger value="features" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
                 <Check className="h-3 w-3" />
                 <span>Features</span>
               </TabsTrigger>
-              <TabsTrigger value="additional" className="py-1.5 flex gap-1 items-center text-xs">
+              <TabsTrigger value="additional" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
                 <Info className="h-3 w-3" />
                 <span>Additional</span>
               </TabsTrigger>
-              <TabsTrigger value="images" className="py-1.5 flex gap-1 items-center text-xs">
-                <Image className="h-3 w-3" />
-                <span>Images & Specs</span>
+              <TabsTrigger
+                value="specifications"
+                className="py-1.5 flex gap-1 items-center text-xs"
+                disabled={submitting}
+              >
+                <FileText className="h-3 w-3" />
+                <span>Specs</span>
+              </TabsTrigger>
+              <TabsTrigger value="images" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
+                <ImageIcon className="h-3 w-3" />
+                <span>Images</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -557,6 +509,7 @@ export default function EditCarPage() {
                         onChange={(e) => setModel(e.target.value)}
                         required
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -564,7 +517,7 @@ export default function EditCarPage() {
                       <Label htmlFor="brand" className="text-xs">
                         Brand <span className="text-destructive">*</span>
                       </Label>
-                      <Select onValueChange={setBrandId} value={brandId} required>
+                      <Select onValueChange={setBrandId} value={brandId} required disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select a brand" />
                         </SelectTrigger>
@@ -582,7 +535,7 @@ export default function EditCarPage() {
                       <Label htmlFor="year" className="text-xs">
                         Year <span className="text-destructive">*</span>
                       </Label>
-                      <Select onValueChange={setYear} value={year} required>
+                      <Select onValueChange={setYear} value={year} required disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select year" />
                         </SelectTrigger>
@@ -607,6 +560,7 @@ export default function EditCarPage() {
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -620,6 +574,7 @@ export default function EditCarPage() {
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -627,7 +582,7 @@ export default function EditCarPage() {
                       <Label htmlFor="condition" className="text-xs">
                         Condition
                       </Label>
-                      <Select onValueChange={setCondition} value={condition}>
+                      <Select onValueChange={setCondition} value={condition} disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select condition" />
                         </SelectTrigger>
@@ -645,7 +600,7 @@ export default function EditCarPage() {
                       <Label htmlFor="bodyType" className="text-xs">
                         Body Type
                       </Label>
-                      <Select onValueChange={setBodyType} value={bodyType}>
+                      <Select onValueChange={setBodyType} value={bodyType} disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select body type" />
                         </SelectTrigger>
@@ -671,11 +626,12 @@ export default function EditCarPage() {
                       onChange={(e) => setDescription(e.target.value)}
                       rows={3}
                       className="text-sm resize-none"
+                      disabled={submitting}
                     />
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end py-3">
-                  <Button type="button" onClick={goToNextTab} size="sm">
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
                     Next: Technical Specifications
                   </Button>
                 </CardFooter>
@@ -702,6 +658,7 @@ export default function EditCarPage() {
                         value={mileage}
                         onChange={(e) => setMileage(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -709,7 +666,7 @@ export default function EditCarPage() {
                       <Label htmlFor="fuelType" className="text-xs">
                         Fuel Type
                       </Label>
-                      <Select onValueChange={setFuelType} value={fuelType}>
+                      <Select onValueChange={setFuelType} value={fuelType} disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select fuel type" />
                         </SelectTrigger>
@@ -734,6 +691,7 @@ export default function EditCarPage() {
                         value={fuelTankCapacity}
                         onChange={(e) => setFuelTankCapacity(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -741,7 +699,7 @@ export default function EditCarPage() {
                       <Label htmlFor="transmission" className="text-xs">
                         Transmission
                       </Label>
-                      <Select onValueChange={setTransmission} value={transmission}>
+                      <Select onValueChange={setTransmission} value={transmission} disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select transmission" />
                         </SelectTrigger>
@@ -767,6 +725,7 @@ export default function EditCarPage() {
                         value={engineSize}
                         onChange={(e) => setEngineSize(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -781,6 +740,7 @@ export default function EditCarPage() {
                         value={horsepower}
                         onChange={(e) => setHorsepower(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -795,6 +755,7 @@ export default function EditCarPage() {
                         value={torque}
                         onChange={(e) => setTorque(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -802,7 +763,7 @@ export default function EditCarPage() {
                       <Label htmlFor="wheelDrive" className="text-xs">
                         Wheel Drive
                       </Label>
-                      <Select onValueChange={setWheelDrive} value={wheelDrive}>
+                      <Select onValueChange={setWheelDrive} value={wheelDrive} disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select wheel drive" />
                         </SelectTrigger>
@@ -827,6 +788,7 @@ export default function EditCarPage() {
                         value={topSpeed}
                         onChange={(e) => setTopSpeed(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -842,6 +804,7 @@ export default function EditCarPage() {
                         value={acceleration}
                         onChange={(e) => setAcceleration(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -857,15 +820,16 @@ export default function EditCarPage() {
                         value={fuelEconomy}
                         onChange={(e) => setFuelEconomy(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm">
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
                     Next: Features & Comfort
                   </Button>
                 </CardFooter>
@@ -896,6 +860,7 @@ export default function EditCarPage() {
                             value={seats}
                             onChange={(e) => setSeats(e.target.value)}
                             className="h-8 text-sm"
+                            disabled={submitting}
                           />
                         </div>
 
@@ -910,6 +875,7 @@ export default function EditCarPage() {
                             value={doors}
                             onChange={(e) => setDoors(e.target.value)}
                             className="h-8 text-sm"
+                            disabled={submitting}
                           />
                         </div>
                       </div>
@@ -924,6 +890,7 @@ export default function EditCarPage() {
                           value={infotainment}
                           onChange={(e) => setInfotainment(e.target.value)}
                           className="h-8 text-sm"
+                          disabled={submitting}
                         />
                       </div>
                     </div>
@@ -932,7 +899,13 @@ export default function EditCarPage() {
                       <h3 className="text-xs font-medium">Features</h3>
                       <div className="grid grid-cols-2 gap-2">
                         <div className="flex items-center space-x-2">
-                          <Checkbox id="gps" checked={gps} onCheckedChange={setGps} className="h-3.5 w-3.5" />
+                          <Checkbox
+                            id="gps"
+                            checked={gps}
+                            onCheckedChange={setGps}
+                            className="h-3.5 w-3.5"
+                            disabled={submitting}
+                          />
                           <Label htmlFor="gps" className="cursor-pointer text-xs">
                             GPS Navigation
                           </Label>
@@ -944,6 +917,7 @@ export default function EditCarPage() {
                             checked={sunroof}
                             onCheckedChange={setSunroof}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="sunroof" className="cursor-pointer text-xs">
                             Sunroof
@@ -956,6 +930,7 @@ export default function EditCarPage() {
                             checked={parkingSensors}
                             onCheckedChange={setParkingSensors}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="parkingSensors" className="cursor-pointer text-xs">
                             Parking Sensors
@@ -968,6 +943,7 @@ export default function EditCarPage() {
                             checked={cruiseControl}
                             onCheckedChange={setCruiseControl}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="cruiseControl" className="cursor-pointer text-xs">
                             Cruise Control
@@ -980,6 +956,7 @@ export default function EditCarPage() {
                             checked={leatherSeats}
                             onCheckedChange={setLeatherSeats}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="leatherSeats" className="cursor-pointer text-xs">
                             Leather Seats
@@ -992,6 +969,7 @@ export default function EditCarPage() {
                             checked={heatedSeats}
                             onCheckedChange={setHeatedSeats}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="heatedSeats" className="cursor-pointer text-xs">
                             Heated Seats
@@ -1004,6 +982,7 @@ export default function EditCarPage() {
                             checked={bluetooth}
                             onCheckedChange={setBluetooth}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="bluetooth" className="cursor-pointer text-xs">
                             Bluetooth
@@ -1016,6 +995,7 @@ export default function EditCarPage() {
                             checked={climateControl}
                             onCheckedChange={setClimateControl}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="climateControl" className="cursor-pointer text-xs">
                             Climate Control
@@ -1028,6 +1008,7 @@ export default function EditCarPage() {
                             checked={keylessEntry}
                             onCheckedChange={setKeylessEntry}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="keylessEntry" className="cursor-pointer text-xs">
                             Keyless Entry
@@ -1040,6 +1021,7 @@ export default function EditCarPage() {
                             checked={rearCamera}
                             onCheckedChange={setRearCamera}
                             className="h-3.5 w-3.5"
+                            disabled={submitting}
                           />
                           <Label htmlFor="rearCamera" className="cursor-pointer text-xs">
                             Rear Camera
@@ -1050,10 +1032,10 @@ export default function EditCarPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm">
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
                     Next: Additional Information
                   </Button>
                 </CardFooter>
@@ -1079,6 +1061,7 @@ export default function EditCarPage() {
                         value={manufactured}
                         onChange={(e) => setManufactured(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -1086,7 +1069,7 @@ export default function EditCarPage() {
                       <Label htmlFor="safetyRating" className="text-xs">
                         Safety Rating
                       </Label>
-                      <Select onValueChange={setSafetyRating} value={safetyRating}>
+                      <Select onValueChange={setSafetyRating} value={safetyRating} disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select safety rating" />
                         </SelectTrigger>
@@ -1110,6 +1093,7 @@ export default function EditCarPage() {
                         value={warranty}
                         onChange={(e) => setWarranty(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -1123,6 +1107,7 @@ export default function EditCarPage() {
                         value={registration}
                         onChange={(e) => setRegistration(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -1137,6 +1122,7 @@ export default function EditCarPage() {
                         value={ownerCount}
                         onChange={(e) => setOwnerCount(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
 
@@ -1144,7 +1130,7 @@ export default function EditCarPage() {
                       <Label htmlFor="insuranceStatus" className="text-xs">
                         Insurance Status
                       </Label>
-                      <Select onValueChange={setInsuranceStatus} value={insuranceStatus}>
+                      <Select onValueChange={setInsuranceStatus} value={insuranceStatus} disabled={submitting}>
                         <SelectTrigger className="h-8 text-sm">
                           <SelectValue placeholder="Select insurance status" />
                         </SelectTrigger>
@@ -1168,47 +1154,31 @@ export default function EditCarPage() {
                         value={taxValidity}
                         onChange={(e) => setTaxValidity(e.target.value)}
                         className="h-8 text-sm"
+                        disabled={submitting}
                       />
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm">
-                    Next: Images & Specifications
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
+                    Next: Specifications
                   </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
 
-            {/* Images & Specifications Tab */}
-            <TabsContent value="images" className="mt-2 h-full">
+{/* Specifications Tab */}
+<TabsContent value="specifications" className="mt-2 h-full">
               <Card className="h-full">
                 <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Images & Specifications</CardTitle>
-                  <CardDescription className="text-xs">Update images and detailed specifications</CardDescription>
+                  <CardTitle className="text-lg">Detailed Specifications</CardTitle>
+                  <CardDescription className="text-xs">Update detailed specifications for the car</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 py-2 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
                   <div className="space-y-3">
-                    <h3 className="text-xs font-medium">
-                      Car Images <span className="text-destructive">*</span>
-                    </h3>
-                    <Multipleimages
-                      loadingIndex={loadingIndex}
-                      setImages={setImages}
-                      deleteImage={deleteImage}
-                      uploadImage={uploadImage}
-                      images={images}
-                      handleMultipleImageChange={handleMultipleImageChange}
-                    />
-                  </div>
-
-                  <Separator className="my-2" />
-
-                  <div className="space-y-3">
-                    <h3 className="text-xs font-medium">Detailed Specifications</h3>
                     <EditeSpecifications
                       removeSpecification={removeSpecification}
                       removeSpecDetail={removeSpecDetail}
@@ -1221,7 +1191,32 @@ export default function EditCarPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
+                    Back
+                  </Button>
+                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
+                    Next: images
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+            {/* Images Tab */}
+            <TabsContent value="images" className="mt-2 h-full">
+              <Card className="h-full">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-lg">Car Images</CardTitle>
+                  <CardDescription className="text-xs">Update images for the car</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 py-2 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+                  <div className="space-y-3">
+                    <UpdateMultipleImages images={images} setImages={setImages} disabled={submitting} />
+                  </div>
+                </CardContent>
+              
+
+
+                <CardFooter className="flex justify-between py-3">
+                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
                     Back
                   </Button>
                   <Button type="submit" disabled={submitting} className="gap-2" size="sm">
@@ -1231,10 +1226,11 @@ export default function EditCarPage() {
                 </CardFooter>
               </Card>
             </TabsContent>
+
+            
           </div>
         </Tabs>
       </form>
     </div>
   )
 }
-

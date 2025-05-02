@@ -17,9 +17,9 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    console.log("🔹 API HIT: Received POST request");
-
+    
     const { name, image } = await request.json();
+    console.log("🔹 API HIT: Received POST request",image);
 
     if (!name || !image) {
       console.error("🚨 Missing name or image");
