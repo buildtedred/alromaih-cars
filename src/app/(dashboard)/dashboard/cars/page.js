@@ -187,13 +187,13 @@ export default function AllCarsPage() {
             <Skeleton className="h-8 w-64" />
             <Skeleton className="h-10 w-32" />
           </div>
-          <div className="border rounded-md">
+          <div className="border rounded-[5px]">
             <div className="p-4 space-y-4">
               {Array(5)
                 .fill(0)
                 .map((_, i) => (
                   <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-12 w-12 rounded-md" />
+                    <Skeleton className="h-12 w-12 rounded-[5px]" />
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-48" />
                       <Skeleton className="h-4 w-24" />
@@ -217,7 +217,11 @@ export default function AllCarsPage() {
               : "Add your first car to get started"}
           </p>
           {!searchTerm && filterBrand === "all" && (
-            <Button asChild className="mt-4">
+            <Button
+              asChild
+              className="mt-4 bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
+              disabled={isDeleting}
+            >
               <Link href="/dashboard/cars/new">
                 <Plus className="mr-2 h-4 w-4" /> Add New Car
               </Link>
@@ -228,9 +232,9 @@ export default function AllCarsPage() {
     }
 
     return (
-      <div className="rounded-md border shadow-sm overflow-hidden">
+      <div className="rounded-[5px] border shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-muted/50 sticky top-0">
+          <TableHeader className="bg-brand-light/50 sticky top-0">
             <TableRow>
               <TableHead className="w-12">
                 <Checkbox
@@ -238,6 +242,7 @@ export default function AllCarsPage() {
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all cars"
                   disabled={isDeleting}
+                  className="rounded-[5px]"
                 />
               </TableHead>
               <TableHead className="w-[80px]">Image</TableHead>
@@ -267,21 +272,25 @@ export default function AllCarsPage() {
           </TableHeader>
           <TableBody>
             {filteredCars.map((car) => (
-              <TableRow key={car.id} className={selectedCars.includes(car.id) ? "bg-muted/50" : "hover:bg-muted/30"}>
+              <TableRow
+                key={car.id}
+                className={selectedCars.includes(car.id) ? "bg-brand-light/50" : "hover:bg-brand-light/30"}
+              >
                 <TableCell>
                   <Checkbox
                     checked={selectedCars.includes(car.id)}
                     onCheckedChange={() => handleSelectCar(car.id)}
                     aria-label={`Select ${car.model}`}
                     disabled={isDeleting}
+                    className="rounded-[5px]"
                   />
                 </TableCell>
                 <TableCell>
-                  <div className="h-10 w-10 rounded-md overflow-hidden bg-muted">
+                  <div className="flex justify-center items-center h-10 w-10 rounded-[5px] overflow-hidden bg-muted">
                     <img
                       src={car?.images?.[0] || placeholderImage}
                       alt={car?.model}
-                      className="h-full w-full object-cover"
+                      className="object-cover"
                       onError={(e) => {
                         e.target.onerror = null
                         e.target.src = placeholderImage
@@ -293,20 +302,34 @@ export default function AllCarsPage() {
                 <TableCell>{car.year}</TableCell>
                 <TableCell>
                   {car?.brand?.name ? (
-                    <Badge variant="outline">{car.brand.name}</Badge>
+                    <Badge variant="outline" className="rounded-[5px]">
+                      {car.brand.name}
+                    </Badge>
                   ) : (
                     <span className="text-muted-foreground text-sm">Unknown</span>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon" asChild disabled={isDeleting}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      disabled={isDeleting}
+                      className="rounded-[5px] hover:text-brand-primary"
+                    >
                       <Link href={`/dashboard/cars/car-details/${car.id}`}>
                         <Eye className="h-4 w-4" />
                         <span className="sr-only">View</span>
                       </Link>
                     </Button>
-                    <Button variant="ghost" size="icon" asChild disabled={isDeleting}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      disabled={isDeleting}
+                      className="rounded-[5px] hover:text-brand-primary"
+                    >
                       <Link href={`/dashboard/cars/${car.id}/edit`}>
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
@@ -315,7 +338,7 @@ export default function AllCarsPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:text-destructive rounded-[5px]"
                       onClick={() => confirmDelete(car.id)}
                       disabled={isDeleting}
                     >
@@ -337,8 +360,8 @@ export default function AllCarsPage() {
       {/* Full page overlay when deleting */}
       {isDeleting && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card p-6 rounded-lg shadow-lg text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <div className="bg-card p-6 rounded-[5px] shadow-lg text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-brand-primary" />
             <h3 className="font-medium text-lg mb-1">{carsToDelete.length > 1 ? "Deleting Cars" : "Deleting Car"}</h3>
             <p className="text-sm text-muted-foreground">Please wait while the operation completes...</p>
           </div>
@@ -352,12 +375,17 @@ export default function AllCarsPage() {
         </div>
         <div className="flex gap-2">
           {selectedCars.length > 0 && (
-            <Button variant="destructive" onClick={confirmDeleteMultiple} disabled={isDeleting} className="gap-1">
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteMultiple}
+              disabled={isDeleting}
+              className="gap-1 rounded-[5px]"
+            >
               {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               Delete Selected ({selectedCars.length})
             </Button>
           )}
-          <Button asChild disabled={isDeleting}>
+          <Button asChild disabled={isDeleting} className="bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]">
             <Link href="/dashboard/cars/new">
               <Plus className="mr-2 h-4 w-4" /> Add New Car
             </Link>
@@ -372,7 +400,7 @@ export default function AllCarsPage() {
             <Input
               type="search"
               placeholder="Search cars..."
-              className="pl-8"
+              className="pl-8 rounded-[5px] border-gray-300"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={isDeleting}
@@ -380,16 +408,18 @@ export default function AllCarsPage() {
           </div>
 
           <Select value={filterBrand} onValueChange={setFilterBrand} disabled={isDeleting}>
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px] rounded-[5px] border-gray-300">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
                 <SelectValue placeholder="Filter by brand" />
               </div>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Brands</SelectItem>
+            <SelectContent className="rounded-[5px]">
+              <SelectItem value="all" className="rounded-[5px]">
+                All Brands
+              </SelectItem>
               {brands.map((brand) => (
-                <SelectItem key={brand} value={brand}>
+                <SelectItem key={brand} value={brand} className="rounded-[5px]">
                   {brand}
                 </SelectItem>
               ))}
@@ -402,7 +432,7 @@ export default function AllCarsPage() {
           size="sm"
           onClick={fetchCars}
           disabled={loading || isDeleting}
-          className="gap-1 w-full sm:w-auto"
+          className="gap-1 w-full sm:w-auto rounded-[5px] border-gray-300 hover:bg-brand-light hover:text-brand-primary"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           <span className="hidden sm:inline">Refresh</span>
@@ -410,22 +440,22 @@ export default function AllCarsPage() {
       </div>
 
       {error && (
-        <div className="bg-destructive/15 p-4 rounded-md text-destructive">
+        <div className="bg-destructive/15 p-4 rounded-[5px] text-destructive">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5" />
             <p className="font-medium">Error loading cars</p>
           </div>
           <p className="text-sm mb-2">{error}</p>
-          <Button variant="outline" size="sm" onClick={fetchCars} disabled={isDeleting}>
+          <Button variant="outline" size="sm" onClick={fetchCars} disabled={isDeleting} className="rounded-[5px]">
             Try Again
           </Button>
-        </div> 
+        </div>
       )}
 
       {renderContent()}
 
       <Dialog open={deleteDialogOpen} onOpenChange={(open) => !isDeleting && setDeleteDialogOpen(open)}>
-        <DialogContent>
+        <DialogContent className="rounded-[5px]">
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
@@ -435,13 +465,19 @@ export default function AllCarsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+              className="rounded-[5px]"
+            >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={() => (carsToDelete.length > 1 ? deleteMultipleCars(carsToDelete) : deleteCar(carsToDelete[0]))}
               disabled={isDeleting}
+              className="rounded-[5px]"
             >
               {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
               {carsToDelete.length > 1 ? `Delete ${carsToDelete.length} cars` : "Delete car"}

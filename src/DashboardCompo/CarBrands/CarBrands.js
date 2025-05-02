@@ -2,19 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  Car,
-  Search,
-  Loader2,
-  AlertTriangle,
-  RefreshCw,
-  SortAsc,
-  SortDesc,
-  Eye,
-} from "lucide-react"
+import { Plus, Pencil, Trash2, Car, Search, Loader2, AlertTriangle, RefreshCw, SortAsc, SortDesc, Eye } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -190,13 +178,13 @@ export default function CarBrands() {
             <Skeleton className="h-8 w-64" />
             <Skeleton className="h-10 w-32" />
           </div>
-          <div className="border rounded-md">
+          <div className="border rounded-[5px]">
             <div className="p-4 space-y-4">
               {Array(5)
                 .fill(0)
                 .map((_, i) => (
                   <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-12 w-12 rounded-md" />
+                    <Skeleton className="h-12 w-12 rounded-[5px]" />
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-48" />
                       <Skeleton className="h-4 w-24" />
@@ -218,7 +206,7 @@ export default function CarBrands() {
             {searchTerm ? "Try a different search term" : "Add your first car brand to get started"}
           </p>
           {!searchTerm && (
-            <Button asChild className="mt-4" disabled={isDeleting}>
+            <Button asChild className="mt-4 bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]" disabled={isDeleting}>
               <Link href="/dashboard/brands/new">
                 <Plus className="mr-2 h-4 w-4" /> Add New Brand
               </Link>
@@ -229,7 +217,7 @@ export default function CarBrands() {
     }
 
     return (
-      <div className="rounded-md border shadow-sm">
+      <div className="rounded-[5px] border shadow-sm">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
@@ -239,6 +227,7 @@ export default function CarBrands() {
                   onCheckedChange={handleSelectAll}
                   aria-label="Select all brands"
                   disabled={isDeleting}
+                  className="rounded-[5px]"
                 />
               </TableHead>
               <TableHead className="w-[80px]">Logo</TableHead>
@@ -267,21 +256,22 @@ export default function CarBrands() {
           </TableHeader>
           <TableBody>
             {filteredBrands.map((brand) => (
-              <TableRow key={brand.id} className={selectedBrands.includes(brand.id) ? "bg-muted/50" : ""}>
+              <TableRow key={brand.id} className={selectedBrands.includes(brand.id) ? "bg-brand-light/50" : ""}>
                 <TableCell>
                   <Checkbox
                     checked={selectedBrands.includes(brand.id)}
                     onCheckedChange={() => handleSelectBrand(brand.id)}
                     aria-label={`Select ${brand.name}`}
                     disabled={isDeleting}
+                    className="rounded-[5px]"
                   />
                 </TableCell>
                 <TableCell>
-                  <div className="h-10 w-10 rounded-md overflow-hidden bg-muted">
+                  <div className="flex justify-center items-center h-10 w-10 rounded-[5px] overflow-hidden bg-muted">
                     <img
                       src={brand.image || placeholderImage}
                       alt={brand.name}
-                      className="h-full w-full object-cover"
+                      className="object-cover"
                       onError={(e) => {
                         e.target.onerror = null
                         e.target.src = placeholderImage
@@ -291,17 +281,17 @@ export default function CarBrands() {
                 </TableCell>
                 <TableCell className="font-medium">{brand.name}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">{brand.cars?.length || 0} Cars</Badge>
+                  <Badge variant="outline" className="rounded-[5px]">{brand.cars?.length || 0} Cars</Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon" asChild disabled={isDeleting}>
+                    <Button variant="ghost" size="icon" asChild disabled={isDeleting} className="rounded-[5px] hover:text-brand-primary">
                       <Link href={`/dashboard/brands/brand-detail/${brand.id}`}>
                         <Eye className="h-4 w-4" />
                         <span className="sr-only">View</span>
                       </Link>
                     </Button>
-                    <Button variant="ghost" size="icon" asChild disabled={isDeleting}>
+                    <Button variant="ghost" size="icon" asChild disabled={isDeleting} className="rounded-[5px] hover:text-brand-primary">
                       <Link href={`/dashboard/brands/${brand.id}/edit`}>
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
@@ -310,7 +300,7 @@ export default function CarBrands() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:text-destructive rounded-[5px]"
                       onClick={() => confirmDelete(brand.id)}
                       disabled={isDeleting}
                     >
@@ -332,8 +322,8 @@ export default function CarBrands() {
       {/* Full-page overlay during deletion */}
       {isDeleting && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card p-6 rounded-lg shadow-lg text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <div className="bg-card p-6 rounded-[5px] shadow-lg text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-brand-primary" />
             <h3 className="font-medium text-lg mb-1">Deleting Brand{brandsToDelete.length > 1 ? "s" : ""}</h3>
             <p className="text-sm text-muted-foreground">Please wait while we process your request...</p>
           </div>
@@ -347,12 +337,12 @@ export default function CarBrands() {
         </div>
         <div className="flex gap-2">
           {selectedBrands.length > 0 && (
-            <Button variant="destructive" onClick={confirmDeleteMultiple} disabled={isDeleting} className="gap-1">
+            <Button variant="destructive" onClick={confirmDeleteMultiple} disabled={isDeleting} className="gap-1 rounded-[5px]">
               {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               Delete Selected ({selectedBrands.length})
             </Button>
           )}
-          <Button asChild disabled={isDeleting}>
+          <Button asChild disabled={isDeleting} className="rounded-[5px] bg-brand-primary hover:bg-brand-primary/90">
             <Link href="/dashboard/brands/new">
               <Plus className="mr-2 h-4 w-4" /> Add New Brand
             </Link>
@@ -366,7 +356,7 @@ export default function CarBrands() {
           <Input
             type="search"
             placeholder="Search brands..."
-            className="pl-8 w-full"
+            className="pl-8 w-full rounded-[5px] border-gray-300"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             disabled={isDeleting}
@@ -378,7 +368,7 @@ export default function CarBrands() {
           size="sm"
           onClick={fetchBrands}
           disabled={loading || isDeleting}
-          className="gap-1 w-full sm:w-auto"
+          className="gap-1 w-full sm:w-auto rounded-[5px] border-gray-300 hover:bg-brand-light hover:text-brand-primary"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           <span className="hidden sm:inline">Refresh</span>
@@ -386,13 +376,13 @@ export default function CarBrands() {
       </div>
 
       {error && (
-        <div className="bg-destructive/15 p-4 rounded-md text-destructive">
+        <div className="bg-destructive/15 p-4 rounded-[5px] text-destructive">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-5 w-5" />
             <p className="font-medium">Error loading brands</p>
           </div>
           <p className="text-sm mb-2">{error}</p>
-          <Button variant="outline" size="sm" onClick={fetchBrands} disabled={isDeleting}>
+          <Button variant="outline" size="sm" onClick={fetchBrands} disabled={isDeleting} className="rounded-[5px]">
             Try Again
           </Button>
         </div>
@@ -401,7 +391,7 @@ export default function CarBrands() {
       {renderContent()}
 
       <Dialog open={deleteDialogOpen} onOpenChange={(open) => !isDeleting && setDeleteDialogOpen(open)}>
-        <DialogContent>
+        <DialogContent className="rounded-[5px]">
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
@@ -411,7 +401,7 @@ export default function CarBrands() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting}>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting} className="rounded-[5px]">
               Cancel
             </Button>
             <Button
@@ -420,6 +410,7 @@ export default function CarBrands() {
                 brandsToDelete.length > 1 ? deleteMultipleBrands(brandsToDelete) : deleteBrand(brandsToDelete[0])
               }
               disabled={isDeleting}
+              className="rounded-[5px]"
             >
               {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
               {brandsToDelete.length > 1 ? `Delete ${brandsToDelete.length} brands` : "Delete brand"}

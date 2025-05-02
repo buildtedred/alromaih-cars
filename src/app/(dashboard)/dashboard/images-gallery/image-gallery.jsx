@@ -335,7 +335,12 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
             {/* Multi-select toggle - hide on gallery page */}
             {!isGalleryPage && (
               <div className="flex items-center space-x-2">
-                <Switch id="multi-select-mode" checked={isMultiSelectMode} onCheckedChange={toggleMultiSelectMode} />
+                <Switch
+                  id="multi-select-mode"
+                  checked={isMultiSelectMode}
+                  onCheckedChange={toggleMultiSelectMode}
+                  className="data-[state=checked]:bg-brand-primary"
+                />
                 <Label htmlFor="multi-select-mode" className="text-sm">
                   Multi-select
                 </Label>
@@ -345,7 +350,13 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
 
           <div className="flex items-center gap-2">
             {/* Refresh button */}
-            <Button variant="outline" size="sm" onClick={fetchImages} disabled={loading}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchImages}
+              disabled={loading}
+              className="rounded-[5px] border-gray-300 hover:bg-brand-light hover:text-brand-primary"
+            >
               <RefreshCw className={`h-4 w-4 mr-1 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </Button>
@@ -358,11 +369,15 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
                 id="image-upload"
                 accept="image/*"
                 onChange={uploadImages}
-                className="absolute inset-0 opacity-0 cursor-pointer"
+                className="absolute inset-0 opacity-0 cursor-pointer rounded-[5px]"
                 disabled={uploading}
                 multiple
               />
-              <Button size="sm" disabled={uploading}>
+              <Button
+                size="sm"
+                disabled={uploading}
+                className="rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+              >
                 {uploading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -381,7 +396,7 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
 
         {/* Duplicate file notification */}
         {duplicateNotification && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-md text-sm flex items-center">
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded-[5px] text-sm flex items-center">
             <AlertCircle className="h-4 w-4 mr-2" />
             {duplicateNotification}
           </div>
@@ -395,14 +410,14 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
             placeholder="Search images..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 h-9"
+            className="pl-9 h-9 rounded-[5px] border-gray-300"
           />
         </div>
 
         {/* Upload progress */}
         {uploading && (
           <div className="w-full">
-            <Progress value={uploadProgress} className="h-1.5" />
+            <Progress value={uploadProgress} className="h-1.5 rounded-[5px]" />
             <p className="text-xs mt-1 text-center text-muted-foreground">{uploadProgress}% uploaded</p>
           </div>
         )}
@@ -411,7 +426,7 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
         {!isGalleryPage && (
           <div className="flex justify-between items-center mt-2 pt-2 border-t">
             {isMultiSelectMode && (
-              <Badge variant="outline" className="h-6">
+              <Badge variant="outline" className="h-6 rounded-[5px]">
                 {selectedImages.length} {selectedImages.length === 1 ? "image" : "images"} selected
               </Badge>
             )}
@@ -420,6 +435,7 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
                 onClick={confirmSelection}
                 disabled={(isMultiSelectMode && selectedImages.length === 0) || (!isMultiSelectMode && !selectedImage)}
                 size="sm"
+                className="rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
               >
                 {isMultiSelectMode
                   ? selectedImages.length > 0
@@ -441,11 +457,11 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item) => (
                   <div key={item} className="w-full">
-                    <Card className="overflow-hidden border-muted">
-                      <Skeleton className="h-[80px] w-full" />
+                    <Card className="overflow-hidden border-muted rounded-[5px]">
+                      <Skeleton className="h-[80px] w-full rounded-[5px]" />
                       <CardContent className="p-1">
-                        <Skeleton className="h-2 w-3/4 mb-1" />
-                        <Skeleton className="h-2 w-1/4" />
+                        <Skeleton className="h-2 w-3/4 mb-1 rounded-[5px]" />
+                        <Skeleton className="h-2 w-1/4 rounded-[5px]" />
                       </CardContent>
                     </Card>
                   </div>
@@ -453,7 +469,7 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
               </div>
             ) : filteredImages.length === 0 ? (
               // Empty state
-              <div className="text-center py-8 bg-muted/30 rounded-lg">
+              <div className="text-center py-8 bg-muted/30 rounded-[5px]">
                 {searchQuery ? (
                   <>
                     <h3 className="text-base font-medium mb-1">No images match your search</h3>
@@ -472,26 +488,27 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
                 {filteredImages.map((image) => (
                   <Card
                     key={image.name}
-                    className={`overflow-hidden cursor-pointer transition-all border-muted hover:border-primary/50 ${
+                    className={`overflow-hidden cursor-pointer transition-all border-muted hover:border-brand-primary/50 rounded-[5px] ${
                       (isMultiSelectMode && isImageSelected(image.name)) ||
                       (!isMultiSelectMode && selectedImage?.name === image.name)
-                        ? "ring-1 ring-primary"
+                        ? "ring-1 ring-brand-primary"
                         : ""
                     }`}
                     onClick={() => handleImageClick(image)}
                   >
                     {/* Image */}
-                    <div className="aspect-square relative">
+                    <div className="aspect-square relative flex justify-center items-center overflow-hidden">
                       <Image
                         src={image.url || "/placeholder.svg"}
                         alt={image.name}
-                       fill
+                        width={150}
+                        height={150}
                         className="object-cover"
                         priority={false}
                       />
                       {((isMultiSelectMode && isImageSelected(image.name)) ||
                         (!isMultiSelectMode && selectedImage?.name === image.name)) && (
-                        <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                        <div className="absolute top-1 right-1 bg-brand-primary text-primary-foreground rounded-full p-0.5">
                           <Check className="h-3 w-3" />
                         </div>
                       )}
@@ -508,7 +525,7 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 rounded-sm text-muted-foreground hover:text-destructive"
+                        className="h-5 w-5 rounded-[5px] text-muted-foreground hover:text-destructive"
                         onClick={(e) => deleteImage(image.name, e)}
                       >
                         <Trash2 className="h-3 w-3" />

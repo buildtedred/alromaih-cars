@@ -71,6 +71,7 @@
     "react-to-pdf": "^1.0.1",
     "react-to-print": "^3.0.5",
     "react-toastify": "^11.0.5",
+    "recharts": "^2.15.3",
     "rtl-detect": "^1.1.2",
     "shadcn": "^2.3.0",
     "slick-carousel": "^1.8.1",
