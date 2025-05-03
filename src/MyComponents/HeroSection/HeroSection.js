@@ -225,6 +225,8 @@ export default function HeroSection() {
   // Get the appropriate text based on current language
   const getLocalizedText = (enText, arText) => (isRTL ? arText : enText)
 
+  
+  // Desktop view
   // Mobile view
   if (isMobile) {
     return (
@@ -270,7 +272,7 @@ export default function HeroSection() {
                 transition={{ duration: 0.3 }}
               >
                 {/* Brand badge */}
-                <div className="inline-block px-2 py-1 bg-white/20 backdrop-blur-sm rounded-md text-white text-xs mb-2">
+                <div className="inline-block px-2 py-1 bg-brand-primary backdrop-blur-sm rounded-md text-white text-xs mb-2">
                   {getLocalizedText(currentCar.brand, currentCar.brandAr)}
                 </div>
 
@@ -392,13 +394,11 @@ export default function HeroSection() {
       </div>
     )
   }
-
-  // Desktop view
   return (
     <div className="container m-auto" ref={containerRef} dir={isRTL ? "rtl" : "ltr"}>
       <div className="relative mb-[100px]">
         {/* Main content area */}
-        <div className="relative bg-black rounded-3xl overflow-hidden">
+        <div className="relative bg-brand-dark rounded-3xl overflow-hidden">
           <div className="grid grid-cols-12 h-[500px]">
             {/* Content side - Swap sides based on language */}
             <div
@@ -408,7 +408,7 @@ export default function HeroSection() {
             >
               {/* Brand name */}
               <div className="mb-2" ref={brandRef}>
-                <span className="inline-block px-3 py-1 rounded-full text-xs uppercase tracking-wider bg-white/10 text-white">
+                <span className="inline-block px-3 py-1 rounded-full text-xs uppercase tracking-wider bg-brand-primary text-white">
                   {getLocalizedText(currentCar.brand, currentCar.brandAr)}
                 </span>
               </div>
@@ -417,7 +417,7 @@ export default function HeroSection() {
               <div ref={nameRef}>
                 <h2
                   className={`text-5xl lg:text-6xl py-2 font-bold mb-3 text-white line-clamp-2 overflow-hidden ${
-                    isRTL ? "font-arabic" : ""
+                    isRTL ? "font-noto" : ""
                   }`}
                 >
                   {getLocalizedText(currentCar.name, currentCar.nameAr)}
@@ -426,7 +426,7 @@ export default function HeroSection() {
 
               {/* Tagline */}
               <div ref={taglineRef} className="mb-8">
-                <p className={`text-lg text-white/80 italic line-clamp-2 ${isRTL ? "font-arabic" : ""}`}>
+                <p className={`text-lg text-white/80 italic line-clamp-2 ${isRTL ? "font-noto" : ""}`}>
                   {getLocalizedText(currentCar.tagline, currentCar.taglineAr)}
                 </p>
               </div>
@@ -437,26 +437,26 @@ export default function HeroSection() {
                   <p className="text-white/60 text-sm mb-1">{isRTL ? "السعر" : "Price"}</p>
                   <div className="flex items-center gap-2">
                     <Image src="/icons/Currency-white.svg" alt="Currency" width={18} height={18} />
-                    <p className={`text-white text-xl font-medium truncate ${isRTL ? "font-arabic" : ""}`}>
+                    <p className={`text-white text-xl font-medium truncate ${isRTL ? "font-noto" : ""}`}>
                       {getLocalizedText(currentCar.price, currentCar.priceAr)}
                     </p>
                   </div>
                 </div>
                 <div className="opacity-0">
                   <p className="text-white/60 text-sm mb-1">{isRTL ? "السنة" : "Year"}</p>
-                  <p className={`text-white text-xl font-medium truncate ${isRTL ? "font-arabic" : ""}`}>
+                  <p className={`text-white text-xl font-medium truncate ${isRTL ? "font-noto" : ""}`}>
                     {getLocalizedText(currentCar.year, currentCar.yearAr)}
                   </p>
                 </div>
                 <div className="opacity-0">
                   <p className="text-white/60 text-sm mb-1">{isRTL ? "المحرك" : "Engine"}</p>
-                  <p className={`text-white text-xl font-medium truncate ${isRTL ? "font-arabic" : ""}`}>
+                  <p className={`text-white text-xl font-medium truncate ${isRTL ? "font-noto" : ""}`}>
                     {getLocalizedText(currentCar.engine, currentCar.engineAr)}
                   </p>
                 </div>
                 <div className="opacity-0">
                   <p className="text-white/60 text-sm mb-1">{isRTL ? "القوة" : "Power"}</p>
-                  <p className={`text-white text-xl font-medium truncate ${isRTL ? "font-arabic" : ""}`}>
+                  <p className={`text-white text-xl font-medium truncate ${isRTL ? "font-noto" : ""}`}>
                     {getLocalizedText(currentCar.power, currentCar.powerAr)}
                   </p>
                 </div>
@@ -565,8 +565,8 @@ export default function HeroSection() {
                   <div
                     className={`absolute inset-0 ${
                       isRTL
-                        ? "bg-gradient-to-r from-transparent via-black/10 to-black"
-                        : "bg-gradient-to-r from-black via-black/5 to-transparent"
+                        ? "bg-gradient-to-r from-transparent via-brand-dark/10 to-brand-dark"
+                        : "bg-gradient-to-r from-brand-dark via-brand-dark/5 to-transparent"
                     }`}
                   ></div>
                 </motion.div>
@@ -599,7 +599,7 @@ export default function HeroSection() {
             />
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center">
               <p className="text-white/70 text-xs uppercase tracking-wider mb-1">{isRTL ? "التالي" : "Next"}</p>
-              <p className={`text-white text-lg font-medium ${isRTL ? "font-arabic" : ""}`}>
+              <p className={`text-white text-lg font-medium ${isRTL ? "font-noto" : ""}`}>
                 {getLocalizedText(nextCar.name, nextCar.nameAr)}
               </p>
             </div>
