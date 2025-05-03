@@ -38,8 +38,6 @@ export async function POST(request) {
       },
     });
 
-    console.log("✅ Brand created:", newBrand);
-
     return NextResponse.json(newBrand, { status: 201 });
   } catch (error) {
     console.error("❌ Error creating brand:", error);

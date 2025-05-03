@@ -260,14 +260,14 @@ export default function UpdateCarForm() {
     if (activeTab === "basic") setActiveTab("technical")
     else if (activeTab === "technical") setActiveTab("features")
     else if (activeTab === "features") setActiveTab("additional")
-    else if (activeTab === "additional") setActiveTab("images")
-    else if (activeTab === "images") setActiveTab("specifications")
+    else if (activeTab === "additional") setActiveTab("specifications")
+    else if (activeTab === "specifications") setActiveTab("images")
   }
 
   // Navigate to previous tab
   const goToPrevTab = () => {
-    if (activeTab === "specifications") setActiveTab("images")
-    else if (activeTab === "images") setActiveTab("additional")
+    if (activeTab === "images") setActiveTab("specifications")
+    else if (activeTab === "specifications") setActiveTab("additional")
     else if (activeTab === "additional") setActiveTab("features")
     else if (activeTab === "features") setActiveTab("technical")
     else if (activeTab === "technical") setActiveTab("basic")
@@ -456,32 +456,52 @@ export default function UpdateCarForm() {
         )}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <div className="sticky top-0 z-10 bg-background pt-1 pb-2 border-b">
-            <TabsList className="w-full grid grid-cols-6 h-auto p-1" disabled={submitting}>
-              <TabsTrigger value="basic" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
+            <TabsList className="w-full grid grid-cols-6 h-auto p-1 rounded-[5px]" disabled={submitting}>
+              <TabsTrigger
+                value="basic"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={submitting}
+              >
                 <Car className="h-3 w-3" />
                 <span>Basic Info</span>
               </TabsTrigger>
-              <TabsTrigger value="technical" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
+              <TabsTrigger
+                value="technical"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={submitting}
+              >
                 <Settings className="h-3 w-3" />
                 <span>Technical</span>
               </TabsTrigger>
-              <TabsTrigger value="features" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
+              <TabsTrigger
+                value="features"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={submitting}
+              >
                 <Check className="h-3 w-3" />
                 <span>Features</span>
               </TabsTrigger>
-              <TabsTrigger value="additional" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
+              <TabsTrigger
+                value="additional"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={submitting}
+              >
                 <Info className="h-3 w-3" />
                 <span>Additional</span>
               </TabsTrigger>
               <TabsTrigger
                 value="specifications"
-                className="py-1.5 flex gap-1 items-center text-xs"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
                 disabled={submitting}
               >
                 <FileText className="h-3 w-3" />
                 <span>Specs</span>
               </TabsTrigger>
-              <TabsTrigger value="images" className="py-1.5 flex gap-1 items-center text-xs" disabled={submitting}>
+              <TabsTrigger
+                value="images"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={submitting}
+              >
                 <ImageIcon className="h-3 w-3" />
                 <span>Images</span>
               </TabsTrigger>
@@ -491,12 +511,12 @@ export default function UpdateCarForm() {
           <div className="flex-1 overflow-auto">
             {/* Basic Information Tab */}
             <TabsContent value="basic" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Basic Information</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Basic Information</CardTitle>
                   <CardDescription className="text-xs">Update the essential details about the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3 py-2">
+                <CardContent className="space-y-3 py-2 px-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div className="space-y-1">
                       <Label htmlFor="model" className="text-xs">
@@ -508,7 +528,7 @@ export default function UpdateCarForm() {
                         value={model}
                         onChange={(e) => setModel(e.target.value)}
                         required
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -518,7 +538,7 @@ export default function UpdateCarForm() {
                         Brand <span className="text-destructive">*</span>
                       </Label>
                       <Select onValueChange={setBrandId} value={brandId} required disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select a brand" />
                         </SelectTrigger>
                         <SelectContent>
@@ -536,7 +556,7 @@ export default function UpdateCarForm() {
                         Year <span className="text-destructive">*</span>
                       </Label>
                       <Select onValueChange={setYear} value={year} required disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select year" />
                         </SelectTrigger>
                         <SelectContent>
@@ -559,7 +579,7 @@ export default function UpdateCarForm() {
                         placeholder="Enter price"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -573,7 +593,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. Red, Blue, Silver"
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -583,7 +603,7 @@ export default function UpdateCarForm() {
                         Condition
                       </Label>
                       <Select onValueChange={setCondition} value={condition} disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select condition" />
                         </SelectTrigger>
                         <SelectContent>
@@ -601,7 +621,7 @@ export default function UpdateCarForm() {
                         Body Type
                       </Label>
                       <Select onValueChange={setBodyType} value={bodyType} disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select body type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -630,8 +650,14 @@ export default function UpdateCarForm() {
                     />
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end py-3">
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
+                <CardFooter className="flex justify-end py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                    disabled={submitting}
+                  >
                     Next: Technical Specifications
                   </Button>
                 </CardFooter>
@@ -640,12 +666,12 @@ export default function UpdateCarForm() {
 
             {/* Technical Specifications Tab */}
             <TabsContent value="technical" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Technical Specifications</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Technical Specifications</CardTitle>
                   <CardDescription className="text-xs">Update the technical details of the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3 py-2">
+                <CardContent className="space-y-3 py-2 px-4">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="space-y-1">
                       <Label htmlFor="mileage" className="text-xs">
@@ -657,7 +683,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 15000"
                         value={mileage}
                         onChange={(e) => setMileage(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -667,7 +693,7 @@ export default function UpdateCarForm() {
                         Fuel Type
                       </Label>
                       <Select onValueChange={setFuelType} value={fuelType} disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select fuel type" />
                         </SelectTrigger>
                         <SelectContent>
@@ -690,7 +716,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 60"
                         value={fuelTankCapacity}
                         onChange={(e) => setFuelTankCapacity(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -700,7 +726,7 @@ export default function UpdateCarForm() {
                         Transmission
                       </Label>
                       <Select onValueChange={setTransmission} value={transmission} disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select transmission" />
                         </SelectTrigger>
                         <SelectContent>
@@ -724,7 +750,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 2.0"
                         value={engineSize}
                         onChange={(e) => setEngineSize(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -739,7 +765,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 180"
                         value={horsepower}
                         onChange={(e) => setHorsepower(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -754,7 +780,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 240"
                         value={torque}
                         onChange={(e) => setTorque(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -764,7 +790,7 @@ export default function UpdateCarForm() {
                         Wheel Drive
                       </Label>
                       <Select onValueChange={setWheelDrive} value={wheelDrive} disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select wheel drive" />
                         </SelectTrigger>
                         <SelectContent>
@@ -787,7 +813,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 220"
                         value={topSpeed}
                         onChange={(e) => setTopSpeed(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -803,7 +829,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 8.5"
                         value={acceleration}
                         onChange={(e) => setAcceleration(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -819,17 +845,30 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 15.5"
                         value={fuelEconomy}
                         onChange={(e) => setFuelEconomy(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px]"
+                    disabled={submitting}
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                    disabled={submitting}
+                  >
                     Next: Features & Comfort
                   </Button>
                 </CardFooter>
@@ -838,9 +877,9 @@ export default function UpdateCarForm() {
 
             {/* Features & Comfort Tab */}
             <TabsContent value="features" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Features & Comfort</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Features & Comfort</CardTitle>
                   <CardDescription className="text-xs">
                     Update the features and comfort options of the car
                   </CardDescription>
@@ -859,7 +898,7 @@ export default function UpdateCarForm() {
                             placeholder="e.g. 5"
                             value={seats}
                             onChange={(e) => setSeats(e.target.value)}
-                            className="h-8 text-sm"
+                            className="h-8 text-sm rounded-[5px]"
                             disabled={submitting}
                           />
                         </div>
@@ -874,7 +913,7 @@ export default function UpdateCarForm() {
                             placeholder="e.g. 4"
                             value={doors}
                             onChange={(e) => setDoors(e.target.value)}
-                            className="h-8 text-sm"
+                            className="h-8 text-sm rounded-[5px]"
                             disabled={submitting}
                           />
                         </div>
@@ -889,7 +928,7 @@ export default function UpdateCarForm() {
                           placeholder="e.g. 10-inch touchscreen with Apple CarPlay"
                           value={infotainment}
                           onChange={(e) => setInfotainment(e.target.value)}
-                          className="h-8 text-sm"
+                          className="h-8 text-sm rounded-[5px]"
                           disabled={submitting}
                         />
                       </div>
@@ -903,7 +942,7 @@ export default function UpdateCarForm() {
                             id="gps"
                             checked={gps}
                             onCheckedChange={setGps}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="gps" className="cursor-pointer text-xs">
@@ -916,7 +955,7 @@ export default function UpdateCarForm() {
                             id="sunroof"
                             checked={sunroof}
                             onCheckedChange={setSunroof}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="sunroof" className="cursor-pointer text-xs">
@@ -929,7 +968,7 @@ export default function UpdateCarForm() {
                             id="parkingSensors"
                             checked={parkingSensors}
                             onCheckedChange={setParkingSensors}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="parkingSensors" className="cursor-pointer text-xs">
@@ -942,7 +981,7 @@ export default function UpdateCarForm() {
                             id="cruiseControl"
                             checked={cruiseControl}
                             onCheckedChange={setCruiseControl}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="cruiseControl" className="cursor-pointer text-xs">
@@ -955,7 +994,7 @@ export default function UpdateCarForm() {
                             id="leatherSeats"
                             checked={leatherSeats}
                             onCheckedChange={setLeatherSeats}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="leatherSeats" className="cursor-pointer text-xs">
@@ -968,7 +1007,7 @@ export default function UpdateCarForm() {
                             id="heatedSeats"
                             checked={heatedSeats}
                             onCheckedChange={setHeatedSeats}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="heatedSeats" className="cursor-pointer text-xs">
@@ -981,7 +1020,7 @@ export default function UpdateCarForm() {
                             id="bluetooth"
                             checked={bluetooth}
                             onCheckedChange={setBluetooth}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="bluetooth" className="cursor-pointer text-xs">
@@ -994,7 +1033,7 @@ export default function UpdateCarForm() {
                             id="climateControl"
                             checked={climateControl}
                             onCheckedChange={setClimateControl}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="climateControl" className="cursor-pointer text-xs">
@@ -1007,7 +1046,7 @@ export default function UpdateCarForm() {
                             id="keylessEntry"
                             checked={keylessEntry}
                             onCheckedChange={setKeylessEntry}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="keylessEntry" className="cursor-pointer text-xs">
@@ -1020,7 +1059,7 @@ export default function UpdateCarForm() {
                             id="rearCamera"
                             checked={rearCamera}
                             onCheckedChange={setRearCamera}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={submitting}
                           />
                           <Label htmlFor="rearCamera" className="cursor-pointer text-xs">
@@ -1031,11 +1070,24 @@ export default function UpdateCarForm() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px]"
+                    disabled={submitting}
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                    disabled={submitting}
+                  >
                     Next: Additional Information
                   </Button>
                 </CardFooter>
@@ -1044,12 +1096,12 @@ export default function UpdateCarForm() {
 
             {/* Additional Information Tab */}
             <TabsContent value="additional" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Additional Information</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Additional Information</CardTitle>
                   <CardDescription className="text-xs">Update additional details about the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3 py-2">
+                <CardContent className="space-y-3 py-2 px-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div className="space-y-1">
                       <Label htmlFor="manufactured" className="text-xs">
@@ -1060,7 +1112,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. Japan, Germany"
                         value={manufactured}
                         onChange={(e) => setManufactured(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -1070,7 +1122,7 @@ export default function UpdateCarForm() {
                         Safety Rating
                       </Label>
                       <Select onValueChange={setSafetyRating} value={safetyRating} disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select safety rating" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1092,7 +1144,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 3 years/100,000 km"
                         value={warranty}
                         onChange={(e) => setWarranty(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -1106,7 +1158,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. ABC-123"
                         value={registration}
                         onChange={(e) => setRegistration(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -1121,7 +1173,7 @@ export default function UpdateCarForm() {
                         placeholder="e.g. 1"
                         value={ownerCount}
                         onChange={(e) => setOwnerCount(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
@@ -1131,7 +1183,7 @@ export default function UpdateCarForm() {
                         Insurance Status
                       </Label>
                       <Select onValueChange={setInsuranceStatus} value={insuranceStatus} disabled={submitting}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select insurance status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1153,31 +1205,44 @@ export default function UpdateCarForm() {
                         type="date"
                         value={taxValidity}
                         onChange={(e) => setTaxValidity(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={submitting}
                       />
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px]"
+                    disabled={submitting}
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                    disabled={submitting}
+                  >
                     Next: Specifications
                   </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
 
-{/* Specifications Tab */}
-<TabsContent value="specifications" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Detailed Specifications</CardTitle>
+            {/* Specifications Tab */}
+            <TabsContent value="specifications" className="mt-2 h-full">
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Detailed Specifications</CardTitle>
                   <CardDescription className="text-xs">Update detailed specifications for the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 py-2 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+                <CardContent className="space-y-4 py-2 px-4 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
                   <div className="space-y-3">
                     <EditeSpecifications
                       removeSpecification={removeSpecification}
@@ -1190,44 +1255,65 @@ export default function UpdateCarForm() {
                     />
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px]"
+                    disabled={submitting}
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={submitting}>
-                    Next: images
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                    disabled={submitting}
+                  >
+                    Next: Images
                   </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
             {/* Images Tab */}
             <TabsContent value="images" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Car Images</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Car Images</CardTitle>
                   <CardDescription className="text-xs">Update images for the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 py-2 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+                <CardContent className="space-y-4 py-2 px-4 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
                   <div className="space-y-3">
                     <UpdateMultipleImages images={images} setImages={setImages} disabled={submitting} />
                   </div>
                 </CardContent>
-              
 
-
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={submitting}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    className="h-8 text-xs rounded-[5px]"
+                    disabled={submitting}
+                  >
                     Back
                   </Button>
-                  <Button type="submit" disabled={submitting} className="gap-2" size="sm">
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="h-8 text-xs gap-2 rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                    size="sm"
+                  >
                     {submitting && <Loader2 className="h-3 w-3 animate-spin" />}
                     Update Car
                   </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
-
-            
           </div>
         </Tabs>
       </form>

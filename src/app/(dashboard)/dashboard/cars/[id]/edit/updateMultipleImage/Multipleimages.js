@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { X, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -28,7 +30,7 @@ export default function UpdateMultipleImages({ images, setImages, disabled }) {
             type="button"
             variant="default"
             size="sm"
-            className="text-xs h-7"
+            className="text-xs h-7 rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
             onClick={() => setIsGalleryOpen(true)}
             disabled={disabled}
           >
@@ -39,18 +41,18 @@ export default function UpdateMultipleImages({ images, setImages, disabled }) {
       </div>
 
       {images.length === 0 ? (
-        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center mt-4">
+        <div className="border-2 border-dashed border-brand-light rounded-[5px] p-6 text-center mt-4 hover:border-brand-dark transition-colors">
           <div className="flex flex-col items-center justify-center">
-            <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+            <ImageIcon className="h-8 w-8 text-brand-primary/60 mb-2" />
             <p className="text-xs text-muted-foreground mb-2">No images selected</p>
             <p className="text-xs text-muted-foreground">Select images from gallery</p>
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-8 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-8 gap-3 mt-4">
           {images.map((image, index) => (
             <div key={index} className="relative group">
-              <div className="aspect-square rounded-md overflow-hidden border">
+              <div className="aspect-square rounded-[5px] overflow-hidden border border-brand-light shadow-sm">
                 <img
                   src={image.url || "/placeholder.svg"}
                   alt={`Image ${index + 1}`}
@@ -60,7 +62,7 @@ export default function UpdateMultipleImages({ images, setImages, disabled }) {
               <button
                 type="button"
                 onClick={() => removeImage(index)}
-                className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-1 right-1 bg-brand-primary text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                 disabled={disabled}
               >
                 <X className="h-3 w-3" />
@@ -72,9 +74,9 @@ export default function UpdateMultipleImages({ images, setImages, disabled }) {
 
       {/* Gallery Modal */}
       <Dialog open={isGalleryOpen} onOpenChange={setIsGalleryOpen}>
-        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto rounded-[5px] border-brand-light">
           <DialogHeader>
-            <DialogTitle className="text-xl">Select Images from Gallery</DialogTitle>
+            <DialogTitle className="text-xl text-brand-primary">Select Images from Gallery</DialogTitle>
             <DialogDescription>Choose multiple images from your gallery to use for this car.</DialogDescription>
           </DialogHeader>
           <div className="mt-4">

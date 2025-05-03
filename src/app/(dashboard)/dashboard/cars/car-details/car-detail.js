@@ -66,7 +66,9 @@ export default function CarDetail({ id }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [variationToDelete, setVariationToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [viewMode, setViewMode] = useState("table") // "grid" or "table"
+  // 1. Remove the viewMode state since we're only using table view
+  // Find and remove this line:
+  // const [viewMode, setViewMode] = useState("table") // "grid" or "table"
 
   useEffect(() => {
     if (id) {
@@ -149,32 +151,32 @@ export default function CarDetail({ id }) {
   // Render loading state
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-4 max-w-7xl space-y-6">
+      <div className="container mx-auto px-3 py-3 max-w-6xl space-y-4">
         <div className="flex items-center gap-2">
-          <Skeleton className="h-9 w-20" />
-          <Skeleton className="h-5 w-5" />
-          <Skeleton className="h-9 w-28" />
+          <Skeleton className="h-8 w-16" />
+          <Skeleton className="h-4 w-4" />
+          <Skeleton className="h-8 w-24" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-3">
-            <Skeleton className="h-[350px] w-full rounded-lg" />
-            <div className="flex gap-2 overflow-x-auto py-1">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-2">
+            <Skeleton className="h-[300px] w-full rounded-[5px]" />
+            <div className="flex gap-1.5 overflow-x-auto py-1">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-16 w-16 flex-shrink-0 rounded-md" />
+                <Skeleton key={i} className="h-14 w-14 flex-shrink-0 rounded-[5px]" />
               ))}
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Skeleton className="h-7 w-3/4" />
-              <Skeleton className="h-5 w-1/2" />
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
             </div>
-            <Skeleton className="h-[180px] w-full rounded-lg" />
-            <div className="space-y-2">
+            <Skeleton className="h-[160px] w-full rounded-[5px]" />
+            <div className="space-y-1.5">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-10 w-full" />
+                <Skeleton key={i} className="h-8 w-full" />
               ))}
             </div>
           </div>
@@ -186,18 +188,20 @@ export default function CarDetail({ id }) {
   // Render error state
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-4 max-w-7xl">
-        <Button variant="outline" onClick={() => router.back()} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+      <div className="container mx-auto px-3 py-3 max-w-6xl">
+        <Button variant="outline" size="sm" onClick={() => router.back()} className="mb-3">
+          <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back
         </Button>
 
-        <div className="bg-destructive/15 p-5 rounded-lg text-destructive">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="h-5 w-5" />
-            <h2 className="text-lg font-semibold">Error Loading Car Details</h2>
+        <div className="bg-destructive/15 p-4 rounded-[5px] text-destructive">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="h-4 w-4" />
+            <h2 className="text-base font-semibold">Error Loading Car Details</h2>
           </div>
-          <p className="mb-3">{error}</p>
-          <Button onClick={() => fetchCarDetails(id)}>Try Again</Button>
+          <p className="text-sm mb-3">{error}</p>
+          <Button size="sm" onClick={() => fetchCarDetails(id)}>
+            Try Again
+          </Button>
         </div>
       </div>
     )
@@ -206,16 +210,18 @@ export default function CarDetail({ id }) {
   // Render no data state
   if (!car) {
     return (
-      <div className="container mx-auto px-4 py-4 max-w-7xl">
-        <Button variant="outline" onClick={() => router.back()} className="mb-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+      <div className="container mx-auto px-3 py-3 max-w-6xl">
+        <Button variant="outline" size="sm" onClick={() => router.back()} className="mb-3">
+          <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back
         </Button>
 
-        <div className="bg-muted p-5 rounded-lg text-center">
-          <Car className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
-          <h2 className="text-lg font-semibold mb-2">Car Not Found</h2>
-          <p className="text-muted-foreground mb-3">The car you're looking for doesn't exist or has been removed.</p>
-          <Button asChild>
+        <div className="bg-muted p-4 rounded-[5px] text-center">
+          <Car className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+          <h2 className="text-base font-semibold mb-1.5">Car Not Found</h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            The car you're looking for doesn't exist or has been removed.
+          </p>
+          <Button size="sm" asChild>
             <Link href="/dashboard/cars">View All Cars</Link>
           </Button>
         </div>
@@ -224,38 +230,62 @@ export default function CarDetail({ id }) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 max-w-7xl space-y-6">
+    <div
+      className={`container mx-auto px-3 py-3 max-w-6xl space-y-4 relative ${isDeleting ? "pointer-events-none" : ""}`}
+    >
+      {isDeleting && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card p-6 rounded-[5px] shadow-lg text-center max-w-md w-full border border-brand-primary/20">
+            <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-brand-primary" />
+            <h3 className="font-medium text-base mb-2">Deleting Variation</h3>
+            <p className="text-muted-foreground text-sm">Please wait while we process your request...</p>
+          </div>
+        </div>
+      )}
       {/* Header with navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => router.back()}>
-            <ArrowLeft className="mr-1 h-3.5 w-3.5" /> Back
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.back()}
+            className="h-7 px-2 text-xs hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
+            disabled={isDeleting}
+          >
+            <ArrowLeft className="mr-1 h-3 w-3" /> Back
           </Button>
-          <div className="flex items-center text-muted-foreground text-sm">
+          <div className="flex items-center text-muted-foreground text-xs">
             <Link href="/dashboard" className="hover:underline">
               Dashboard
             </Link>
-            <ChevronRight className="h-3.5 w-3.5 mx-1" />
+            <ChevronRight className="h-3 w-3 mx-1" />
             <Link href="/dashboard/cars" className="hover:underline">
               Cars
             </Link>
-            <ChevronRight className="h-3.5 w-3.5 mx-1" />
-            <span className="text-foreground font-medium truncate">{car.model}</span>
+            <ChevronRight className="h-3 w-3 mx-1" />
+            <span className="text-foreground font-medium truncate max-w-[150px]">{car.model}</span>
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <Button asChild size="sm">
-            <Link href={`/dashboard/cars/${car.id}/edit`}>Edit Car</Link>
+        <div className="flex gap-1.5">
+          <Button
+            asChild
+            size="sm"
+            className="h-7 px-2 text-xs bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
+            disabled={isDeleting}
+          >
+            <Link href={`/dashboard/cars/${car.id}/edit`}>
+              <Pencil className="mr-1 h-3 w-3" /> Edit Car
+            </Link>
           </Button>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left column - Car images */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+        <div className="lg:col-span-2 space-y-3">
+          <div className="relative aspect-video bg-muted rounded-[5px] overflow-hidden border border-gray-200">
             {car.images && car.images.length > 0 ? (
               <img
                 src={car.images[0] || "/placeholder.svg"}
@@ -268,28 +298,31 @@ export default function CarDetail({ id }) {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Car className="h-12 w-12 text-muted-foreground" />
+                <Car className="h-10 w-10 text-muted-foreground" />
               </div>
             )}
 
             {car.images && car.images.length > 0 && (
               <Button
-                className="absolute bottom-3 right-3"
+                className="absolute bottom-2 right-2"
                 size="sm"
+                variant="secondary"
                 onClick={() => openImagePreview(car.images, car.model)}
+                className="h-7 px-2 text-xs"
+                disabled={isDeleting}
               >
-                <ImageIcon className="mr-1.5 h-3.5 w-3.5" /> View All Images
+                <ImageIcon className="mr-1 h-3 w-3" /> View All Images
               </Button>
             )}
           </div>
 
           {car.images && car.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto py-1 pb-2">
+            <div className="flex gap-1.5 overflow-x-auto py-1 pb-1.5">
               {car.images.map((image, index) => (
                 <div
                   key={index}
-                  className="h-16 w-16 flex-shrink-0 rounded-md overflow-hidden border cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => openImagePreview(car.images, car.model)}
+                  className={`h-10 w-10 flex-shrink-0 rounded-[5px] overflow-hidden border border-gray-200 ${isDeleting ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-80 transition-opacity"}`}
+                  onClick={isDeleting ? undefined : () => openImagePreview(car.images, car.model)}
                 >
                   <img
                     src={image || "/placeholder.svg"}
@@ -297,7 +330,7 @@ export default function CarDetail({ id }) {
                     className="h-full w-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null
-                      e.target.src = "/placeholder.svg?height=64&width=64"
+                      e.target.src = "/placeholder.svg?height=56&width=56"
                     }}
                   />
                 </div>
@@ -306,43 +339,43 @@ export default function CarDetail({ id }) {
           )}
 
           {/* Car details tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-            <TabsList className="grid grid-cols-4 mb-4">
-              <TabsTrigger value="details" className="text-xs py-1.5">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-3">
+            <TabsList className="grid grid-cols-4 mb-3 h-8 bg-brand-light/50">
+              <TabsTrigger value="details" className="text-xs py-1" disabled={isDeleting}>
                 Basic Details
               </TabsTrigger>
-              <TabsTrigger value="technical" className="text-xs py-1.5">
+              <TabsTrigger value="technical" className="text-xs py-1" disabled={isDeleting}>
                 Technical
               </TabsTrigger>
-              <TabsTrigger value="specifications" className="text-xs py-1.5">
+              <TabsTrigger value="specifications" className="text-xs py-1" disabled={isDeleting}>
                 Specifications
               </TabsTrigger>
-              <TabsTrigger value="variations" className="text-xs py-1.5">
+              <TabsTrigger value="variations" className="text-xs py-1" disabled={isDeleting}>
                 Variations
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="details" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Basic Information</CardTitle>
+            <TabsContent value="details" className="space-y-3 mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Card className="rounded-[5px] shadow-sm border border-gray-200">
+                  <CardHeader className="pb-1.5 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium">Basic Information</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 pt-0">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Model</span>
-                        <p className="text-sm font-medium">{car.model || "N/A"}</p>
+                  <CardContent className="space-y-1.5 pt-0 px-3 pb-3">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Model</span>
+                        <p className="text-xs font-medium">{car.model || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Year</span>
-                        <p className="text-sm font-medium">{car.year || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Year</span>
+                        <p className="text-xs font-medium">{car.year || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Brand</span>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Brand</span>
                         <div className="flex items-center gap-1">
                           {car.brand?.image && (
-                            <div className="h-4 w-4 rounded overflow-hidden bg-muted">
+                            <div className="h-3 w-3 rounded overflow-hidden bg-muted">
                               <img
                                 src={car.brand.image || "/placeholder.svg"}
                                 alt={car.brand.name}
@@ -350,64 +383,64 @@ export default function CarDetail({ id }) {
                               />
                             </div>
                           )}
-                          <p className="text-sm font-medium">{car.brand?.name || "Unknown"}</p>
+                          <p className="text-xs font-medium">{car.brand?.name || "Unknown"}</p>
                         </div>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Price</span>
-                        <p className="text-sm font-medium">{car.price ? `$${car.price.toLocaleString()}` : "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Price</span>
+                        <p className="text-xs font-medium">{car.price ? `$${car.price.toLocaleString()}` : "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Color</span>
-                        <p className="text-sm font-medium">{car.color || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Color</span>
+                        <p className="text-xs font-medium">{car.color || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Condition</span>
-                        <p className="text-sm font-medium">{car.condition || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Condition</span>
+                        <p className="text-xs font-medium">{car.condition || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Body Type</span>
-                        <p className="text-sm font-medium">{car.bodyType || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Body Type</span>
+                        <p className="text-xs font-medium">{car.bodyType || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Manufactured In</span>
-                        <p className="text-sm font-medium">{car.manufactured || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Manufactured In</span>
+                        <p className="text-xs font-medium">{car.manufactured || "N/A"}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Additional Information</CardTitle>
+                <Card className="rounded-[5px] shadow-sm border border-gray-200">
+                  <CardHeader className="pb-1.5 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium">Additional Information</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 pt-0">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Registration</span>
-                        <p className="text-sm font-medium">{car.registration || "N/A"}</p>
+                  <CardContent className="space-y-1.5 pt-0 px-3 pb-3">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Registration</span>
+                        <p className="text-xs font-medium">{car.registration || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Previous Owners</span>
-                        <p className="text-sm font-medium">{car.ownerCount || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Previous Owners</span>
+                        <p className="text-xs font-medium">{car.ownerCount || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Insurance Status</span>
-                        <p className="text-sm font-medium">{car.insuranceStatus || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Insurance Status</span>
+                        <p className="text-xs font-medium">{car.insuranceStatus || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Tax Validity</span>
-                        <p className="text-sm font-medium">
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Tax Validity</span>
+                        <p className="text-xs font-medium">
                           {car.taxValidity ? format(new Date(car.taxValidity), "dd MMM yyyy") : "N/A"}
                         </p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Safety Rating</span>
-                        <p className="text-sm font-medium">{car.safetyRating || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Safety Rating</span>
+                        <p className="text-xs font-medium">{car.safetyRating || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Warranty</span>
-                        <p className="text-sm font-medium">{car.warranty || "N/A"}</p>
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] text-muted-foreground">Warranty</span>
+                        <p className="text-xs font-medium">{car.warranty || "N/A"}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -415,111 +448,111 @@ export default function CarDetail({ id }) {
               </div>
 
               {car.description && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Description</h3>
-                  <div className="p-4 bg-muted/50 rounded-md">
-                    <p className="text-sm">{car.description}</p>
+                <div className="space-y-1.5">
+                  <h3 className="text-xs font-medium">Description</h3>
+                  <div className="p-3 bg-muted/50 rounded-[5px]">
+                    <p className="text-xs">{car.description}</p>
                   </div>
                 </div>
               )}
             </TabsContent>
 
-            <TabsContent value="technical" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Engine & Performance</CardTitle>
+            <TabsContent value="technical" className="space-y-3 mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Card className="rounded-[5px] shadow-sm border border-gray-200">
+                  <CardHeader className="pb-1.5 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium">Engine & Performance</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 pt-0">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Gauge className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Engine Size</span>
+                  <CardContent className="space-y-1.5 pt-0 px-3 pb-3">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Gauge className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Engine Size</span>
                         </div>
-                        <p className="text-sm font-medium">{car.engineSize ? `${car.engineSize}L` : "N/A"}</p>
+                        <p className="text-xs font-medium">{car.engineSize ? `${car.engineSize}L` : "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Zap className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Horsepower</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Zap className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Horsepower</span>
                         </div>
-                        <p className="text-sm font-medium">{car.horsepower ? `${car.horsepower} HP` : "N/A"}</p>
+                        <p className="text-xs font-medium">{car.horsepower ? `${car.horsepower} HP` : "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Dumbbell className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Torque</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Dumbbell className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Torque</span>
                         </div>
-                        <p className="text-sm font-medium">{car.torque ? `${car.torque} Nm` : "N/A"}</p>
+                        <p className="text-xs font-medium">{car.torque ? `${car.torque} Nm` : "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Speedometer className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Top Speed</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Speedometer className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Top Speed</span>
                         </div>
-                        <p className="text-sm font-medium">{car.topSpeed ? `${car.topSpeed} km/h` : "N/A"}</p>
+                        <p className="text-xs font-medium">{car.topSpeed ? `${car.topSpeed} km/h` : "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Timer className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">0-100 km/h</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Timer className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">0-100 km/h</span>
                         </div>
-                        <p className="text-sm font-medium">{car.acceleration ? `${car.acceleration}s` : "N/A"}</p>
+                        <p className="text-xs font-medium">{car.acceleration ? `${car.acceleration}s` : "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Compass className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Wheel Drive</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Compass className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Wheel Drive</span>
                         </div>
-                        <p className="text-sm font-medium">{car.wheelDrive || "N/A"}</p>
+                        <p className="text-xs font-medium">{car.wheelDrive || "N/A"}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Fuel & Transmission</CardTitle>
+                <Card className="rounded-[5px] shadow-sm border border-gray-200">
+                  <CardHeader className="pb-1.5 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium">Fuel & Transmission</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 pt-0">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Fuel className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Fuel Type</span>
+                  <CardContent className="space-y-1.5 pt-0 px-3 pb-3">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Fuel className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Fuel Type</span>
                         </div>
-                        <p className="text-sm font-medium">{car.fuelType || "N/A"}</p>
+                        <p className="text-xs font-medium">{car.fuelType || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Droplets className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Fuel Tank</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Droplets className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Fuel Tank</span>
                         </div>
-                        <p className="text-sm font-medium">
+                        <p className="text-xs font-medium">
                           {car.fuelTankCapacity ? `${car.fuelTankCapacity}L` : "N/A"}
                         </p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Leaf className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Fuel Economy</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Leaf className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Fuel Economy</span>
                         </div>
-                        <p className="text-sm font-medium">{car.fuelEconomy ? `${car.fuelEconomy} km/L` : "N/A"}</p>
+                        <p className="text-xs font-medium">{car.fuelEconomy ? `${car.fuelEconomy} km/L` : "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Cog className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Transmission</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Cog className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Transmission</span>
                         </div>
-                        <p className="text-sm font-medium">{car.transmission || "N/A"}</p>
+                        <p className="text-xs font-medium">{car.transmission || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Milestone className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Mileage</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Milestone className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Mileage</span>
                         </div>
-                        <p className="text-sm font-medium">
+                        <p className="text-xs font-medium">
                           {car.mileage ? `${car.mileage.toLocaleString()} km` : "N/A"}
                         </p>
                       </div>
@@ -527,81 +560,81 @@ export default function CarDetail({ id }) {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Interior & Capacity</CardTitle>
+                <Card className="rounded-[5px] shadow-sm border border-gray-200">
+                  <CardHeader className="pb-1.5 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium">Interior & Capacity</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 pt-0">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Armchair className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Seats</span>
+                  <CardContent className="space-y-1.5 pt-0 px-3 pb-3">
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Armchair className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Seats</span>
                         </div>
-                        <p className="text-sm font-medium">{car.seats || "N/A"}</p>
+                        <p className="text-xs font-medium">{car.seats || "N/A"}</p>
                       </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Truck className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">Doors</span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-0.5">
+                          <Truck className="h-2.5 w-2.5 text-muted-foreground" />
+                          <span className="text-[10px] text-muted-foreground">Doors</span>
                         </div>
-                        <p className="text-sm font-medium">{car.doors || "N/A"}</p>
+                        <p className="text-xs font-medium">{car.doors || "N/A"}</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Features</CardTitle>
+                <Card className="rounded-[5px] shadow-sm border border-gray-200">
+                  <CardHeader className="pb-1.5 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium">Features</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2 pt-0">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex items-center gap-2">
-                        <div className={`h-3 w-3 rounded-full ${car.gps ? "bg-green-500" : "bg-muted"}`}></div>
-                        <span className="text-xs">GPS Navigation</span>
+                  <CardContent className="space-y-1.5 pt-0 px-3 pb-3">
+                    <div className="grid grid-cols-2 gap-1">
+                      <div className="flex items-center gap-1.5">
+                        <div className={`h-2 w-2 rounded-full ${car.gps ? "bg-green-500" : "bg-muted"}`}></div>
+                        <span className="text-[10px]">GPS Navigation</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`h-3 w-3 rounded-full ${car.sunroof ? "bg-green-500" : "bg-muted"}`}></div>
-                        <span className="text-xs">Sunroof</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`h-2 w-2 rounded-full ${car.sunroof ? "bg-green-500" : "bg-muted"}`}></div>
+                        <span className="text-[10px]">Sunroof</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <div
-                          className={`h-3 w-3 rounded-full ${car.parkingSensors ? "bg-green-500" : "bg-muted"}`}
+                          className={`h-2 w-2 rounded-full ${car.parkingSensors ? "bg-green-500" : "bg-muted"}`}
                         ></div>
-                        <span className="text-xs">Parking Sensors</span>
+                        <span className="text-[10px]">Parking Sensors</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <div
-                          className={`h-3 w-3 rounded-full ${car.cruiseControl ? "bg-green-500" : "bg-muted"}`}
+                          className={`h-2 w-2 rounded-full ${car.cruiseControl ? "bg-green-500" : "bg-muted"}`}
                         ></div>
-                        <span className="text-xs">Cruise Control</span>
+                        <span className="text-[10px]">Cruise Control</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`h-3 w-3 rounded-full ${car.leatherSeats ? "bg-green-500" : "bg-muted"}`}></div>
-                        <span className="text-xs">Leather Seats</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`h-2 w-2 rounded-full ${car.leatherSeats ? "bg-green-500" : "bg-muted"}`}></div>
+                        <span className="text-[10px]">Leather Seats</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`h-3 w-3 rounded-full ${car.heatedSeats ? "bg-green-500" : "bg-muted"}`}></div>
-                        <span className="text-xs">Heated Seats</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`h-2 w-2 rounded-full ${car.heatedSeats ? "bg-green-500" : "bg-muted"}`}></div>
+                        <span className="text-[10px]">Heated Seats</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`h-3 w-3 rounded-full ${car.bluetooth ? "bg-green-500" : "bg-muted"}`}></div>
-                        <span className="text-xs">Bluetooth</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`h-2 w-2 rounded-full ${car.bluetooth ? "bg-green-500" : "bg-muted"}`}></div>
+                        <span className="text-[10px]">Bluetooth</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <div
-                          className={`h-3 w-3 rounded-full ${car.climateControl ? "bg-green-500" : "bg-muted"}`}
+                          className={`h-2 w-2 rounded-full ${car.climateControl ? "bg-green-500" : "bg-muted"}`}
                         ></div>
-                        <span className="text-xs">Climate Control</span>
+                        <span className="text-[10px]">Climate Control</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`h-3 w-3 rounded-full ${car.keylessEntry ? "bg-green-500" : "bg-muted"}`}></div>
-                        <span className="text-xs">Keyless Entry</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`h-2 w-2 rounded-full ${car.keylessEntry ? "bg-green-500" : "bg-muted"}`}></div>
+                        <span className="text-[10px]">Keyless Entry</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className={`h-3 w-3 rounded-full ${car.rearCamera ? "bg-green-500" : "bg-muted"}`}></div>
-                        <span className="text-xs">Rear Camera</span>
+                      <div className="flex items-center gap-1.5">
+                        <div className={`h-2 w-2 rounded-full ${car.rearCamera ? "bg-green-500" : "bg-muted"}`}></div>
+                        <span className="text-[10px]">Rear Camera</span>
                       </div>
                     </div>
                   </CardContent>
@@ -609,26 +642,26 @@ export default function CarDetail({ id }) {
               </div>
 
               {car.infotainment && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium">Infotainment System</h3>
-                  <div className="p-4 bg-muted/50 rounded-md">
-                    <p className="text-sm">{car.infotainment || "N/A"}</p>
+                <div className="space-y-1.5">
+                  <h3 className="text-xs font-medium">Infotainment System</h3>
+                  <div className="p-3 bg-muted/50 rounded-[5px]">
+                    <p className="text-xs">{car.infotainment || "N/A"}</p>
                   </div>
                 </div>
               )}
             </TabsContent>
 
-            <TabsContent value="specifications" className="space-y-4">
+            <TabsContent value="specifications" className="space-y-3 mt-0">
               {car.spacification && car.spacification.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {car.spacification.map((spec, index) => (
-                    <div key={index} className="space-y-3">
-                      <h3 className="text-base font-medium">{spec.title || `Specification Group ${index + 1}`}</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div key={index} className="space-y-2">
+                      <h3 className="text-xs font-medium">{spec.title || `Specification Group ${index + 1}`}</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {spec.details?.map((detail, detailIndex) => (
-                          <div key={detailIndex} className="flex justify-between p-2 bg-muted/50 rounded-md">
-                            <span className="text-xs text-muted-foreground">{detail.label}</span>
-                            <span className="text-xs font-medium">{detail.value}</span>
+                          <div key={detailIndex} className="flex justify-between p-1.5 bg-muted/50 rounded-[5px]">
+                            <span className="text-[10px] text-muted-foreground">{detail.label}</span>
+                            <span className="text-[10px] font-medium">{detail.value}</span>
                           </div>
                         ))}
                       </div>
@@ -636,45 +669,54 @@ export default function CarDetail({ id }) {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <Info className="h-10 w-10 text-muted-foreground mb-3" />
-                  <h3 className="text-base font-medium">No Specifications Available</h3>
-                  <p className="text-xs text-muted-foreground mt-1">This car doesn't have any specifications listed.</p>
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <Info className="h-8 w-8 text-muted-foreground mb-2" />
+                  <h3 className="text-sm font-medium">No Specifications Available</h3>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    This car doesn't have any specifications listed.
+                  </p>
                 </div>
               )}
             </TabsContent>
 
-            <TabsContent value="variations" className="space-y-4">
+            <TabsContent value="variations" className="space-y-3 mt-0">
               {car.otherVariations && car.otherVariations.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
+                  {/* 2. Update the variations tab content to remove the grid/table toggle and only show table view */}
+                  {/* Replace the variations tab header section with this: */}
                   <div className="flex justify-between items-center">
-                    <h3 className="text-base font-medium">Available Variations</h3>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setViewMode("grid")}
-                        className={`h-7 px-2 ${viewMode === "grid" ? "bg-muted" : ""}`}
-                      >
-                        <span className="text-xs">Grid</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setViewMode("table")}
-                        className={`h-7 px-2 ${viewMode === "table" ? "bg-muted" : ""}`}
-                      >
-                        <span className="text-xs">Table</span>
-                      </Button>
-                    </div>
+                    <h3 className="text-xs font-medium">Available Variations</h3>
                   </div>
 
-                  {viewMode === "table" ? (
-                    <div className="border rounded-md overflow-hidden">
+                  {/* 3. Remove the viewMode toggle buttons */}
+                  {/* Find and remove this code: */}
+                  {/* <div className="flex gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setViewMode("grid")}
+                      className={`h-6 px-1.5 rounded-[5px] border-gray-300 ${viewMode === "grid" ? "bg-brand-light text-brand-primary" : "hover:bg-brand-light/50"}`}
+                    >
+                      <Grid2x2 className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setViewMode("table")}
+                      className={`h-6 px-1.5 rounded-[5px] border-gray-300 ${viewMode === "table" ? "bg-brand-light text-brand-primary" : "hover:bg-brand-light/50"}`}
+                    >
+                      <ListIcon className="h-3 w-3" />
+                    </Button>
+                  </div> */}
+
+                  {/* 4. Remove the viewMode conditional rendering and grid view */}
+                  {/* Replace this code: */}
+                  {/* {viewMode === "table" ? (
+                    <div className="border border-gray-200 rounded-[5px] overflow-hidden">
                       <Table>
-                        <TableHeader>
+                        <TableHeader className="bg-brand-light/30">
                           <TableRow>
-                            <TableHead className="w-[80px]">Image</TableHead>
+                            <TableHead className="w-[60px]">Image</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Color</TableHead>
                             <TableHead>Price</TableHead>
@@ -683,9 +725,9 @@ export default function CarDetail({ id }) {
                         </TableHeader>
                         <TableBody>
                           {car.otherVariations.map((variation) => (
-                            <TableRow key={variation.id}>
-                              <TableCell>
-                                <div className="h-10 w-10 rounded-md overflow-hidden bg-muted">
+                            <TableRow key={variation.id} className="hover:bg-brand-light/30">
+                              <TableCell className="py-1.5">
+                                <div className="h-8 w-8 rounded-[5px] overflow-hidden bg-muted">
                                   {variation.images && variation.images.length > 0 ? (
                                     <img
                                       src={variation.images[0] || "/placeholder.svg"}
@@ -693,51 +735,64 @@ export default function CarDetail({ id }) {
                                       className="h-full w-full object-cover"
                                       onError={(e) => {
                                         e.target.onerror = null
-                                        e.target.src = "/placeholder.svg?height=40&width=40"
+                                        e.target.src = "/placeholder.svg?height=32&width=32"
                                       }}
                                     />
                                   ) : (
                                     <div className="h-full w-full flex items-center justify-center">
-                                      <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                                      <ImageIcon className="h-4 w-4 text-muted-foreground" />
                                     </div>
                                   )}
                                 </div>
                               </TableCell>
-                              <TableCell className="font-medium text-sm">{variation.name}</TableCell>
-                              <TableCell>
-                                <div className="flex items-center gap-1.5">
+                              <TableCell className="font-medium text-xs py-1.5">{variation.name}</TableCell>
+                              <TableCell className="py-1.5">
+                                <div className="flex items-center gap-1">
                                   <div
-                                    className="h-3 w-3 rounded-full border"
+                                    className="h-2.5 w-2.5 rounded-full border"
                                     style={{ backgroundColor: variation.colorHex || "#cccccc" }}
                                   />
-                                  <span className="text-xs">{variation.colorName}</span>
+                                  <span className="text-[10px]">{variation.colorName}</span>
                                 </div>
                               </TableCell>
-                              <TableCell>
-                                <Badge variant="outline" className="text-xs">
-                                  <DollarSign className="h-3 w-3 mr-0.5" />
+                              <TableCell className="py-1.5">
+                                <Badge variant="outline" className="text-[10px] py-0 h-4">
+                                  <DollarSign className="h-2.5 w-2.5 mr-0.5" />
                                   {variation.price?.toLocaleString() || "N/A"}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-right">
+                              <TableCell className="text-right py-1.5">
                                 <div className="flex justify-end gap-1">
-                                  <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
+                                    asChild
+                                    disabled={isDeleting}
+                                  >
                                     <Link href={`/dashboard/variations/${variation.id}`}>
-                                      <Eye className="h-3.5 w-3.5" />
-                                    </Link>
-                                  </Button>
-                                  <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                                    <Link href={`/dashboard/cars/new/EditVariationForm?id=${variation.id}`}>
-                                      <Pencil className="h-3.5 w-3.5" />
+                                      <Eye className="h-3 w-3" />
                                     </Link>
                                   </Button>
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-7 w-7 text-destructive hover:text-destructive"
-                                    onClick={() => confirmDeleteVariation(variation)}
+                                    className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
+                                    asChild
+                                    disabled={isDeleting}
                                   >
-                                    <Trash2 className="h-3.5 w-3.5" />
+                                    <Link href={`/dashboard/cars/new/EditVariationForm?id=${variation.id}`}>
+                                      <Pencil className="h-3 w-3" />
+                                    </Link>
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 rounded-[5px] hover:bg-destructive/10"
+                                    onClick={() => confirmDeleteVariation(variation)}
+                                    disabled={isDeleting}
+                                  >
+                                    <Trash2 className="h-3 w-3 text-red-500" />
                                   </Button>
                                 </div>
                               </TableCell>
@@ -747,9 +802,9 @@ export default function CarDetail({ id }) {
                       </Table>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {car.otherVariations.map((variation) => (
-                        <Card key={variation.id} className="overflow-hidden">
+                        <Card key={variation.id} className="overflow-hidden rounded-[5px] shadow-sm">
                           <div className="relative aspect-video bg-muted">
                             {variation.images && variation.images.length > 0 ? (
                               <img
@@ -758,65 +813,67 @@ export default function CarDetail({ id }) {
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   e.target.onerror = null
-                                  e.target.src = "/placeholder.svg?height=160&width=240"
+                                  e.target.src = "/placeholder.svg?height=120&width=200"
                                 }}
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <ImageIcon className="h-10 w-10 text-muted-foreground" />
+                                <ImageIcon className="h-8 w-8 text-muted-foreground" />
                               </div>
-                            )}
-
-                            {variation.images && variation.images.length > 0 && (
-                              <Button
-                                size="sm"
-                                variant="secondary"
-                                className="absolute bottom-2 right-2 h-7 px-2 text-xs"
-                                onClick={() => openImagePreview(variation.images, variation.name)}
-                              >
-                                <ImageIcon className="mr-1 h-3 w-3" /> View Images
-                              </Button>
                             )}
                           </div>
 
-                          <CardContent className="p-3 space-y-3">
+                          <CardContent className="p-2 space-y-2">
                             <div>
-                              <h3 className="text-sm font-medium">{variation.name}</h3>
-                              <div className="flex items-center gap-2 mt-1">
+                              <h3 className="text-xs font-medium">{variation.name}</h3>
+                              <div className="flex items-center gap-1.5 mt-0.5">
                                 <div className="flex items-center gap-1">
                                   <div
-                                    className="h-3 w-3 rounded-full border"
+                                    className="h-2.5 w-2.5 rounded-full border"
                                     style={{ backgroundColor: variation.colorHex || "#cccccc" }}
                                   />
-                                  <span className="text-xs text-muted-foreground">{variation.colorName}</span>
+                                  <span className="text-[10px] text-muted-foreground">{variation.colorName}</span>
                                 </div>
                               </div>
                             </div>
 
                             <div className="flex justify-between items-center">
-                              <Badge variant="outline" className="px-2 py-0.5 text-xs">
-                                <DollarSign className="h-3 w-3 mr-0.5" />
+                              <Badge variant="outline" className="px-1.5 py-0 h-4 text-[10px]">
+                                <DollarSign className="h-2.5 w-2.5 mr-0.5" />
                                 {variation.price?.toLocaleString() || "N/A"}
                               </Badge>
 
                               <div className="flex gap-1">
-                                <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
+                                  asChild
+                                  disabled={isDeleting}
+                                >
                                   <Link href={`/dashboard/variations/${variation.id}`}>
-                                    <Eye className="h-3.5 w-3.5" />
-                                  </Link>
-                                </Button>
-                                <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
-                                  <Link href={`/dashboard/variations/edit?id=${variation.id}`}>
-                                    <Pencil className="h-3.5 w-3.5" />
+                                    <Eye className="h-3 w-3" />
                                   </Link>
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-7 w-7 text-destructive hover:text-destructive"
-                                  onClick={() => confirmDeleteVariation(variation)}
+                                  className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
+                                  asChild
+                                  disabled={isDeleting}
                                 >
-                                  <Trash2 className="h-3.5 w-3.5" />
+                                  <Link href={`/dashboard/variations/edit?id=${variation.id}`}>
+                                    <Pencil className="h-3 w-3" />
+                                  </Link>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 text-destructive hover:bg-destructive/10 rounded-[5px]"
+                                  onClick={() => confirmDeleteVariation(variation)}
+                                  disabled={isDeleting}
+                                >
+                                  <Trash2 className="h-3 w-3" />
                                 </Button>
                               </div>
                             </div>
@@ -824,26 +881,123 @@ export default function CarDetail({ id }) {
                         </Card>
                       ))}
                     </div>
-                  )}
+                  )} */}
+
+                  {/* With this simpler table-only version: */}
+                  <div className="border border-gray-200 rounded-[5px] overflow-hidden">
+                    <Table>
+                      <TableHeader className="bg-brand-light/30">
+                        <TableRow>
+                          <TableHead className="w-[60px]">Image</TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Color</TableHead>
+                          <TableHead>Price</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {car.otherVariations.map((variation) => (
+                          <TableRow key={variation.id} className="hover:bg-brand-light/30">
+                            <TableCell className="py-1.5">
+                              <div className="h-8 w-8 rounded-[5px] overflow-hidden bg-muted">
+                                {variation.images && variation.images.length > 0 ? (
+                                  <img
+                                    src={variation.images[0] || "/placeholder.svg"}
+                                    alt={variation.name}
+                                    className="h-full w-full object-cover"
+                                    onError={(e) => {
+                                      e.target.onerror = null
+                                      e.target.src = "/placeholder.svg?height=32&width=32"
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="h-full w-full flex items-center justify-center">
+                                    <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-medium text-xs py-1.5">{variation.name}</TableCell>
+                            <TableCell className="py-1.5">
+                              <div className="flex items-center gap-1">
+                                <div
+                                  className="h-2.5 w-2.5 rounded-full border"
+                                  style={{ backgroundColor: variation.colorHex || "#cccccc" }}
+                                />
+                                <span className="text-[10px]">{variation.colorName}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="py-1.5">
+                              <Badge variant="outline" className="text-[10px] py-0 h-4">
+                                <DollarSign className="h-2.5 w-2.5 mr-0.5" />
+                                {variation.price?.toLocaleString() || "N/A"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right py-1.5">
+                              <div className="flex justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
+                                  asChild
+                                  disabled={isDeleting}
+                                >
+                                  <Link href={`/dashboard/variations/${variation.id}`}>
+                                    <Eye className="h-3 w-3" />
+                                  </Link>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
+                                  asChild
+                                  disabled={isDeleting}
+                                >
+                                  <Link href={`/dashboard/cars/new/EditVariationForm?id=${variation.id}`}>
+                                    <Pencil className="h-3 w-3" />
+                                  </Link>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 rounded-[5px] hover:bg-destructive/10"
+                                  onClick={() => confirmDeleteVariation(variation)}
+                                  disabled={isDeleting}
+                                >
+                                  <Trash2 className="h-3 w-3 text-red-500" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
 
                   <div className="flex justify-end">
-                    <Button variant="outline" size="sm" asChild className="h-8 text-xs">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="h-7 text-[10px] rounded-[5px] hover:bg-brand-light hover:text-brand-primary"
+                      disabled={isDeleting}
+                    >
                       <Link href={`/dashboard/cars/new/${car.id}/AddOtherVariationForm`}>
-                        <Plus className="mr-1 h-3.5 w-3.5" /> Add New Variation
+                        <Plus className="mr-1 h-3 w-3" /> Add New Variation
                       </Link>
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <Palette className="h-10 w-10 text-muted-foreground mb-3" />
-                  <h3 className="text-base font-medium">No Variations Available</h3>
-                  <p className="text-xs text-muted-foreground mt-1 mb-3">
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <Palette className="h-8 w-8 text-muted-foreground mb-2" />
+                  <h3 className="text-sm font-medium">No Variations Available</h3>
+                  <p className="text-[10px] text-muted-foreground mt-1 mb-2">
                     This car doesn't have any variations listed.
                   </p>
-                  <Button size="sm" asChild>
+                  <Button size="sm" asChild className="h-7 text-[10px]">
                     <Link href={`/dashboard/cars/new/${car.id}/AddOtherVariationForm`}>
-                      <Plus className="mr-1 h-3.5 w-3.5" /> Add Variation
+                      <Plus className="mr-1 h-3 w-3" /> Add Variation
                     </Link>
                   </Button>
                 </div>
@@ -853,34 +1007,34 @@ export default function CarDetail({ id }) {
         </div>
 
         {/* Right column - Summary and actions */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold">{car.model}</h1>
-            <div className="flex flex-wrap gap-1.5">
-              <Badge variant="outline" className="flex items-center gap-1 text-xs">
-                <Calendar className="h-3 w-3" /> {car.year}
+            <h1 className="text-xl font-bold">{car.model}</h1>
+            <div className="flex flex-wrap gap-1">
+              <Badge variant="outline" className="flex items-center gap-0.5 text-[10px] h-4 px-1.5">
+                <Calendar className="h-2.5 w-2.5" /> {car.year}
               </Badge>
-              <Badge variant="secondary" className="flex items-center gap-1 text-xs">
-                <Tag className="h-3 w-3" /> {car.brand?.name || "Unknown"}
+              <Badge variant="secondary" className="flex items-center gap-0.5 text-[10px] h-4 px-1.5">
+                <Tag className="h-2.5 w-2.5" /> {car.brand?.name || "Unknown"}
               </Badge>
               {car.price && (
-                <Badge variant="outline" className="flex items-center gap-1 text-xs">
-                  <DollarSign className="h-3 w-3" /> {car.price.toLocaleString()}
+                <Badge variant="outline" className="flex items-center gap-0.5 text-[10px] h-4 px-1.5">
+                  <DollarSign className="h-2.5 w-2.5" /> {car.price.toLocaleString()}
                 </Badge>
               )}
               {car.bodyType && (
-                <Badge variant="outline" className="flex items-center gap-1 text-xs">
-                  <Car className="h-3 w-3" /> {car.bodyType}
+                <Badge variant="outline" className="flex items-center gap-0.5 text-[10px] h-4 px-1.5">
+                  <Car className="h-2.5 w-2.5" /> {car.bodyType}
                 </Badge>
               )}
             </div>
           </div>
 
-          <Card>
-            <CardContent className="p-4 space-y-3">
-              <h3 className="text-sm font-medium">Car Summary</h3>
+          <Card className="rounded-[5px] shadow-sm border border-gray-200 bg-white">
+            <CardContent className="p-3 space-y-2">
+              <h3 className="text-xs font-medium">Car Summary</h3>
 
-              <div className="space-y-2 text-sm">
+              <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Model:</span>
                   <span className="font-medium">{car.model}</span>
@@ -929,14 +1083,25 @@ export default function CarDetail({ id }) {
 
               <Separator className="my-1" />
 
-              <div className="space-y-2">
-                <Button className="w-full h-8 text-xs" asChild>
-                  <Link href={`/dashboard/cars/${car.id}/edit`}>Edit Car Details</Link>
+              <div className="space-y-1.5">
+                <Button
+                  className="w-full h-7 text-[10px] bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
+                  asChild
+                  disabled={isDeleting}
+                >
+                  <Link href={`/dashboard/cars/${car.id}/edit`}>
+                    <Pencil className="mr-1 h-3 w-3" /> Edit Car Details
+                  </Link>
                 </Button>
 
-                <Button variant="outline" className="w-full h-8 text-xs" asChild>
+                <Button
+                  variant="outline"
+                  className="w-full h-7 text-[10px] rounded-[5px] hover:bg-brand-light hover:text-brand-primary"
+                  asChild
+                  disabled={isDeleting}
+                >
                   <Link href={`/dashboard/cars/new/${car.id}/AddOtherVariationForm`}>
-                    <Plus className="mr-1 h-3.5 w-3.5" /> Add Variation
+                    <Plus className="mr-1 h-3 w-3" /> Add Variation
                   </Link>
                 </Button>
               </div>
@@ -944,24 +1109,24 @@ export default function CarDetail({ id }) {
           </Card>
 
           {car.otherVariations && car.otherVariations.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium">Available Variations</h3>
+            <div className="space-y-2">
+              <h3 className="text-xs font-medium">Available Variations</h3>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1">
                 {car.otherVariations.slice(0, 5).map((variation) => (
                   <div
                     key={variation.id}
-                    className="flex items-center justify-between p-2 bg-muted/50 rounded-md hover:bg-muted transition-colors"
+                    className="flex items-center justify-between p-1.5 bg-brand-light/30 rounded-[5px] hover:bg-brand-light/50 transition-colors"
                   >
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
                       <div
-                        className="h-3 w-3 rounded-full border"
+                        className="h-2.5 w-2.5 rounded-full border"
                         style={{ backgroundColor: variation.colorHex || "#cccccc" }}
                       />
-                      <span className="text-xs">{variation.name}</span>
+                      <span className="text-[10px]">{variation.name}</span>
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      <DollarSign className="h-2.5 w-2.5 mr-0.5" />
+                    <Badge variant="outline" className="text-[10px] py-0 h-4 px-1">
+                      <DollarSign className="h-2 w-2 mr-0.5" />
                       {variation.price?.toLocaleString() || "N/A"}
                     </Badge>
                   </div>
@@ -971,8 +1136,9 @@ export default function CarDetail({ id }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="w-full text-xs h-7 mt-1"
+                    className="w-full text-[10px] h-6 mt-0.5"
                     onClick={() => setActiveTab("variations")}
+                    disabled={isDeleting}
                   >
                     View all {car.otherVariations.length} variations
                   </Button>
@@ -982,30 +1148,30 @@ export default function CarDetail({ id }) {
           )}
 
           {car.brand && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium">Brand Information</h3>
+            <div className="space-y-2">
+              <h3 className="text-xs font-medium">Brand Information</h3>
 
-              <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-md">
+              <div className="flex items-center gap-2 p-2 bg-brand-light/30 rounded-[5px] border border-brand-primary/10">
                 {car.brand.image && (
-                  <div className="h-10 w-10 rounded overflow-hidden bg-muted flex-shrink-0">
+                  <div className="h-8 w-8 rounded-[5px] overflow-hidden bg-muted flex-shrink-0">
                     <img
                       src={car.brand.image || "/placeholder.svg"}
                       alt={car.brand.name}
                       className="h-full w-full object-contain"
                       onError={(e) => {
                         e.target.onerror = null
-                        e.target.src = "/placeholder.svg?height=40&width=40"
+                        e.target.src = "/placeholder.svg?height=32&width=32"
                       }}
                     />
                   </div>
                 )}
                 <div>
-                  <h4 className="text-sm font-medium">{car.brand.name}</h4>
+                  <h4 className="text-xs font-medium">{car.brand.name}</h4>
                   <Link
                     href={`/dashboard/brands/${car.brand.id}`}
-                    className="text-xs text-primary flex items-center hover:underline"
+                    className={`text-[10px] text-primary flex items-center hover:underline ${isDeleting ? "pointer-events-none opacity-50" : ""}`}
                   >
-                    View brand details <ExternalLink className="ml-0.5 h-2.5 w-2.5" />
+                    View brand details <ExternalLink className="ml-0.5 h-2 w-2" />
                   </Link>
                 </div>
               </div>
@@ -1016,13 +1182,13 @@ export default function CarDetail({ id }) {
 
       {/* Image preview dialog */}
       <Dialog open={imagePreviewOpen} onOpenChange={setImagePreviewOpen}>
-        <DialogContent className="sm:max-w-3xl">
+        <DialogContent className="sm:max-w-2xl rounded-[5px] border-brand-primary/20">
           <DialogHeader>
-            <DialogTitle>Images for {selectedImageTitle}</DialogTitle>
+            <DialogTitle className="text-sm">Images for {selectedImageTitle}</DialogTitle>
           </DialogHeader>
-          <div className="mt-3">
+          <div className="mt-2">
             {selectedImages.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <Carousel className="w-full">
                   <CarouselContent>
                     {selectedImages.map((image, index) => (
@@ -1031,7 +1197,7 @@ export default function CarDetail({ id }) {
                           <img
                             src={image || "/placeholder.svg"}
                             alt={`${selectedImageTitle} image ${index + 1}`}
-                            className="max-h-[50vh] w-auto max-w-full object-contain rounded-md"
+                            className="max-h-[40vh] w-auto max-w-full object-contain rounded-[5px]"
                             onError={(e) => {
                               e.target.onerror = null
                               e.target.src = "/placeholder.svg"
@@ -1041,16 +1207,16 @@ export default function CarDetail({ id }) {
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious />
-                  <CarouselNext />
+                  <CarouselPrevious className="h-7 w-7" />
+                  <CarouselNext className="h-7 w-7" />
                 </Carousel>
 
-                <div className="grid grid-cols-6 gap-2">
+                <div className="grid grid-cols-6 gap-1.5">
                   {selectedImages.map((image, index) => (
                     <TooltipProvider key={index}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="aspect-square rounded-md overflow-hidden border cursor-pointer">
+                          <div className="aspect-square rounded-[5px] overflow-hidden border cursor-pointer">
                             <img
                               src={image || "/placeholder.svg"}
                               alt={`Thumbnail ${index + 1}`}
@@ -1062,8 +1228,8 @@ export default function CarDetail({ id }) {
                             />
                           </div>
                         </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-xs">Image {index + 1}</p>
+                        <TooltipContent className="text-[10px]">
+                          <p>Image {index + 1}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -1071,9 +1237,9 @@ export default function CarDetail({ id }) {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-48 text-center">
-                <ImageIcon className="h-10 w-10 text-muted-foreground mb-3" />
-                <h3 className="text-base font-medium">No images available</h3>
+              <div className="flex flex-col items-center justify-center h-40 text-center">
+                <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                <h3 className="text-sm font-medium">No images available</h3>
               </div>
             )}
           </div>
@@ -1082,25 +1248,31 @@ export default function CarDetail({ id }) {
 
       {/* Delete confirmation dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-[5px] border-red-200">
           <DialogHeader>
-            <DialogTitle>Delete Variation</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-sm">Delete Variation</DialogTitle>
+            <DialogDescription className="text-xs">
               Are you sure you want to delete the variation "{variationToDelete?.name}"? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-4">
-            <Button variant="outline" size="sm" onClick={() => setDeleteDialogOpen(false)}>
+          <DialogFooter className="mt-3">
+            <Button variant="outline" size="sm" onClick={() => setDeleteDialogOpen(false)} className="h-7 text-xs">
               Cancel
             </Button>
-            <Button variant="destructive" size="sm" onClick={deleteVariation} disabled={isDeleting}>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={deleteVariation}
+              disabled={isDeleting}
+              className="h-7 text-xs rounded-[5px] bg-red-500 hover:bg-red-600"
+            >
               {isDeleting ? (
                 <>
-                  <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Deleting...
+                  <Loader2 className="h-3 w-3 mr-1 animate-spin" /> Deleting...
                 </>
               ) : (
                 <>
-                  <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete
+                  <Trash2 className="h-3 w-3 mr-1" /> Delete
                 </>
               )}
             </Button>
@@ -1110,4 +1282,3 @@ export default function CarDetail({ id }) {
     </div>
   )
 }
-

@@ -11,7 +11,6 @@ import {
   BarChart,
   Truck,
   Gauge,
-  HelpCircle,
   FileCode,
   Sliders,
   Tag,
@@ -23,11 +22,14 @@ import {
   HardDrive,
   FileDigit,
   UserCog,
-  BookOpen,
+  ChevronRight,
+  LogOut,
+  FileImage,
+  Film,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import {
   Sidebar,
@@ -60,6 +62,33 @@ import LogoutButton from "./logoutbutton/Logout"
 
 export function AppSidebar() {
   const pathname = usePathname()
+
+  const [logo, setLogo] = useState(null)
+  const [logoLoading, setLogoLoading] = useState(true)
+
+  // console.log("object",logo[0])
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        setLogoLoading(true)
+        const response = await fetch("/api/supabasPrisma/logo")
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch logo")
+        }
+
+        const data = await response.json()
+        setLogo(data)
+      } catch (error) {
+        console.error("Error fetching logo:", error)
+      } finally {
+        setLogoLoading(false)
+      }
+    }
+
+    fetchLogo()
+  }, [])
 
   // Create a single array for all menu items with nested structure
   const menuData = [
@@ -95,7 +124,11 @@ export function AppSidebar() {
           path: "/dashboard/maintenance",
           icon: Wrench,
           dropdownKey: "maintenance",
-          subItems: [{ title: "Images Gallery", path: "/dashboard/images-gallery", icon: ImageIcon }],
+          subItems: [
+            { title: "Images Gallery", path: "/dashboard/images-gallery", icon: ImageIcon },
+            { title: "Logo", path: "/dashboard/logos", icon: FileImage },
+            { title: "Carousel", path: "/dashboard/car-carousel", icon: Film },
+          ],
         },
         { title: "Parts & Accessories", path: "/dashboard/parts", icon: Gauge },
       ],
@@ -142,7 +175,9 @@ export function AppSidebar() {
   menuData.forEach((section) => {
     section.items.forEach((item) => {
       if (item.dropdownKey) {
-        initialDropdownState[item.dropdownKey] = true // Set all dropdowns open by default
+        // Check if any subitem path matches the current pathname
+        const isActive = item.subItems?.some((subItem) => subItem.path === pathname)
+        initialDropdownState[item.dropdownKey] = isActive // Only open if a subitem is active
       }
     })
   })
@@ -179,41 +214,45 @@ export function AppSidebar() {
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton
                   isActive={isAnyChildActive}
-                  className="py-[20px] rounded-[5px] bg-white   shadow-sm  hover:bg-white "
+                  className={`py-3 rounded-[5px] ${
+                    isAnyChildActive
+                      ? "bg-brand-light border-l-4 border-brand-primary"
+                      : "bg-white hover:bg-brand-light/50"
+                  } shadow-sm transition-all duration-200`}
                 >
-                  <div
-                    className={` flexitems-center justify-center rounded-[5px] ${
-                      isAnyChildActive ? "bg-brand-primary" : "bg-white shadow-sm"
-                    }`}
-                  >
-                    <item.icon className={`p-1 ${isAnyChildActive ? "text-white" : "text-gray-600"}`} />
+                  <div className="flex items-center gap-3">
+                    <item.icon className={`h-5 w-5 ${isAnyChildActive ? "text-brand-primary" : "text-gray-600"}`} />
+                    <span
+                      className={`text-sm font-medium ${isAnyChildActive ? "text-brand-primary" : "text-gray-700"}`}
+                    >
+                      {item.title}
+                    </span>
                   </div>
-                  <span className="text-sm  font-medium text-gray-700">{item.title}</span>
                   <ChevronDown
-                    className={`ml-auto text-gray-500 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
+                    className={`ml-auto h-4 w-4 text-gray-500 transition-transform duration-200 ${
+                      isDropdownOpen ? "rotate-180" : ""
+                    }`}
                   />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2  ">
-                <SidebarMenuSub>
-                  {item.subItems.map((subItem, index) => (
-                    <SidebarMenuSubItem key={subItem.path} className={index > 0 ? "mt-2" : ""}>
+              <CollapsibleContent className="mt-1 pl-2">
+                <SidebarMenuSub className="w-full">
+                  {item.subItems.map((subItem) => (
+                    <SidebarMenuSubItem key={subItem.path} className="mt-1 w-full">
                       <SidebarMenuSubButton
                         asChild
                         isActive={isActive(subItem.path)}
-                        className="py-[20px] rounded-[5px] bg-white  shadow-sm flex items-center hover:bg-white/80 "
+                        className={`py-2.5 px-3 w-full rounded-[5px] ${
+                          isActive(subItem.path) ? "bg-brand-primary/10 text-brand-primary" : "hover:bg-brand-light/70"
+                        } transition-colors duration-200`}
                       >
-                        <Link href={subItem.path} className="flex items-center gap-4">
-                          <div
-                            className={`flex items-center justify-center rounded-[5px] ${
-                              isActive(subItem.path) ? "bg-brand-primary" : "bg-white shadow-sm"
-                            }`}
-                          >
-                            <subItem.icon
-                              className={`p-1 ${isActive(subItem.path) ? "text-white" : "text-gray-600"}`}
-                            />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700">{subItem.title}</span>
+                        <Link href={subItem.path} className="flex items-center gap-3 w-full">
+                          <subItem.icon
+                            className={`h-4 w-4 ${isActive(subItem.path) ? "text-brand-primary" : "text-gray-500"}`}
+                          />
+                          <span className={`text-sm ${isActive(subItem.path) ? "font-medium" : "font-normal"}`}>
+                            {subItem.title}
+                          </span>
                         </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
@@ -231,17 +270,17 @@ export function AppSidebar() {
             <SidebarMenuButton
               asChild
               isActive={isActive(item.path)}
-              className="py-[20px] rounded-[5px] bg-white shadow-sm hover:bg-white/80"
+              className={`py-3 rounded-[5px] ${
+                isActive(item.path)
+                  ? "bg-brand-light border-l-4 border-brand-primary"
+                  : "bg-white hover:bg-brand-light/50"
+              } shadow-sm transition-all duration-200`}
             >
-              <Link href={item.path} className="flex items-center gap-4">
-                <div
-                  className={`flex  items-center justify-center rounded-[5px] ${
-                    isActive(item.path) ? "bg-brand-primary" : "bg-white shadow-sm"
-                  }`}
-                >
-                  <item.icon className={`p-1 ${isActive(item.path) ? "text-white" : "text-gray-600"}`} />
-                </div>
-                <span className="text-sm font-medium text-gray-700">{item.title}</span>
+              <Link href={item.path} className="flex items-center gap-3">
+                <item.icon className={`h-5 w-5 ${isActive(item.path) ? "text-brand-primary" : "text-gray-600"}`} />
+                <span className={`text-sm font-medium ${isActive(item.path) ? "text-brand-primary" : "text-gray-700"}`}>
+                  {item.title}
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -251,61 +290,86 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar className="border-r-0 bg-brand-light">
-      <SidebarHeader className="flex items-center justify-between p-4">
+    <Sidebar className="border-r border-gray-200 bg-white">
+      <SidebarHeader className="flex items-center justify-between p-4 border-b border-gray-100">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Car className="h-6 w-6 text-brand-primary" />
-          <span className="font-bold text-lg text-brand-primary">CarAdmin</span>
+          {logoLoading ? (
+            <div className="h-6 w-32 animate-pulse rounded bg-gray-200"></div>
+          ) : logo[0]?.imageUrl ? (
+            <div className="h-8 max-w-[140px]">
+              <img
+                src={logo[0]?.imageUrl || "/placeholder.svg"}
+                alt={logo[0]?.title || "Company Logo"}
+                className="h-full object-contain"
+                onError={(e) => {
+                  e.target.onerror = null
+                  e.target.style.display = "none"
+                  e.target.nextSibling.style.display = "block"
+                }}
+              />
+
+            </div>
+          ) : (
+            <span className="font-bold text-lg text-brand-primary">{logo?.title || "CarAdmin"}</span>
+          )}
         </Link>
       </SidebarHeader>
+          {/* {logo[0]?.imageUrl || "/placeholder.svg"} */}
 
-      <SidebarContent className="px-4">
+      <SidebarContent className="px-3 py-4">
         {menuData.map((section, index) => (
-          <div key={section.section}>
-            {index > 0 && <SidebarSeparator className="my-4 bg-brand-dark/30" />}
+          <div key={section.section} className={index > 0 ? "mt-6" : ""}>
+            {index > 0 && <SidebarSeparator className="mb-4 bg-gray-200" />}
 
             <SidebarGroup>
-              <SidebarGroupLabel className=" px-2 text-xs font-medium text-brand-primary/70">
+              <SidebarGroupLabel className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
                 {section.section}
               </SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu className=" space-y-2 mt-2">{renderMenuItems(section.items)}</SidebarMenu>
+                <SidebarMenu className="space-y-1 mt-2">{renderMenuItems(section.items)}</SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
           </div>
         ))}
       </SidebarContent>
 
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 border-t border-gray-100">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="w-full flex items-center justify-between rounded-[10px] bg-white px-4 py-3 shadow-sm hover:bg-white/80"
+              className="w-full flex items-center justify-between rounded-[5px] bg-brand-light/50 px-3 py-2.5 hover:bg-brand-light transition-colors duration-200"
             >
-              <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                  <AvatarFallback>U</AvatarFallback>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8 border-2 border-brand-primary/20">
+                  <AvatarImage src="/abstract-geometric-shapes.png" alt="User" />
+                  <AvatarFallback className="bg-brand-primary/10 text-brand-primary font-medium">AU</AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium text-gray-700">Admin User</span>
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium text-gray-800">Admin User</span>
+                  <span className="text-xs text-gray-500">admin@example.com</span>
+                </div>
               </div>
-              <ChevronDown className="h-4 w-4 text-gray-500" />
+              <ChevronRight className="h-4 w-4 text-gray-500" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-xl border-none bg-white p-2 shadow-lg">
+          <DropdownMenuContent
+            align="end"
+            className="w-56 rounded-[5px] border border-gray-200 bg-white p-1.5 shadow-lg"
+          >
             <DropdownMenuLabel className="px-2 py-1.5 text-sm font-medium text-gray-700">My Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="my-1 bg-gray-200" />
-            <DropdownMenuItem className="rounded-lg px-2 py-1.5 text-sm text-gray-700">
+            <DropdownMenuItem className="rounded-[5px] px-2 py-1.5 text-sm text-gray-700 cursor-pointer hover:bg-brand-light/50">
               <UserCog className="mr-2 h-4 w-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-lg px-2 py-1.5 text-sm text-gray-700">
+            <DropdownMenuItem className="rounded-[5px] px-2 py-1.5 text-sm text-gray-700 cursor-pointer hover:bg-brand-light/50">
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator className="my-1 bg-gray-200" />
-            <DropdownMenuItem className="rounded-lg px-2 py-1.5 text-sm text-gray-700">
+            <DropdownMenuItem className="rounded-[5px] px-2 py-1.5 text-sm text-red-600 cursor-pointer hover:bg-red-50">
+              <LogOut className="mr-2 h-4 w-4" />
               <LogoutButton />
             </DropdownMenuItem>
           </DropdownMenuContent>

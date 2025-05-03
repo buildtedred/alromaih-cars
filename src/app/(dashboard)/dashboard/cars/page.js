@@ -174,218 +174,272 @@ export default function AllCarsPage() {
     setDeleteDialogOpen(true)
   }
 
-  // Render the content based on loading and data state
-  // Placeholder image for brands without images
+  // Placeholder image for cars without images
   const placeholderImage =
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgZmlsbD0iIzZiNzI4MCIgZHk9Ii4xZW0iPkJyYW5kIEltYWdlPC90ZXh0Pjwvc3ZnPg=="
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgZmlsbD0iIzZiNzI4MCIgZHk9Ii4xZW0iPkNhciBJbWFnZTwvdGV4dD48L3N2Zz4="
 
+  // Render loading skeletons
+  const renderSkeletons = () => {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="border rounded-[5px]">
+          <div className="p-4 space-y-4">
+            {Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <Skeleton className="h-12 w-12 rounded-[5px]" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Render empty state
+  const renderEmptyState = () => {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <Car className="h-16 w-16 text-brand-primary/30 mb-4" />
+        <h3 className="text-lg font-medium">No cars found</h3>
+        <p className="text-muted-foreground mt-2">
+          {searchTerm || filterBrand !== "all"
+            ? "Try different search terms or filters"
+            : "Add your first car to get started"}
+        </p>
+        {!searchTerm && filterBrand === "all" && (
+          <Button
+            asChild
+            className="mt-6 bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
+            disabled={isDeleting}
+          >
+            <Link href="/dashboard/cars/new">
+              <Plus className="mr-2 h-4 w-4" /> Add New Car
+            </Link>
+          </Button>
+        )}
+      </div>
+    )
+  }
+
+  // Render error state
+  const renderError = () => {
+    return (
+      <div className="bg-destructive/15 p-4 rounded-[5px] text-destructive border border-destructive/30">
+        <div className="flex items-center gap-2 mb-2">
+          <AlertTriangle className="h-5 w-5" />
+          <p className="font-medium">Error loading cars</p>
+        </div>
+        <p className="text-sm mb-2">{error}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={fetchCars}
+          disabled={isDeleting}
+          className="rounded-[5px] border-destructive/30 hover:bg-destructive/20"
+        >
+          Try Again
+        </Button>
+      </div>
+    )
+  }
+
+  // Render the main content
   const renderContent = () => {
     if (loading) {
-      return (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-10 w-32" />
-          </div>
-          <div className="border rounded-[5px]">
-            <div className="p-4 space-y-4">
-              {Array(5)
-                .fill(0)
-                .map((_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-12 w-12 rounded-[5px]" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-48" />
-                      <Skeleton className="h-4 w-24" />
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )
+      return renderSkeletons()
     }
 
-    if (filteredCars.length === 0 && !error) {
-      return (
-        <div className="flex flex-col items-center justify-center h-64 text-center">
-          <Car className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium">No cars found</h3>
-          <p className="text-muted-foreground mt-2">
-            {searchTerm || filterBrand !== "all"
-              ? "Try different search terms or filters"
-              : "Add your first car to get started"}
-          </p>
-          {!searchTerm && filterBrand === "all" && (
-            <Button
-              asChild
-              className="mt-4 bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
-              disabled={isDeleting}
-            >
-              <Link href="/dashboard/cars/new">
-                <Plus className="mr-2 h-4 w-4" /> Add New Car
-              </Link>
-            </Button>
-          )}
-        </div>
-      )
+    if (error) {
+      return renderError()
+    }
+
+    if (filteredCars.length === 0) {
+      return renderEmptyState()
     }
 
     return (
       <div className="rounded-[5px] border shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-brand-light/50 sticky top-0">
-            <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={selectedCars.length === filteredCars.length && filteredCars.length > 0}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="Select all cars"
-                  disabled={isDeleting}
-                  className="rounded-[5px]"
-                />
-              </TableHead>
-              <TableHead className="w-[80px]">Image</TableHead>
-              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("model")}>
-                <div className="flex items-center gap-1">
-                  Model
-                  {sortField === "model" &&
-                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("year")}>
-                <div className="flex items-center gap-1">
-                  Year
-                  {sortField === "year" &&
-                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("brand")}>
-                <div className="flex items-center gap-1">
-                  Brand
-                  {sortField === "brand" &&
-                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredCars.map((car) => (
-              <TableRow
-                key={car.id}
-                className={selectedCars.includes(car.id) ? "bg-brand-light/50" : "hover:bg-brand-light/30"}
-              >
-                <TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10">
+              <TableRow>
+                <TableHead className="w-12">
                   <Checkbox
-                    checked={selectedCars.includes(car.id)}
-                    onCheckedChange={() => handleSelectCar(car.id)}
-                    aria-label={`Select ${car.model}`}
+                    checked={selectedCars.length === filteredCars.length && filteredCars.length > 0}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Select all cars"
                     disabled={isDeleting}
                     className="rounded-[5px]"
                   />
-                </TableCell>
-                <TableCell>
-                  <div className="flex justify-center items-center h-10 w-10 rounded-[5px] overflow-hidden bg-muted">
-                    <img
-                      src={car?.images?.[0] || placeholderImage}
-                      alt={car?.model}
-                      className="object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null
-                        e.target.src = placeholderImage
-                      }}
-                    />
+                </TableHead>
+                <TableHead className="w-[80px]">Image</TableHead>
+                <TableHead
+                  className={`${!isDeleting ? "cursor-pointer hover:text-brand-primary" : ""}`}
+                  onClick={() => !isDeleting && handleSort("model")}
+                >
+                  <div className="flex items-center gap-1">
+                    Model
+                    {sortField === "model" &&
+                      (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
                   </div>
-                </TableCell>
-                <TableCell className="font-medium">{car.model}</TableCell>
-                <TableCell>{car.year}</TableCell>
-                <TableCell>
-                  {car?.brand?.name ? (
-                    <Badge variant="outline" className="rounded-[5px]">
-                      {car.brand.name}
-                    </Badge>
-                  ) : (
-                    <span className="text-muted-foreground text-sm">Unknown</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      asChild
-                      disabled={isDeleting}
-                      className="rounded-[5px] hover:text-brand-primary"
-                    >
-                      <Link href={`/dashboard/cars/car-details/${car.id}`}>
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      asChild
-                      disabled={isDeleting}
-                      className="rounded-[5px] hover:text-brand-primary"
-                    >
-                      <Link href={`/dashboard/cars/${car.id}/edit`}>
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive rounded-[5px]"
-                      onClick={() => confirmDelete(car.id)}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
+                </TableHead>
+                <TableHead
+                  className={`${!isDeleting ? "cursor-pointer hover:text-brand-primary" : ""}`}
+                  onClick={() => !isDeleting && handleSort("year")}
+                >
+                  <div className="flex items-center gap-1">
+                    Year
+                    {sortField === "year" &&
+                      (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
                   </div>
-                </TableCell>
+                </TableHead>
+                <TableHead
+                  className={`${!isDeleting ? "cursor-pointer hover:text-brand-primary" : ""}`}
+                  onClick={() => !isDeleting && handleSort("brand")}
+                >
+                  <div className="flex items-center gap-1">
+                    Brand
+                    {sortField === "brand" &&
+                      (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredCars.map((car) => (
+                <TableRow
+                  key={car.id}
+                  className={selectedCars.includes(car.id) ? "bg-brand-light/50" : "hover:bg-brand-light/30"}
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedCars.includes(car.id)}
+                      onCheckedChange={() => handleSelectCar(car.id)}
+                      aria-label={`Select ${car.model}`}
+                      disabled={isDeleting}
+                      className="rounded-[5px]"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex justify-center items-center h-12 w-12 rounded-[5px] overflow-hidden bg-muted border">
+                      <img
+                        src={car?.images?.[0] || placeholderImage}
+                        alt={car?.model}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null
+                          e.target.src = placeholderImage
+                        }}
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">{car.model}</TableCell>
+                  <TableCell>{car.year}</TableCell>
+                  <TableCell>
+                    {car?.brand?.name ? (
+                      <Badge
+                        variant="outline"
+                        className="rounded-[5px] bg-brand-light/50 text-brand-primary border-brand-primary/20"
+                      >
+                        {car.brand.name}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Unknown</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        disabled={isDeleting}
+                        className="rounded-[5px] hover:bg-brand-light hover:text-brand-primary"
+                      >
+                        <Link href={`/dashboard/cars/car-details/${car.id}`}>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">View</span>
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        disabled={isDeleting}
+                        className="rounded-[5px] hover:bg-brand-light hover:text-brand-primary"
+                      >
+                        <Link href={`/dashboard/cars/${car.id}/edit`}>
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-[5px] hover:bg-destructive/10"
+                        onClick={() => confirmDelete(car.id)}
+                        disabled={isDeleting}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-4 relative">
-      {/* Full page overlay when deleting */}
+      {/* Full-page overlay during deletion */}
       {isDeleting && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card p-6 rounded-[5px] shadow-lg text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-brand-primary" />
-            <h3 className="font-medium text-lg mb-1">{carsToDelete.length > 1 ? "Deleting Cars" : "Deleting Car"}</h3>
-            <p className="text-sm text-muted-foreground">Please wait while the operation completes...</p>
+          <div className="bg-card p-8 rounded-[5px] shadow-lg text-center max-w-md w-full border border-brand-primary/20">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto mb-6 text-brand-primary" />
+            <h3 className="font-medium text-xl mb-2">Deleting Car{carsToDelete.length > 1 ? "s" : ""}</h3>
+            <p className="text-muted-foreground">Please wait while we process your request...</p>
           </div>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-brand-light/30 p-4 rounded-[5px] border border-brand-primary/10">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">All Cars</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-brand-primary">All Cars</h1>
           <p className="text-muted-foreground">Manage your cars and their brands</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full sm:w-auto">
           {selectedCars.length > 0 && (
             <Button
               variant="destructive"
               onClick={confirmDeleteMultiple}
               disabled={isDeleting}
-              className="gap-1 rounded-[5px]"
+              className="gap-1 rounded-[5px] w-full sm:w-auto"
             >
               {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               Delete Selected ({selectedCars.length})
             </Button>
           )}
-          <Button asChild disabled={isDeleting} className="bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]">
+          <Button
+            asChild
+            disabled={isDeleting}
+            className="rounded-[5px] bg-brand-primary hover:bg-brand-primary/90 w-full sm:w-auto"
+          >
             <Link href="/dashboard/cars/new">
               <Plus className="mr-2 h-4 w-4" /> Add New Car
             </Link>
@@ -400,7 +454,7 @@ export default function AllCarsPage() {
             <Input
               type="search"
               placeholder="Search cars..."
-              className="pl-8 rounded-[5px] border-gray-300"
+              className="pl-8 rounded-[5px] border-gray-300 focus-visible:ring-brand-primary"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               disabled={isDeleting}
@@ -439,37 +493,29 @@ export default function AllCarsPage() {
         </Button>
       </div>
 
-      {error && (
-        <div className="bg-destructive/15 p-4 rounded-[5px] text-destructive">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-5 w-5" />
-            <p className="font-medium">Error loading cars</p>
-          </div>
-          <p className="text-sm mb-2">{error}</p>
-          <Button variant="outline" size="sm" onClick={fetchCars} disabled={isDeleting} className="rounded-[5px]">
-            Try Again
-          </Button>
-        </div>
-      )}
+      {error && renderError()}
 
       {renderContent()}
 
       <Dialog open={deleteDialogOpen} onOpenChange={(open) => !isDeleting && setDeleteDialogOpen(open)}>
-        <DialogContent className="rounded-[5px]">
+        <DialogContent className="rounded-[5px] border-red-200 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Confirm Deletion
+            </DialogTitle>
             <DialogDescription>
               {carsToDelete.length > 1
                 ? `Are you sure you want to delete ${carsToDelete.length} cars? This action cannot be undone.`
                 : "Are you sure you want to delete this car? This action cannot be undone."}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-between">
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={isDeleting}
-              className="rounded-[5px]"
+              className="rounded-[5px] mt-2 sm:mt-0"
             >
               Cancel
             </Button>
@@ -477,7 +523,7 @@ export default function AllCarsPage() {
               variant="destructive"
               onClick={() => (carsToDelete.length > 1 ? deleteMultipleCars(carsToDelete) : deleteCar(carsToDelete[0]))}
               disabled={isDeleting}
-              className="rounded-[5px]"
+              className="rounded-[5px] bg-red-500 hover:bg-red-600"
             >
               {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
               {carsToDelete.length > 1 ? `Delete ${carsToDelete.length} cars` : "Delete car"}

@@ -31,7 +31,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function CarVariations() {
@@ -45,9 +44,6 @@ export default function CarVariations() {
   const [sortDirection, setSortDirection] = useState("asc")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [variationsToDelete, setVariationsToDelete] = useState([])
-  const [imagePreviewOpen, setImagePreviewOpen] = useState(false)
-  const [selectedImages, setSelectedImages] = useState([])
-  const [selectedVariationName, setSelectedVariationName] = useState("")
 
   useEffect(() => {
     fetchVariations()
@@ -67,7 +63,7 @@ export default function CarVariations() {
       const text = await response.text()
       let data
 
-      try {
+      try { 
         // Try to parse the response as JSON
         data = JSON.parse(text)
       } catch (parseError) {
@@ -155,24 +151,27 @@ export default function CarVariations() {
     }
   }
 
-  const openImagePreview = (variation) => {
-    setSelectedImages(variation.images || [])
-    setSelectedVariationName(variation.name)
-    setImagePreviewOpen(true)
-  }
-
   // Filter variations based on search term
   let filteredVariations = variations.filter((variation) => {
     return (
       variation.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      variation.colorName?.toLowerCase().includes(searchTerm.toLowerCase())
+      variation.colorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      variation.car?.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      variation.car?.brand?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     )
   })
 
   // Sort variations
   filteredVariations = [...filteredVariations].sort((a, b) => {
-    const aValue = a[sortField]
-    const bValue = b[sortField]
+    let aValue, bValue
+
+    if (sortField === "car") {
+      aValue = a.car?.model || ""
+      bValue = b.car?.model || ""
+    } else {
+      aValue = a[sortField]
+      bValue = b[sortField]
+    }
 
     if (aValue < bValue) return sortDirection === "asc" ? -1 : 1
     if (aValue > bValue) return sortDirection === "asc" ? 1 : -1
@@ -189,219 +188,294 @@ export default function CarVariations() {
     setDeleteDialogOpen(true)
   }
 
-  // Render the content based on loading and data state
+  // Render loading skeletons
+  const renderSkeletons = () => {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="border rounded-[5px]">
+          <div className="p-4 space-y-4">
+            {Array(5)
+              .fill(0)
+              .map((_, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <Skeleton className="h-12 w-12 rounded-[5px]" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Render empty state
+  const renderEmptyState = () => {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <Car className="h-16 w-16 text-brand-primary/30 mb-4" />
+        <h3 className="text-lg font-medium">No variations found</h3>
+        <p className="text-muted-foreground mt-2">
+          {searchTerm ? "Try a different search term" : "No variations available"}
+        </p>
+      </div>
+    )
+  }
+
+  // Render error state
+  const renderError = () => {
+    return (
+      <div className="bg-destructive/15 p-4 rounded-[5px] text-destructive border border-destructive/30">
+        <div className="flex items-center gap-2 mb-2">
+          <AlertTriangle className="h-5 w-5" />
+          <p className="font-medium">Error loading variations</p>
+        </div>
+        <p className="text-sm mb-2">{error}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={fetchVariations}
+          disabled={isDeleting}
+          className="rounded-[5px] border-destructive/30 hover:bg-destructive/20"
+        >
+          Try Again
+        </Button>
+      </div>
+    )
+  }
+
+  // Render the main content
   const renderContent = () => {
     if (loading) {
-      return (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-10 w-32" />
-          </div>
-          <div className="border rounded-[5px]">
-            <div className="p-4 space-y-4">
-              {Array(5)
-                .fill(0)
-                .map((_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-12 w-12 rounded-[5px]" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-48" />
-                      <Skeleton className="h-4 w-24" />
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )
+      return renderSkeletons()
     }
 
-    if (filteredVariations.length === 0 && !error) {
-      return (
-        <div className="flex flex-col items-center justify-center h-64 text-center">
-          <Car className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium">No variations found</h3>
-          <p className="text-muted-foreground mt-2">
-            {searchTerm ? "Try a different search term" : "No variations available"}
-          </p>
-        </div>
-      )
+    if (error) {
+      return renderError()
+    }
+
+    if (filteredVariations.length === 0) {
+      return renderEmptyState()
     }
 
     return (
       <div className="rounded-[5px] border shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-brand-light/50 sticky top-0">
-            <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={selectedVariations.length === filteredVariations.length && filteredVariations.length > 0}
-                  onCheckedChange={handleSelectAll}
-                  aria-label="Select all variations"
-                  disabled={isDeleting}
-                  className="rounded-[5px]"
-                />
-              </TableHead>
-              <TableHead className="w-[100px]">Images</TableHead>
-              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("name")}>
-                <div className="flex items-center gap-1">
-                  Name
-                  {sortField === "name" &&
-                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("colorName")}>
-                <div className="flex items-center gap-1">
-                  Color
-                  {sortField === "colorName" &&
-                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => !isDeleting && handleSort("price")}>
-                <div className="flex items-center gap-1">
-                  Price
-                  {sortField === "price" &&
-                    (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredVariations.map((variation) => (
-              <TableRow
-                key={variation.id}
-                className={selectedVariations.includes(variation.id) ? "bg-brand-light/50" : "hover:bg-brand-light/30"}
-              >
-                <TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10">
+              <TableRow>
+                <TableHead className="w-12">
                   <Checkbox
-                    checked={selectedVariations.includes(variation.id)}
-                    onCheckedChange={() => !isDeleting && handleSelectVariation(variation.id)}
-                    aria-label={`Select ${variation.name}`}
+                    checked={selectedVariations.length === filteredVariations.length && filteredVariations.length > 0}
+                    onCheckedChange={handleSelectAll}
+                    aria-label="Select all variations"
                     disabled={isDeleting}
                     className="rounded-[5px]"
                   />
-                </TableCell>
-                <TableCell>
-                  <div className="flex overflow-hidden">
-                    {variation.images && variation.images.length > 0 ? (
-                      <div className="h-10 w-10 flex justify-center items-center overflow-hiddenr bg-muted inline-block">
-                        <img
-                          src={variation.images[0] || "/placeholder.svg"}
-                          alt={`${variation.name} image`}
-                          className=" object-cover"
-                          onError={(e) => {
-                            e.target.onerror = null
-                            e.target.src = "/placeholder.svg"
-                          }}
-                        />
+                </TableHead>
+                <TableHead className="w-[80px]">Image</TableHead>
+                <TableHead
+                  className={`${!isDeleting ? "cursor-pointer hover:text-brand-primary" : ""}`}
+                  onClick={() => !isDeleting && handleSort("name")}
+                >
+                  <div className="flex items-center gap-1">
+                    Name
+                    {sortField === "name" &&
+                      (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className={`${!isDeleting ? "cursor-pointer hover:text-brand-primary" : ""}`}
+                  onClick={() => !isDeleting && handleSort("car")}
+                >
+                  <div className="flex items-center gap-1">
+                    Car
+                    {sortField === "car" &&
+                      (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className={`${!isDeleting ? "cursor-pointer hover:text-brand-primary" : ""}`}
+                  onClick={() => !isDeleting && handleSort("colorName")}
+                >
+                  <div className="flex items-center gap-1">
+                    Color
+                    {sortField === "colorName" &&
+                      (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className={`${!isDeleting ? "cursor-pointer hover:text-brand-primary" : ""}`}
+                  onClick={() => !isDeleting && handleSort("price")}
+                >
+                  <div className="flex items-center gap-1">
+                    Price
+                    {sortField === "price" &&
+                      (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                  </div>
+                </TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredVariations.map((variation) => (
+                <TableRow
+                  key={variation.id}
+                  className={
+                    selectedVariations.includes(variation.id) ? "bg-brand-light/50" : "hover:bg-brand-light/30"
+                  }
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedVariations.includes(variation.id)}
+                      onCheckedChange={() => !isDeleting && handleSelectVariation(variation.id)}
+                      aria-label={`Select ${variation.name}`}
+                      disabled={isDeleting}
+                      className="rounded-[5px]"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="h-12 w-12 flex justify-center items-center rounded-[5px] overflow-hidden bg-muted border">
+                            {variation.images && variation.images.length > 0 ? (
+                              <img
+                                src={variation.images[0] || "/placeholder.svg?height=48&width=48&query=car"}
+                                alt={`${variation.name} image`}
+                                className="h-full w-full object-cover"
+                                onError={(e) => {
+                                  e.target.onerror = null
+                                  e.target.src = "/classic-red-convertible.png"
+                                }}
+                              />
+                            ) : (
+                              <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="rounded-[5px]">
+                          {variation.images && variation.images.length > 0
+                            ? `${variation.images.length} image${variation.images.length > 1 ? "s" : ""} available`
+                            : "No images available"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </TableCell>
+                  <TableCell className="font-medium">{variation.name}</TableCell>
+                  <TableCell>
+                    {variation.car ? (
+                      <div className="flex flex-col">
+                        <span className="font-medium">{variation.car.model}</span>
+                        {variation.car.brand && (
+                          <Badge
+                            variant="outline"
+                            className="mt-1 w-fit rounded-[5px] bg-brand-light/30 text-brand-primary border-brand-primary/20"
+                          >
+                            {variation.car.brand.name}
+                          </Badge>
+                        )}
                       </div>
                     ) : (
-                      <div className="h-10 w-10 rounded-[5px] overflow-hidden bg-muted flex items-center justify-center">
-                        <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                      </div>
+                      <span className="text-muted-foreground text-sm italic">Not assigned</span>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-4 h-6 px-2 rounded-[5px] hover:text-brand-primary"
-                      onClick={() => !isDeleting && openImagePreview(variation)}
-                      disabled={isDeleting || !variation.images || variation.images.length === 0}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="h-4 w-4 rounded-full border"
+                        style={{ backgroundColor: variation.colorHex || "#cccccc" }}
+                      />
+                      {variation.colorName}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className="rounded-[5px] bg-brand-light/50 text-brand-primary border-brand-primary/20"
                     >
-                      View All
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium">{variation.name}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="h-4 w-4 rounded-full border"
-                      style={{ backgroundColor: variation.colorHex || "#cccccc" }}
-                    />
-                    {variation.colorName}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="rounded-[5px]">
-                    <DollarSign className="h-3 w-3 mr-1" />
-                    {variation.price?.toLocaleString() || "N/A"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      asChild
-                      disabled={isDeleting}
-                      className="rounded-[5px] hover:text-brand-primary"
-                    >
-                      <Link href={`/dashboard/car-variations/variation-detail/${variation.id}`}>
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      asChild
-                      disabled={isDeleting}
-                      className="rounded-[5px] hover:text-brand-primary"
-                    >
-                      <Link href={`/dashboard/cars/new/EditVariationForm?id=${variation.id}`}>
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive rounded-[5px]"
-                      onClick={() => !isDeleting && confirmDelete(variation.id)}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      <DollarSign className="h-3 w-3 mr-1" />
+                      {variation.price?.toLocaleString() || "N/A"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        disabled={isDeleting}
+                        className="rounded-[5px] hover:bg-brand-light hover:text-brand-primary"
+                      >
+                        <Link href={`/dashboard/car-variations/variation-detail/${variation.id}`}>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">View</span>
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        disabled={isDeleting}
+                        className="rounded-[5px] hover:bg-brand-light hover:text-brand-primary"
+                      >
+                        <Link href={`/dashboard/cars/new/EditVariationForm?id=${variation.id}`}>
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-[5px] hover:bg-destructive/10"
+                        onClick={() => !isDeleting && confirmDelete(variation.id)}
+                        disabled={isDeleting}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-4 relative">
-      {/* Full page overlay during deletion */}
+      {/* Full-page overlay during deletion */}
       {isDeleting && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card p-6 rounded-[5px] shadow-lg text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-brand-primary" />
-            <h3 className="font-medium text-lg mb-1">
-              {variationsToDelete.length > 1 ? "Deleting Variations" : "Deleting Variation"}
-            </h3>
-            <p className="text-sm text-muted-foreground">Please wait while the operation completes...</p>
+          <div className="bg-card p-8 rounded-[5px] shadow-lg text-center max-w-md w-full border border-brand-primary/20">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto mb-6 text-brand-primary" />
+            <h3 className="font-medium text-xl mb-2">Deleting Variation{variationsToDelete.length > 1 ? "s" : ""}</h3>
+            <p className="text-muted-foreground">Please wait while we process your request...</p>
           </div>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-brand-light/30 p-4 rounded-[5px] border border-brand-primary/10">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Car Variations</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Car Variations</h1>
           <p className="text-muted-foreground">Manage your car variations and their colors</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full sm:w-auto">
           {selectedVariations.length > 0 && (
             <Button
               variant="destructive"
               onClick={confirmDeleteMultiple}
               disabled={isDeleting}
-              className="gap-1 rounded-[5px]"
+              className="gap-1 rounded-[5px] w-full sm:w-auto"
             >
               {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               Delete Selected ({selectedVariations.length})
@@ -411,12 +485,12 @@ export default function CarVariations() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative flex-1 max-w-sm w-full">
+        <div className="relative flex-1 max-w-md w-full">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search variations..."
-            className="pl-8 w-full rounded-[5px] border-gray-300"
+            placeholder="Search variations by name, color, or car model..."
+            className="pl-8 w-full rounded-[5px] border-gray-300 focus-visible:ring-brand-primary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             disabled={isDeleting}
@@ -435,45 +509,29 @@ export default function CarVariations() {
         </Button>
       </div>
 
-      {error && (
-        <div className="bg-destructive/15 p-4 rounded-[5px] text-destructive">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-5 w-5" />
-            <p className="font-medium">Error loading variations</p>
-          </div>
-          <p className="text-sm mb-2">{error}</p>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={fetchVariations}
-              disabled={isDeleting}
-              className="rounded-[5px]"
-            >
-              Try Again
-            </Button>
-          </div>
-        </div>
-      )}
+      {error && renderError()}
 
       {renderContent()}
 
       <Dialog open={deleteDialogOpen} onOpenChange={(open) => !isDeleting && setDeleteDialogOpen(open)}>
-        <DialogContent className="rounded-[5px]">
+        <DialogContent className="rounded-[5px] border-red-200 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Confirm Deletion
+            </DialogTitle>
             <DialogDescription>
               {variationsToDelete.length > 1
                 ? `Are you sure you want to delete ${variationsToDelete.length} variations? This action cannot be undone.`
                 : "Are you sure you want to delete this variation? This action cannot be undone."}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-between">
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
               disabled={isDeleting}
-              className="rounded-[5px]"
+              className="rounded-[5px] mt-2 sm:mt-0"
             >
               Cancel
             </Button>
@@ -485,85 +543,10 @@ export default function CarVariations() {
                   : deleteVariation(variationsToDelete[0])
               }
               disabled={isDeleting}
-              className="rounded-[5px]"
+              className="rounded-[5px] bg-red-500 hover:bg-red-600"
             >
               {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
               {variationsToDelete.length > 1 ? `Delete ${variationsToDelete.length} variations` : "Delete variation"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={imagePreviewOpen} onOpenChange={(open) => !isDeleting && setImagePreviewOpen(open)}>
-        <DialogContent className="sm:max-w-3xl rounded-[5px]">
-          <DialogHeader>
-            <DialogTitle>Images for {selectedVariationName}</DialogTitle>
-          </DialogHeader>
-          <div className="mt-4">
-            {selectedImages.length > 0 ? (
-              <div className="space-y-6">
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {selectedImages.map((image, index) => (
-                      <CarouselItem key={index}>
-                        <div className="flex aspect-video items-center justify-center p-1">
-                          <img
-                            src={image || "/placeholder.svg"}
-                            alt={`${selectedVariationName} image ${index + 1}`}
-                            className="max-h-[60vh] w-auto  object-contain rounded-[5px]"
-                            onError={(e) => {
-                              e.target.onerror = null
-                              e.target.src = "/placeholder.svg"
-                            }}
-                          />
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="rounded-[5px]" />
-                  <CarouselNext className="rounded-[5px]" />
-                </Carousel>
-
-                <div className="grid grid-cols-6 gap-2">
-                  {selectedImages.map((image, index) => (
-                    <TooltipProvider key={index}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="aspect-square rounded-[5px] overflow-hidden border cursor-pointer">
-                            <img
-                              src={image || "/placeholder.svg"}
-                              alt={`Thumbnail ${index + 1}`}
-                              className="h-full w-full object-cover"
-                              onError={(e) => {
-                                e.target.onerror = null
-                                e.target.src = "/placeholder.svg"
-                              }}
-                            />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent className="rounded-[5px]">
-                          <p>Image {index + 1}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-64 text-center">
-                <ImageIcon className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">No images available</h3>
-              </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setImagePreviewOpen(false)}
-              disabled={isDeleting}
-              className="rounded-[5px]"
-            >
-              Close
             </Button>
           </DialogFooter>
         </DialogContent>

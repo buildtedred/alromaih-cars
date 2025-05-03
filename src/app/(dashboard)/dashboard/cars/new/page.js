@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, Car, ImageIcon, Settings, Info, Check } from "lucide-react"
-import Link from "next/link"
+import { ArrowLeft, Loader2, Car, ImageIcon, Settings, Info, Check, AlertCircle, ChevronRight } from "lucide-react"
 import axios from "axios"
 
 import { Input } from "@/components/ui/input"
@@ -18,7 +17,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Skeleton } from "@/components/ui/skeleton"
 import MultipleImages from "./multipleImages/MultipleImages"
 import AddSpecifications from "./AddSpecifications/AddSpecifications"
-
 
 // Predefined options for dropdowns
 const FUEL_TYPES = ["Petrol", "Diesel", "Hybrid", "Electric", "LPG", "CNG", "Other"]
@@ -40,6 +38,9 @@ const BODY_TYPES = [
 const SAFETY_RATINGS = ["5 Stars", "4 Stars", "3 Stars", "2 Stars", "1 Star", "Not Rated"]
 const INSURANCE_STATUS = ["Fully Insured", "Third Party", "Expired", "None"]
 const YEARS = Array.from({ length: 55 }, (_, i) => new Date().getFullYear() - i)
+
+// Define the tab order for navigation
+const TAB_ORDER = ["basic", "technical", "features", "additional", "specifications", "images"]
 
 export default function AddCarForm() {
   const router = useRouter()
@@ -245,10 +246,10 @@ export default function AddCarForm() {
       })
 
       setUploadStatus("Car added successfully! Redirecting...")
-      setTimeout(() => {
+
         router.push("/dashboard/cars")
         router.refresh()
-      }, 1000)
+
     } catch (error) {
       console.error("Error adding car:", error)
       setError(error.response?.data?.error || error.message || "Failed to add car")
@@ -257,71 +258,58 @@ export default function AddCarForm() {
     }
   }
 
-  // Navigate to next tab
+  // Navigate to next tab - fixed to use the TAB_ORDER array
   const goToNextTab = () => {
-    if (activeTab === "basic") setActiveTab("technical")
-    else if (activeTab === "technical") setActiveTab("features")
-    else if (activeTab === "features") setActiveTab("additional")
-    else if (activeTab === "additional") setActiveTab("images")
-    else if (activeTab === "images") setActiveTab("specifications")
+    const currentIndex = TAB_ORDER.indexOf(activeTab)
+    if (currentIndex < TAB_ORDER.length - 1) {
+      setActiveTab(TAB_ORDER[currentIndex + 1])
+    }
   }
 
-  // Navigate to previous tab
+  // Navigate to previous tab - fixed to use the TAB_ORDER array
   const goToPrevTab = () => {
-    if (activeTab === "specifications") setActiveTab("images")
-    else if (activeTab === "images") setActiveTab("additional")
-    else if (activeTab === "additional") setActiveTab("features")
-    else if (activeTab === "features") setActiveTab("technical")
-    else if (activeTab === "technical") setActiveTab("basic")
+    const currentIndex = TAB_ORDER.indexOf(activeTab)
+    if (currentIndex > 0) {
+      setActiveTab(TAB_ORDER[currentIndex - 1])
+    }
   }
 
   // Render skeleton loading state for brands
   if (brandsLoading) {
     return (
-      <div className="container mx-auto py-4">
+      <div className="w-full py-4 px-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <Skeleton className="h-10 w-32 mb-2" />
-            <Skeleton className="h-8 w-48 mb-1" />
-            <Skeleton className="h-4 w-64" />
+            <Skeleton className="h-8 w-28 mb-2" />
+            <Skeleton className="h-6 w-40 mb-1" />
+            <Skeleton className="h-4 w-56" />
           </div>
-          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-8 w-32" />
         </div>
 
-        <div className="border rounded-md p-4 mb-4">
-          <Skeleton className="h-8 w-full mb-4" />
-          <div className="grid grid-cols-5 gap-2 mb-4">
-            {Array(5)
-              .fill(0)
-              .map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-          </div>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-6 w-40 mb-2" />
-            <Skeleton className="h-4 w-64" />
+        <Card className="rounded-[5px] shadow-sm border-brand-primary/10">
+          <CardHeader className="py-3 px-4 space-y-1">
+            <Skeleton className="h-5 w-32 mb-1" />
+            <Skeleton className="h-4 w-48" />
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Array(6)
+          <CardContent className="space-y-4 py-3 px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Array(4)
                 .fill(0)
                 .map((_, i) => (
                   <div key={i} className="space-y-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-8 w-full" />
                   </div>
                 ))}
             </div>
             <div className="space-y-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-20 w-full" />
             </div>
           </CardContent>
-          <CardFooter className="flex justify-end">
-            <Skeleton className="h-10 w-40" />
+          <CardFooter className="flex justify-end py-3 px-4 border-t">
+            <Skeleton className="h-8 w-32" />
           </CardFooter>
         </Card>
       </div>
@@ -329,80 +317,129 @@ export default function AddCarForm() {
   }
 
   return (
-    <div className="container mx-auto py-4">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <Button variant="ghost" asChild className="mb-1 h-8" disabled={loading}>
-            <Link href="/dashboard/cars">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Cars
-            </Link>
+    <div className="w-full py-4 px-4 relative">
+      {/* Full-page overlay during loading */}
+      {loading && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card p-6 rounded-[5px] shadow-lg text-center max-w-md w-full border border-brand-primary/20">
+            <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-brand-primary" />
+            <h3 className="font-medium text-lg mb-2">Adding Car</h3>
+            <p className="text-muted-foreground">Please wait while we process your request...</p>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-4">
+        <div className="flex items-center text-xs text-muted-foreground mb-2">
+          <Button
+            type="button"
+            variant="ghost"
+            className="p-0 h-auto hover:text-brand-primary transition-colors"
+            onClick={() => router.back()}
+            disabled={loading}
+          >
+            Dashboard
           </Button>
-          <h1 className="text-xl font-bold tracking-tight">Add New Car</h1>
-          <p className="text-sm text-muted-foreground">Fill in the details to add a new car to your inventory</p>
+          <ChevronRight className="h-3 w-3 mx-1" />
+          <Button
+            type="button"
+            variant="ghost"
+            className="p-0 h-auto hover:text-brand-primary transition-colors"
+            onClick={() => router.back()}
+            disabled={loading}
+          >
+            Cars
+          </Button>
+          <ChevronRight className="h-3 w-3 mx-1" />
+          <span className="text-foreground">Add New Car</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex flex-col gap-1">
-            <div className="text-xs font-medium">Form completion: {formProgress}%</div>
-            <div className="h-1.5 w-32 bg-muted rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary transition-all duration-300"
-                style={{ width: `${formProgress}%` }}
-              ></div>
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-brand-primary">Add New Car</h1>
+            <p className="text-xs text-muted-foreground">Fill in the details to add a new car to your inventory</p>
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full sm:w-auto h-8 text-xs rounded-[5px]"
+            onClick={() => router.back()}
+            disabled={loading}
+          >
+            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to Cars
+          </Button>
         </div>
       </div>
 
       {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+        <Alert
+          variant="destructive"
+          className="mb-3 py-2 text-sm animate-in fade-in-50 slide-in-from-top-5 duration-300 rounded-[5px]"
+        >
+          <AlertCircle className="h-3.5 w-3.5" />
+          <AlertTitle className="text-sm font-medium">Error</AlertTitle>
+          <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
 
       {uploadStatus && (
-        <Alert className="mb-4">
-          <Check className="h-4 w-4 mr-2" />
-          <AlertTitle>Success</AlertTitle>
-          <AlertDescription>{uploadStatus}</AlertDescription>
+        <Alert className="mb-3 py-2 text-sm bg-green-50 text-green-800 border-green-200 animate-in fade-in-50 slide-in-from-top-5 duration-300 rounded-[5px]">
+          <Check className="h-3.5 w-3.5 text-green-600" />
+          <AlertTitle className="text-sm font-medium">Success</AlertTitle>
+          <AlertDescription className="text-xs">{uploadStatus}</AlertDescription>
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="h-[calc(100vh-160px)] flex flex-col">
-        {loading && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div className="bg-card p-6 rounded-lg shadow-lg text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-              <h3 className="font-medium text-lg mb-1">Submitting Car Details</h3>
-              <p className="text-sm text-muted-foreground">Please wait while we save your car data...</p>
-            </div>
-          </div>
-        )}
+      <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-200px)]">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <div className="sticky top-0 z-10 bg-background pt-1 pb-2 border-b">
-            <TabsList className="w-full grid grid-cols-6 h-auto p-1" disabled={loading}>
-              <TabsTrigger value="basic" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
+            <TabsList className="w-full grid grid-cols-6 h-auto p-1 rounded-[5px]" disabled={loading}>
+              <TabsTrigger
+                value="basic"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={loading}
+              >
                 <Car className="h-3 w-3" />
                 <span>Basic Info</span>
               </TabsTrigger>
-              <TabsTrigger value="technical" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
+              <TabsTrigger
+                value="technical"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={loading}
+              >
                 <Settings className="h-3 w-3" />
                 <span>Technical</span>
               </TabsTrigger>
-              <TabsTrigger value="features" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
+              <TabsTrigger
+                value="features"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={loading}
+              >
                 <Check className="h-3 w-3" />
                 <span>Features</span>
               </TabsTrigger>
-              <TabsTrigger value="additional" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
+              <TabsTrigger
+                value="additional"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={loading}
+              >
                 <Info className="h-3 w-3" />
                 <span>Additional</span>
               </TabsTrigger>
-              <TabsTrigger value="specifications" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
+              <TabsTrigger
+                value="specifications"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={loading}
+              >
                 <Settings className="h-3 w-3" />
                 <span>Specs</span>
               </TabsTrigger>
-              <TabsTrigger value="images" className="py-1.5 flex gap-1 items-center text-xs" disabled={loading}>
+              <TabsTrigger
+                value="images"
+                className="py-1.5 flex gap-1 items-center text-xs rounded-[5px]"
+                disabled={loading}
+              >
                 <ImageIcon className="h-3 w-3" />
                 <span>Images</span>
               </TabsTrigger>
@@ -412,12 +449,12 @@ export default function AddCarForm() {
           <div className="flex-1 overflow-auto">
             {/* Basic Information Tab */}
             <TabsContent value="basic" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Basic Information</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Basic Information</CardTitle>
                   <CardDescription className="text-xs">Enter the essential details about the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3 py-2">
+                <CardContent className="space-y-3 py-2 px-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div className="space-y-1">
                       <Label htmlFor="model" className="text-xs">
@@ -429,7 +466,7 @@ export default function AddCarForm() {
                         value={model}
                         onChange={(e) => setModel(e.target.value)}
                         required
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -439,10 +476,10 @@ export default function AddCarForm() {
                         Brand <span className="text-destructive">*</span>
                       </Label>
                       <Select onValueChange={setBrandId} value={brandId} required disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select a brand" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {brands.map((brand) => (
                             <SelectItem key={brand.id} value={brand.id}>
                               {brand.name}
@@ -457,10 +494,10 @@ export default function AddCarForm() {
                         Year <span className="text-destructive">*</span>
                       </Label>
                       <Select onValueChange={setYear} value={year} required disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select year" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {YEARS.map((year) => (
                             <SelectItem key={year} value={year.toString()}>
                               {year}
@@ -480,7 +517,7 @@ export default function AddCarForm() {
                         placeholder="Enter price"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -494,7 +531,7 @@ export default function AddCarForm() {
                         placeholder="e.g. Red, Blue, Silver"
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -504,10 +541,10 @@ export default function AddCarForm() {
                         Condition
                       </Label>
                       <Select onValueChange={setCondition} value={condition} disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select condition" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {CONDITION_TYPES.map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
@@ -522,10 +559,10 @@ export default function AddCarForm() {
                         Body Type
                       </Label>
                       <Select onValueChange={setBodyType} value={bodyType} disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select body type" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {BODY_TYPES.map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
@@ -546,13 +583,19 @@ export default function AddCarForm() {
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       rows={3}
-                      className="text-sm resize-none"
+                      className="text-sm resize-none rounded-[5px]"
                       disabled={loading}
                     />
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end py-3">
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
+                <CardFooter className="flex justify-end py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                  >
                     Next: Technical Specifications
                   </Button>
                 </CardFooter>
@@ -561,12 +604,12 @@ export default function AddCarForm() {
 
             {/* Technical Specifications Tab */}
             <TabsContent value="technical" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Technical Specifications</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Technical Specifications</CardTitle>
                   <CardDescription className="text-xs">Enter the technical details of the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3 py-2">
+                <CardContent className="space-y-3 py-2 px-4">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="space-y-1">
                       <Label htmlFor="mileage" className="text-xs">
@@ -578,7 +621,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 15000"
                         value={mileage}
                         onChange={(e) => setMileage(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -588,10 +631,10 @@ export default function AddCarForm() {
                         Fuel Type
                       </Label>
                       <Select onValueChange={setFuelType} value={fuelType} disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select fuel type" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {FUEL_TYPES.map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
@@ -611,7 +654,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 60"
                         value={fuelTankCapacity}
                         onChange={(e) => setFuelTankCapacity(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -621,10 +664,10 @@ export default function AddCarForm() {
                         Transmission
                       </Label>
                       <Select onValueChange={setTransmission} value={transmission} disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select transmission" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {TRANSMISSION_TYPES.map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
@@ -645,7 +688,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 2.0"
                         value={engineSize}
                         onChange={(e) => setEngineSize(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -660,7 +703,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 180"
                         value={horsepower}
                         onChange={(e) => setHorsepower(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -675,7 +718,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 240"
                         value={torque}
                         onChange={(e) => setTorque(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -685,10 +728,10 @@ export default function AddCarForm() {
                         Wheel Drive
                       </Label>
                       <Select onValueChange={setWheelDrive} value={wheelDrive} disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select wheel drive" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {WHEEL_DRIVE_TYPES.map((type) => (
                             <SelectItem key={type} value={type}>
                               {type}
@@ -708,7 +751,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 220"
                         value={topSpeed}
                         onChange={(e) => setTopSpeed(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -724,7 +767,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 8.5"
                         value={acceleration}
                         onChange={(e) => setAcceleration(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -740,17 +783,30 @@ export default function AddCarForm() {
                         placeholder="e.g. 15.5"
                         value={fuelEconomy}
                         onChange={(e) => setFuelEconomy(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px]"
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                  >
                     Next: Features & Comfort
                   </Button>
                 </CardFooter>
@@ -759,14 +815,14 @@ export default function AddCarForm() {
 
             {/* Features & Comfort Tab */}
             <TabsContent value="features" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Features & Comfort</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Features & Comfort</CardTitle>
                   <CardDescription className="text-xs">
                     Specify the features and comfort options of the car
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="py-2">
+                <CardContent className="py-2 px-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-3">
                       <div className="grid grid-cols-2 gap-3">
@@ -780,7 +836,7 @@ export default function AddCarForm() {
                             placeholder="e.g. 5"
                             value={seats}
                             onChange={(e) => setSeats(e.target.value)}
-                            className="h-8 text-sm"
+                            className="h-8 text-sm rounded-[5px]"
                             disabled={loading}
                           />
                         </div>
@@ -795,7 +851,7 @@ export default function AddCarForm() {
                             placeholder="e.g. 4"
                             value={doors}
                             onChange={(e) => setDoors(e.target.value)}
-                            className="h-8 text-sm"
+                            className="h-8 text-sm rounded-[5px]"
                             disabled={loading}
                           />
                         </div>
@@ -810,7 +866,7 @@ export default function AddCarForm() {
                           placeholder="e.g. 10-inch touchscreen with Apple CarPlay"
                           value={infotainment}
                           onChange={(e) => setInfotainment(e.target.value)}
-                          className="h-8 text-sm"
+                          className="h-8 text-sm rounded-[5px]"
                           disabled={loading}
                         />
                       </div>
@@ -824,7 +880,7 @@ export default function AddCarForm() {
                             id="gps"
                             checked={gps}
                             onCheckedChange={setGps}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="gps" className="cursor-pointer text-xs">
@@ -837,7 +893,7 @@ export default function AddCarForm() {
                             id="sunroof"
                             checked={sunroof}
                             onCheckedChange={setSunroof}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="sunroof" className="cursor-pointer text-xs">
@@ -850,7 +906,7 @@ export default function AddCarForm() {
                             id="parkingSensors"
                             checked={parkingSensors}
                             onCheckedChange={setParkingSensors}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="parkingSensors" className="cursor-pointer text-xs">
@@ -863,7 +919,7 @@ export default function AddCarForm() {
                             id="cruiseControl"
                             checked={cruiseControl}
                             onCheckedChange={setCruiseControl}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="cruiseControl" className="cursor-pointer text-xs">
@@ -876,7 +932,7 @@ export default function AddCarForm() {
                             id="leatherSeats"
                             checked={leatherSeats}
                             onCheckedChange={setLeatherSeats}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="leatherSeats" className="cursor-pointer text-xs">
@@ -889,7 +945,7 @@ export default function AddCarForm() {
                             id="heatedSeats"
                             checked={heatedSeats}
                             onCheckedChange={setHeatedSeats}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="heatedSeats" className="cursor-pointer text-xs">
@@ -902,7 +958,7 @@ export default function AddCarForm() {
                             id="bluetooth"
                             checked={bluetooth}
                             onCheckedChange={setBluetooth}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="bluetooth" className="cursor-pointer text-xs">
@@ -915,7 +971,7 @@ export default function AddCarForm() {
                             id="climateControl"
                             checked={climateControl}
                             onCheckedChange={setClimateControl}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="climateControl" className="cursor-pointer text-xs">
@@ -928,7 +984,7 @@ export default function AddCarForm() {
                             id="keylessEntry"
                             checked={keylessEntry}
                             onCheckedChange={setKeylessEntry}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="keylessEntry" className="cursor-pointer text-xs">
@@ -941,7 +997,7 @@ export default function AddCarForm() {
                             id="rearCamera"
                             checked={rearCamera}
                             onCheckedChange={setRearCamera}
-                            className="h-3.5 w-3.5"
+                            className="h-3.5 w-3.5 rounded-[2px]"
                             disabled={loading}
                           />
                           <Label htmlFor="rearCamera" className="cursor-pointer text-xs">
@@ -952,11 +1008,24 @@ export default function AddCarForm() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px]"
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                  >
                     Next: Additional Information
                   </Button>
                 </CardFooter>
@@ -965,12 +1034,12 @@ export default function AddCarForm() {
 
             {/* Additional Information Tab */}
             <TabsContent value="additional" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Additional Information</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Additional Information</CardTitle>
                   <CardDescription className="text-xs">Provide additional details about the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3 py-2">
+                <CardContent className="space-y-3 py-2 px-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div className="space-y-1">
                       <Label htmlFor="manufactured" className="text-xs">
@@ -981,7 +1050,7 @@ export default function AddCarForm() {
                         placeholder="e.g. Japan, Germany"
                         value={manufactured}
                         onChange={(e) => setManufactured(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -991,10 +1060,10 @@ export default function AddCarForm() {
                         Safety Rating
                       </Label>
                       <Select onValueChange={setSafetyRating} value={safetyRating} disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select safety rating" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {SAFETY_RATINGS.map((rating) => (
                             <SelectItem key={rating} value={rating}>
                               {rating}
@@ -1013,7 +1082,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 3 years/100,000 km"
                         value={warranty}
                         onChange={(e) => setWarranty(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -1027,7 +1096,7 @@ export default function AddCarForm() {
                         placeholder="e.g. ABC-123"
                         value={registration}
                         onChange={(e) => setRegistration(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -1042,7 +1111,7 @@ export default function AddCarForm() {
                         placeholder="e.g. 1"
                         value={ownerCount}
                         onChange={(e) => setOwnerCount(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
@@ -1052,10 +1121,10 @@ export default function AddCarForm() {
                         Insurance Status
                       </Label>
                       <Select onValueChange={setInsuranceStatus} value={insuranceStatus} disabled={loading}>
-                        <SelectTrigger className="h-8 text-sm">
+                        <SelectTrigger className="h-8 text-sm rounded-[5px]">
                           <SelectValue placeholder="Select insurance status" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-[5px]">
                           {INSURANCE_STATUS.map((status) => (
                             <SelectItem key={status} value={status}>
                               {status}
@@ -1074,32 +1143,80 @@ export default function AddCarForm() {
                         type="date"
                         value={taxValidity}
                         onChange={(e) => setTaxValidity(e.target.value)}
-                        className="h-8 text-sm"
+                        className="h-8 text-sm rounded-[5px]"
                         disabled={loading}
                       />
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px]"
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
-                    Next: Images & Specifications
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                  >
+                    Next: Specifications
                   </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
 
-            
+            {/* Images Tab */}
+            <TabsContent value="images" className="mt-2 h-full">
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Car Images</CardTitle>
+                  <CardDescription className="text-xs">Upload and manage car images</CardDescription>
+                </CardHeader>
+                <CardContent className="py-2 px-4 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+                  <div className="space-y-3">
+                    <MultipleImages images={images} setImages={setImages} disabled={loading} />
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px]"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="h-8 text-xs gap-2 rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                    size="sm"
+                  >
+                    {loading && <Loader2 className="h-3 w-3 animate-spin" />}
+                    Add Car
+                  </Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+
             {/* Specifications Tab */}
             <TabsContent value="specifications" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Detailed Specifications</CardTitle>
+              <Card className="h-full rounded-[5px] shadow-sm border-brand-primary/10">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-base text-brand-primary">Detailed Specifications</CardTitle>
                   <CardDescription className="text-xs">Add detailed specifications for the car</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 py-2 overflow-auto" >
+                <CardContent className="py-2 px-4 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
                   <AddSpecifications
                     specifications={specifications}
                     addSpecDetail={addSpecDetail}
@@ -1111,46 +1228,29 @@ export default function AddCarForm() {
                     disabled={loading}
                   />
                 </CardContent>
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
+                <CardFooter className="flex justify-between py-3 px-4 border-t bg-muted/20">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goToPrevTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px]"
+                  >
                     Back
                   </Button>
-                  <Button type="button" onClick={goToNextTab} size="sm" disabled={loading}>
-                    Next: images
+                  <Button
+                    type="button"
+                    onClick={goToNextTab}
+                    size="sm"
+                    disabled={loading}
+                    className="h-8 text-xs rounded-[5px] bg-brand-primary hover:bg-brand-primary/90"
+                  >
+                    Next: Images
                   </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
-
-            {/* Images Tab */}
-            <TabsContent value="images" className="mt-2 h-full">
-              <Card className="h-full">
-                <CardHeader className="py-3">
-                  <CardTitle className="text-lg">Car Images</CardTitle>
-                  <CardDescription className="text-xs">Upload and manage car images</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 py-2 overflow-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
-                  <div className="space-y-3">
-                    <MultipleImages images={images} setImages={setImages} disabled={loading} />
-                  </div>
-                </CardContent>
-              
-
-
-
-
-                <CardFooter className="flex justify-between py-3">
-                  <Button type="button" variant="outline" onClick={goToPrevTab} size="sm" disabled={loading}>
-                    Back
-                  </Button>
-                  <Button type="submit" disabled={loading} className="gap-2" size="sm">
-                    {loading && <Loader2 className="h-3 w-3 animate-spin" />}
-                    Add Car
-                  </Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-
           </div>
         </Tabs>
       </form>
