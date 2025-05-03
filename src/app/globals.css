@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap");
+
 /* Tailwind CSS Directives */
 @tailwind base;
 @tailwind components;
@@ -7,8 +8,6 @@
 /* Global Styles */
 body {
   font-family: "IBM Plex Sans Arabic", sans-serif;
-  /* background: rgb(243 244 246 / var(--tw-bg-opacity, 1)); */
-  /* background: rgb(243 244 246 / var(--tw-bg-opacity, 1)); */
 }
 
 /* Global Scrollbar Styles */
@@ -23,7 +22,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #46194F;
+  background: #46194f;
   border-radius: 10px;
 }
 
@@ -34,117 +33,12 @@ body {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #46194F rgba(113, 48, 138, 0.05);
-}
-
-/* Custom Range Input Styles */
-.range-slider {
-  height: 0;
-}
-
-.range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  pointer-events: all;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #46194F;
-  cursor: pointer;
-  margin-top: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.range-slider::-moz-range-thumb {
-  pointer-events: all;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #46194F;
-  cursor: pointer;
-  margin-top: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.range-slider::-webkit-slider-thumb:hover,
-.range-slider::-moz-range-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.range-slider::-webkit-slider-runnable-track,
-.range-slider::-moz-range-track {
-  width: 100%;
-  height: 2px;
-  background: #e5e7eb;
-  border: none;
-  border-radius: 1px;
-}
-
-@media (max-width: 640px) {
-  .rounded-\[20px\] {
-    border-radius: 16px;
-  }
-
-  .text-2xl {
-    font-size: 1.25rem;
-  }
-
-  .text-xl {
-    font-size: 1.1rem;
-  }
-
-  .px-6 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .mx-4 {
-    margin-left: 0.75rem;
-    margin-right: 0.75rem;
-  }
-
-  .h-\[180px\] {
-    height: 160px;
-  }
-
-  /* Added responsive padding for small screens */
-  .px-2 {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-
-@layer base {
-  :root {
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-  .dark {
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+  scrollbar-color: #46194f rgba(113, 48, 138, 0.05);
 }
 
 /* Brand Colors */
 :root {
-  --brand-primary: #46194F;
+  --brand-primary: #46194f;
   --brand-light: #f5e8fa;
   --brand-dark: #4a1d6e;
 }
@@ -172,118 +66,157 @@ body {
   }
 }
 
-/* Custom Scrollbar Styles (for specific elements) */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(113, 48, 138, 0.05);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #46194F;
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #4a1d6e;
-}
-
-/* For Firefox */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #46194F rgba(113, 48, 138, 0.05);
-}
-
-/* Specifications container - prevent scrolling */
-.specs-container {
-  height: auto !important;
-  min-height: 400px;
-  overflow: visible !important;
-}
-
-@media (max-width: 768px) {
-  .specs-container {
-    min-height: 300px;
+/* Custom shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -40rem 0;
+  }
+  100% {
+    background-position: 40rem 0;
   }
 }
 
-/* Make sure all scrollbars use brand color */
-html,
-body,
-div,
-section,
-article,
-aside,
-nav,
-main,
-header,
-footer {
-  scrollbar-color: #46194F rgba(113, 48, 138, 0.05) !important;
+.animate-shimmer {
+  animation: shimmer 3s infinite linear;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background-size: 200% 100%;
 }
 
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb,
-div::-webkit-scrollbar-thumb,
-section::-webkit-scrollbar-thumb,
-article::-webkit-scrollbar-thumb,
-aside::-webkit-scrollbar-thumb,
-nav::-webkit-scrollbar-thumb,
-main::-webkit-scrollbar-thumb,
-header::-webkit-scrollbar-thumb,
-footer::-webkit-scrollbar-thumb {
-  background: #46194F !important;
-  border-radius: 10px;
+/* CSS Mask Button Animation Styles */
+@keyframes ani {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+  to {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
 }
 
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track,
-div::-webkit-scrollbar-track,
-section::-webkit-scrollbar-track,
-article::-webkit-scrollbar-track,
-aside::-webkit-scrollbar-track,
-nav::-webkit-scrollbar-track,
-main::-webkit-scrollbar-track,
-header::-webkit-scrollbar-track,
-footer::-webkit-scrollbar-track {
-  background: rgba(113, 48, 138, 0.05) !important;
-  border-radius: 10px;
+@keyframes ani2 {
+  from {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  to {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
 }
 
-/* Dialog scrollbar styles */
-.scrollbar-custom {
-  scrollbar-width: thin;
-  scrollbar-color: #46194F rgba(113, 48, 138, 0.05);
+.button-container-mask {
+  position: relative;
+  width: 180px;
+  height: 45px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  border: 1px solid #46194f;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-weight: 300;
+  transition: 0.5s;
+  letter-spacing: 1px;
+  border-radius: 5px;
 }
 
-.scrollbar-custom::-webkit-scrollbar {
-  width: 6px;
+.mask-text {
+  position: absolute;
+  color: #46194f;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.scrollbar-custom::-webkit-scrollbar-track {
-  background: rgba(113, 48, 138, 0.05);
-  border-radius: 10px;
-}
-
-.scrollbar-custom::-webkit-scrollbar-thumb {
-  background: #46194F;
-  border-radius: 10px;
-}
-
-.scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: #4a1d6e;
-}
-
-.ReactTags__tag {
-  background-color: #4b225f;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
-  color: white;
-}
-.ReactTags__remove {
-  margin-left: 5px;
+.mask-button {
+  width: 101%;
+  height: 100%;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-weight: 500;
+  padding: 0 16px;
+  font-size: 15px;
+  letter-spacing: 1px;
+  background: #46194f;
+  -webkit-mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png");
+  mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png");
+  -webkit-mask-size: 2300% 100%;
+  mask-size: 2300% 100%;
+  border: none;
+  color: #fff;
   cursor: pointer;
+  -webkit-animation: ani2 0.7s steps(22) forwards;
+  animation: ani2 0.7s steps(22) forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.mask-button:hover {
+  -webkit-animation: ani 0.7s steps(22) forwards;
+  animation: ani 0.7s steps(22) forwards;
+}
+
+/* Mobile version with full width */
+.button-container-mask-mobile {
+  position: relative;
+  width: 100%;
+  height: 45px;
+  overflow: hidden;
+  border: 1px solid #46194f;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-weight: 300;
+  transition: 0.5s;
+  letter-spacing: 1px;
+  border-radius: 5px;
+}
+
+.mask-text-mobile {
+  position: absolute;
+  color: #46194f;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mask-button-mobile {
+  width: 101%;
+  height: 100%;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  background: #46194f;
+  -webkit-mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png");
+  mask: url("https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png");
+  -webkit-mask-size: 2300% 100%;
+  mask-size: 2300% 100%;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  -webkit-animation: ani2 0.7s steps(22) forwards;
+  animation: ani2 0.7s steps(22) forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.mask-button-mobile:hover {
+  -webkit-animation: ani 0.7s steps(22) forwards;
+  animation: ani 0.7s steps(22) forwards;
 }

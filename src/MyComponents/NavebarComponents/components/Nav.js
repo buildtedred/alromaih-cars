@@ -14,7 +14,9 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
   // Get locale from URL params
   const params = useParams()
   // Get current locale from the pathname (assuming the locale is the first part of the path)
-  const locale = pathname &&  pathname?.startsWith("/ar") ? "ar" : "en"
+  const locale = pathname && pathname?.startsWith("/ar") ? "ar" : "en"
+  const isRTL = locale === "ar"
+
   // Create a translation function that works with your structure
   const getTranslation = (key) => {
     // Define hardcoded fallbacks for when translations fail
@@ -38,7 +40,7 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
       }
 
       // Otherwise use our fallbacks based on the current locale
-      const currentLocale = pathname &&  pathname?.startsWith("/ar") ? "ar" : "en"
+      const currentLocale = pathname && pathname?.startsWith("/ar") ? "ar" : "en"
       if (currentLocale === "ar") {
         const arFallbacks = {
           home: "الرئيسية",
@@ -102,6 +104,19 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
     },
   }
 
+  // Animation variants for the nav
+  const navVariants = {
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.4,
+        ease: "easeInOut",
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
   // Animation variants for each nav item
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -122,42 +137,138 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
   }
 
   return (
-    <AnimatePresence>
-      <motion.nav
-        className={`bg-white border-t ${isMobile ? "block md:hidden" : "hidden md:block"}`}
-        variants={isMobile ? drawerVariants : {}}
-        initial={isMobile ? "hidden" : false}
-        animate={isMobile ? "visible" : false}
-        exit={isMobile ? "exit" : false}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-center md:h-12">
-            <div className="flex flex-col md:flex-row md:items-center md:space-x-8 rtl:space-x-reverse">
+    <>
+      <style jsx global>{`
+        /* Nav item hover effect */
+        .nav-item-hover {
+          transition: transform 0.3s ease, color 0.3s ease;
+        }
+        .nav-item-hover:hover {
+          transform: translateY(-2px);
+          color: #46194F;
+        }
+        
+        /* Underline animation */
+        .nav-underline {
+          position: relative;
+        }
+        .nav-underline::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background-color: #46194F;
+          transition: width 0.3s ease;
+        }
+        .nav-underline:hover::after {
+          width: 100%;
+        }
+        
+        /* Active nav item */
+        .nav-active::after {
+          width: 100%;
+        }
+      `}</style>
+
+      <AnimatePresence>
+        <motion.nav
+          className={`bg-white ${isMobile ? "block md:hidden" : "hidden md:block"}`}
+          variants={isMobile ? drawerVariants : navVariants}
+          initial={isMobile ? "hidden" : "visible"}
+          animate="visible"
+          exit={isMobile ? "exit" : undefined}
+          style={{ transition: "all 0.3s ease-in-out" }}
+        >
+          <div className="container mx-auto">
+            <div
+              className={`
+              ${
+                isMobile
+                  ? "flex flex-col space-y-0.5 items-start"
+                  : "flex items-center justify-center h-14 space-x-10 rtl:space-x-reverse"
+              }
+            `}
+            >
               {navItems.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href
 
                 return (
-                  <motion.div key={item.key} onClick={handleLinkClick} variants={isMobile ? itemVariants : {}}>
-                    <Link
-                      href={`/${locale}/${item.href}`}
-                      className={`flex items-center text-gray-700 hover:text-brand-primary font-medium transition-colors py-3 md:py-0 border-b md:border-b-0 border-gray-100 last:border-b-0 ${
-                        isActive ? "text-brand-primary" : ""
-                      }`}
-                      aria-current={isActive ? "page" : undefined}
+                  <motion.div
+                    key={item.key}
+                    variants={isMobile ? itemVariants : {}}
+                    className={`relative ${isMobile ? "w-full" : ""}`}
+                  >
+                    <motion.div
+                      whileHover={!isMobile ? { y: -2, scale: 1.05 } : {}}
+                      className="relative"
+                      initial={false} // Prevent initial animation
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
                     >
-                      <Icon className="w-5 h-5 mr-2" />
-                      {/* Make sure item.label is a string */}
-                      {typeof item.label === "string" ? item.label : ""}
-                    </Link>
+                      <Link
+                        href={`/${locale}${item.href}`}
+                        onClick={handleLinkClick}
+                        className={`
+                          block font-medium relative nav-underline ${isActive ? "nav-active" : ""}
+                          ${
+                            isMobile
+                              ? "px-5 py-3.5 hover:bg-gray-50/80 text-gray-800 transition-colors w-full flex items-center justify-between"
+                              : "px-3 py-1 hover:text-brand-primary group nav-item-hover"
+                          }
+                          ${isActive ? "text-brand-primary" : ""}
+                          
+                          2345678
+                          1234567
+                        `}
+                        aria-current={isActive ? "page" : undefined}
+                        style={{ transition: "all 0.3s ease" }}
+                      >
+                        <span className="flex items-center">
+                          {Icon && <Icon className={`w-5 h-5 ${isMobile ? "mr-3" : "mr-2"}`} />}
+                          {/* Make sure item.label is a string */}
+                          <span className={`${isActive ? "font-semibold" : ""}`}>
+                            {typeof item.label === "string" ? item.label : ""}
+                          </span>
+                        </span>
+
+                        {/* Mobile arrow indicator */}
+                        {isMobile && (
+                          <span className={`text-gray-400 ${isActive ? "text-brand-primary" : ""}`}>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className={`${isRTL ? "rotate-180" : ""}`}
+                            >
+                              <path d="m9 18 6-6-6-6" />
+                            </svg>
+                          </span>
+                        )}
+
+                        {/* Active indicator for mobile */}
+                        {isActive && isMobile && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-primary rounded-r-md"></div>
+                        )}
+
+                        {/* Underline effect for desktop - handled by CSS classes */}
+                      </Link>
+                    </motion.div>
                   </motion.div>
                 )
               })}
             </div>
           </div>
-        </div>
-      </motion.nav>
-    </AnimatePresence>
+        </motion.nav>
+      </AnimatePresence>
+    </>
   )
 }
 
