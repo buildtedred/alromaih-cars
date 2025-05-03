@@ -1,9 +1,10 @@
 "use client"
+
 import { SlidesProvider } from "@/contexts/SliderContext"
 import BrandShowcase from "@/MyComponents/brandshowcase"
 import { FinancePartners } from "@/MyComponents/FinancePartners"
-import { HeroSection } from "@/MyComponents/HeroSection/HeroSection"
-import CarBuyingInterface from "../../MyComponents/Find-Car/Find-Perfect-car.jsx"
+import HeroSection from "@/MyComponents/HeroSection/HeroSection"
+import CarBuyingInterface from "@/MyComponents/Find-Car/Find-Perfect-car.jsx"
 import CarListing from "@/MyComponents/Cards/car-listing.jsx"
 import { usePathname } from "next/navigation"
 
@@ -12,7 +13,7 @@ export default function Home() {
   const isArabic = pathname?.startsWith("/ar")
 
   return (
-    <main className="min-h-screen m-auto">
+    <main className="min-h-screen my-12 m-auto">
       <SlidesProvider>
         {/* HeroSection inside SlidesProvider */}
         <HeroSection />
@@ -42,4 +43,3 @@ export default function Home() {
     </main>
   )
 }
-

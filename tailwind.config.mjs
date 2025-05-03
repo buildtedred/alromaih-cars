@@ -53,7 +53,7 @@ export default {
     			brand: {
     				primary: '#46194F',
     				light: '#EDE8EE',
-    				dark: '#C6AECC',
+    				dark: '#1f0c23',
     				DEFAULT: '#46194F'
     			},
     			sidebar: {

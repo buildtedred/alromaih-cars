@@ -19,6 +19,7 @@ const CarComparisonSelector = () => {
   const [cars, setCars] = useState([])
   const [showThirdCar, setShowThirdCar] = useState(false)
   const [activeCarIndex, setActiveCarIndex] = useState(0) // For mobile tab navigation
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     // Set cars from the imported data
@@ -632,23 +633,28 @@ const CarComparisonSelector = () => {
 
       {/* Compare Button */}
       <div className="flex justify-center mt-6">
-        <button
-          onClick={handleCompare}
-          className={`bg-brand-primary text-white px-6 py-4 md:px-10 md:py-4 rounded-lg md:rounded-full text-lg font-medium flex items-center gap-2 w-full md:w-auto md:shadow-md justify-center md:justify-start ${
-            !canCompare ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={!canCompare}
-        >
-          {isRTL ? (
-            <>
-              عرض المقارنة <ArrowLeft className="w-5 h-5" />
-            </>
-          ) : (
-            <>
-              Show Comparison <ArrowRight className="w-5 h-5" />
-            </>
-          )}
-        </button>
+        <div className={`${!canCompare ? "opacity-50 pointer-events-none" : ""} ${isRTL ? "rtl" : ""}`}>
+          <div className={`${isMobileMenuOpen ? "button-container-mask-mobile" : "button-container-mask md:w-auto"}`}>
+            <span className={`${isMobileMenuOpen ? "mask-text-mobile" : "mask-text"}`}>
+              {isRTL ? "عرض المقارنة" : "Show Comparison"}
+            </span>
+            <button
+              onClick={handleCompare}
+              disabled={!canCompare}
+              className={`${isMobileMenuOpen ? "mask-button-mobile" : "mask-button"}`}
+            >
+              {isRTL ? (
+                <>
+                  عرض المقارنة <ArrowLeft className="w-5 h-5" />
+                </>
+              ) : (
+                <>
+                  Show Comparison <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
