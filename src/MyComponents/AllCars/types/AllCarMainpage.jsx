@@ -1174,7 +1174,7 @@ const AllCarMainpage = () => {
 
   // Replace the main return statement in AllCarMainpage component with this updated layout
   return (
-    <div className="container mx-auto py-8" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="container mx-auto py-0 sm:py-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Desktop Sidebar - Only shown on desktop */}
         <div className="hidden lg:block lg:w-[280px] sticky top-4 self-start max-h-[calc(100vh-2rem)] rounded-xl overflow-hidden shadow-md">
@@ -1189,6 +1189,17 @@ const AllCarMainpage = () => {
 
         {/* Main content */}
         <div className="flex-1">
+
+          {/* Breadcrumb Navigation - Moved to where tags were */}
+          <div className="mb-4">
+            <Breadcrumb items={getBreadcrumbItems()} />
+          </div>
+
+          {/* PromoSlider - Now appears after the breadcrumb */}
+          <div className="mb-6">
+            <PromoSlider />
+          </div>
+
           {/* Mobile-only filter button */}
           <div className="lg:hidden mb-4">
             {/* Mobile Filter Button */}
@@ -1201,17 +1212,7 @@ const AllCarMainpage = () => {
               <span>{currentLocale === "ar" ? "فلترة النتائج" : "Filter Results"}</span>
             </button>
           </div>
-
-          {/* Breadcrumb Navigation - Moved to where tags were */}
-          <div className="mb-4">
-            <Breadcrumb items={getBreadcrumbItems()} />
-          </div>
-
-          {/* PromoSlider - Now appears after the breadcrumb */}
-          <div className="mb-6">
-            <PromoSlider />
-          </div>
-
+          
           {/* Available Cars Header with Tags moved here */}
           <div className="bg-brand-light rounded-[10px] p-4 mb-6 shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">

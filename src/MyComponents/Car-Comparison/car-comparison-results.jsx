@@ -3,7 +3,32 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Check, X, Heart, Share2, Printer, Download, BarChart3, Gauge, Fuel, Sparkles, Award, Zap, Shield, Maximize, Users, TrendingUp, TrendingDown, Minus, ArrowLeft, ArrowRight } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  X,
+  Heart,
+  Share2,
+  Printer,
+  Download,
+  BarChart3,
+  Gauge,
+  Fuel,
+  Sparkles,
+  Award,
+  Zap,
+  Shield,
+  Maximize,
+  Users,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react"
 import carsData, { specNames, specCategories } from "@/app/api/mock-data"
 import { toggleWishlistItem, isInWishlist } from "@/lib/wishlist-utils"
 import ShareDialog from "./share-dialog"
@@ -566,10 +591,8 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="max-w-7xl mx-auto" ref={contentRef}>
       {/* Breadcrumb Navigation */}
-      <div
-      onClick={onCompareAgain} 
-       className="mb-4 px-4 sm:px-0">
-        <Breadcrumb  items={getBreadcrumbItems()} className="text-sm" />
+      <div onClick={onCompareAgain} className="mb-4 px-4 sm:px-0">
+        <Breadcrumb items={getBreadcrumbItems()} className="text-sm" />
       </div>
       {/* Header with Gradient Background */}
       <div className="relative mb-10 overflow-hidden rounded-2xl">
@@ -755,7 +778,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
         <div className="flex items-center justify-center mt-6 gap-4">
           <button
             onClick={navigateToPreviousCar}
-            className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center border border-brand-light active:bg-gray-100"
+            className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center border border-brand-light active:bg-gray-100 hover:bg-gray-50 transition-colors"
             aria-label={isRTL ? "السيارة السابقة" : "Previous car"}
           >
             {isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
@@ -779,7 +802,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
           <button
             onClick={navigateToNextCar}
-            className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center border border-brand-light active:bg-gray-100"
+            className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center border border-brand-light active:bg-gray-100 hover:bg-gray-50 transition-colors"
             aria-label={isRTL ? "السيارة التالية" : "Next car"}
           >
             {isRTL ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
@@ -840,7 +863,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             className={`px-4 py-3 font-medium text-sm flex items-center gap-2 flex-1 justify-center ${
               activeTab === "specs"
                 ? "text-brand-primary border-b-2 border-brand-primary"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 hover:text-gray-700 transition-colors"
             }`}
           >
             <BarChart3 className="w-4 h-4" />
@@ -851,7 +874,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             className={`px-4 py-3 font-medium text-sm flex items-center gap-2 flex-1 justify-center ${
               activeTab === "features"
                 ? "text-brand-primary border-b-2 border-brand-primary"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 hover:text-gray-700 transition-colors"
             }`}
           >
             <Award className="w-4 h-4" />
@@ -862,7 +885,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             className={`px-4 py-3 font-medium text-sm flex items-center gap-2 flex-1 justify-center ${
               activeTab === "price"
                 ? "text-brand-primary border-b-2 border-brand-primary"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-500 hover:text-gray-700 transition-colors"
             }`}
           >
             <div className="w-4 h-4 relative">
@@ -882,7 +905,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                 className={`flex items-center justify-between p-4 cursor-pointer rounded-xl transition-all ${
                   openCategories[category.id]
                     ? "bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white shadow-lg"
-                    : "bg-white shadow border border-brand-light hover:bg-brand-light hover:bg-opacity-30"
+                    : "bg-white shadow border border-brand-light hover:bg-brand-light hover:bg-opacity-30 transition-colors"
                 }`}
                 onClick={() => toggleCategory(category.id)}
               >
@@ -1089,11 +1112,11 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                     <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
                       <div className="flex justify-center">
                         {car1.features[feature] ? (
-                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
                             <Check className="w-5 h-5 text-brand-primary" />
                           </div>
                         ) : (
-                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
                             <X className="w-5 h-5 text-brand-primary text-opacity-70" />
                           </div>
                         )}
@@ -1102,11 +1125,11 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                     <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
                       <div className="flex justify-center">
                         {car2.features[feature] ? (
-                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
                             <Check className="w-5 h-5 text-brand-primary" />
                           </div>
                         ) : (
-                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
                             <X className="w-5 h-5 text-brand-primary text-opacity-70" />
                           </div>
                         )}
@@ -1116,11 +1139,11 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                       <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
                         <div className="flex justify-center">
                           {car3.features[feature] ? (
-                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
                               <Check className="w-5 h-5 text-brand-primary" />
                             </div>
                           ) : (
-                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
                               <X className="w-5 h-5 text-brand-primary text-opacity-70" />
                             </div>
                           )}
@@ -1172,11 +1195,11 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                         <span className="text-sm text-gray-600">{getText(car1.name)}</span>
                       </div>
                       {car1.features[feature] ? (
-                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
                           <Check className="w-5 h-5 text-brand-primary" />
                         </div>
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
                           <X className="w-5 h-5 text-brand-primary text-opacity-70" />
                         </div>
                       )}
@@ -1197,11 +1220,11 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                         <span className="text-sm text-gray-600">{getText(car2.name)}</span>
                       </div>
                       {car2.features[feature] ? (
-                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
                           <Check className="w-5 h-5 text-brand-primary" />
                         </div>
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
                           <X className="w-5 h-5 text-brand-primary text-opacity-70" />
                         </div>
                       )}
@@ -1240,11 +1263,11 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                             <span className="text-sm text-gray-600">{getText(car3.name)}</span>
                           </div>
                           {car3.features[feature] ? (
-                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
                               <Check className="w-5 h-5 text-brand-primary" />
                             </div>
                           ) : (
-                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
                               <X className="w-5 h-5 text-brand-primary text-opacity-70" />
                             </div>
                           )}
@@ -1272,7 +1295,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
               {/* Price Cards */}
               <div className={`grid ${hasThirdCar ? "grid-cols-3" : "grid-cols-2"} gap-6 mb-10`}>
                 {/* Car 1 Price Card */}
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative">
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow">
                   <div className="absolute top-0 right-0 w-24 h-24">
                     <div className="absolute transform rotate-45 bg-brand-primary text-white font-medium py-1 text-xs text-center w-32 top-6 -right-8">
                       {car1.cashPrice === highestPrice
@@ -1349,7 +1372,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                 </div>
 
                 {/* Car 2 Price Card */}
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative">
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow">
                   <div className="absolute top-0 right-0 w-24 h-24">
                     <div className="absolute transform rotate-45 bg-brand-primary text-white font-medium py-1 text-xs text-center w-32 top-6 -right-8">
                       {car2.cashPrice === highestPrice
@@ -1427,7 +1450,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
                 {/* Car 3 Price Card (if present) */}
                 {hasThirdCar && (
-                  <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative">
+                  <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow">
                     <div className="absolute top-0 right-0 w-24 h-24">
                       <div className="absolute transform rotate-45 bg-brand-primary text-white font-medium py-1 text-xs text-center w-32 top-6 -right-8">
                         {car3.cashPrice === highestPrice
@@ -1527,7 +1550,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
               <div className="grid grid-cols-3 gap-8">
                 {/* Highest Price */}
-                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light">
+                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light hover:shadow-lg transition-shadow">
                   <div className="flex items-center justify-between mb-3">
                     <div className="text-sm font-medium text-gray-600">{isRTL ? "أعلى سعر" : "Highest Price"}</div>
                     <TrendingUp className="w-5 h-5 text-brand-primary" />
@@ -1558,7 +1581,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                 </div>
 
                 {/* Lowest Price */}
-                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light">
+                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light hover:shadow-lg transition-shadow">
                   <div className="flex items-center justify-between mb-3">
                     <div className="text-sm font-medium text-gray-600">{isRTL ? "أقل سعر" : "Lowest Price"}</div>
                     <TrendingDown className="w-5 h-5 text-brand-primary" />
@@ -1591,7 +1614,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                 </div>
 
                 {/* Price Difference */}
-                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light">
+                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light hover:shadow-lg transition-shadow">
                   <div className="flex items-center justify-between mb-3">
                     <div className="text-sm font-medium text-gray-600">
                       {isRTL ? "الفرق السعري" : "Price Difference"}
@@ -1648,7 +1671,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                   </thead>
                   <tbody>
                     {/* Car 1 */}
-                    <tr className="hover:bg-gray-50">
+                    <tr className="hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-6 border-b border-r border-gray-200">
                         <div className="flex items-center">
                           <div className="w-12 h-12 relative mr-3">
@@ -1697,7 +1720,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                     </tr>
 
                     {/* Car 2 */}
-                    <tr className="hover:bg-gray-50">
+                    <tr className="hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-6 border-b border-r border-gray-200">
                         <div className="flex items-center">
                           <div className="w-12 h-12 relative mr-3">
@@ -1747,7 +1770,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
                     {/* Car 3 (if present) */}
                     {hasThirdCar && (
-                      <tr className="hover:bg-gray-50">
+                      <tr className="hover:bg-gray-50 transition-colors">
                         <td className="py-4 px-6 border-b border-r border-gray-200">
                           <div className="flex items-center">
                             <div className="w-12 h-12 relative mr-3">
@@ -1805,7 +1828,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
               {/* Mobile Price Cards */}
               <div className="space-y-4">
                 {/* Car 1 Price Card */}
-                <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden hover:shadow-md transition-shadow">
                   <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -1854,7 +1877,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                 </div>
 
                 {/* Car 2 Price Card */}
-                <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
+                <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden hover:shadow-md transition-shadow">
                   <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -1904,7 +1927,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
                 {/* Car 3 Price Card (if present) */}
                 {hasThirdCar && (
-                  <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
+                  <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden hover:shadow-md transition-shadow">
                     <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -2219,20 +2242,22 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
       {/* Compare Again Button */}
       <div className="flex justify-center mb-8 px-4 no-print">
-        <button
-          onClick={onCompareAgain}
-          className="w-full sm:w-auto bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white px-6 py-4 rounded-xl text-base font-medium flex items-center justify-center gap-3 shadow-lg hover:opacity-90 transition-colors"
-        >
-          {isRTL ? (
-            <>
-              <ArrowRight className="w-5 h-5" /> قارن سيارة أخرى
-            </>
-          ) : (
-            <>
-              <ArrowLeft className="w-5 h-5" /> Compare Another Car
-            </>
-          )}
-        </button>
+        <div className={`${isRTL ? "rtl" : ""}`}>
+          <div className={`button-container-mask md:w-auto`}>
+            <span className="mask-text">{isRTL ? "قارن سيارة أخرى" : "Compare Another Car"}</span>
+            <button onClick={onCompareAgain} className="mask-button">
+              {isRTL ? (
+                <>
+                  <ArrowRight className="w-5 h-5" /> قارن سيارة أخرى
+                </>
+              ) : (
+                <>
+                  <ArrowLeft className="w-5 h-5" /> Compare Another Car
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )
