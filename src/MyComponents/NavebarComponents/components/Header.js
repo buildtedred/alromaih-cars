@@ -1,8 +1,7 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Menu, X, Search, Phone } from 'lucide-react'
+import { Menu, X, Search, Phone } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import Nav from "./Nav"
 import LanguageToggle from "./LanguageToggle"
@@ -18,24 +17,64 @@ import { usePathname } from "next/navigation"
 const Header = () => {
   const { t } = useTranslation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isTabletMenuOpen, setIsTabletMenuOpen] = useState(false)
   const [isSearchVisible, setIsSearchVisible] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [scroll, setScroll] = useState(0)
+  const [scrollProgress, setScrollProgress] = useState(0)
   const [isScrollingUp, setIsScrollingUp] = useState(true)
   const [isAtTop, setIsAtTop] = useState(true)
-  const prevScrollY = useRef(0)
+  const headerRef = useRef(null)
+  const [windowWidth, setWindowWidth] = useState(0)
+  const tabletMenuRef = useRef(null)
   const { scrollY } = useScroll()
   const pathname = usePathname() || ""
   const isRTL = pathname && pathname.startsWith("/ar")
-  const headerRef = useRef(null)
+  const prevScrollY = useRef(0)
+  const [isHeaderFixed, setIsHeaderFixed] = useState(false)
+  const [headerHeight, setHeaderHeight] = useState(0)
 
-  // Track scroll position and direction with smooth animation
+  // Track window width for responsive adjustments
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth)
+      // Close tablet menu if screen size changes to desktop
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+
+    // Set initial width
+    if (typeof window !== "undefined") {
+      setWindowWidth(window.innerWidth)
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
+  // Close tablet menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tabletMenuRef.current && !tabletMenuRef.current.contains(event.target) && isTabletMenuOpen) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [isMobileMenuOpen])
+
+  // Track scroll position for progress bar only
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = prevScrollY.current
-    prevScrollY.current = latest
     setScroll(latest)
-    setIsScrollingUp(latest < previous)
-    setIsAtTop(latest < 10)
+
+    // Calculate scroll progress for the progress bar
+    if (typeof window !== "undefined") {
+      const totalHeight = document.body.scrollHeight - window.innerHeight
+      const progress = (latest / totalHeight) * 100
+      setScrollProgress(progress)
+    }
   })
 
   // Prevent background scrolling when mobile menu is open
@@ -56,92 +95,191 @@ const Header = () => {
   }, [])
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
+  const toggleTabletMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen)
   const toggleSearch = () => setIsSearchVisible(!isSearchVisible)
 
   if (!mounted) return null
 
-  // Header animation variants - always visible
-  const headerVariants = {
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.3, ease: "easeInOut" },
-    }
-  }
+  // Determine if we're in tablet mode (768px - 1023px)
+  const isTablet = windowWidth >= 768 && windowWidth < 1024
+  const isMobile = windowWidth < 768
 
   return (
     <>
       <style jsx global>{`
-        /* Smooth header transitions */
-        .header-transition {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Smooth shadow transition */
-        .shadow-transition {
-          transition: box-shadow 0.5s ease-in-out;
-        }
-
-        /* Smooth background transition */
-        .bg-transition {
-          transition: background-color 0.5s ease-in-out;
-        }
-
-        /* Smooth scale transition for nav items */
-        .nav-item-transition {
-          transition: transform 0.2s ease-out;
-        }
-        .nav-item-transition:hover {
-          transform: translateY(-2px) scale(1.02);
-        }
-
-        /* Smooth underline animation */
-        .underline-animation {
-          position: relative;
-        }
-        .underline-animation::after {
-          content: "";
-          position: absolute;
-          width: 0;
-          height: 2px;
-          bottom: -4px;
-          left: 0;
-          background-color: #46194f;
-          transition: width 0.3s ease;
-        }
-        .underline-animation:hover::after {
+        /* Basic styles without transitions */
+        .header-content-container {
           width: 100%;
+          margin-left: auto;
+          margin-right: auto;
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+          .header-content-container {
+            padding-left: 2rem;
+            padding-right: 2rem;
+          }
+        }
+        
+        @media (min-width: 768px) {
+          .header-content-container {
+            {/* padding-left: 3rem;
+            padding-right: 3rem; */}
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .header-content-container {
+            padding-left: 5rem;
+            padding-right: 5rem;
+          }
+        }
+        
+        @media (min-width: 1280px) {
+          .header-content-container {
+            padding-left: 7rem;
+            padding-right: 7rem;
+          }
+        }
+
+        /* Call button styles */
+        .call-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 0 16px;
+          height: 40px;
+          border-radius: 5px;
+          font-family: "IBM Plex Sans Arabic", sans-serif;
+          font-weight: 500;
+          font-size: 15px;
+          letter-spacing: 0.5px;
+          background-color: #46194f;
+          color: white;
+          border: 1px solid #46194f;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 6px rgba(70, 25, 79, 0.15);
+        }
+
+        .call-button:hover {
+          background-color: transparent;
+          color: #46194f;
+        }
+
+        .call-button:hover .call-icon {
+          color: #46194f;
+        }
+
+        .call-icon {
+          color: white;
+          transition: color 0.3s ease;
+        }
+
+        /* Mobile call button */
+        .call-button-mobile {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          height: 50px;
+          border-radius: 5px;
+          font-family: "IBM Plex Sans Arabic", sans-serif;
+          font-weight: 500;
+          font-size: 16px;
+          letter-spacing: 0.5px;
+          background-color: #46194f;
+          color: white;
+          border: 1px solid #46194f;
+          transition: all 0.3s ease;
+        }
+
+        .call-button-mobile:hover {
+          background-color: transparent;
+          color: #46194f;
+        }
+
+        .call-button-mobile:hover .call-icon {
+          color: #46194f;
+        }
+
+        /* Fixed header styles */
+        .header-always-fixed {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          z-index: 50;
+          background-color: rgba(255, 255, 255, 0.98);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Centered navigation */
+        .nav-centered {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
+
+        /* Add padding to body to account for fixed header */
+        body {
+          padding-top: 80px; /* Adjust this value to match your header height */
+        }
+        
+        /* Mobile header icons */
+        .mobile-header-icon {
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        /* Consistent icon sizes for mobile */
+        .mobile-icon-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+        }
+        
+        .mobile-icon-wrapper:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Language toggle larger size */
+        .language-toggle-wrapper {
+          transform: scale(1.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       `}</style>
 
-      {/* Header container with sticky behavior - always visible */}
-      <motion.header
-        ref={headerRef}
-        className="font-noto sticky top-0 z-40 w-full"
-        initial="visible"
-        animate="visible"
-        variants={headerVariants}
-      >
+      {/* Header container - always fixed */}
+      <header ref={headerRef} className="font-noto w-full header-always-fixed h-20">
         <div
-          className="relative bg-white/95 backdrop-blur-md border-b border-gray-100 header-transition shadow-transition bg-transition"
+          className="relative w-full bg-white/95 backdrop-blur-md border-b border-gray-100"
           style={{
-            boxShadow: scroll > 50 ? "0 4px 20px rgba(0, 0, 0, 0.08)" : "none",
-            backgroundColor: scroll > 50 ? "rgba(255, 255, 255, 0.98)" : "rgba(255, 255, 255, 1)",
-            transition: "all 0.3s ease-in-out",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+            backgroundColor: "rgba(255, 255, 255, 0.98)",
           }}
         >
-          {/* Premium gradient accent line */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#46194F] via-[#4a1d6e] to-[#46194F] opacity-90"></div>
-
-          <div className="container mx-auto lg:px-[6rem]">
+          {/* Content container with 7rem padding on desktop */}
+          <div className="header-content-container">
             <div className="flex items-center justify-between h-20">
-              {/* Logo - removed hover effects */}
+              {/* Logo - smaller on mobile */}
               <div className="flex items-center">
                 <Link href={isRTL ? "/ar" : "/en"} className="block">
                   <Image
                     src={logo9 || "/placeholder.svg"}
-                    height={50}
-                    width={150}
+                    height={isMobile ? 40 : 50}
+                    width={isMobile ? 100 : isTablet ? 120 : 150}
                     alt={"Logo"}
                     className="object-contain"
                     priority
@@ -149,71 +287,128 @@ const Header = () => {
                 </Link>
               </div>
 
-              {/* Desktop Navigation - Hidden on mobile */}
-              <div className="hidden md:flex items-center space-x-7 rtl:space-x-reverse header-transition">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={toggleSearch}
-                  className="p-2.5 rounded-full hover:bg-gray-50 transition-colors relative group"
-                  aria-label={t("search")}
-                >
-                  <Search className="h-5 w-5 text-gray-700 group-hover:text-[#46194F] transition-colors" />
-                  <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-[#46194F] group-hover:w-full transition-all duration-300 transform -translate-x-1/2"></span>
-                </motion.button>
+              {/* Desktop Navigation (Large screens only) */}
+              {!isTablet && !isMobile && (
+                <div className="hidden lg:flex items-center justify-between flex-1 ml-8">
+                  {/* Navigation Links - Centered */}
+                  <div className="flex-1 flex justify-center">
+                    <Nav isMobile={false} isTablet={false} setIsMobileMenuOpen={setIsMobileMenuOpen} />
+                  </div>
 
-                <motion.div whileHover={{ scale: 1.1 }} className="relative group">
-                  <WishlistCounter />
-                  <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-[#46194F] group-hover:w-full transition-all duration-300 transform -translate-x-1/2"></span>
-                </motion.div>
+                  {/* Action Buttons */}
+                  <div className="flex items-center space-x-5 rtl:space-x-reverse">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={toggleSearch}
+                      className="p-2.5 rounded-full hover:bg-gray-50 transition-colors relative group"
+                      aria-label={t("search")}
+                    >
+                      <Search className="h-5 w-5 text-gray-700 group-hover:text-brand-primary transition-colors" />
+                      <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-brand-primary group-hover:w-full transition-all duration-300 transform -translate-x-1/2"></span>
+                    </motion.button>
 
-                <motion.div whileHover={{ scale: 1.1 }} className="relative group">
-                  <LanguageToggle />
-                  <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-[#46194F] group-hover:w-full transition-all duration-300 transform -translate-x-1/2"></span>
-                </motion.div>
+                    <motion.div whileHover={{ scale: 1.1 }} className="relative group">
+                      <WishlistCounter />
+                      <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-[#46194F] group-hover:w-full transition-all duration-300 transform -translate-x-1/2"></span>
+                    </motion.div>
 
-                {/* Premium Call Button - Desktop with CSS mask animation */}
-                <div className="button-container-mask">
-                  <span className="mask-text">9200 31202</span>
-                  <a href="tel:920031202" className="mask-button">
-                    <div className="flex items-center justify-center gap-2">
-                      <Phone className="h-5 w-5" />
+                    <motion.div whileHover={{ scale: 1.1 }} className="relative group">
+                      <LanguageToggle />
+                      <span className="absolute -bottom-1 left-1/2 w-0 h-0.5 bg-[#46194F] group-hover:w-full transition-all duration-300 transform -translate-x-1/2"></span>
+                    </motion.div>
+
+                    {/* Desktop Call Button with clean hover effect */}
+                    <motion.a
+                      href="tel:920031202"
+                      className="call-button"
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Phone className="call-icon h-5 w-5" />
                       <span>9200 31202</span>
-                    </div>
-                  </a>
+                    </motion.a>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Mobile Navigation */}
-              <div className="flex md:hidden items-center space-x-3 rtl:space-x-reverse">
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={toggleSearch}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                  aria-label={t("search")}
-                >
-                  <Search className="h-5 w-5 text-gray-700" />
-                </motion.button>
+              {/* Tablet Navigation (iPad/Tablet only) */}
+              {isTablet && (
+                <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                  <div className="mobile-icon-wrapper">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={toggleSearch}
+                      className="mobile-header-icon"
+                      aria-label={t("search")}
+                    >
+                      <Search className="h-6 w-6 text-gray-700" />
+                    </motion.button>
+                  </div>
 
-                <motion.div whileTap={{ scale: 0.9 }}>
-                  <WishlistCounter />
-                </motion.div>
+                  <div className="mobile-icon-wrapper">
+                    <motion.div whileTap={{ scale: 0.9 }} className="mobile-header-icon">
+                      <WishlistCounter size="large" />
+                    </motion.div>
+                  </div>
 
-                <motion.div whileTap={{ scale: 0.9 }}>
-                  <LanguageToggle />
-                </motion.div>
+                  <div className="mobile-icon-wrapper">
+                    <motion.div whileTap={{ scale: 0.9 }}>
+                      <div className="language-toggle-wrapper">
+                        <LanguageToggle />
+                      </div>
+                    </motion.div>
+                  </div>
 
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-[5px] hover:bg-gray-100 transition-all"
-                  onClick={toggleMobileMenu}
-                >
-                  {isMobileMenuOpen ? <X className="h-6 w-6 text-[#46194F]" /> : <Menu className="h-6 w-6" />}
-                </motion.button>
-              </div>
+                  <div className="mobile-icon-wrapper">
+                    <motion.button whileTap={{ scale: 0.9 }} className="mobile-header-icon" onClick={toggleMobileMenu}>
+                      {isMobileMenuOpen ? <X className="h-6 w-6 text-brand-primary" /> : <Menu className="h-6 w-6" />}
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile Navigation - improved spacing and consistent icon sizes */}
+              {isMobile && (
+                <div className="flex items-center space-x-1 rtl:space-x-reverse">
+                  <div className="mobile-icon-wrapper">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={toggleSearch}
+                      className="mobile-header-icon"
+                      aria-label={t("search")}
+                    >
+                      <Search className="h-6 w-6 text-gray-700" />
+                    </motion.button>
+                  </div>
+
+                  <div className="mobile-icon-wrapper">
+                    <motion.div whileTap={{ scale: 0.9 }} className="mobile-header-icon">
+                      <WishlistCounter size="large" />
+                    </motion.div>
+                  </div>
+
+                  <div className="mobile-icon-wrapper">
+                    <motion.div whileTap={{ scale: 0.9 }}>
+                      <div className="language-toggle-wrapper">
+                        <LanguageToggle />
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  <div className="mobile-icon-wrapper">
+                    <button onClick={toggleMobileMenu} className="mobile-header-icon">
+                      {isMobileMenuOpen ? <X className="h-6 w-6 text-brand-primary" /> : <Menu className="h-6 w-6" />}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Progress Bar */}
+        <ProgressBar />
 
         {/* Search Component with improved animation */}
         <AnimatePresence>
@@ -225,24 +420,12 @@ const Header = () => {
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               className="w-full bg-white shadow-lg border-t border-gray-100"
             >
-              <div className="container mx-auto lg:px-[7rem] py-4">
+              <div className="header-content-container py-4">
                 <SearchComponent isVisible={isSearchVisible} onClose={toggleSearch} />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Navigation for desktop with enhanced styling */}
-        <div
-          className="hidden md:block bg-white border-b border-gray-100 shadow-sm transition-all duration-500"
-          style={{
-            boxShadow: scroll > 50 ? "0 4px 10px rgba(0, 0, 0, 0.05)" : "none",
-          }}
-        >
-          <div className="container mx-auto lg:px-[6rem]">
-            <Nav isMobile={false} setIsMobileMenuOpen={setIsMobileMenuOpen} />
-          </div>
-        </div>
 
         {/* Mobile Menu Overlay with Backdrop */}
         <AnimatePresence>
@@ -264,9 +447,9 @@ const Header = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: isRTL ? 300 : -300 }}
                 transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                className={`md:hidden fixed top-0 ${
+                className={`lg:hidden fixed top-0 ${
                   isRTL ? "right-0" : "left-0"
-                } h-full w-[85%] max-w-[320px] bg-white shadow-xl z-50 overflow-y-auto`}
+                } h-full w-[85%] max-w-[320px] bg-white shadow-xl z-50 overflow-y-auto pb-20`}
               >
                 {/* Mobile menu header with left-aligned logo */}
                 <div className="flex justify-between items-center py-2 px-1 border-b border-gray-100">
@@ -279,38 +462,45 @@ const Header = () => {
                       className="object-contain"
                     />
                   </Link>
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
+                  <button
                     onClick={toggleMobileMenu}
-                    className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors text-[#46194F]"
+                    className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200 text-[#46194F]"
                   >
                     <X className="h-5 w-5" />
-                  </motion.button>
+                  </button>
                 </div>
 
                 {/* Mobile navigation */}
                 <div className="py-2">
-                  <Nav isMobile={true} setIsMobileMenuOpen={setIsMobileMenuOpen} />
-                </div>
-
-                {/* Premium Call Button - Mobile with CSS mask animation */}
-                <div className="px-5 py-4 border-t mt-2">
-                  <div className="button-container-mask-mobile">
-                    <span className="mask-text-mobile">9200 31202</span>
-                    <a href="tel:920031202" className="mask-button-mobile">
-                      <div className="flex items-center justify-center gap-2">
-                        <Phone className="h-5 w-5" />
-                        <span>9200 31202</span>
-                      </div>
-                    </a>
-                  </div>
+                  <Nav isMobile={true} setIsMobileMenuOpen={setIsMobileMenuOpen} showCallButton={true} />
                 </div>
               </motion.div>
             </>
           )}
         </AnimatePresence>
-      </motion.header>
+      </header>
     </>
+  )
+}
+
+// Progress Bar Component
+const ProgressBar = () => {
+  const { scrollYProgress } = useScroll()
+  return (
+    <motion.div
+      id="scroll-indicator"
+      style={{
+        scaleX: scrollYProgress,
+        position: "fixed",
+        top: 80, // Position it at the bottom of the header
+        left: 0,
+        right: 0,
+        height: 2,
+        originX: 0,
+        zIndex: 10,
+        backgroundColor: "#71308A",
+      }}
+    />
   )
 }
 

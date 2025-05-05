@@ -10,12 +10,12 @@ const ProgressBar = () => {
             style={{
                 scaleX: scrollYProgress,
                 position: "fixed",
-                top: 0,
+                top: 70,
                 left: 0,
                 right: 0,
-                height: 3,
+                height: 2,
                 originX: 0,
-                zIndex: 1000,
+                zIndex: 10,
                 backgroundColor: "#71308A",
             }}
         />
