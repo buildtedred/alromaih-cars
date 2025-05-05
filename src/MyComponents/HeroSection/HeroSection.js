@@ -230,7 +230,7 @@ export default function HeroSection() {
   // Mobile view
   if (isMobile) {
     return (
-      <div className="mx-auto my-6">
+      <div className="mx-auto">
         {/* Fixed height container */}
         <div
           className="relative bg-white rounded-[5px] overflow-hidden shadow-md h-[400px]"
@@ -396,7 +396,7 @@ export default function HeroSection() {
   }
   return (
     <div className="container m-auto" ref={containerRef} dir={isRTL ? "rtl" : "ltr"}>
-      <div className="relative mb-[100px]">
+      <div className="relative  mb-[100px]">
         {/* Main content area */}
         <div className="relative bg-brand-dark rounded-3xl overflow-hidden">
           <div className="grid grid-cols-12 h-[500px]">
@@ -416,7 +416,7 @@ export default function HeroSection() {
               {/* Car name */}
               <div ref={nameRef}>
                 <h2
-                  className={`text-5xl lg:text-6xl py-2 font-bold mb-3 text-white line-clamp-2 overflow-hidden ${
+                  className={`text-4xl lg:text-6xl py-2 font-bold mb-3 text-white line-clamp-2 overflow-hidden ${
                     isRTL ? "font-noto" : ""
                   }`}
                 >

@@ -18,27 +18,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import carsData from "@/app/api/mock-data";
 import { Button } from "@/components/ui/button";
 
-// Custom scrollbar styles
-const scrollbarStyles = `
-  .scrollbar-custom::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  
-  .scrollbar-custom::-webkit-scrollbar-track {
-    background: rgba(113, 48, 138, 0.05);
-    border-radius: 10px;
-  }
-  
-  .scrollbar-custom::-webkit-scrollbar-thumb {
-    background: #71308a;
-    border-radius: 10px;
-  }
-  
-  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    background: #4a1d6e;
-  }
-`;
+
 
 // Custom animations for badges
 const badgeAnimations = `
@@ -100,7 +80,7 @@ export default function CarFinderModal() {
   return (
     <div className="flex flex-col md:flex-row w-full max-w-6xl mx-auto rounded-xl overflow-hidden bg-brand-light/30 shadow-lg">
       {/* Left side - Payment Method Selection */}
-      <div className="p-4 sm:p-6 md:p-8 md:w-1/2 bg-brand-primary/10">
+      <div className="p-4 sm:p-6 md:p-8 md:w-3/4 bg-brand-primary/10">
         <h1 className="text-xl sm:text-2xl font-bold text-brand-primary mb-4 sm:mb-6 ">
           {isArabic ? "اختر طريقة الدفع" : "Choose Payment Method"}
         </h1>
