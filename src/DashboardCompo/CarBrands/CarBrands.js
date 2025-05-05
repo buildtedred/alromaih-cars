@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Image from "next/image"
 
 export default function CarBrands() {
   const [brands, setBrands] = useState([])
@@ -275,10 +276,12 @@ export default function CarBrands() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-center items-center h-12 w-12 rounded-[5px] overflow-hidden bg-muted border">
-                      <img
+                      <Image
                         src={brand.image || placeholderImage}
                         alt={brand.name}
-                        className="object-cover h-full w-full"
+                        className="object-cover"
+                        width={48}
+                        height={48}
                         onError={(e) => {
                           e.target.onerror = null
                           e.target.src = placeholderImage

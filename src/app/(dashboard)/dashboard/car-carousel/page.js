@@ -192,12 +192,13 @@ export default function CarCarouselList() {
               {filteredCarousels.map((carousel) => (
                 <TableRow key={carousel.id}>
                   <TableCell>
-                    <div className="relative h-12 w-16 rounded-[5px] overflow-hidden bg-muted border">
+                    <div className=" flex justify-center items-center relative h-12 w-16 rounded-[5px] overflow-hidden bg-muted border">
                       <Image
                         src={carousel.imageUrl || "/placeholder.svg?height=160&width=320&query=carousel image"}
                         alt={carousel.title}
-                        fill
                         className="object-cover"
+                        width={48}
+                        height={48}
                         onError={(e) => {
                           e.target.onerror = null
                           e.target.src = "/placeholder.svg?key=w5u71"

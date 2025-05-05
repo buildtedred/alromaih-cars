@@ -32,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
+import Image from "next/image"
 
 export default function AllCarsPage() {
   const [cars, setCars] = useState([])
@@ -333,10 +334,12 @@ export default function AllCarsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-center items-center h-12 w-12 rounded-[5px] overflow-hidden bg-muted border">
-                      <img
+                      <Image
                         src={car?.images?.[0] || placeholderImage}
                         alt={car?.model}
-                        className="h-full w-full object-cover"
+                        className="object-cover"
+                        width={48}
+                        height={48}
                         onError={(e) => {
                           e.target.onerror = null
                           e.target.src = placeholderImage

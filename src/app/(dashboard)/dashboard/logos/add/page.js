@@ -2,156 +2,240 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ImageIcon } from 'lucide-react'
+import { ArrowLeft, Loader2, ImageIcon, Check, Upload, X, AlertCircle, ChevronRight } from 'lucide-react'
+import Link from "next/link"
+import axios from "axios"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import ImageGallery from "../../images-gallery/image-gallery"
 
 export default function AddLogoPage() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
-    title: "",
-    imageUrl: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [name, setName] = useState("")
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [uploadStatus, setUploadStatus] = useState(null)
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  // Handle form input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const handleNameChange = (e) => {
+    const newName = e.target.value
+    setName(newName)
   }
 
-  // Handle image selection from gallery
-  const handleImageSelect = (imageUrl) => {
-    setFormData((prev) => ({ ...prev, imageUrl }))
-    setIsDialogOpen(false)
+  // Handle image selection
+  const handleImageSelect = (url) => {
+    setSelectedImageUrl(url)
+    setIsDialogOpen(false) // Close the dialog when image is selected
   }
 
-  // Add new logo
-  const handleAddLogo = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault()
-    setIsSubmitting(true)
+    setError(null)
+    setUploadStatus(null)
+
+    if (!name.trim()) {
+      setError("Logo name is required")
+      return
+    }
+
+    if (!selectedImageUrl) {
+      setError("Please select an image from the gallery")
+      return
+    }
 
     try {
-      const response = await fetch("/api/supabasPrisma/logo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
+      setLoading(true)
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Failed to add logo")
+      const payload = {
+        title: name,
+        imageUrl: selectedImageUrl,
       }
 
-      // Navigate back to logos list
+      // Use Axios to send the POST request
+      const response = await axios.post("/api/supabasPrisma/logo", payload)
+
+      // Handle success response
+      setUploadStatus("Logo created successfully!")
       router.push("/dashboard/logos")
+      router.refresh()
     } catch (error) {
-      console.error("Error adding logo:", error)
-      alert("Failed to add logo: " + (error.message || "Unknown error"))
+      // Handle errors
+      console.error("Error creating logo:", error)
+
+      // Check if error is an Axios error and handle it
+      if (error.response) {
+        setError(error.response.data.error || "Failed to create logo. It may already exist.")
+      } else {
+        setError("Failed to create logo. It may already exist.")
+      }
     } finally {
-      setIsSubmitting(false)
+      setLoading(false)
     }
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4">
-      {/* Breadcrumb */}
-      <div className="flex items-center text-sm text-gray-600 mb-2">
-        <span>Dashboard</span>
-        <span className="mx-2">›</span>
-        <span>Logos</span>
-        <span className="mx-2">›</span>
-        <span className="text-gray-900">Add New Logo</span>
+    <div className="max-w-3xl mx-auto px-4 py-4 relative">
+      {/* Full-page overlay during loading */}
+      {loading && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card p-6 rounded-[5px] shadow-lg text-center max-w-md w-full border border-brand-primary/20">
+            <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-brand-primary" />
+            <h3 className="font-medium text-lg mb-2">Creating Logo</h3>
+            <p className="text-muted-foreground">Please wait while we process your request...</p>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-4">
+        <div className="flex items-center text-xs text-muted-foreground mb-2">
+          <Link href="/dashboard" className="hover:text-brand-primary transition-colors">
+            Dashboard
+          </Link>
+          <ChevronRight className="h-3 w-3 mx-1" />
+          <Link href="/dashboard/logos" className="hover:text-brand-primary transition-colors">
+            Logos
+          </Link>
+          <ChevronRight className="h-3 w-3 mx-1" />
+          <span className="text-foreground">Add New Logo</span>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-brand-primary">Add New Logo</h1>
+            <p className="text-xs text-muted-foreground">Create a new logo to add to your collection</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full sm:w-auto h-8 text-xs rounded-[5px]"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back to Logos
+          </Button>
+        </div>
       </div>
 
-      {/* Header */}
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-[#5D2E8C]">Add New Logo</h1>
-          <p className="text-gray-600">Create a new logo to add to your collection</p>
-        </div>
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-2 h-9 px-4 border-gray-300"
-          onClick={() => router.push("/dashboard/logos")}
+      {error && (
+        <Alert
+          variant="destructive"
+          className="mb-3 py-2 text-sm animate-in fade-in-50 slide-in-from-top-5 duration-300 rounded-[5px]"
         >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Logos</span>
-        </Button>
-      </div>
+          <AlertCircle className="h-3.5 w-3.5" />
+          <AlertTitle className="text-sm font-medium">Error</AlertTitle>
+          <AlertDescription className="text-xs">{error}</AlertDescription>
+        </Alert>
+      )}
 
-      {/* Form Card */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        {/* Card Header */}
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-[#5D2E8C]">Logo Details</h2>
-          <p className="text-sm text-gray-500">Enter the details for the new logo</p>
-        </div>
+      {uploadStatus && !error && (
+        <Alert className="mb-3 py-2 text-sm bg-green-50 text-green-800 border-green-200 animate-in fade-in-50 slide-in-from-top-5 duration-300 rounded-[5px]">
+          <Check className="h-3.5 w-3.5 text-green-600" />
+          <AlertTitle className="text-sm font-medium">Success</AlertTitle>
+          <AlertDescription className="text-xs">{uploadStatus}</AlertDescription>
+        </Alert>
+      )}
 
-        <form onSubmit={handleAddLogo}>
-          {/* Card Content */}
-          <div className="px-6 py-5 space-y-6">
-            {/* Logo Name Field */}
-            <div>
-              <label className="block mb-1 font-medium">
+      <Card className="shadow-md border-brand-primary/10 overflow-hidden rounded-[5px]">
+        <form onSubmit={handleSubmit} className="rounded-[5px]">
+          <CardHeader className="bg-brand-light/30 border-b border-brand-primary/10 py-3 px-4">
+            <CardTitle className="text-base text-brand-primary">Logo Details</CardTitle>
+            <CardDescription className="text-xs">Enter the details for the new logo</CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4 pt-4 px-4">
+            <div className="space-y-1">
+              <Label htmlFor="name" className="text-sm font-medium">
                 Logo Name <span className="text-red-500">*</span>
-              </label>
+              </Label>
               <Input
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                required
-                disabled={isSubmitting}
-                className="w-full h-10 px-3 border-gray-300"
+                id="name"
+                value={name}
+                onChange={handleNameChange}
                 placeholder="Enter logo name"
+                className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
+                required
               />
-              <p className="mt-1 text-sm text-gray-500">Enter the official name of the logo</p>
+              <p className="text-xs text-muted-foreground">Enter the official name of the logo</p>
             </div>
 
-            {/* Logo Image Field */}
-            <div>
-              <label className="block mb-1 font-medium">
-                Logo Image <span className="text-red-500">*</span>
-              </label>
-              <div className="border border-gray-300 rounded-md p-6">
-                {formData.imageUrl ? (
-                  <div className="flex flex-col items-center">
-                    <img
-                      src={formData.imageUrl || "/placeholder.svg"}
-                      alt="Logo preview"
-                      className="max-h-40 object-contain mb-4"
-                      onError={(e) => {
-                        e.target.src = "/placeholder.svg?height=100&width=100"
-                      }}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsDialogOpen(true)}
-                      className="h-9 border-gray-300"
-                    >
-                      Change Image
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <div className="bg-gray-100 p-4 rounded-md mr-4">
-                      <svg className="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center">
+                <Label className="text-sm font-medium">
+                  Logo Image <span className="text-red-500">*</span>
+                </Label>
+                {selectedImageUrl && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 rounded-[5px]"
+                          onClick={() => setSelectedImageUrl(null)}
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          Clear
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-xs">Remove selected image</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+
+              <div className="border rounded-[5px] bg-muted/30 overflow-hidden">
+                {selectedImageUrl ? (
+                  <div className="flex items-center gap-3 p-3">
+                    <div className="relative w-16 h-16 bg-white rounded-[5px] p-1 shadow-sm flex-shrink-0 border">
+                      <img
+                        src={selectedImageUrl || "/placeholder.svg"}
+                        alt="Selected"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                     <div className="flex-1">
-                      <div className="text-gray-500 mb-2">No image selected</div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <div className="h-4 w-4 rounded-[50%] bg-green-100 flex items-center justify-center">
+                          <Check className="h-2.5 w-2.5 text-green-600" />
+                        </div>
+                        <span className="text-xs text-green-700 font-medium">Image selected</span>
+                      </div>
                       <Button
                         type="button"
-                        className="bg-[#5D2E8C] hover:bg-[#4A2470] text-white"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs rounded-[5px]"
                         onClick={() => setIsDialogOpen(true)}
                       >
-                        <ImageIcon className="h-4 w-4 mr-2" />
+                        <ImageIcon className="h-3 w-3 mr-1.5" />
+                        Change Image
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3 p-3">
+                    <div className="h-10 w-10 rounded-[5px] bg-brand-light/50 flex items-center justify-center flex-shrink-0">
+                      <Upload className="h-5 w-5 text-brand-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-medium mb-1">No image selected</p>
+                      <Button
+                        type="button"
+                        variant="default"
+                        size="sm"
+                        className="h-7 text-xs bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
+                        onClick={() => setIsDialogOpen(true)}
+                      >
+                        <ImageIcon className="h-3 w-3 mr-1.5" />
                         Select from Gallery
                       </Button>
                     </div>
@@ -159,37 +243,33 @@ export default function AddLogoPage() {
                 )}
               </div>
             </div>
-          </div>
+          </CardContent>
 
-          {/* Card Footer */}
-          <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push("/dashboard/logos")}
-              className="h-9 border-gray-300"
-              disabled={isSubmitting}
-            >
+          <CardFooter className="flex justify-end gap-2 py-3 px-4 border-t bg-muted/20">
+            <Button variant="outline" type="button" className="h-8 text-xs rounded-[5px]" onClick={() => router.back()}>
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.title || !formData.imageUrl}
-              className="h-9 bg-[#9370B5] hover:bg-[#7A5C9A] text-white"
+              disabled={loading || !selectedImageUrl || !name.trim()}
+              className="h-8 text-xs bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
             >
               Create Logo
             </Button>
-          </div>
+          </CardFooter>
         </form>
-      </div>
+      </Card>
 
       {/* Image Gallery Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl text-[#5D2E8C]">Select Logo Image</DialogTitle>
+        <DialogContent className="sm:max-w-[85vw] max-h-[85vh] overflow-hidden p-0 rounded-[5px]">
+          <DialogHeader className="px-4 pt-4 pb-3 border-b">
+            <DialogTitle className="text-base text-brand-primary">Select Logo Image</DialogTitle>
+            <DialogDescription className="text-xs">
+              Choose an image from your gallery to use as the logo
+            </DialogDescription>
           </DialogHeader>
-          <div className="mt-4">
+          <div className="overflow-y-auto max-h-[calc(85vh-8rem)] p-4">
             <ImageGallery onSelect={handleImageSelect} />
           </div>
         </DialogContent>

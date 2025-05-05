@@ -457,7 +457,7 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item) => (
                   <div key={item} className="w-full">
-                    <Card className="overflow-hidden border-muted rounded-[5px]">
+                    <Card className="overflow-hidden border-muted rounded-[5px] h-[120px]">
                       <Skeleton className="h-[80px] w-full rounded-[5px]" />
                       <CardContent className="p-1">
                         <Skeleton className="h-2 w-3/4 mb-1 rounded-[5px]" />
@@ -488,7 +488,7 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
                 {filteredImages.map((image) => (
                   <Card
                     key={image.name}
-                    className={`overflow-hidden cursor-pointer transition-all border-muted hover:border-brand-primary/50 rounded-[5px] ${
+                    className={`overflow-hidden cursor-pointer transition-all border-muted hover:border-brand-primary/50 rounded-[5px] h-[120px] ${
                       (isMultiSelectMode && isImageSelected(image.name)) ||
                       (!isMultiSelectMode && selectedImage?.name === image.name)
                         ? "ring-1 ring-brand-primary"
@@ -497,12 +497,12 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
                     onClick={() => handleImageClick(image)}
                   >
                     {/* Image */}
-                    <div className="aspect-square relative flex justify-center items-center overflow-hidden">
+                    <div className="h-[70px] relative flex justify-center items-center overflow-hidden">
                       <Image
                         src={image.url || "/placeholder.svg"}
                         alt={image.name}
                         width={150}
-                        height={150}
+                        height={100}
                         className="object-cover"
                         priority={false}
                       />
@@ -515,17 +515,17 @@ export default function ImageGallery({ onSelect, onSelectMultiple, multiSelect =
                     </div>
 
                     {/* Image details and delete button */}
-                    <CardContent className="p-1 pb-0">
+                    <CardContent className="p-1 pb-0 h-[30px]">
                       <div className="truncate text-[10px]">{image.name}</div>
                       <div className="text-[8px] text-muted-foreground">{formatFileSize(image.size)}</div>
                     </CardContent>
 
                     {/* Delete button */}
-                    <CardFooter className="p-1 pt-0 flex justify-end">
+                    <CardFooter className="p-1 pt-0 flex justify-end h-[20px]">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-5 w-5 rounded-[5px] text-muted-foreground hover:text-destructive"
+                        className="h-5 w-5 rounded-[5px] text-muted-foreground hover:text-red-500"
                         onClick={(e) => deleteImage(image.name, e)}
                       >
                         <Trash2 className="h-3 w-3" />
