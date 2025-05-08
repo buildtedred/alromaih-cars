@@ -10,8 +10,8 @@ export default function TermsPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section with White Background */}
-      <div className="bg-white pt-20 pb-16">
-        <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto">
+      <div className="bg-white">
+        <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1340px] mx-auto">
           <div className={`${locale === "ar" ? "rtl" : ""}`}>
             {/* Hero Section - Now styled like other sections */}
             <section className="bg-white rounded-xl p-4 mb-8">

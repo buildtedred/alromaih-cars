@@ -12,6 +12,23 @@ import * as SliderPrimitive from "@radix-ui/react-slider"
 import { useDetailContext } from "@/contexts/detailProvider"
 import { Breadcrumb } from "../../breadcrumb" // Import the Breadcrumb component
 
+// Helper function to safely get text from an object or string
+const getText = (textObj, language) => {
+  if (textObj === null || textObj === undefined) return ""
+  if (typeof textObj !== "object") return String(textObj)
+  return textObj[language] || textObj.en || ""
+}
+
+// Helper function to safely get brand string
+const getBrandString = (brand, language) => {
+  return getText(brand, language)
+}
+
+// Helper function to safely get lowercase brand
+const getBrandLowerCase = (brand, language) => {
+  return getBrandString(brand, language).toLowerCase()
+}
+
 // Add this new component for selected filters display
 const SelectedFilters = ({ selectedFilters, onRemoveFilter, onClearAll, language }) => {
   if (!selectedFilters || selectedFilters.length === 0) return null
@@ -240,7 +257,7 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
 const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = false, onClose }) => {
   const { searchbrands } = useDetailContext()
   const [expandedBrands, setExpandedBrands] = useState([])
-  const [searchTerm, setSearchTerm] = useState(searchbrands?.brand)
+  const [searchTerm, setSearchTerm] = useState(searchbrands?.brand ? getText(searchbrands.brand, language) : "")
   // Add state to track which sections are expanded
   const [expandedSections, setExpandedSections] = useState({
     priceRange: true,
@@ -265,10 +282,16 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   const modelsByBrand = useMemo(() => {
     const models = {}
     brands.forEach((brand) => {
-      models[brand] = cars
-        .filter((car) => car.brand === brand)
+      // Use getBrandString to safely get the brand name
+      const brandKey = getBrandString(brand, language)
+      models[brandKey] = cars
+        .filter((car) => {
+          const carBrand = getBrandString(car.brand, language)
+          const currentBrand = getBrandString(brand, language)
+          return carBrand === currentBrand
+        })
         .map((car) => {
-          const modelName = typeof car.name === "object" ? car.name[language] || car.name.en : car.name
+          const modelName = getText(car.name, language)
           return { id: car.id, name: modelName }
         })
     })
@@ -278,12 +301,20 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   // Filter brands based on search term
   const filteredBrands = useMemo(() => {
     if (!searchTerm) return brands
-    return brands.filter(
-      (brand) =>
-        brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        modelsByBrand[brand]?.some((model) => model.name.toLowerCase().includes(searchTerm.toLowerCase())),
-    )
-  }, [brands, modelsByBrand, searchTerm])
+
+    return brands.filter((brand) => {
+      // Use getBrandLowerCase to safely get lowercase brand name
+      const brandStr = getBrandLowerCase(brand, language)
+      const searchTermLower = searchTerm.toLowerCase()
+
+      // Check if brand name contains search term
+      if (brandStr.includes(searchTermLower)) return true
+
+      // Check if any model of this brand contains search term
+      const brandKey = getBrandString(brand, language)
+      return modelsByBrand[brandKey]?.some((model) => model.name.toLowerCase().includes(searchTermLower))
+    })
+  }, [brands, modelsByBrand, searchTerm, language])
 
   // Toggle section expansion
   const toggleSection = (section, e) => {
@@ -308,18 +339,22 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   // Check if all models of a brand are selected
   const areAllModelsSelected = useCallback(
     (brand) => {
-      const brandModels = modelsByBrand[brand] || []
+      // Use getBrandString to safely get the brand name
+      const brandKey = getBrandString(brand, language)
+      const brandModels = modelsByBrand[brandKey] || []
       if (brandModels.length === 0) return false
 
       return brandModels.every((model) => filters.selectedModels?.includes(model.id))
     },
-    [filters.selectedModels, modelsByBrand],
+    [filters.selectedModels, modelsByBrand, language],
   )
 
   // Handle brand checkbox change
   const handleBrandCheck = useCallback(
     (brand, checked) => {
-      const brandModels = modelsByBrand[brand] || []
+      // Use getBrandString to safely get the brand name
+      const brandKey = getBrandString(brand, language)
+      const brandModels = modelsByBrand[brandKey] || []
       const modelIds = brandModels.map((model) => model.id)
 
       let updatedModels = [...(filters.selectedModels || [])]
@@ -338,7 +373,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
 
       onFilterChange({ selectedModels: updatedModels })
     },
-    [filters.selectedModels, modelsByBrand, onFilterChange],
+    [filters.selectedModels, modelsByBrand, onFilterChange, language],
   )
 
   // Handle model checkbox change
@@ -441,7 +476,12 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   // Helper function to get brand logo
   const getBrandLogo = (brandName) => {
     // Find a car with this brand
-    const car = cars.find((car) => car.brand?.toLowerCase() === brandName.toLowerCase())
+    const car = cars.find((car) => {
+      // Use getBrandLowerCase to safely compare brand names
+      const carBrandStr = getBrandLowerCase(car.brand, language)
+      const brandNameStr = getBrandLowerCase(brandName, language)
+      return carBrandStr === brandNameStr
+    })
     // Return the brand logo if found, otherwise return a placeholder
     return car?.brandLogo || `/placeholder.svg?height=20&width=20`
   }
@@ -566,70 +606,76 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
 
               {/* Brand list */}
               <div className="space-y-2">
-                {filteredBrands.map((brand) => (
-                  <div key={brand} className="mb-4">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id={`brand-${brand}`}
-                        checked={areAllModelsSelected(brand)}
-                        onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
-                        className="h-4 w-4 rounded-[5px] border-2 border-brand-primary focus:ring-brand-primary"
-                        style={{
-                          backgroundColor: areAllModelsSelected(brand) ? "#46194F" : "transparent",
-                          borderColor: areAllModelsSelected(brand) ? "#46194F" : "",
-                        }}
-                      />
-                      <Label
-                        htmlFor={`brand-${brand}`}
-                        className="text-xs font-medium cursor-pointer flex items-center gap-1 flex-1"
-                      >
-                        <img
-                          src={getBrandLogo(brand) || "/placeholder.svg"}
-                          alt={brand}
-                          className="h-5 w-5 object-contain"
+                {filteredBrands.map((brand) => {
+                  // Use getBrandString to safely get the brand name
+                  const brandStr = getBrandString(brand, language)
+                  return (
+                    <div key={brandStr} className="mb-4">
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id={`brand-${brandStr}`}
+                          checked={areAllModelsSelected(brand)}
+                          onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
+                          className="h-4 w-4 rounded-[5px] border-2 border-brand-primary focus:ring-brand-primary"
+                          style={{
+                            backgroundColor: areAllModelsSelected(brand) ? "#46194F" : "transparent",
+                            borderColor: areAllModelsSelected(brand) ? "#46194F" : "",
+                          }}
                         />
-                        {brand}
-                      </Label>
-                      <div className="text-xs text-gray-500 mr-2">({modelsByBrand[brand]?.length || 0})</div>
-                      <button
-                        onClick={(e) => toggleBrand(brand, e)}
-                        className="h-6 w-6 flex items-center justify-center text-brand-primary"
-                      >
-                        {expandedBrands.includes(brand) ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-
-                    {/* Models list - shown when brand is expanded */}
-                    {expandedBrands.includes(brand) && (
-                      <div className="ml-6 mt-2 space-y-1 border-l-2 border-brand-primary/20 pl-3">
-                        {modelsByBrand[brand]?.map((model) => (
-                          <div key={model.id} className="flex items-center gap-2">
-                            <Checkbox
-                              id={`model-${model.id}`}
-                              checked={filters.selectedModels?.includes(model.id)}
-                              onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
-                              className="h-3.5 w-3.5  rounded-[5px] border-brand-primary focus:ring-brand-primary"
-                              style={{
-                                backgroundColor: filters.selectedModels?.includes(model.id) ? "#46194F" : "transparent",
-                                borderColor: filters.selectedModels?.includes(model.id) ? "#46194F" : "",
-                              }}
-                            />
-                            <Label
-                              htmlFor={`model-${model.id}`}
-                              className="text-[10px] font-medium cursor-pointer text-gray-700"
-                            >
-                              {model.name}
-                            </Label>
-                          </div>
-                        ))}
+                        <Label
+                          htmlFor={`brand-${brandStr}`}
+                          className="text-xs font-medium cursor-pointer flex items-center gap-1 flex-1"
+                        >
+                          <img
+                            src={getBrandLogo(brand) || "/placeholder.svg"}
+                            alt={brandStr}
+                            className="h-5 w-5 object-contain"
+                          />
+                          {brandStr}
+                        </Label>
+                        <div className="text-xs text-gray-500 mr-2">({modelsByBrand[brandStr]?.length || 0})</div>
+                        <button
+                          onClick={(e) => toggleBrand(brand, e)}
+                          className="h-6 w-6 flex items-center justify-center text-brand-primary"
+                        >
+                          {expandedBrands.includes(brand) ? (
+                            <ChevronUp className="h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4" />
+                          )}
+                        </button>
                       </div>
-                    )}
-                  </div>
-                ))}
+
+                      {/* Models list - shown when brand is expanded */}
+                      {expandedBrands.includes(brand) && (
+                        <div className="ml-6 mt-2 space-y-1 border-l-2 border-brand-primary/20 pl-3">
+                          {modelsByBrand[brandStr]?.map((model) => (
+                            <div key={model.id} className="flex items-center gap-2">
+                              <Checkbox
+                                id={`model-${model.id}`}
+                                checked={filters.selectedModels?.includes(model.id)}
+                                onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
+                                className="h-3.5 w-3.5  rounded-[5px] border-brand-primary focus:ring-brand-primary"
+                                style={{
+                                  backgroundColor: filters.selectedModels?.includes(model.id)
+                                    ? "#46194F"
+                                    : "transparent",
+                                  borderColor: filters.selectedModels?.includes(model.id) ? "#46194F" : "",
+                                }}
+                              />
+                              <Label
+                                htmlFor={`model-${model.id}`}
+                                className="text-[10px] font-medium cursor-pointer text-gray-700"
+                              >
+                                {model.name}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -700,9 +746,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                 ...new Set(
                   cars.map((car) => {
                     // Handle both object and string fuel types
-                    return typeof car.specs?.fuelType === "object"
-                      ? car.specs.fuelType[language] || car.specs.fuelType.en
-                      : car.specs?.fuelType
+                    return getText(car.specs?.fuelType, language)
                   }),
                 ),
               ]
@@ -757,9 +801,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                 ...new Set(
                   cars.map((car) => {
                     // Handle both object and string transmission types
-                    return typeof car.specs?.transmission === "object"
-                      ? car.specs.transmission[language] || car.specs.transmission.en
-                      : car.specs?.transmission
+                    return getText(car.specs?.transmission, language)
                   }),
                 ),
               ]
@@ -816,9 +858,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                 ...new Set(
                   cars.map((car) => {
                     // Handle both object and string seats types
-                    return typeof car.specs?.seats === "object"
-                      ? car.specs.seats[language] || car.specs.seats.en
-                      : car.specs?.seats
+                    return getText(car.specs?.seats, language)
                   }),
                 ),
               ]
@@ -844,14 +884,6 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
           )}
         </div>
       </div>
-
-      {/* Filter footer */}
-      {/* <div
-        className="bg-brand-light border-t border-gray-200 p-4 rounded-b-xl shadow-sm"
-        style={{ boxShadow: "0 -2px 6px rgba(0, 0, 0, 0.05)" }}
-      >
-       
-      </div> */}
     </div>
   )
 }
@@ -940,10 +972,7 @@ const AllCarMainpage = () => {
 
         // Filter by fuel type
         if (filters.fuelTypes?.length > 0) {
-          const carFuelType =
-            typeof car.specs?.fuelType === "object"
-              ? car.specs.fuelType[currentLocale] || car.specs.fuelType.en
-              : car.specs?.fuelType
+          const carFuelType = getText(car.specs?.fuelType, currentLocale)
           if (!carFuelType || !filters.fuelTypes.includes(carFuelType)) {
             return false
           }
@@ -951,10 +980,7 @@ const AllCarMainpage = () => {
 
         // Filter by transmission
         if (filters.transmission?.length > 0) {
-          const carTransmission =
-            typeof car.specs?.transmission === "object"
-              ? car.specs.transmission[currentLocale] || car.specs.transmission.en
-              : car.specs?.transmission
+          const carTransmission = getText(car.specs?.transmission, currentLocale)
           if (!carTransmission || !filters.transmission.includes(carTransmission)) {
             return false
           }
@@ -962,10 +988,7 @@ const AllCarMainpage = () => {
 
         // Filter by seats
         if (filters.seats?.length > 0) {
-          const carSeats =
-            typeof car.specs?.seats === "object"
-              ? car.specs.seats[currentLocale] || car.specs.seats.en
-              : car.specs?.seats
+          const carSeats = getText(car.specs?.seats, currentLocale)
           if (!carSeats || !filters.seats.includes(carSeats)) {
             return false
           }
@@ -1009,12 +1032,12 @@ const AllCarMainpage = () => {
     filters.selectedModels.forEach((modelId) => {
       const car = cars.find((car) => car.id === modelId)
       if (car?.brand) {
-        brands.add(car.brand)
+        brands.add(getBrandString(car.brand, currentLocale))
       }
     })
 
     return Array.from(brands)
-  }, [filters.selectedModels, cars])
+  }, [filters.selectedModels, cars, currentLocale])
 
   // Generate breadcrumb items with brand name if available
   // UPDATED: Only show brand in breadcrumb if exactly ONE brand is selected
@@ -1056,7 +1079,7 @@ const AllCarMainpage = () => {
       filters.selectedModels.forEach((modelId) => {
         const car = cars.find((car) => car.id === modelId)
         if (car && car.brand) {
-          selectedBrands.add(car.brand)
+          selectedBrands.add(getBrandString(car.brand, currentLocale))
         }
       })
 
@@ -1125,7 +1148,7 @@ const AllCarMainpage = () => {
             ...prevFilters,
             selectedModels: prevFilters.selectedModels.filter((modelId) => {
               const car = cars.find((car) => car.id === modelId)
-              return car && car.brand !== filterId
+              return car && getBrandString(car.brand, currentLocale) !== filterId
             }),
           }))
           break
@@ -1157,7 +1180,7 @@ const AllCarMainpage = () => {
           break
       }
     },
-    [cars],
+    [cars, currentLocale],
   )
 
   // Function to clear all filters
@@ -1189,7 +1212,6 @@ const AllCarMainpage = () => {
 
         {/* Main content */}
         <div className="flex-1">
-
           {/* Breadcrumb Navigation - Moved to where tags were */}
           <div className="mb-4">
             <Breadcrumb items={getBreadcrumbItems()} />
@@ -1212,7 +1234,7 @@ const AllCarMainpage = () => {
               <span>{currentLocale === "ar" ? "فلترة النتائج" : "Filter Results"}</span>
             </button>
           </div>
-          
+
           {/* Available Cars Header with Tags moved here */}
           <div className="bg-brand-light rounded-[10px] p-4 mb-6 shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
@@ -1243,15 +1265,14 @@ const AllCarMainpage = () => {
                 </div>
               </div>
             </div>
-
           </div>
-            {/* Selected Filters - Moved to Available Cars section */}
-            <SelectedFilters
-              selectedFilters={getSelectedFilters()}
-              onRemoveFilter={handleRemoveFilter}
-              onClearAll={handleClearAllFilters}
-              language={currentLocale}
-            />
+          {/* Selected Filters - Moved to Available Cars section */}
+          <SelectedFilters
+            selectedFilters={getSelectedFilters()}
+            onRemoveFilter={handleRemoveFilter}
+            onClearAll={handleClearAllFilters}
+            language={currentLocale}
+          />
 
           {/* Results Section */}
           <div id="results-top" style={{ animation: "0.2s ease-out forwards fadeIn" }}>

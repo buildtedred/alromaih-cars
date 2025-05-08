@@ -132,6 +132,85 @@ const printStyles = `
   }
 `
 
+// Add a responsive table style for mobile devices
+// Add this to the top of the component, after the printStyles constant
+const responsiveTableStyles = `
+@media (max-width: 767px) {
+  .responsive-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    position: relative;
+    border-radius: 0.5rem;
+    display: block;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+  }
+  
+  .responsive-table-container::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .responsive-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .responsive-table-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  .responsive-table-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  .responsive-table {
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0.5rem;
+    overflow: visible;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    width: 100%;
+  }
+  
+  .responsive-table th,
+  .responsive-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    white-space: normal;
+    min-width: 80px;
+    font-size: 10px;
+  }
+  
+  .responsive-table th:first-child,
+  .responsive-table td:first-child {
+    min-width: 100px;
+    font-size: 10px;
+  }
+  
+  .responsive-table th {
+    background-color: #f9fafb;
+    font-weight: 500;
+    color: #374151;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: 10px;
+  }
+  
+  .responsive-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .responsive-table tr:hover td {
+    background-color: #f9fafb;
+  }
+}
+`
+
 const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
   const pathname = usePathname()
   const currentLocale = pathname.startsWith("/ar") ? "ar" : "en"
@@ -141,19 +220,32 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
   const [car1, setCar1] = useState(null)
   const [car2, setCar2] = useState(null)
   const [car3, setCar3] = useState(null)
-  const [openCategories, setOpenCategories] = useState({
-    transmission: true, // Open the first category by default
-    engine: false,
-    dimensions: false,
-    capacity: false,
-    safety: false,
-  })
+  const [openCategories, setOpenCategories] = useState(
+    specCategories.reduce((acc, category) => {
+      // Set the first category to be open by default
+      acc[category.id] = category.id === "transmission"
+      return acc
+    }, {}),
+  )
   const [isLoading, setIsLoading] = useState(true)
   const [activeCarIndex, setActiveCarIndex] = useState(0) // For mobile carousel
   const [activeTab, setActiveTab] = useState("specs") // specs, features, price
   const [favorites, setFavorites] = useState([])
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const [stickyTabs, setStickyTabs] = useState(false)
+  const tabsRef = useRef(null)
+
+  // Add responsive table styles
+  useEffect(() => {
+    const styleElement = document.createElement("style")
+    styleElement.innerHTML = responsiveTableStyles
+    document.head.appendChild(styleElement)
+
+    return () => {
+      document.head.removeChild(styleElement)
+    }
+  }, [])
 
   const handlePrint = () => {
     // Create a style element for print styles
@@ -255,6 +347,32 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
   const handleShare = () => {
     setIsShareDialogOpen(true)
   }
+
+  // Handle sticky tabs
+  useEffect(() => {
+    let scrollTimer
+    let ticking = false
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (tabsRef.current) {
+            const tabsPosition = tabsRef.current.getBoundingClientRect().top
+            // Account for the fixed header height (80px)
+            setStickyTabs(tabsPosition <= 80)
+          }
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      clearTimeout(scrollTimer)
+    }
+  }, [])
 
   // Determine if we have 2 or 3 cars to compare
   const hasThirdCar = !!car3Id
@@ -361,7 +479,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
         badgeText = isRTL ? "خصم" : "Discount"
         icon = (
           <div className="w-3 h-3 relative">
-            <Image src={car1.icons.currency || "/placeholder.svg"} alt="Currency" width={12} height={12} />
+            <Image src="/icons/Currency-white.svg" alt="Currency" width={12} height={12} />
           </div>
         )
         break
@@ -422,9 +540,26 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
     }
   }, [car1, car2, car3, hasThirdCar])
 
+  // Force table reflow on tab change for better mobile scrolling
+  useEffect(() => {
+    // Small delay to ensure DOM is updated
+    const timer = setTimeout(() => {
+      const tableContainers = document.querySelectorAll(".responsive-table-container")
+      tableContainers.forEach((container) => {
+        // Force reflow
+        container.style.display = "none"
+        // This line causes the browser to recalculate layout
+        void container.offsetHeight
+        container.style.display = "block"
+      })
+    }, 50)
+
+    return () => clearTimeout(timer)
+  }, [activeTab])
+
   if (isLoading || !car1 || !car2 || (hasThirdCar && !car3)) {
     return (
-      <div className="max-w-7xl mx-auto p-8">
+      <div className="max-w-7xl mx-auto p-4 sm:p-8">
         <div className="flex justify-center items-center h-60">
           <div className="animate-pulse flex flex-col items-center">
             <div className="h-16 w-16 rounded-full bg-brand-light mb-6"></div>
@@ -438,7 +573,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
   // Create a reusable car card component
   const CarCard = ({ car }) => (
-    <div className="flex flex-col h-full car-card">
+    <div className="flex flex-col h-full car-card transform transition-all duration-300 hover:translate-y-[-4px]">
       {/* Car Image with Gradient Overlay */}
       <div className="relative h-56 bg-gradient-to-br from-brand-primary to-[#2D0F33] rounded-t-xl overflow-hidden">
         {/* Decorative elements */}
@@ -462,7 +597,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             e.preventDefault()
             toggleFavorite(car.id)
           }}
-          className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center z-20 transition-all bg-white/20 text-white hover:bg-white/30"
+          className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center z-20 transition-all bg-white/20 text-white hover:bg-white/30 active:scale-95"
         >
           <Heart className={`w-4 h-4 ${favorites.includes(car.id) ? "fill-brand-primary" : ""}`} />
         </button>
@@ -488,12 +623,12 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
         </div>
 
         {/* Price */}
-        <div className="mb-6 bg-gradient-to-r from-brand-light to-white rounded-xl p-4">
+        <div className="mb-6 bg-gradient-to-r from-brand-light to-white rounded-xl p-4 shadow-sm">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
             <span className="text-xl font-bold text-brand-primary flex items-center">
               <Image
-                src={car.icons.currency || "/placeholder.svg"}
+                src="/icons/Currency.svg"
                 alt="Currency"
                 width={18}
                 height={18}
@@ -505,50 +640,50 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
         </div>
 
         {/* Key Specs */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4">
           {/* Engine */}
-          <div className="bg-brand-light bg-opacity-30 rounded-xl p-4">
+          <div className="bg-brand-light bg-opacity-30 rounded-xl p-2 sm:p-4 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
                 <Zap className="w-4 h-4 text-brand-primary" />
               </div>
               <span className="text-sm font-medium text-gray-700">{isRTL ? "المحرك" : "Engine"}</span>
             </div>
-            <p className="text-sm font-medium ml-11">{getText(car.specs.engine)}</p>
-            <p className="text-xs text-gray-500 ml-11">{getText(car.specs.power)}</p>
+            <p className="text-xs sm:text-sm font-medium ml-11 truncate">{getText(car.specs.engine)}</p>
+            <p className="text-xs text-gray-500 ml-11 truncate">{getText(car.specs.power)}</p>
           </div>
 
           {/* Transmission */}
-          <div className="bg-brand-light bg-opacity-30 rounded-xl p-4">
+          <div className="bg-brand-light bg-opacity-30 rounded-xl p-2 sm:p-4 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
                 <Gauge className="w-4 h-4 text-brand-primary" />
               </div>
               <span className="text-sm font-medium text-gray-700">{isRTL ? "ناقل الحركة" : "Transmission"}</span>
             </div>
-            <p className="text-sm font-medium ml-11">{getText(car.specs.transmission)}</p>
+            <p className="text-xs sm:text-sm font-medium ml-11 truncate">{getText(car.specs.transmission)}</p>
           </div>
 
           {/* Fuel */}
-          <div className="bg-brand-light bg-opacity-30 rounded-xl p-4">
+          <div className="bg-brand-light bg-opacity-30 rounded-xl p-2 sm:p-4 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
                 <Fuel className="w-4 h-4 text-brand-primary" />
               </div>
               <span className="text-sm font-medium text-gray-700">{isRTL ? "الوقود" : "Fuel"}</span>
             </div>
-            <p className="text-sm font-medium ml-11">{getText(car.specs.fuelType)}</p>
+            <p className="text-xs sm:text-sm font-medium ml-11 truncate">{getText(car.specs.fuelType)}</p>
           </div>
 
           {/* Seats */}
-          <div className="bg-brand-light bg-opacity-30 rounded-xl p-4">
+          <div className="bg-brand-light bg-opacity-30 rounded-xl p-2 sm:p-4 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
                 <Users className="w-4 h-4 text-brand-primary" />
               </div>
               <span className="text-sm font-medium text-gray-700">{isRTL ? "المقاعد" : "Seats"}</span>
             </div>
-            <p className="text-sm font-medium ml-11">{getText(car.specs.seats)}</p>
+            <p className="text-xs sm:text-sm font-medium ml-11 truncate">{getText(car.specs.seats)}</p>
           </div>
         </div>
       </div>
@@ -574,33 +709,47 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
       const car1Name = getText(car1.name)
       const car2Name = getText(car2.name)
 
+      let label = ""
       if (hasThirdCar && car3) {
-        items.push({
-          label: `${car1Name} vs ${car2Name} vs ${getText(car3.name)}`,
-        })
+        label = `${car1Name} vs ${car2Name} vs ${getText(car3.name)}`
       } else {
-        items.push({
-          label: `${car1Name} vs ${car2Name}`,
-        })
+        label = `${car1Name} vs ${car2Name}`
       }
+
+      // Truncate the label if it's too long
+      if (label.length > 30) {
+        label = label.substring(0, 27) + "..."
+      }
+
+      items.push({
+        label: label,
+        className: "truncate max-w-full",
+      })
     }
 
     return items
   }
 
   return (
-    <div dir={isRTL ? "rtl" : "ltr"} className="max-w-7xl mx-auto" ref={contentRef}>
+    <div
+      dir={isRTL ? "rtl" : "ltr"}
+      className="max-w-[100%] w-full mx-auto pt-4 sm:pt-6 md:pt-8 lg:pt-0"
+      ref={contentRef}
+    >
       {/* Breadcrumb Navigation */}
-      <div onClick={onCompareAgain} className="mb-4 px-4 sm:px-0">
-        <Breadcrumb items={getBreadcrumbItems()} className="text-sm" />
+      <div className="mb-4 mt-2 sm:mt-4 px-0 overflow-hidden">
+        <Breadcrumb items={getBreadcrumbItems()} className="text-sm whitespace-nowrap overflow-hidden" />
       </div>
+
       {/* Header with Gradient Background */}
-      <div className="relative mb-10 overflow-hidden rounded-2xl">
+      <div className="relative mb-10 overflow-hidden rounded-md shadow-xl mx-0" style={{ borderRadius: "5px" }}>
         <div className="absolute inset-0 bg-gradient-to-r from-brand-primary to-[#2D0F33]"></div>
         <div className="absolute inset-0 bg-[url('/placeholder.svg?height=200&width=1200')] opacity-10 mix-blend-overlay"></div>
         <div className="relative z-10 px-6 py-12 text-center">
-          <h1 className="text-4xl font-bold text-white mb-3">{isRTL ? "قارن بين السيارات" : "Compare Cars"}</h1>
-          <p className="text-white/80 text-lg max-w-2xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3 drop-shadow-md">
+            {isRTL ? "قارن بين السيارات" : "Compare Cars"}
+          </h1>
+          <p className="text-white/80 text-base sm:text-lg max-w-2xl mx-auto">
             {isRTL
               ? "مقارنة تفصيلية بين السيارات لمساعدتك في اتخاذ القرار الأفضل"
               : "Detailed car comparison to help you make the best decision"}
@@ -610,7 +759,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
           <div className="flex flex-wrap justify-center gap-3 mt-6 no-print">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors backdrop-blur-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-all backdrop-blur-sm active:scale-95"
               style={{ borderRadius: "5px" }}
             >
               <Printer className="w-4 h-4" />
@@ -618,7 +767,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             </button>
             <button
               onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors backdrop-blur-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-all backdrop-blur-sm active:scale-95"
               style={{ borderRadius: "5px" }}
             >
               <Share2 className="w-4 h-4" />
@@ -635,7 +784,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             <button
               onClick={handleDownload}
               disabled={isGeneratingPDF}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-colors backdrop-blur-sm ${isGeneratingPDF ? "opacity-50 cursor-wait" : ""}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md bg-white/20 text-white hover:bg-white/30 transition-all backdrop-blur-sm active:scale-95 ${isGeneratingPDF ? "opacity-50 cursor-wait" : ""}`}
               style={{ borderRadius: "5px" }}
             >
               <Download className="w-4 h-4" />
@@ -656,11 +805,12 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-32 -mt-32"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white opacity-10 rounded-full -ml-32 -mb-32"></div>
       </div>
-      {/* Mobile Car Carousel */}
-      <div className="md:hidden mb-8">
+
+      {/* Car Carousel (Mobile and Tablet) */}
+      <div className="lg:hidden mb-8 mt-4 px-0">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light">
           {/* Car Image with Gradient Overlay */}
-          <div className="relative h-56 bg-gradient-to-br from-brand-primary to-[#2D0F33]">
+          <div className="relative h-56 sm:h-64 bg-gradient-to-br from-brand-primary to-[#2D0F33]">
             {/* Decorative elements */}
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15),_transparent_70%)]"></div>
             <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent"></div>
@@ -682,14 +832,14 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                 e.preventDefault()
                 toggleFavorite(getActiveCar().id)
               }}
-              className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center z-20 transition-all bg-white/20 text-white hover:bg-white/30"
+              className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center z-20 transition-all bg-white/20 text-white hover:bg-white/30 active:scale-95"
             >
               <Heart className={`w-4 h-4 ${favorites.includes(getActiveCar().id) ? "fill-brand-primary" : ""}`} />
             </button>
 
             {/* Car Name Overlay */}
             <div className="absolute bottom-4 left-0 w-full px-5 z-20">
-              <h3 className="text-xl font-bold text-white">{getText(getActiveCar().name)}</h3>
+              <h3 className="text-xl font-bold text-white drop-shadow-md">{getText(getActiveCar().name)}</h3>
               <p className="text-sm text-gray-300">{getText(getActiveCar().modelYear)}</p>
             </div>
           </div>
@@ -708,12 +858,12 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             </div>
 
             {/* Price */}
-            <div className="mb-6 bg-gradient-to-r from-brand-light to-white rounded-xl p-4">
+            <div className="mb-6 bg-gradient-to-r from-brand-light to-white rounded-xl p-4 shadow-sm">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
                 <span className="text-xl font-bold text-brand-primary flex items-center">
                   <Image
-                    src={getActiveCar().icons.currency || "/placeholder.svg"}
+                    src="/icons/Currency.svg"
                     alt="Currency"
                     width={18}
                     height={18}
@@ -725,50 +875,62 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
             </div>
 
             {/* Key Specs */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {/* Engine */}
-              <div className="bg-brand-light bg-opacity-30 rounded-xl p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+              <div className="bg-brand-light bg-opacity-30 rounded-xl p-3 overflow-hidden shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center flex-shrink-0">
                     <Zap className="w-4 h-4 text-brand-primary" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{isRTL ? "المحرك" : "Engine"}</span>
+                  <span className="text-sm font-medium text-gray-700 truncate">{isRTL ? "المحرك" : "Engine"}</span>
                 </div>
-                <p className="text-sm font-medium ml-11">{getText(getActiveCar().specs.engine)}</p>
-                <p className="text-xs text-gray-500 ml-11">{getText(getActiveCar().specs.power)}</p>
+                <div className="pl-10">
+                  <p className="text-xs sm:text-sm font-medium truncate">{getText(getActiveCar().specs.engine)}</p>
+                  <p className="text-xs text-gray-500 truncate">{getText(getActiveCar().specs.power)}</p>
+                </div>
               </div>
 
               {/* Transmission */}
-              <div className="bg-brand-light bg-opacity-30 rounded-xl p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+              <div className="bg-brand-light bg-opacity-30 rounded-xl p-3 overflow-hidden shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center flex-shrink-0">
                     <Gauge className="w-4 h-4 text-brand-primary" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{isRTL ? "ناقل الحركة" : "Transmission"}</span>
+                  <span className="text-sm font-medium text-gray-700 truncate">
+                    {isRTL ? "ناقل الحركة" : "Transmission"}
+                  </span>
                 </div>
-                <p className="text-sm font-medium ml-11">{getText(getActiveCar().specs.transmission)}</p>
+                <div className="pl-10">
+                  <p className="text-xs sm:text-sm font-medium truncate">
+                    {getText(getActiveCar().specs.transmission)}
+                  </p>
+                </div>
               </div>
 
               {/* Fuel */}
-              <div className="bg-brand-light bg-opacity-30 rounded-xl p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+              <div className="bg-brand-light bg-opacity-30 rounded-xl p-3 overflow-hidden shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center flex-shrink-0">
                     <Fuel className="w-4 h-4 text-brand-primary" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{isRTL ? "الوقود" : "Fuel"}</span>
+                  <span className="text-sm font-medium text-gray-700 truncate">{isRTL ? "الوقود" : "Fuel"}</span>
                 </div>
-                <p className="text-sm font-medium ml-11">{getText(getActiveCar().specs.fuelType)}</p>
+                <div className="pl-10">
+                  <p className="text-xs sm:text-sm font-medium truncate">{getText(getActiveCar().specs.fuelType)}</p>
+                </div>
               </div>
 
               {/* Seats */}
-              <div className="bg-brand-light bg-opacity-30 rounded-xl p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+              <div className="bg-brand-light bg-opacity-30 rounded-xl p-3 overflow-hidden shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center flex-shrink-0">
                     <Users className="w-4 h-4 text-brand-primary" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{isRTL ? "المقاعد" : "Seats"}</span>
+                  <span className="text-sm font-medium text-gray-700 truncate">{isRTL ? "المقاعد" : "Seats"}</span>
                 </div>
-                <p className="text-sm font-medium ml-11">{getText(getActiveCar().specs.seats)}</p>
+                <div className="pl-10">
+                  <p className="text-xs sm:text-sm font-medium truncate">{getText(getActiveCar().specs.seats)}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -778,7 +940,8 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
         <div className="flex items-center justify-center mt-6 gap-4">
           <button
             onClick={navigateToPreviousCar}
-            className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center border border-brand-light active:bg-gray-100 hover:bg-gray-50 transition-colors"
+            className="w-12 h-12 rounded-md bg-white shadow-md flex items-center justify-center border border-brand-light active:bg-gray-100 hover:bg-gray-50 transition-colors active:scale-95"
+            style={{ borderRadius: "5px" }}
             aria-label={isRTL ? "السيارة السابقة" : "Previous car"}
           >
             {isRTL ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
@@ -790,11 +953,12 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
               <button
                 key={index}
                 onClick={() => setActiveCarIndex(index)}
-                className={`w-4 h-4 rounded-full transition-all ${
+                className={`w-4 h-4 rounded-md transition-all ${
                   activeCarIndex === index
                     ? "bg-gradient-to-r from-brand-primary to-[#2D0F33] scale-110 shadow-md"
                     : "bg-brand-light"
                 }`}
+                style={{ borderRadius: "5px" }}
                 aria-label={`Car ${index + 1}`}
               />
             ))}
@@ -802,16 +966,20 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
           <button
             onClick={navigateToNextCar}
-            className="w-12 h-12 rounded-full bg-white shadow-md flex items-center justify-center border border-brand-light active:bg-gray-100 hover:bg-gray-50 transition-colors"
+            className="w-12 h-12 rounded-md bg-white shadow-md flex items-center justify-center border border-brand-light active:bg-gray-100 hover:bg-gray-50 transition-colors active:scale-95"
+            style={{ borderRadius: "5px" }}
             aria-label={isRTL ? "السيارة التالية" : "Next car"}
           >
             {isRTL ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
           </button>
         </div>
       </div>
+
       {/* Desktop Car Comparison */}
-      <div className="hidden md:block mb-10">
-        <div className={`grid ${hasThirdCar ? "grid-cols-3" : "grid-cols-2"} gap-6 relative`}>
+      <div className="hidden lg:block mb-10 px-0">
+        <div
+          className={`grid ${hasThirdCar ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 md:grid-cols-2"} gap-6 relative`}
+        >
           {/* Car 1 */}
           <div className="shadow-xl rounded-xl overflow-hidden">
             <CarCard car={car1} />
@@ -819,7 +987,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
 
           {/* VS Badge for 2 cars */}
           {!hasThirdCar && (
-            <div className="absolute left-1/2 top-28 transform -translate-x-1/2 z-10 shadow-xl rounded-full p-2 bg-gradient-to-r from-white to-gray-100 border border-gray-200">
+            <div className="absolute left-1/2 top-28 transform -translate-x-1/2 z-10 shadow-xl rounded-full p-2 bg-gradient-to-r from-white to-gray-100 border border-gray-200 hidden lg:block">
               <div className="bg-white rounded-full p-1">
                 <Image src="/icons/Vs.svg" alt="VS" width={60} height={60} />
               </div>
@@ -834,12 +1002,12 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
           {/* VS Badges for 3 cars */}
           {hasThirdCar && (
             <>
-              <div className="absolute left-1/3 top-28 transform -translate-x-1/2 z-10 shadow-xl rounded-full p-2 bg-gradient-to-r from-white to-gray-100 border border-gray-200">
+              <div className="absolute left-1/3 top-28 transform -translate-x-1/2 z-10 shadow-xl rounded-full p-2 bg-gradient-to-r from-white to-gray-100 border border-gray-200 hidden lg:block">
                 <div className="bg-white rounded-full p-1">
                   <Image src="/icons/VS.svg" alt="VS" width={60} height={60} />
                 </div>
               </div>
-              <div className="absolute left-2/3 top-28 transform -translate-x-1/2 z-10 shadow-xl rounded-full p-2 bg-gradient-to-r from-white to-gray-100 border border-gray-200">
+              <div className="absolute left-2/3 top-28 transform -translate-x-1/2 z-10 shadow-xl rounded-full p-2 bg-gradient-to-r from-white to-gray-100 border border-gray-200 hidden lg:block">
                 <div className="bg-white rounded-full p-1">
                   <Image src="/icons/VS.svg" alt="VS" width={60} height={60} />
                 </div>
@@ -855,609 +1023,537 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
           )}
         </div>
       </div>
+
       {/* Tabs Navigation */}
-      <div className="flex border-b border-brand-light mb-6 overflow-x-auto scrollbar-hide no-print w-full">
+      <div
+        ref={tabsRef}
+        className={`flex border-b border-brand-light mb-4 sm:mb-6 overflow-x-auto scrollbar-hide no-print w-full ${
+          stickyTabs ? "sticky top-20 z-40 bg-white shadow-md transition-all duration-300" : ""
+        }`}
+        style={{
+          paddingLeft: stickyTabs ? "0" : "0",
+          paddingRight: stickyTabs ? "0" : "0",
+          paddingTop: stickyTabs ? "0.5rem" : "0",
+          paddingBottom: stickyTabs ? "0.5rem" : "0",
+          maxWidth: "100%",
+          marginLeft: "auto",
+          marginRight: "auto",
+          transform: stickyTabs ? "translateZ(0)" : "none", // Force hardware acceleration
+        }}
+      >
         <div className="flex min-w-full">
           <button
             onClick={() => setActiveTab("specs")}
-            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 flex-1 justify-center ${
+            className={`px-2 py-2 font-medium text-[10px] xs:text-xs sm:text-sm flex items-center gap-1 flex-1 justify-center ${
               activeTab === "specs"
                 ? "text-brand-primary border-b-2 border-brand-primary"
                 : "text-gray-500 hover:text-gray-700 transition-colors"
             }`}
           >
-            <BarChart3 className="w-4 h-4" />
-            <span className="whitespace-nowrap">{isRTL ? "المواصفات" : "Specifications"}</span>
+            <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="whitespace-nowrap">{isRTL ? "المواصفات" : "Specs"}</span>
           </button>
           <button
             onClick={() => setActiveTab("features")}
-            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 flex-1 justify-center ${
+            className={`px-2 py-2 font-medium text-[10px] xs:text-xs sm:text-sm flex items-center gap-1 flex-1 justify-center ${
               activeTab === "features"
                 ? "text-brand-primary border-b-2 border-brand-primary"
                 : "text-gray-500 hover:text-gray-700 transition-colors"
             }`}
           >
-            <Award className="w-4 h-4" />
+            <Award className="w-3 h-3 sm:w-4 sm:h-4" />
             <span className="whitespace-nowrap">{isRTL ? "الميزات" : "Features"}</span>
           </button>
           <button
             onClick={() => setActiveTab("price")}
-            className={`px-4 py-3 font-medium text-sm flex items-center gap-2 flex-1 justify-center ${
+            className={`px-2 py-2 font-medium text-[10px] xs:text-xs sm:text-sm flex items-center gap-1 flex-1 justify-center ${
               activeTab === "price"
                 ? "text-brand-primary border-b-2 border-brand-primary"
                 : "text-gray-500 hover:text-gray-700 transition-colors"
             }`}
           >
-            <div className="w-4 h-4 relative">
-              <Image src={car1?.icons?.currency || "/placeholder.svg"} alt="Currency" width={16} height={16} />
+            <div className="w-3 h-3 sm:w-4 sm:h-4 relative">
+              <Image src="/icons/Currency.svg" alt="Currency" width={12} height={12} />
             </div>
             <span className="whitespace-nowrap">{isRTL ? "الأسعار" : "Price"}</span>
           </button>
         </div>
       </div>
+
       {/* Tab Content */}
-      {activeTab === "specs" && (
-        <div className="mb-10 section">
-          {specCategories.map((category) => (
-            <div key={category.id} className="mb-6">
-              {/* Category Header */}
-              <div
-                className={`flex items-center justify-between p-4 cursor-pointer rounded-xl transition-all ${
-                  openCategories[category.id]
-                    ? "bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white shadow-lg"
-                    : "bg-white shadow border border-brand-light hover:bg-brand-light hover:bg-opacity-30 transition-colors"
-                }`}
-                onClick={() => toggleCategory(category.id)}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      openCategories[category.id] ? "bg-white/20" : "bg-brand-primary/10"
-                    }`}
-                  >
-                    {getSpecIcon(category.id)}
-                  </div>
-                  <span className="font-medium">{getText(category.name)}</span>
-                </div>
-                {openCategories[category.id] ? (
-                  <ChevronUp className="w-5 h-5" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-500" />
-                )}
+      <div className="px-0">
+        {/* Specifications Tab Content */}
+        {activeTab === "specs" && (
+          <div className="mb-10 section">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light">
+              <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-3">
+                <h2 className="text-sm font-medium">{isRTL ? "مقارنة المواصفات" : "Specifications"}</h2>
               </div>
 
-              {/* Specifications Table - Desktop View */}
-              {openCategories[category.id] && (
-                <>
-                  <div className="mt-3 bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light hidden md:block">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-brand-light bg-opacity-30">
-                          <th className="py-4 px-6 text-left text-sm font-medium text-gray-700 border-b border-brand-light">
-                            {isRTL ? "المواصفات" : "Specification"}
+              <div className="p-3 sm:p-6 overflow-visible">
+                {/* Specs Categories */}
+                {specCategories.map((category) => (
+                  <div key={category.id} className="mb-4 last:mb-0">
+                    <button
+                      onClick={() => toggleCategory(category.id)}
+                      className="w-full flex items-center justify-between bg-brand-light bg-opacity-20 p-3 rounded-xl mb-3 hover:bg-opacity-30 transition-colors shadow-sm"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center">
+                          {getSpecIcon(category.id)}
+                        </div>
+                        <span className="font-medium text-gray-800 text-sm">{getText(category.name)}</span>
+                      </div>
+                      {openCategories[category.id] ? (
+                        <ChevronUp className="w-4 h-4 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-gray-500" />
+                      )}
+                    </button>
+
+                    {/* Improved Responsive Specs Table */}
+                    {openCategories[category.id] && (
+                      <div
+                        className="responsive-table-container"
+                        style={{ position: "relative", zIndex: 1, WebkitOverflowScrolling: "touch" }}
+                      >
+                        <table className="responsive-table min-w-full divide-y divide-gray-200">
+                          <thead>
+                            <tr className="bg-gray-50">
+                              <th className="py-3 px-3 sm:px-4 text-left text-[10px] xs:text-xs sm:text-sm font-medium text-gray-700 border-b border-r border-gray-200 w-1/3 sm:w-auto">
+                                {isRTL ? "المواصفات" : "Specification"}
+                              </th>
+                              <th className="py-3 px-3 sm:px-4 text-center text-[10px] xs:text-xs sm:text-sm font-medium text-gray-700 border-b border-r border-gray-200">
+                                <div className="truncate max-w-[100px] sm:max-w-none mx-auto">{getText(car1.name)}</div>
+                              </th>
+                              <th className="py-3 px-3 sm:px-4 text-center text-[10px] xs:text-xs sm:text-sm font-medium text-gray-700 border-b border-r border-gray-200">
+                                <div className="truncate max-w-[100px] sm:max-w-none mx-auto">{getText(car2.name)}</div>
+                              </th>
+                              {hasThirdCar && (
+                                <th className="py-3 px-3 sm:px-4 text-center text-[10px] xs:text-xs sm:text-sm font-medium text-gray-700 border-b border-gray-200">
+                                  <div className="truncate max-w-[100px] sm:max-w-none mx-auto">
+                                    {getText(car3.name)}
+                                  </div>
+                                </th>
+                              )}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200">
+                            {category.specs.map((specKey) => (
+                              <tr key={specKey} className="hover:bg-gray-50 transition-colors">
+                                <td className="py-1 sm:py-2 px-2 sm:px-3 border-r border-gray-200 font-medium text-[10px] xs:text-xs sm:text-sm">
+                                  <div className="line-clamp-2 sm:line-clamp-none">{getSpecName(specKey)}</div>
+                                </td>
+                                <td className="py-2 sm:py-3 px-3 sm:px-4 text-center border-r border-gray-200 text-[10px] xs:text-xs sm:text-sm">
+                                  <div className="line-clamp-2 sm:line-clamp-none">{getText(car1.specs[specKey])}</div>
+                                </td>
+                                <td className="py-2 sm:py-3 px-3 sm:px-4 text-center border-r border-gray-200 text-[10px] xs:text-xs sm:text-sm">
+                                  <div className="line-clamp-2 sm:line-clamp-none">{getText(car2.specs[specKey])}</div>
+                                </td>
+                                {hasThirdCar && (
+                                  <td className="py-2 sm:py-3 px-3 sm:px-4 text-center border-gray-200 text-[10px] xs:text-xs sm:text-sm">
+                                    <div className="line-clamp-2 sm:line-clamp-none">
+                                      {getText(car3.specs[specKey])}
+                                    </div>
+                                  </td>
+                                )}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "features" && (
+          <div className="mb-10 section">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light">
+              <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-3">
+                <h2 className="text-sm font-medium">{isRTL ? "مقارنة الميزات" : "Features"}</h2>
+              </div>
+
+              <div className="p-3 sm:p-6 overflow-visible">
+                <div
+                  className="responsive-table-container"
+                  style={{ position: "relative", zIndex: 1, WebkitOverflowScrolling: "touch" }}
+                >
+                  <table className="responsive-table min-w-full divide-y divide-gray-200 border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="py-3 px-3 sm:px-4 text-left text-[10px] xs:text-xs sm:text-sm font-medium text-gray-700 border-b border-r border-gray-200 w-1/2 sm:w-auto">
+                          {isRTL ? "الميزات" : "Feature"}
+                        </th>
+                        <th className="py-3 px-3 sm:px-4 text-center text-[10px] xs:text-xs sm:text-sm font-medium text-gray-700 border-b border-r border-gray-200">
+                          <div className="truncate max-w-[100px] sm:max-w-none mx-auto">{getText(car1.name)}</div>
+                        </th>
+                        <th className="py-3 px-3 sm:px-4 text-center text-[10px] xs:text-xs sm:text-sm font-medium text-gray-700 border-b border-r border-gray-200">
+                          <div className="truncate max-w-[100px] sm:max-w-none mx-auto">{getText(car2.name)}</div>
+                        </th>
+                        {hasThirdCar && (
+                          <th className="py-3 px-3 sm:px-4 text-center text-[10px] xs:text-xs sm:text-sm font-medium text-gray-700 border-b border-gray-200">
+                            <div className="truncate max-w-[100px] sm:max-w-none mx-auto">{getText(car3.name)}</div>
                           </th>
-                          <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-brand-light">
-                            {getText(car1.name)}
-                          </th>
-                          <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-brand-light">
-                            {getText(car2.name)}
-                          </th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {Object.entries(car1.features || {}).map(([key, value]) => (
+                        <tr key={key} className="hover:bg-gray-50 transition-colors">
+                          <td className="py-2 sm:py-3 px-3 sm:px-4 text-[10px] xs:text-xs sm:text-sm border-b border-r border-gray-200">
+                            <div className="line-clamp-2 sm:line-clamp-none">{getText({ en: key, ar: key })}</div>
+                          </td>
+                          <td className="py-2 sm:py-3 px-3 sm:px-4 text-center border-b border-r border-gray-200">
+                            {value ? (
+                              <div className="flex justify-center">
+                                <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
+                                  <Check className="w-4 h-4 text-green-600" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex justify-center">
+                                <div className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center">
+                                  <X className="w-4 h-4 text-red-600" />
+                                </div>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-2 sm:py-3 px-3 sm:px-4 text-center border-b border-r border-gray-200">
+                            {car2.features && car2.features[key] ? (
+                              <div className="flex justify-center">
+                                <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
+                                  <Check className="w-4 h-4 text-green-600" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex justify-center">
+                                <div className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center">
+                                  <X className="w-4 h-4 text-red-600" />
+                                </div>
+                              </div>
+                            )}
+                          </td>
                           {hasThirdCar && (
-                            <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-brand-light">
-                              {getText(car3.name)}
-                            </th>
+                            <td className="py-2 sm:py-3 px-3 sm:px-4 text-center border-b border-gray-200">
+                              {car3.features && car3.features[key] ? (
+                                <div className="flex justify-center">
+                                  <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center">
+                                    <Check className="w-4 h-4 text-green-600" />
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="flex justify-center">
+                                  <div className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center">
+                                    <X className="w-4 h-4 text-red-600" />
+                                  </div>
+                                </div>
+                              )}
+                            </td>
                           )}
                         </tr>
-                      </thead>
-                      <tbody>
-                        {category.specs.map((spec, index) => (
-                          <tr key={spec} className={index % 2 === 0 ? "bg-white" : "bg-brand-light bg-opacity-10"}>
-                            <td className="py-4 px-6 text-sm font-medium text-gray-900 border-b border-brand-light">
-                              {getSpecName(spec)}
-                            </td>
-                            <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
-                              <div className="flex justify-center">
-                                <span className="px-4 py-1 rounded-full bg-brand-light text-brand-primary font-medium">
-                                  {car1?.specs[spec] ? getText(car1.specs[spec]) : "-"}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
-                              <div className="flex justify-center">
-                                <span className="px-4 py-1 rounded-full bg-brand-light text-brand-primary font-medium">
-                                  {car2?.specs[spec] ? getText(car2.specs[spec]) : "-"}
-                                </span>
-                              </div>
-                            </td>
-                            {hasThirdCar && (
-                              <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
-                                <div className="flex justify-center">
-                                  <span className="px-4 py-1 rounded-full bg-brand-light text-brand-primary font-medium">
-                                    {car3?.specs[spec] ? getText(car3.specs[spec]) : "-"}
-                                  </span>
-                                </div>
-                              </td>
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile View - Card-based layout */}
-                  <div className="md:hidden mt-3 space-y-4 px-2">
-                    {category.specs.map((spec) => (
-                      <div
-                        key={spec}
-                        className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden"
-                      >
-                        <div className="bg-brand-light bg-opacity-30 py-3 px-4 border-b border-brand-light">
-                          <span className="font-medium text-gray-800">{getSpecName(spec)}</span>
-                        </div>
-
-                        <div className="divide-y divide-brand-light">
-                          {/* Car 1 */}
-                          <div className="p-4 flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 relative">
-                                <Image
-                                  src={car1.brandLogo || "/placeholder.svg?height=20&width=20"}
-                                  alt={car1.brand}
-                                  width={20}
-                                  height={20}
-                                  style={{ objectFit: "contain" }}
-                                />
-                              </div>
-                              <span className="text-sm text-gray-600 truncate max-w-[120px]">{getText(car1.name)}</span>
-                            </div>
-                            <span className="px-3 py-1 rounded-full bg-brand-light text-brand-primary text-sm font-medium">
-                              {car1?.specs[spec] ? getText(car1.specs[spec]) : "-"}
-                            </span>
-                          </div>
-
-                          {/* Car 2 */}
-                          <div className="p-4 flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 relative">
-                                <Image
-                                  src={car2.brandLogo || "/placeholder.svg?height=20&width=20"}
-                                  alt={car2.brand}
-                                  width={20}
-                                  height={20}
-                                  style={{ objectFit: "contain" }}
-                                />
-                              </div>
-                              <span className="text-sm text-gray-600">{getText(car2.name)}</span>
-                            </div>
-                            <span className="px-3 py-1 rounded-full bg-brand-light text-brand-primary text-sm font-medium">
-                              {car2?.specs[spec] ? getText(car2.specs[spec]) : "-"}
-                            </span>
-                          </div>
-
-                          {/* Car 3 (if present) */}
-                          {hasThirdCar && (
-                            <div className="p-4 flex justify-between items-center">
-                              <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 relative">
-                                  <Image
-                                    src={car3.brandLogo || "/placeholder.svg?height=20&width=20"}
-                                    alt={car3.brand}
-                                    width={20}
-                                    height={20}
-                                    style={{ objectFit: "contain" }}
-                                  />
-                                </div>
-                                <span className="text-sm text-gray-600">{getText(car3.name)}</span>
-                              </div>
-                              <span className="px-3 py-1 rounded-full bg-brand-light text-brand-primary text-sm font-medium">
-                                {car3?.specs[spec] ? getText(car3.specs[spec]) : "-"}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-      )}
-
-      {activeTab === "features" && (
-        <div className="mb-10 section">
-          {/* Desktop View */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light hidden md:block">
-            <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-5">
-              <h2 className="text-lg font-medium">{isRTL ? "مقارنة الميزات" : "Feature Comparison"}</h2>
-            </div>
-            <table className="w-full">
-              <thead>
-                <tr className="bg-brand-light bg-opacity-30">
-                  <th className="py-4 px-6 text-left text-sm font-medium text-gray-700 border-b border-brand-light">
-                    {isRTL ? "الميزات" : "Features"}
-                  </th>
-                  <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-brand-light">
-                    {getText(car1.name)}
-                  </th>
-                  <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-brand-light">
-                    {getText(car2.name)}
-                  </th>
-                  {hasThirdCar && (
-                    <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-brand-light">
-                      {getText(car3.name)}
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(car1.features).map(([feature, value], index) => (
-                  <tr key={feature} className={index % 2 === 0 ? "bg-white" : "bg-brand-light bg-opacity-10"}>
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900 border-b border-brand-light">
-                      {isRTL
-                        ? feature
-                            .replace(/([A-Z])/g, " $1")
-                            .replace(/^./, (str) => str.toUpperCase())
-                            .replace("Exterior Features", "ميزات خارجية")
-                            .replace("Interior", "داخلي")
-                            .replace("Exterior", "خارجي")
-                            .replace("Engine", "محرك")
-                            .replace("Safety", "سلامة")
-                            .replace("Technology", "تكنولوجيا")
-                            .replace("Entertainment", "ترفيه")
-                            .replace("Comfort", "راحة")
-                        : feature.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-                    </td>
-                    <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
-                      <div className="flex justify-center">
-                        {car1.features[feature] ? (
-                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
-                            <Check className="w-5 h-5 text-brand-primary" />
-                          </div>
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
-                            <X className="w-5 h-5 text-brand-primary text-opacity-70" />
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
-                      <div className="flex justify-center">
-                        {car2.features[feature] ? (
-                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
-                            <Check className="w-5 h-5 text-brand-primary" />
-                          </div>
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
-                            <X className="w-5 h-5 text-brand-primary text-opacity-70" />
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    {hasThirdCar && (
-                      <td className="py-4 px-6 text-center text-sm border-b border-brand-light">
-                        <div className="flex justify-center">
-                          {car3.features[feature] ? (
-                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
-                              <Check className="w-5 h-5 text-brand-primary" />
-                            </div>
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
-                              <X className="w-5 h-5 text-brand-primary text-opacity-70" />
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
+        )}
 
-          {/* Mobile View - Card-based layout */}
-          <div className="md:hidden space-y-4 px-2">
-            {Object.entries(car1.features).map(([feature, value], index) => {
-              const featureName = isRTL
-                ? feature
-                    .replace(/([A-Z])/g, " $1")
-                    .replace(/^./, (str) => str.toUpperCase())
-                    .replace("Exterior Features", "ميزات خارجية")
-                    .replace("Interior", "داخلي")
-                    .replace("Exterior", "خارجي")
-                    .replace("Engine", "محرك")
-                    .replace("Safety", "سلامة")
-                    .replace("Technology", "تكنولوجيا")
-                    .replace("Entertainment", "ترفيه")
-                    .replace("Comfort", "راحة")
-                : feature.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())
+        {/* Price Tab Content */}
+        {activeTab === "price" && (
+          <div className="mb-10 section">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light">
+              <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-3">
+                <h2 className="text-sm font-medium">{isRTL ? "مقارنة الأسعار" : "Price"}</h2>
+              </div>
 
-              return (
-                <div key={feature} className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
-                  <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] py-3 px-4 text-white">
-                    <span className="font-medium text-sm">{featureName}</span>
+              {/* Mobile Price Cards */}
+              <div className="md:hidden p-4 space-y-6 overflow-visible">
+                {/* Mobile Price Cards */}
+                <div className="space-y-4">
+                  {/* Car 1 Price Card */}
+                  <div className="bg-white rounded-xl shadow-md border border-brand-light overflow-hidden hover:shadow-lg transition-all transform hover:-translate-y-1">
+                    <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-3 sm:p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 relative">
+                            <Image
+                              src={car1.brandLogo || "/placeholder.svg?height=24&width=24"}
+                              alt={car1.brand}
+                              fill
+                              style={{ objectFit: "contain" }}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-white font-medium text-xs sm:text-sm md:text-base">
+                            {getText(car1.name)}
+                          </span>
+                          <span className="text-white/70 text-xs">{getText(car1.brand)}</span>
+                        </div>
+                      </div>
+                      {getStatusBadge(car1.status)}
+                    </div>
+                    <div className="p-3 sm:p-4">
+                      <div className="flex justify-between items-center mb-3 sm:mb-4 bg-brand-light/20 p-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
+                        <span className="text-sm sm:text-lg font-bold text-brand-primary flex items-center">
+                          <Image
+                            src="/icons/Currency.svg"
+                            alt="Currency"
+                            width={14}
+                            height={14}
+                            className="inline mr-1"
+                          />
+                          {car1.cashPrice.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center bg-brand-light/10 p-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-gray-600">
+                          {isRTL ? "القسط الشهري" : "Monthly Installment"}
+                        </span>
+                        <span className="text-xs sm:text-base font-semibold text-gray-700 flex items-center">
+                          <Image
+                            src="/icons/Currency.svg"
+                            alt="Currency"
+                            width={12}
+                            height={12}
+                            className="inline mr-1"
+                          />
+                          {car1.installmentPrice.toLocaleString()}
+                          <span className="text-[10px] sm:text-xs text-gray-500 ml-1">
+                            {isRTL ? "/ شهر" : "/ month"}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="divide-y divide-brand-light">
-                    {/* Car 1 */}
-                    <div className="p-4 flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 relative">
-                          <Image
-                            src={car1.brandLogo || "/placeholder.svg?height=20&width=20"}
-                            alt={car1.brand}
-                            width={20}
-                            height={20}
-                            style={{ objectFit: "contain" }}
-                          />
-                        </div>
-                        <span className="text-sm text-gray-600">{getText(car1.name)}</span>
-                      </div>
-                      {car1.features[feature] ? (
-                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
-                          <Check className="w-5 h-5 text-brand-primary" />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
-                          <X className="w-5 h-5 text-brand-primary text-opacity-70" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Car 2 */}
-                    <div className="p-4 flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 relative">
-                          <Image
-                            src={car2.brandLogo || "/placeholder.svg?height=20&width=20"}
-                            alt={car2.brand}
-                            width={20}
-                            height={20}
-                            style={{ objectFit: "contain" }}
-                          />
-                        </div>
-                        <span className="text-sm text-gray-600">{getText(car2.name)}</span>
-                      </div>
-                      {car2.features[feature] ? (
-                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
-                          <Check className="w-5 h-5 text-brand-primary" />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
-                          <X className="w-5 h-5 text-brand-primary text-opacity-70" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Car 3 (if present) */}
-                    {hasThirdCar && (
-                      <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
-                        <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                              <div className="w-8 h-8 relative">
-                                <Image
-                                  src={car3.brandLogo || "/placeholder.svg?height=24&width=24"}
-                                  alt={car3.brand}
-                                  fill
-                                  style={{ objectFit: "contain" }}
-                                />
-                              </div>
-                            </div>
-                            <span className="text-white font-medium">{getText(car3.name)}</span>
+                  {/* Car 2 Price Card */}
+                  <div className="bg-white rounded-xl shadow-md border border-brand-light overflow-hidden hover:shadow-lg transition-all transform hover:-translate-y-1">
+                    <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-3 sm:p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 relative">
+                            <Image
+                              src={car2.brandLogo || "/placeholder.svg?height=24&width=24"}
+                              alt={car2.brand}
+                              fill
+                              style={{ objectFit: "contain" }}
+                            />
                           </div>
-                          {getStatusBadge(car3.status)}
                         </div>
-                        <div className="p-4 flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 relative">
+                        <div className="flex flex-col">
+                          <span className="text-white font-medium text-xs sm:text-sm md:text-base">
+                            {getText(car2.name)}
+                          </span>
+                          <span className="text-white/70 text-xs">{getText(car2.brand)}</span>
+                        </div>
+                      </div>
+                      {getStatusBadge(car2.status)}
+                    </div>
+                    <div className="p-3 sm:p-4">
+                      <div className="flex justify-between items-center mb-3 sm:mb-4 bg-brand-light/20 p-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
+                        <span className="text-sm sm:text-lg font-bold text-brand-primary flex items-center">
+                          <Image
+                            src="/icons/Currency.svg"
+                            alt="Currency"
+                            width={14}
+                            height={14}
+                            className="inline mr-1"
+                          />
+                          {car2.cashPrice.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center bg-brand-light/10 p-2 rounded-lg">
+                        <span className="text-xs sm:text-sm text-gray-600">
+                          {isRTL ? "القسط الشهري" : "Monthly Installment"}
+                        </span>
+                        <span className="text-xs sm:text-base font-semibold text-gray-700 flex items-center">
+                          <Image
+                            src="/icons/Currency.svg"
+                            alt="Currency"
+                            width={12}
+                            height={12}
+                            className="inline mr-1"
+                          />
+                          {car2.installmentPrice.toLocaleString()}
+                          <span className="text-[10px] sm:text-xs text-gray-500 ml-1">
+                            {isRTL ? "/ شهر" : "/ month"}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Car 3 Price Card (if present) */}
+                  {hasThirdCar && (
+                    <div className="bg-white rounded-xl shadow-md border border-brand-light overflow-hidden hover:shadow-lg transition-all transform hover:-translate-y-1">
+                      <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-3 sm:p-4 flex items-center justify-between">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center">
+                            <div className="w-6 h-6 sm:w-8 sm:h-8 relative">
                               <Image
-                                src={car3.brandLogo || "/placeholder.svg?height=20&width=20"}
+                                src={car3.brandLogo || "/placeholder.svg?height=24&width=24"}
                                 alt={car3.brand}
-                                width={20}
-                                height={20}
+                                fill
                                 style={{ objectFit: "contain" }}
                               />
                             </div>
-                            <span className="text-sm text-gray-600">{getText(car3.name)}</span>
                           </div>
-                          {car3.features[feature] ? (
-                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-20 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-30 transition-colors">
-                              <Check className="w-5 h-5 text-brand-primary" />
-                            </div>
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-brand-primary bg-opacity-10 flex items-center justify-center hover:bg-brand-primary hover:bg-opacity-20 transition-colors">
-                              <X className="w-5 h-5 text-brand-primary text-opacity-70" />
-                            </div>
-                          )}
+                          <div className="flex flex-col">
+                            <span className="text-white font-medium text-xs sm:text-sm md:text-base">
+                              {getText(car3.name)}
+                            </span>
+                            <span className="text-white/70 text-xs">{getText(car3.brand)}</span>
+                          </div>
+                        </div>
+                        {getStatusBadge(car3.status)}
+                      </div>
+                      <div className="p-3 sm:p-4">
+                        <div className="flex justify-between items-center mb-3 sm:mb-4 bg-brand-light/20 p-2 rounded-lg">
+                          <span className="text-xs sm:text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
+                          <span className="text-sm sm:text-lg font-bold text-brand-primary flex items-center">
+                            <Image
+                              src="/icons/Currency.svg"
+                              alt="Currency"
+                              width={14}
+                              height={14}
+                              className="inline mr-1"
+                            />
+                            {car3.cashPrice.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center bg-brand-light/10 p-2 rounded-lg">
+                          <span className="text-xs sm:text-sm text-gray-600">
+                            {isRTL ? "القسط الشهري" : "Monthly Installment"}
+                          </span>
+                          <span className="text-xs sm:text-base font-semibold text-gray-700 flex items-center">
+                            <Image
+                              src="/icons/Currency.svg"
+                              alt="Currency"
+                              width={12}
+                              height={12}
+                              className="inline mr-1"
+                            />
+                            {car3.installmentPrice.toLocaleString()}
+                            <span className="text-[10px] sm:text-xs text-gray-500 ml-1">
+                              {isRTL ? "/ شهر" : "/ month"}
+                            </span>
+                          </span>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {activeTab === "price" && (
-        <div className="mb-10 section">
-          {/* Desktop View */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light">
-            <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-5">
-              <h2 className="text-lg font-medium">{isRTL ? "مقارنة الأسعار" : "Price Comparison"}</h2>
-            </div>
-
-            {/* Desktop Price Cards */}
-            <div className="p-8 hidden md:block">
-              {/* Price Cards */}
-              <div className={`grid ${hasThirdCar ? "grid-cols-3" : "grid-cols-2"} gap-6 mb-10`}>
-                {/* Car 1 Price Card */}
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow">
-                  <div className="absolute top-0 right-0 w-24 h-24">
-                    <div className="absolute transform rotate-45 bg-brand-primary text-white font-medium py-1 text-xs text-center w-32 top-6 -right-8">
-                      {car1.cashPrice === highestPrice
-                        ? isRTL
-                          ? "الأعلى سعراً"
-                          : "Highest Price"
-                        : car1.cashPrice === lowestPrice
-                          ? isRTL
-                            ? "الأقل سعراً"
-                            : "Lowest Price"
-                          : ""}
                     </div>
-                  </div>
+                  )}
+                </div>
 
-                  <div className="p-6 flex items-center border-b border-brand-light">
-                    <div className="w-16 h-16 relative mr-4">
+                {/* Mobile Price Comparison Summary */}
+                <div className="bg-white rounded-xl p-3 sm:p-4 shadow-md border border-brand-light">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 mr-2 relative">
                       <Image
-                        src={car1.image || "/placeholder.svg?height=64&width=64"}
-                        alt={getText(car1.name)}
-                        fill
-                        style={{ objectFit: "contain" }}
+                        src="/icons/Currency.svg"
+                        alt="Currency"
+                        width={16}
+                        height={16}
+                        className="text-brand-primary"
                       />
                     </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900">{getText(car1.name)}</h3>
-                      <div className="flex items-center mt-1">
-                        <div className="w-6 h-6 relative mr-2">
-                          <Image
-                            src={car1.brandLogo || "/placeholder.svg?height=24&width=24"}
-                            alt={car1.brand}
-                            fill
-                            style={{ objectFit: "contain" }}
-                          />
+                    <span className="truncate">{isRTL ? "ملخص المقارنة السعرية" : "Price Comparison Summary"}</span>
+                  </h3>
+
+                  <div className="space-y-2 sm:space-y-3">
+                    {/* Highest Price */}
+                    <div className="bg-white rounded-lg p-2 sm:p-3 border border-brand-light shadow-sm">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs sm:text-sm font-medium text-gray-600 flex items-center">
+                          <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-1" />
+                          <span className="truncate">{isRTL ? "أعلى سعر" : "Highest Price"}</span>
                         </div>
-                        <span className="text-sm text-gray-600">{car1.brand}</span>
-                        <div className="ml-3">{getStatusBadge(car1.status)}</div>
+                        <div className="flex items-center">
+                          <Image src="/icons/Currency.svg" alt="Currency" width={12} height={12} className="mr-1" />
+                          <span className="font-bold text-xs sm:text-sm text-brand-primary">
+                            {highestPrice.toLocaleString()}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="mb-6">
-                      <div className="text-sm text-gray-500 mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
-                      <div className="flex items-center">
-                        <Image
-                          src={car1.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={24}
-                          height={24}
-                          className="mr-2"
-                        />
-                        <span className="text-3xl font-bold text-brand-primary">{car1.cashPrice.toLocaleString()}</span>
-                        {getPriceComparisonIcon(car1, lowestPrice, highestPrice)}
+                      <div className="text-[10px] sm:text-xs text-gray-500 pl-4 sm:pl-5 truncate">
+                        {car1.cashPrice === highestPrice
+                          ? getText(car1.name)
+                          : car2.cashPrice === highestPrice
+                            ? getText(car2.name)
+                            : getText(car3?.name || "")}
                       </div>
                     </div>
 
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">{isRTL ? "القسط الشهري" : "Monthly Installment"}</div>
-                      <div className="flex items-center">
-                        <Image
-                          src={car1.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={20}
-                          height={20}
-                          className="mr-2"
-                        />
-                        <span className="text-xl font-semibold text-gray-800">
-                          {car1.installmentPrice.toLocaleString()}
+                    {/* Lowest Price */}
+                    <div className="bg-white rounded-lg p-2 sm:p-3 border border-brand-light shadow-sm">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs sm:text-sm font-medium text-gray-600 flex items-center">
+                          <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 text-brand-primary mr-1" />
+                          <span className="truncate">{isRTL ? "أقل سعر" : "Lowest Price"}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Image src="/icons/Currency.svg" alt="Currency" width={12} height={12} className="mr-1" />
+                          <span className="font-bold text-xs sm:text-sm text-brand-primary">
+                            {lowestPrice.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] sm:text-xs text-gray-500 pl-4 sm:pl5 truncate">
+                        {car1.cashPrice === lowestPrice
+                          ? getText(car1.name)
+                          : car2.cashPrice === lowestPrice
+                            ? getText(car2.name)
+                            : getText(car3?.name || "")}
+                      </div>
+                    </div>
+
+                    {/* Price Difference */}
+                    <div className="bg-white rounded-lg p-2 sm:p-3 border border-brand-light shadow-sm">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-xs sm:text-sm font-medium text-gray-600 truncate">
+                          {isRTL ? "الفرق السعري" : "Price Difference"}
+                        </div>
+                        <div className="flex items-center">
+                          <Image src="/icons/Currency.svg" alt="Currency" width={12} height={12} className="mr-1" />
+                          <span className="font-bold text-xs sm:text-sm text-brand-primary">
+                            {priceDifference.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] sm:text-xs text-gray-500 text-right">
+                        {Math.round((priceDifference / lowestPrice) * 100)}%{" "}
+                        <span className="truncate inline-block max-w-[100px] align-bottom">
+                          {isRTL ? "من السعر الأقل" : "of lowest price"}
                         </span>
-                        <span className="text-sm text-gray-500 ml-2">{isRTL ? "/ شهر" : "/ month"}</span>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Car 2 Price Card */}
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow">
-                  <div className="absolute top-0 right-0 w-24 h-24">
-                    <div className="absolute transform rotate-45 bg-brand-primary text-white font-medium py-1 text-xs text-center w-32 top-6 -right-8">
-                      {car2.cashPrice === highestPrice
-                        ? isRTL
-                          ? "الأعلى سعراً"
-                          : "Highest Price"
-                        : car2.cashPrice === lowestPrice
-                          ? isRTL
-                            ? "الأقل سعراً"
-                            : "Lowest Price"
-                          : ""}
-                    </div>
-                  </div>
-
-                  <div className="p-6 flex items-center border-b border-brand-light">
-                    <div className="w-16 h-16 relative mr-4">
-                      <Image
-                        src={car2.image || "/placeholder.svg?height=64&width=64"}
-                        alt={getText(car2.name)}
-                        fill
-                        style={{ objectFit: "contain" }}
-                      />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900">{getText(car2.name)}</h3>
-                      <div className="flex items-center mt-1">
-                        <div className="w-6 h-6 relative mr-2">
-                          <Image
-                            src={car2.brandLogo || "/placeholder.svg?height=24&width=24"}
-                            alt={car2.brand}
-                            fill
-                            style={{ objectFit: "contain" }}
-                          />
-                        </div>
-                        <span className="text-sm text-gray-600">{car2.brand}</span>
-                        <div className="ml-3">{getStatusBadge(car2.status)}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="mb-6">
-                      <div className="text-sm text-gray-500 mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
-                      <div className="flex items-center">
-                        <Image
-                          src={car2.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={24}
-                          height={24}
-                          className="mr-2"
-                        />
-                        <span className="text-3xl font-bold text-brand-primary">{car2.cashPrice.toLocaleString()}</span>
-                        {getPriceComparisonIcon(car2, lowestPrice, highestPrice)}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">{isRTL ? "القسط الشهري" : "Monthly Installment"}</div>
-                      <div className="flex items-center">
-                        <Image
-                          src={car2.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={20}
-                          height={20}
-                          className="mr-2"
-                        />
-                        <span className="text-xl font-semibold text-gray-800">
-                          {car2.installmentPrice.toLocaleString()}
-                        </span>
-                        <span className="text-sm text-gray-500 ml-2">{isRTL ? "/ شهر" : "/ month"}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Car 3 Price Card (if present) */}
-                {hasThirdCar && (
-                  <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow">
+              {/* Desktop Price Cards */}
+              <div className="p-4 sm:p-8 hidden md:block overflow-visible">
+                {/* Price Cards */}
+                <div
+                  className={`grid ${hasThirdCar ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1 lg:grid-cols-2"} gap-6 mb-10`}
+                >
+                  {/* Car 1 Price Card */}
+                  <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow transform hover:-translate-y-1">
                     <div className="absolute top-0 right-0 w-24 h-24">
                       <div className="absolute transform rotate-45 bg-brand-primary text-white font-medium py-1 text-xs text-center w-32 top-6 -right-8">
-                        {car3.cashPrice === highestPrice
+                        {car1.cashPrice === highestPrice
                           ? isRTL
                             ? "الأعلى سعراً"
                             : "Highest Price"
-                          : car3.cashPrice === lowestPrice
+                          : car1.cashPrice === lowestPrice
                             ? isRTL
                               ? "الأقل سعراً"
                               : "Lowest Price"
@@ -1466,27 +1562,28 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                     </div>
 
                     <div className="p-6 flex items-center border-b border-brand-light">
-                      <div className="w-16 h-16 relative mr-4">
+                      {/* Car image - only show on desktop, not on iPad */}
+                      <div className="w-16 h-16 relative mr-4 hidden xl:block">
                         <Image
-                          src={car3.image || "/placeholder.svg?height=64&width=64"}
-                          alt={getText(car3.name)}
+                          src={car1.image || "/placeholder.svg?height=64&width=64"}
+                          alt={getText(car1.name)}
                           fill
                           style={{ objectFit: "contain" }}
                         />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">{getText(car3.name)}</h3>
+                        <h3 className="text-lg font-bold text-gray-900">{getText(car1.name)}</h3>
                         <div className="flex items-center mt-1">
                           <div className="w-6 h-6 relative mr-2">
                             <Image
-                              src={car3.brandLogo || "/placeholder.svg?height=24&width=24"}
-                              alt={car3.brand}
+                              src={car1.brandLogo || "/placeholder.svg?height=24&width=24"}
+                              alt={car1.brand}
                               fill
                               style={{ objectFit: "contain" }}
                             />
                           </div>
-                          <span className="text-sm text-gray-600">{car3.brand}</span>
-                          <div className="ml-3">{getStatusBadge(car3.status)}</div>
+                          <span className="text-sm text-gray-600">{getText(car1.brand)}</span>
+                          <div className="ml-3">{getStatusBadge(car1.status)}</div>
                         </div>
                       </div>
                     </div>
@@ -1495,17 +1592,11 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                       <div className="mb-6">
                         <div className="text-sm text-gray-500 mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
                         <div className="flex items-center">
-                          <Image
-                            src={car3.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={24}
-                            height={24}
-                            className="mr-2"
-                          />
+                          <Image src="/icons/Currency.svg" alt="Currency" width={24} height={24} className="mr-2" />
                           <span className="text-3xl font-bold text-brand-primary">
-                            {car3.cashPrice.toLocaleString()}
+                            {car1.cashPrice.toLocaleString()}
                           </span>
-                          {getPriceComparisonIcon(car3, lowestPrice, highestPrice)}
+                          {getPriceComparisonIcon(car1, lowestPrice, highestPrice)}
                         </div>
                       </div>
 
@@ -1514,720 +1605,152 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
                           {isRTL ? "القسط الشهري" : "Monthly Installment"}
                         </div>
                         <div className="flex items-center">
-                          <Image
-                            src={car3.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={20}
-                            height={20}
-                            className="mr-2"
-                          />
+                          <Image src="/icons/Currency.svg" alt="Currency" width={20} height={20} className="mr-2" />
                           <span className="text-xl font-semibold text-gray-800">
-                            {car3.installmentPrice.toLocaleString()}
+                            {car1.installmentPrice.toLocaleString()}
                           </span>
                           <span className="text-sm text-gray-500 ml-2">{isRTL ? "/ شهر" : "/ month"}</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Price Comparison Summary */}
-            <div className="bg-white rounded-xl p-6 mb-10 border border-brand-light">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                <div className="w-5 h-5 mr-2 relative">
-                  <Image
-                    src={car1.icons.currency || "/placeholder.svg"}
-                    alt="Currency"
-                    width={20}
-                    height={20}
-                    className="text-brand-primary"
-                  />
-                </div>
-                {isRTL ? "ملخص المقارنة السعرية" : "Price Comparison Summary"}
-              </h3>
-
-              <div className="grid grid-cols-3 gap-8">
-                {/* Highest Price */}
-                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light hover:shadow-lg transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="text-sm font-medium text-gray-600">{isRTL ? "أعلى سعر" : "Highest Price"}</div>
-                    <TrendingUp className="w-5 h-5 text-brand-primary" />
-                  </div>
-                  <div className="flex items-center">
-                    <Image
-                      src={
-                        car1.cashPrice >= car2.cashPrice && car1.cashPrice >= (car3?.cashPrice || 0)
-                          ? car1.icons.currency
-                          : car2.cashPrice >= car1.cashPrice && car2.cashPrice >= (car3?.cashPrice || 0)
-                            ? car2.icons.currency
-                            : car3.icons.currency || "/placeholder.svg"
-                      }
-                      alt="Currency"
-                      width={20}
-                      height={20}
-                      className="mr-2"
-                    />
-                    <span className="text-2xl font-bold text-gray-900">{highestPrice.toLocaleString()}</span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    {car1.cashPrice === highestPrice
-                      ? getText(car1.name)
-                      : car2.cashPrice === highestPrice
-                        ? getText(car2.name)
-                        : getText(car3?.name || "")}
-                  </div>
-                </div>
-
-                {/* Lowest Price */}
-                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light hover:shadow-lg transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="text-sm font-medium text-gray-600">{isRTL ? "أقل سعر" : "Lowest Price"}</div>
-                    <TrendingDown className="w-5 h-5 text-brand-primary" />
-                  </div>
-                  <div className="flex items-center">
-                    <Image
-                      src={
-                        car1.cashPrice <= car2.cashPrice &&
-                        car1.cashPrice <= (car3?.cashPrice || Number.POSITIVE_INFINITY)
-                          ? car1.icons.currency
-                          : car2.cashPrice <= car1.cashPrice &&
-                              car2.cashPrice <= (car3?.cashPrice || Number.POSITIVE_INFINITY)
-                            ? car2.icons.currency
-                            : car3.icons.currency || "/placeholder.svg"
-                      }
-                      alt="Currency"
-                      width={20}
-                      height={20}
-                      className="mr-2"
-                    />
-                    <span className="text-2xl font-bold text-gray-900">{lowestPrice.toLocaleString()}</span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    {car1.cashPrice === lowestPrice
-                      ? getText(car1.name)
-                      : car2.cashPrice === lowestPrice
-                        ? getText(car2.name)
-                        : getText(car3?.name || "")}
-                  </div>
-                </div>
-
-                {/* Price Difference */}
-                <div className="bg-white rounded-xl p-5 shadow-md border border-brand-light hover:shadow-lg transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="text-sm font-medium text-gray-600">
-                      {isRTL ? "الفرق السعري" : "Price Difference"}
-                    </div>
-                    <div className="w-5 h-5 relative">
-                      <Image
-                        src={car1.icons.currency || "/placeholder.svg"}
-                        alt="Currency"
-                        width={20}
-                        height={20}
-                        className="text-brand-primary"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <Image
-                      src={car1.icons.currency || "/placeholder.svg"}
-                      alt="Currency"
-                      width={20}
-                      height={20}
-                      className="mr-2"
-                    />
-                    <span className="text-2xl font-bold text-gray-900">{priceDifference.toLocaleString()}</span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    {Math.round((priceDifference / lowestPrice) * 100)}% {isRTL ? "من السعر الأقل" : "of lowest price"}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Price Comparison Table */}
-            <div className="bg-white rounded-xl shadow-md border border-brand-light overflow-hidden">
-              <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-4">
-                <h3 className="text-lg font-medium">{isRTL ? "جدول مقارنة الأسعار" : "Price Comparison Table"}</h3>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="py-4 px-6 text-left text-sm font-medium text-gray-700 border-b border-r border-gray-200">
-                        {isRTL ? "السيارة" : "Car"}
-                      </th>
-                      <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-r border-gray-200">
-                        {isRTL ? "سعر الكاش" : "Cash Price"}
-                      </th>
-                      <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-r border-gray-200">
-                        {isRTL ? "القسط الشهري" : "Monthly Installment"}
-                      </th>
-                      <th className="py-4 px-6 text-center text-sm font-medium text-gray-700 border-b border-gray-200">
-                        {isRTL ? "الحالة" : "Status"}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {/* Car 1 */}
-                    <tr className="hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6 border-b border-r border-gray-200">
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 relative mr-3">
-                            <Image
-                              src={car1.image || "/placeholder.svg?height=48&width=48"}
-                              alt={getText(car1.name)}
-                              fill
-                              style={{ objectFit: "contain" }}
-                            />
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900">{getText(car1.name)}</div>
-                            <div className="text-sm text-gray-500">{car1.brand}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-center border-b border-r border-gray-200">
-                        <div className="flex items-center justify-center">
-                          <Image
-                            src={car1.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={16}
-                            height={16}
-                            className="mr-1"
-                          />
-                          <span className="font-bold text-brand-primary">{car1.cashPrice.toLocaleString()}</span>
-                          {getPriceComparisonIcon(car1, lowestPrice, highestPrice)}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-center border-b border-r border-gray-200">
-                        <div className="flex items-center justify-center">
-                          <Image
-                            src={car1.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={14}
-                            height={14}
-                            className="mr-1"
-                          />
-                          <span className="font-medium">{car1.installmentPrice.toLocaleString()}</span>
-                          <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-center border-b border-gray-200">
-                        <div className="flex justify-center">{getStatusBadge(car1.status)}</div>
-                      </td>
-                    </tr>
-
-                    {/* Car 2 */}
-                    <tr className="hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6 border-b border-r border-gray-200">
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 relative mr-3">
-                            <Image
-                              src={car2.image || "/placeholder.svg?height=48&width=48"}
-                              alt={getText(car2.name)}
-                              fill
-                              style={{ objectFit: "contain" }}
-                            />
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900">{getText(car2.name)}</div>
-                            <div className="text-sm text-gray-500">{car2.brand}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-center border-b border-r border-gray-200">
-                        <div className="flex items-center justify-center">
-                          <Image
-                            src={car2.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={16}
-                            height={16}
-                            className="mr-1"
-                          />
-                          <span className="font-bold text-brand-primary">{car2.cashPrice.toLocaleString()}</span>
-                          {getPriceComparisonIcon(car2, lowestPrice, highestPrice)}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-center border-b border-r border-gray-200">
-                        <div className="flex items-center justify-center">
-                          <Image
-                            src={car2.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={14}
-                            height={14}
-                            className="mr-1"
-                          />
-                          <span className="font-medium">{car2.installmentPrice.toLocaleString()}</span>
-                          <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-center border-b border-gray-200">
-                        <div className="flex justify-center">{getStatusBadge(car2.status)}</div>
-                      </td>
-                    </tr>
-
-                    {/* Car 3 (if present) */}
-                    {hasThirdCar && (
-                      <tr className="hover:bg-gray-50 transition-colors">
-                        <td className="py-4 px-6 border-b border-r border-gray-200">
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 relative mr-3">
-                              <Image
-                                src={car3.image || "/placeholder.svg?height=48&width=48"}
-                                alt={getText(car3.name)}
-                                fill
-                                style={{ objectFit: "contain" }}
-                              />
-                            </div>
-                            <div>
-                              <div className="font-medium text-gray-900">{getText(car3.name)}</div>
-                              <div className="text-sm text-gray-500">{car3.brand}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 text-center border-b border-r border-gray-200">
-                          <div className="flex items-center justify-center">
-                            <Image
-                              src={car3.icons.currency || "/placeholder.svg"}
-                              alt="Currency"
-                              width={16}
-                              height={16}
-                              className="mr-1"
-                            />
-                            <span className="font-bold text-brand-primary">{car3.cashPrice.toLocaleString()}</span>
-                            {getPriceComparisonIcon(car3, lowestPrice, highestPrice)}
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 text-center border-b border-r border-gray-200">
-                          <div className="flex items-center justify-center">
-                            <Image
-                              src={car3.icons.currency || "/placeholder.svg"}
-                              alt="Currency"
-                              width={14}
-                              height={14}
-                              className="mr-1"
-                            />
-                            <span className="font-medium">{car3.installmentPrice.toLocaleString()}</span>
-                            <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 text-center border-b border-gray-200">
-                          <div className="flex justify-center">{getStatusBadge(car3.status)}</div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Mobile Price View */}
-            <div className="md:hidden p-4 space-y-6">
-              {/* Mobile Price Cards */}
-              <div className="space-y-4">
-                {/* Car 1 Price Card */}
-                <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <div className="w-8 h-8 relative">
-                          <Image
-                            src={car1.brandLogo || "/placeholder.svg?height=24&width=24"}
-                            alt={car1.brand}
-                            fill
-                            style={{ objectFit: "contain" }}
-                          />
-                        </div>
+                  {/* Car 2 Price Card */}
+                  <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow transform hover:-translate-y-1">
+                    <div className="absolute top-0 right-0 w-24 h-24">
+                      <div className="absolute transform rotate-45 bg-brand-primary text-white font-medium py-1 text-xs text-center w-32 top-6 -right-8">
+                        {car2.cashPrice === highestPrice
+                          ? isRTL
+                            ? "الأعلى سعراً"
+                            : "Highest Price"
+                          : car2.cashPrice === lowestPrice
+                            ? isRTL
+                              ? "الأقل سعراً"
+                              : "Lowest Price"
+                            : ""}
                       </div>
-                      <span className="text-white font-medium text-sm md:text-base">{getText(car1.name)}</span>
                     </div>
-                    {getStatusBadge(car1.status)}
-                  </div>
-                  <div className="p-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
-                      <span className="text-lg font-bold text-brand-primary flex items-center">
+
+                    <div className="p-6 flex items-center border-b border-brand-light">
+                      {/* Car image - only show on desktop, not on iPad */}
+                      <div className="w-16 h-16 relative mr-4 hidden xl:block">
                         <Image
-                          src={car1.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={16}
-                          height={16}
-                          className="inline mr-1"
-                        />
-                        {car1.cashPrice.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
-                      <span className="text-base font-semibold text-brand-primary flex items-center">
-                        <Image
-                          src={car1.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={14}
-                          height={14}
-                          className="inline mr-1"
-                        />
-                        {car1.installmentPrice.toLocaleString()}
-                        <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Car 2 Price Card */}
-                <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <div className="w-8 h-8 relative">
-                          <Image
-                            src={car2.brandLogo || "/placeholder.svg?height=24&width=24"}
-                            alt={car2.brand}
-                            fill
-                            style={{ objectFit: "contain" }}
-                          />
-                        </div>
-                      </div>
-                      <span className="text-white font-medium text-sm md:text-base">{getText(car2.name)}</span>
-                    </div>
-                    {getStatusBadge(car2.status)}
-                  </div>
-                  <div className="p-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
-                      <span className="text-lg font-bold text-brand-primary flex items-center">
-                        <Image
-                          src={car2.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={16}
-                          height={16}
-                          className="inline mr-1"
-                        />
-                        {car2.cashPrice.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
-                      <span className="text-base font-semibold text-brand-primary flex items-center">
-                        <Image
-                          src={car2.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={14}
-                          height={14}
-                          className="inline mr-1"
-                        />
-                        {car2.installmentPrice.toLocaleString()}
-                        <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Car 3 Price Card (if present) */}
-                {hasThirdCar && (
-                  <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                          <div className="w-8 h-8 relative">
-                            <Image
-                              src={car3.brandLogo || "/placeholder.svg?height=24&width=24"}
-                              alt={car3.brand}
-                              fill
-                              style={{ objectFit: "contain" }}
-                            />
-                          </div>
-                        </div>
-                        <span className="text-white font-medium text-sm md:text-base">{getText(car3.name)}</span>
-                      </div>
-                      {getStatusBadge(car3.status)}
-                    </div>
-                    <div className="p-4">
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm text-gray-600">{isRTL ? "سعر الكاش" : "Cash Price"}</span>
-                        <span className="text-lg font-bold text-brand-primary flex items-center">
-                          <Image
-                            src={car3.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={16}
-                            height={16}
-                            className="inline mr-1"
-                          />
-                          {car3.cashPrice.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">{isRTL ? "القسط الشهري" : "Monthly Installment"}</span>
-                        <span className="text-base font-semibold text-brand-primary flex items-center">
-                          <Image
-                            src={car3.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={14}
-                            height={14}
-                            className="inline mr-1"
-                          />
-                          {car3.installmentPrice.toLocaleString()}
-                          <span className="text-xs text-gray-500 ml-1">{isRTL ? "/ شهر" : "/ month"}</span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Price Comparison Summary - Mobile */}
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-brand-light">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <div className="w-5 h-5 mr-2 relative">
-                    <Image
-                      src={car1.icons.currency || "/placeholder.svg"}
-                      alt="Currency"
-                      width={20}
-                      height={20}
-                      className="text-brand-primary"
-                    />
-                  </div>
-                  {isRTL ? "ملخص المقارنة السعرية" : "Price Comparison Summary"}
-                </h3>
-
-                <div className="space-y-3">
-                  {/* Highest Price */}
-                  <div className="bg-white rounded-lg p-3 border border-brand-light">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="text-sm font-medium text-gray-600 flex items-center">
-                        <TrendingUp className="w-4 h-4 text-brand-primary mr-1" />
-                        {isRTL ? "أعلى سعر" : "Highest Price"}
-                      </div>
-                      <div className="flex items-center">
-                        <Image
-                          src={car1.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={14}
-                          height={14}
-                          className="mr-1"
-                        />
-                        <span className="font-bold text-brand-primary">{highestPrice.toLocaleString()}</span>
-                      </div>
-                    </div>
-                    <div className="text-xs text-gray-500 pl-5">
-                      {car1.cashPrice === highestPrice
-                        ? getText(car1.name)
-                        : car2.cashPrice === highestPrice
-                          ? getText(car2.name)
-                          : getText(car3?.name || "")}
-                    </div>
-                  </div>
-
-                  {/* Lowest Price */}
-                  <div className="bg-white rounded-lg p-3 border border-brand-light">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="text-sm font-medium text-gray-600 flex items-center">
-                        <TrendingDown className="w-4 h-4 text-brand-primary mr-1" />
-                        {isRTL ? "أقل سعر" : "Lowest Price"}
-                      </div>
-                      <div className="flex items-center">
-                        <Image
-                          src={car1.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={14}
-                          height={14}
-                          className="mr-1"
-                        />
-                        <span className="font-bold text-brand-primary">{lowestPrice.toLocaleString()}</span>
-                      </div>
-                    </div>
-                    <div className="text-xs text-gray-500 pl-5">
-                      {car1.cashPrice === lowestPrice
-                        ? getText(car1.name)
-                        : car2.cashPrice === lowestPrice
-                          ? getText(car2.name)
-                          : getText(car3?.name || "")}
-                    </div>
-                  </div>
-
-                  {/* Price Difference */}
-                  <div className="bg-white rounded-lg p-3 border border-brand-light">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="text-sm font-medium text-gray-600">
-                        {isRTL ? "الفرق السعري" : "Price Difference"}
-                      </div>
-                      <div className="flex items-center">
-                        <Image
-                          src={car1.icons.currency || "/placeholder.svg"}
-                          alt="Currency"
-                          width={14}
-                          height={14}
-                          className="mr-1"
-                        />
-                        <span className="font-bold text-brand-primary">{priceDifference.toLocaleString()}</span>
-                      </div>
-                    </div>
-                    <div className="text-xs text-gray-500 text-right">
-                      {Math.round((priceDifference / lowestPrice) * 100)}%{" "}
-                      {isRTL ? "من السعر الأقل" : "of lowest price"}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mobile Price Comparison Table */}
-              <div className="bg-white rounded-xl shadow-sm border border-brand-light overflow-hidden">
-                <div className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white p-3">
-                  <h3 className="text-base font-medium">{isRTL ? "جدول مقارنة الأسعار" : "Price Comparison Table"}</h3>
-                </div>
-
-                <div className="divide-y divide-gray-100">
-                  {/* Car 1 */}
-                  <div className="p-3">
-                    <div className="flex items-center mb-2">
-                      <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
-                        <Image
-                          src={car1.image || "/placeholder.svg?height=40&width=40"}
-                          alt={getText(car1.name)}
-                          width={36}
-                          height={36}
-                          style={{ objectFit: "contain" }}
-                        />
-                      </div>
-                      <div>
-                        <div className="font-medium text-sm">{getText(car1.name)}</div>
-                        <div className="text-xs text-gray-500">{car1.brand}</div>
-                      </div>
-                      <div className="ml-auto">{getStatusBadge(car1.status)}</div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      <div className="bg-gray-50 p-2 rounded-md">
-                        <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
-                        <div className="flex items-center text-sm font-medium">
-                          <Image
-                            src={car1.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={12}
-                            height={12}
-                            className="mr-1"
-                          />
-                          {car1.cashPrice.toLocaleString()}
-                          {getPriceComparisonIcon(car1, lowestPrice, highestPrice)}
-                        </div>
-                      </div>
-
-                      <div className="bg-gray-50 p-2 rounded-md">
-                        <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
-                        <div className="flex items-center text-sm">
-                          <Image
-                            src={car1.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={12}
-                            height={12}
-                            className="mr-1"
-                          />
-                          {car1.installmentPrice.toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Car 2 */}
-                  <div className="p-3">
-                    <div className="flex items-center mb-2">
-                      <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
-                        <Image
-                          src={car2.image || "/placeholder.svg?height=40&width=40"}
+                          src={car2.image || "/placeholder.svg?height=64&width=64"}
                           alt={getText(car2.name)}
-                          width={36}
-                          height={36}
+                          fill
                           style={{ objectFit: "contain" }}
                         />
                       </div>
                       <div>
-                        <div className="font-medium text-sm">{getText(car2.name)}</div>
-                        <div className="text-xs text-gray-500">{car2.brand}</div>
+                        <h3 className="text-lg font-bold text-gray-900">{getText(car2.name)}</h3>
+                        <div className="flex items-center mt-1">
+                          <div className="w-6 h-6 relative mr-2">
+                            <Image
+                              src={car2.brandLogo || "/placeholder.svg?height=24&width=24"}
+                              alt={car2.brand}
+                              fill
+                              style={{ objectFit: "contain" }}
+                            />
+                          </div>
+                          <span className="text-sm text-gray-600">{getText(car2.brand)}</span>
+                          <div className="ml-3">{getStatusBadge(car2.status)}</div>
+                        </div>
                       </div>
-                      <div className="ml-auto">{getStatusBadge(car2.status)}</div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      <div className="bg-gray-50 p-2 rounded-md">
-                        <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
-                        <div className="flex items-center text-sm font-medium">
-                          <Image
-                            src={car2.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={12}
-                            height={12}
-                            className="mr-1"
-                          />
-                          {car2.cashPrice.toLocaleString()}
+                    <div className="p-6">
+                      <div className="mb-6">
+                        <div className="text-sm text-gray-500 mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
+                        <div className="flex items-center">
+                          <Image src="/icons/Currency.svg" alt="Currency" width={24} height={24} className="mr-2" />
+                          <span className="text-3xl font-bold text-brand-primary">
+                            {car2.cashPrice.toLocaleString()}
+                          </span>
                           {getPriceComparisonIcon(car2, lowestPrice, highestPrice)}
                         </div>
                       </div>
 
-                      <div className="bg-gray-50 p-2 rounded-md">
-                        <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
-                        <div className="flex items-center text-sm">
-                          <Image
-                            src={car2.icons.currency || "/placeholder.svg"}
-                            alt="Currency"
-                            width={12}
-                            height={12}
-                            className="mr-1"
-                          />
-                          {car2.installmentPrice.toLocaleString()}
+                      <div>
+                        <div className="text-sm text-gray-500 mb-1">
+                          {isRTL ? "القسط الشهري" : "Monthly Installment"}
+                        </div>
+                        <div className="flex items-center">
+                          <Image src="/icons/Currency.svg" alt="Currency" width={20} height={20} className="mr-2" />
+                          <span className="text-xl font-semibold text-gray-800">
+                            {car2.installmentPrice.toLocaleString()}
+                          </span>
+                          <span className="text-sm text-gray-500 ml-2">{isRTL ? "/ شهر" : "/ month"}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Car 3 (if present) */}
+                  {/* Car 3 Price Card (if present) */}
                   {hasThirdCar && (
-                    <div className="p-3">
-                      <div className="flex items-center mb-2">
-                        <div className="w-10 h-10 relative mr-2 bg-gray-50 rounded-md flex items-center justify-center">
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light relative hover:shadow-xl transition-shadow transform hover:-translate-y-1">
+                      <div className="absolute top-0 right-0 w-24 h-24">
+                        <div className="absolute transform rotate-45 bg-brand-primary text-white font-medium py-1 text-xs text-center w-32 top-6 -right-8">
+                          {car3.cashPrice === highestPrice
+                            ? isRTL
+                              ? "الأعلى سعراً"
+                              : "Highest Price"
+                            : car3.cashPrice === lowestPrice
+                              ? isRTL
+                                ? "الأقل سعراً"
+                                : "Lowest Price"
+                              : ""}
+                        </div>
+                      </div>
+
+                      <div className="p-6 flex items-center border-b border-brand-light">
+                        {/* Car image - only show on desktop, not on iPad */}
+                        <div className="w-16 h-16 relative mr-4 hidden xl:block">
                           <Image
-                            src={car3.image || "/placeholder.svg?height=40&width=40"}
+                            src={car3.image || "/placeholder.svg?height=64&width=64"}
                             alt={getText(car3.name)}
-                            width={36}
-                            height={36}
+                            fill
                             style={{ objectFit: "contain" }}
                           />
                         </div>
                         <div>
-                          <div className="font-medium text-sm">{getText(car3.name)}</div>
-                          <div className="text-xs text-gray-500">{car3.brand}</div>
+                          <h3 className="text-lg font-bold text-gray-900">{getText(car3.name)}</h3>
+                          <div className="flex items-center mt-1">
+                            <div className="w-6 h-6 relative mr-2">
+                              <Image
+                                src={car3.brandLogo || "/placeholder.svg?height=24&width=24"}
+                                alt={car3.brand}
+                                fill
+                                style={{ objectFit: "contain" }}
+                              />
+                            </div>
+                            <span className="text-sm text-gray-600">{getText(car3.brand)}</span>
+                            <div className="ml-3">{getStatusBadge(car3.status)}</div>
+                          </div>
                         </div>
-                        <div className="ml-auto">{getStatusBadge(car3.status)}</div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        <div className="bg-gray-50 p-2 rounded-md">
-                          <div className="text-xs text-gray-500">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
-                          <div className="flex items-center text-sm font-medium">
-                            <Image
-                              src={car3.icons.currency || "/placeholder.svg"}
-                              alt="Currency"
-                              width={12}
-                              height={12}
-                              className="mr-1"
-                            />
-                            {car3.cashPrice.toLocaleString()}
+                      <div className="p-6">
+                        <div className="mb-6">
+                          <div className="text-sm text-gray-500 mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</div>
+                          <div className="flex items-center">
+                            <Image src="/icons/Currency.svg" alt="Currency" width={24} height={24} className="mr-2" />
+                            <span className="text-3xl font-bold text-brand-primary">
+                              {car3.cashPrice.toLocaleString()}
+                            </span>
                             {getPriceComparisonIcon(car3, lowestPrice, highestPrice)}
                           </div>
                         </div>
 
-                        <div className="bg-gray-50 p-2 rounded-md">
-                          <div className="text-xs text-gray-500">{isRTL ? "القسط الشهري" : "Monthly"}</div>
-                          <div className="flex items-center text-sm">
-                            <Image
-                              src={car3.icons.currency || "/placeholder.svg"}
-                              alt="Currency"
-                              width={12}
-                              height={12}
-                              className="mr-1"
-                            />
-                            {car3.installmentPrice.toLocaleString()}
+                        <div>
+                          <div className="text-sm text-gray-500 mb-1">
+                            {isRTL ? "القسط الشهري" : "Monthly Installment"}
+                          </div>
+                          <div className="flex items-center">
+                            <Image src="/icons/Currency.svg" alt="Currency" width={20} height={20} className="mr-2" />
+                            <span className="text-xl font-semibold text-gray-800">
+                              {car3.installmentPrice.toLocaleString()}
+                            </span>
+                            <span className="text-sm text-gray-500 ml-2">{isRTL ? "/ شهر" : "/ month"}</span>
                           </div>
                         </div>
                       </div>
@@ -2237,25 +1760,47 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Compare Again Button */}
-      <div className="flex justify-center mb-8 px-4 no-print">
-        <div className={`${isRTL ? "rtl" : ""}`}>
-          <div className={`button-container-mask md:w-auto`}>
-            <span className="mask-text">{isRTL ? "قارن سيارة أخرى" : "Compare Another Car"}</span>
-            <button onClick={onCompareAgain} className="mask-button">
-              {isRTL ? (
-                <>
-                  <ArrowRight className="w-5 h-5" /> قارن سيارة أخرى
-                </>
-              ) : (
-                <>
-                  <ArrowLeft className="w-5 h-5" /> Compare Another Car
-                </>
-              )}
-            </button>
+      {/* Compare Another Car Button - Separate from tabs, at bottom of page */}
+      <div className="px-0 mb-12 mt-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-brand-light">
+            <div className="p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-center sm:text-left">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  {isRTL ? "هل تريد مقارنة سيارة أخرى؟" : "Want to compare another car?"}
+                </h3>
+                <p className="text-sm text-gray-600 max-w-md">
+                  {isRTL
+                    ? "يمكنك مقارنة المزيد من السيارات للعثور على السيارة المثالية لك"
+                    : "You can compare more cars to find the perfect vehicle for you"}
+                </p>
+              </div>
+
+              <button
+                onClick={onCompareAgain}
+                className="bg-gradient-to-r from-brand-primary to-[#2D0F33] text-white font-medium py-3 px-6 rounded-md shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-2 min-w-[200px] justify-center whitespace-nowrap"
+                style={{ borderRadius: "5px" }}
+              >
+                {isRTL ? (
+                  <>
+                    <ArrowRight className="w-5 h-5 flex-shrink-0" />
+                    <span className="text-sm sm:text-base font-medium">
+                      {isRTL ? "قارن سيارة أخرى" : "Compare Another Car"}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowLeft className="w-5 h-5 flex-shrink-0" />
+                    <span className="text-sm sm:text-base font-medium">
+                      {isRTL ? "قارن سيارة أخرى" : "Compare Another Car"}
+                    </span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

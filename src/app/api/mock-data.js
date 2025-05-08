@@ -5,59 +5,59 @@
 const carImages = {
   car1: "/images/car1.png",
   car1_1: "/images/car1.png",
-  car1_2: "/images/car1.png",
-  car1_3: "/images/car1.png",
-  car1_4: "/images/car1.png",
+  car1_2: "/images/car2.png",
+  car1_3: "/images/car3.png",
+  car1_4: "/images/car4.png",
   car2: "/images/car2.png",
   car2_1: "/images/car2.png",
-  car2_2: "/images/car2.png",
-  car2_3: "/images/car2.png",
-  car2_4: "/images/car2.png",
+  car2_2: "/images/car5.png",
+  car2_3: "/images/car6.png",
+  car2_4: "/images/car7.png",
   car3: "/images/car3.png",
   car3_1: "/images/car3.png",
-  car3_2: "/images/car3.png",
-  car3_3: "/images/car3.png",
-  car3_4: "/images/car3.png",
+  car3_2: "/images/car8.png",
+  car3_3: "/images/car9.png",
+  car3_4: "/images/car10.png",
   car4: "/images/car4.png",
   car4_1: "/images/car4.png",
-  car4_2: "/images/car4.png",
-  car4_3: "/images/car4.png",
-  car4_4: "/images/car4.png",
+  car4_2: "/images/car11.png",
+  car4_3: "/images/car1.png",
+  car4_4: "/images/car2.png",
   car5: "/images/car5.png",
   car5_1: "/images/car5.png",
-  car5_2: "/images/car5.png",
-  car5_3: "/images/car5.png",
-  car5_4: "/images/car5.png",
+  car5_2: "/images/car3.png",
+  car5_3: "/images/car4.png",
+  car5_4: "/images/car6.png",
   car6: "/images/car6.png",
   car6_1: "/images/car6.png",
-  car6_2: "/images/car6.png",
-  car6_3: "/images/car6.png",
-  car6_4: "/images/car6.png",
+  car6_2: "/images/car7.png",
+  car6_3: "/images/car8.png",
+  car6_4: "/images/car9.png",
   car7: "/images/car7.png",
   car7_1: "/images/car7.png",
-  car7_2: "/images/car7.png",
-  car7_3: "/images/car7.png",
-  car7_4: "/images/car7.png",
+  car7_2: "/images/car10.png",
+  car7_3: "/images/car11.png",
+  car7_4: "/images/car1.png",
   car8: "/images/car8.png",
   car8_1: "/images/car8.png",
-  car8_2: "/images/car8.png",
-  car8_3: "/images/car8.png",
-  car8_4: "/images/car8.png",
+  car8_2: "/images/car2.png",
+  car8_3: "/images/car3.png",
+  car8_4: "/images/car4.png",
   car9: "/images/car9.png",
   car9_1: "/images/car9.png",
-  car9_2: "/images/car9.png",
-  car9_3: "/images/car9.png",
-  car9_4: "/images/car9.png",
+  car9_2: "/images/car2.png",
+  car9_3: "/images/car3.png",
+  car9_4: "/images/car4.png",
   car10: "/images/car10.png",
   car10_1: "/images/car10.png",
-  car10_2: "/images/car10.png",
-  car10_3: "/images/car10.png",
-  car10_4: "/images/car10.png",
+  car10_2: "/images/car11.png",
+  car10_3: "/images/car1.png",
+  car10_4: "/images/car2.png",
   car11: "/images/car11.png",
   car11_1: "/images/car11.png",
-  car11_2: "/images/car11.png",
-  car11_3: "/images/car11.png",
-  car11_4: "/images/car11.png",
+  car11_2: "/images/car3.png",
+  car11_3: "/images/car4.png",
+  car11_4: "/images/car5.png",
 }
 
 // Brand logos
@@ -107,12 +107,12 @@ const specNames = {
   brakes: { en: "Brakes", ar: "المكابح" },
   parkingSensors: { en: "Parking Sensors", ar: "حساسات الركن" },
   camera: { en: "Rear Camera", ar: "كاميرا خلفية" },
-  fuelType: { en: "Fuel Type", ar: "نوع الوقود" },
+  fuelType: { en: "Fuel Type", ar: "نو�� الوقود" },
   year: { en: "Year", ar: "السنة" },
 }
 
-// Specification categories with their icons
-const specCategories = [
+// Specification categories
+export const specCategories = [
   {
     id: "transmission",
     name: { en: "Transmission", ar: "ناقل الحركة" },
@@ -199,6 +199,24 @@ const overviewCategories = [
     },
   ],
 ]
+
+// Brand names with Arabic translations
+export const brandNames = {
+  Toyota: { en: "Toyota", ar: "تويوتا" },
+  Honda: { en: "Honda", ar: "هوندا" },
+  Hyundai: { en: "Hyundai", ar: "هيونداي" },
+  Nissan: { en: "Nissan", ar: "نيسان" },
+  Chevrolet: { en: "Chevrolet", ar: "شيفروليه" },
+  Ford: { en: "Ford", ar: "فورد" },
+  MG: { en: "MG", ar: "إم جي" },
+  Changan: { en: "Changan", ar: "شانجان" },
+  Chery: { en: "Chery", ar: "شيري" },
+  Haval: { en: "Haval", ar: "هافال" },
+  Jetour: { en: "Jetour", ar: "جيتور" },
+  Bestune: { en: "Bestune", ar: "بيستون" },
+  Hongqi: { en: "Hongqi", ar: "هونغتشي" },
+  Suzuki: { en: "Suzuki", ar: "سوزوكي" },
+}
 
 // Default features for all cars
 const defaultFeatures = {
@@ -604,7 +622,7 @@ const carsData = [
       },
       width: {
         en: "1,860 mm",
-        ar: "1,860 ملم",
+        ar: "1,860 mلم",
       },
       height: {
         en: "1,445 mm",
@@ -1439,7 +1457,7 @@ const carsData = [
       },
       camera: {
         en: "360° Camera System",
-        ar: "نظام كاميرا 360 درجة",
+        ar: "كاميرا 360 درجة",
       },
     },
     additional_images: [carImages.car9_1, carImages.car9_2, carImages.car9_3, carImages.car9_4],
@@ -1720,4 +1738,4 @@ export const fetchCars = () => {
 
 // Export all the data for use in components
 export default carsData
-export { specNames, specCategories, overviewCategories }
+export { specNames, overviewCategories }

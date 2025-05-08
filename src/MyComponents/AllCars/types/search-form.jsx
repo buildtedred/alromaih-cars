@@ -1,4 +1,4 @@
-import { Search } from "lucide-react"
+import { Search } from 'lucide-react'
 
 export function SearchForm() {
   return (
@@ -12,4 +12,3 @@ export function SearchForm() {
     </div>
   )
 }
-
