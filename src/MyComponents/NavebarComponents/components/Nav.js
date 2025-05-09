@@ -6,8 +6,9 @@ import { useParams, usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { motion, AnimatePresence } from "framer-motion"
+import { Phone } from "lucide-react"
 
-const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
+const Nav = ({ isMobile, isTablet, isDropdown, setIsMobileMenuOpen, showCallButton }) => {
   const pathname = usePathname() || ""
   const [isClient, setIsClient] = useState(false)
   const { t } = useTranslation()
@@ -66,9 +67,32 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
 
   const handleLinkClick = () => {
     // Close the mobile menu when a link is clicked
-    if (isMobile && setIsMobileMenuOpen) {
+    if ((isMobile || isTablet) && setIsMobileMenuOpen) {
       setIsMobileMenuOpen(false)
     }
+  }
+
+  // Add this function to check if a link is active
+  const isLinkActive = (itemHref) => {
+    // Get the full path with locale
+    const fullPath = `/${locale}${itemHref}`
+
+    // Exact match (for home page and exact routes)
+    if (pathname === fullPath) {
+      return true
+    }
+
+    // For nested routes, check if the current path starts with the item's href
+    // But only if the item href is not the home page
+    if (itemHref !== "/" && pathname.startsWith(fullPath)) {
+      // Make sure it's a proper section (e.g., /cars should match /cars/detail but not /carsomething)
+      const remainingPath = pathname.slice(fullPath.length)
+      if (remainingPath === "" || remainingPath.startsWith("/")) {
+        return true
+      }
+    }
+
+    return false
   }
 
   // Create navItems only when client-side
@@ -125,6 +149,7 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
       y: 0,
       transition: {
         duration: 0.3,
+        ease: "easeOut",
       },
     },
     exit: {
@@ -136,6 +161,28 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
     },
   }
 
+  // Animation variants for the nav container
+  const navContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08, // Stagger the children animations
+        delayChildren: 0.1, // Delay before starting children animations
+      },
+    },
+  }
+
+  // Determine the appropriate class for the nav container based on the view mode
+  const getNavContainerClass = () => {
+    if (isMobile) return "block lg:hidden"
+    return "flex-1"
+  }
+
+  // Find the contact page item
+  const contactItem = navItems.find((item) => item.key === "contact")
+  const hasContactItem = !!contactItem
+
   return (
     <>
       <style jsx global>{`
@@ -145,7 +192,7 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
         }
         .nav-item-hover:hover {
           transform: translateY(-2px);
-          color: #46194F;
+          color: var(--tw-color-brand-primary, #46194F);
         }
         
         /* Underline animation */
@@ -159,7 +206,7 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
           left: 0;
           width: 0;
           height: 2px;
-          background-color: #46194F;
+          background-color: var(--tw-color-brand-primary, #46194F);
           transition: width 0.3s ease;
         }
         .nav-underline:hover::after {
@@ -167,39 +214,134 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
         }
         
         /* Active nav item */
+        .nav-active {
+          position: relative;
+          color: var(--tw-color-brand-primary, #46194F) !important;
+          font-weight: 500;
+        }
+
         .nav-active::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
           width: 100%;
+          height: 2px;
+          background-color: var(--tw-color-brand-primary, #46194F);
+          transition: width 0.3s ease;
+        }
+
+        /* Mobile active state */
+        .mobile-nav-active {
+          background-color: rgba(70, 25, 79, 0.08);
+          position: relative;
+        }
+
+        .mobile-nav-active::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          background-color: var(--tw-color-brand-primary, #46194F);
+          border-radius: 0 2px 2px 0;
+        }
+
+        /* Dropdown menu item styles */
+        .dropdown-item {
+          transition: all 0.2s ease;
+          border-left: 3px solid transparent;
+        }
+        
+        .dropdown-item:hover {
+          background-color: rgba(70, 25, 79, 0.05);
+          border-left-color: var(--tw-color-brand-primary, #46194F);
+        }
+        
+        .dropdown-item.active {
+          background-color: rgba(70, 25, 79, 0.1);
+          border-left-color: var(--tw-color-brand-primary, #46194F);
+          font-weight: 500;
+        }
+
+        /* Call button styles */
+        .call-button-mobile {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          height: 50px;
+          border-radius: 5px;
+          font-family: "IBM Plex Sans Arabic", sans-serif;
+          font-weight: 500;
+          font-size: 16px;
+          letter-spacing: 0.5px;
+          background-color: #46194f;
+          color: white;
+          border: 1px solid #46194f;
+          transition: all 0.3s ease;
+        }
+
+        .call-button-mobile:hover {
+          background-color: transparent;
+          color: #46194f;
+        }
+
+        .call-button-mobile:hover .call-icon {
+          color: #46194f;
+        }
+
+        .call-icon {
+          color: white;
+          transition: color 0.3s ease;
         }
       `}</style>
 
       <AnimatePresence>
         <motion.nav
-          className={`bg-white ${isMobile ? "block md:hidden" : "hidden md:block"}`}
-          variants={isMobile ? drawerVariants : navVariants}
-          initial={isMobile ? "hidden" : "visible"}
+          className={getNavContainerClass()}
+          variants={isMobile || (isTablet && isDropdown) ? drawerVariants : navVariants}
+          initial={isMobile || (isTablet && isDropdown) ? "hidden" : "visible"}
           animate="visible"
-          exit={isMobile ? "exit" : undefined}
+          exit={isMobile || (isTablet && isDropdown) ? "exit" : undefined}
           style={{ transition: "all 0.3s ease-in-out" }}
         >
-          <div className="container mx-auto">
+          <motion.div
+            className={isMobile || (isTablet && isDropdown) ? "w-full" : ""}
+            variants={isMobile ? navContainerVariants : {}}
+          >
             <div
               className={`
               ${
                 isMobile
                   ? "flex flex-col space-y-0.5 items-start"
-                  : "flex items-center justify-center h-14 space-x-10 rtl:space-x-reverse"
+                  : isTablet && isDropdown
+                    ? "flex flex-col w-full"
+                    : "flex items-center justify-center space-x-6 rtl:space-x-reverse"
               }
             `}
             >
               {navItems.map((item) => {
                 const Icon = item.icon
-                const isActive = pathname === item.href
+                const isActive = isLinkActive(item.href)
+                const isContact = item.key === "contact"
+
+                // Determine the appropriate class for the nav item based on the view mode
+                const getLinkClass = () => {
+                  if (isMobile) {
+                    return "px-5 py-3.5 hover:bg-gray-50/80 text-gray-800 transition-colors w-full flex items-center justify-between"
+                  }
+
+                  return "px-3 py-1 hover:text-brand-primary group nav-item-hover text-sm"
+                }
 
                 return (
                   <motion.div
                     key={item.key}
-                    variants={isMobile ? itemVariants : {}}
-                    className={`relative ${isMobile ? "w-full" : ""}`}
+                    variants={isMobile || (isTablet && isDropdown) ? itemVariants : {}}
+                    className={`relative ${isMobile || (isTablet && isDropdown) ? "w-full" : ""}`}
                   >
                     <motion.div
                       whileHover={!isMobile ? { y: -2, scale: 1.05 } : {}}
@@ -211,22 +353,19 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
                         href={`/${locale}${item.href}`}
                         onClick={handleLinkClick}
                         className={`
-                          block font-medium relative nav-underline ${isActive ? "nav-active" : ""}
-                          ${
-                            isMobile
-                              ? "px-5 py-3.5 hover:bg-gray-50/80 text-gray-800 transition-colors w-full flex items-center justify-between"
-                              : "px-3 py-1 hover:text-brand-primary group nav-item-hover"
-                          }
+                          block font-medium relative 
+                          ${!isMobile ? `nav-underline ${isActive ? "nav-active" : ""}` : ""}
+                          ${isMobile ? `${isActive ? "mobile-nav-active" : ""}` : ""}
+                          ${getLinkClass()}
                           ${isActive ? "text-brand-primary" : ""}
-                          
-                          2345678
-                          1234567
                         `}
                         aria-current={isActive ? "page" : undefined}
                         style={{ transition: "all 0.3s ease" }}
                       >
                         <span className="flex items-center">
-                          {Icon && <Icon className={`w-5 h-5 ${isMobile ? "mr-3" : "mr-2"}`} />}
+                          {Icon && (isMobile || (isTablet && isDropdown)) && (
+                            <Icon className={`w-5 h-5 ${isMobile || isDropdown ? "mr-3" : "mr-2"}`} />
+                          )}
                           {/* Make sure item.label is a string */}
                           <span className={`${isActive ? "font-semibold" : ""}`}>
                             {typeof item.label === "string" ? item.label : ""}
@@ -257,15 +396,33 @@ const Nav = ({ isMobile, setIsMobileMenuOpen }) => {
                         {isActive && isMobile && (
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-primary rounded-r-md"></div>
                         )}
-
-                        {/* Underline effect for desktop - handled by CSS classes */}
                       </Link>
                     </motion.div>
+
+                    {/* Add call button after contact item */}
+                    {isContact && isMobile && showCallButton && (
+                      <div className="w-full px-5 py-4">
+                        <a href="tel:920031202" className="call-button-mobile">
+                          <Phone className="call-icon h-5 w-5" />
+                          <span>9200 31202</span>
+                        </a>
+                      </div>
+                    )}
                   </motion.div>
                 )
               })}
+
+              {/* If there's no contact item, add the call button at the end */}
+              {isMobile && showCallButton && !hasContactItem && (
+                <div className="w-full px-5 py-4">
+                  <a href="tel:920031202" className="call-button-mobile">
+                    <Phone className="call-icon h-5 w-5" />
+                    <span>9200 31202</span>
+                  </a>
+                </div>
+              )}
             </div>
-          </div>
+          </motion.div>
         </motion.nav>
       </AnimatePresence>
     </>
