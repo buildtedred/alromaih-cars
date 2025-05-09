@@ -31,7 +31,7 @@ export async function POST(req) {
     const ipAddress = getClientIp(headers);
     const userAgent = headers.get('user-agent') || 'Unknown';
     const referrer = headers.get('referer') || 'Direct';
-
+// console.log("sssssssssssssssssssss",ipAddress)
     // Get geo location (with caching)
     const geo = await getGeoLocation(ipAddress);
 

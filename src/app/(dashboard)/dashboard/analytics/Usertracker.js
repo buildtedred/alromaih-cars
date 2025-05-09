@@ -1,510 +1,423 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { MapPin, Clock, Monitor, Globe, ArrowUpRight, RefreshCw, Search } from "lucide-react"
+import { useState } from "react"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import {
+  MapPin,
+  Globe,
+  Clock,
+  Monitor,
+  Smartphone,
+  Laptop,
+  Chrome,
+  ChromeIcon as Firefox,
+  AppleIcon as Safari,
+  ExternalLink,
+  Info,
+  User,
+  Cpu,
+  Flag,
+  ArrowUpRight,
+} from "lucide-react"
 import { format } from "date-fns"
 
-export default function AnalyticsPage2() {
-  const [viewData, setViewData] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [refreshing, setRefreshing] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedProduct, setSelectedProduct] = useState(null)
+export function UserTrackingCards({ trackingData }) {
+  const [activeTab, setActiveTab] = useState("overview")
 
-  // Fetch view data
-  const fetchViewData = async () => {
-    try {
-      setRefreshing(true)
-      const response = await fetch("/api/track-view")
+  // Card background colors
+  const cardBgColors = [
+    "bg-green-50",
+    "bg-blue-50",
+    "bg-purple-50",
+    "bg-orange-50",
+    "bg-pink-50",
+    "bg-teal-50",
+    "bg-amber-50",
+    "bg-indigo-50",
+  ]
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch view data")
-      }
+  if (!trackingData) {
+    return (
+      <Card className="rounded-[5px] border-gray-200 shadow-sm">
+        <CardHeader>
+          <CardTitle>User Tracking</CardTitle>
+          <CardDescription>No tracking data available</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-500">No user tracking data is available for this view.</p>
+        </CardContent>
+      </Card>
+    )
+  }
 
-      const result = await response.json()
+  const { id, productId, data, viewedAt } = trackingData
+  const { geo, device, referrer, ipAddress, userAgent } = data
+  const geoData = geo?.data?.data || {}
 
-      if (result.success) {
-        setViewData(result.data)
-        setError(null)
-      } else {
-        setError(result.message || "Failed to load data")
-      }
-    } catch (err) {
-      console.error("Error fetching view data:", err)
-      setError("Failed to load view data. Please try again.")
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
+  // Format date for display
+  const formattedDate = format(new Date(viewedAt), "PPpp")
+  const relativeTime = getRelativeTime(new Date(viewedAt))
+
+  // Get browser icon
+  const getBrowserIcon = (browser) => {
+    switch (browser?.toLowerCase()) {
+      case "chrome":
+        return <Chrome className="h-5 w-5 text-blue-500" />
+      case "firefox":
+        return <Firefox className="h-5 w-5 text-orange-500" />
+      case "safari":
+        return <Safari className="h-5 w-5 text-blue-400" />
+      default:
+        return <Globe className="h-5 w-5 text-gray-500" />
     }
   }
 
-  // Load data on initial render
-  useEffect(() => {
-    fetchViewData()
-  }, [])
-
-  // Filter data based on search term and selected product
-  const filteredData = viewData.filter((view) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      view.productId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (view.data?.geo?.data?.data?.country_name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (view.data?.geo?.data?.data?.city || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (view.data?.device?.browser || "").toLowerCase().includes(searchTerm.toLowerCase())
-
-    const matchesProduct = selectedProduct === null || view.productId === selectedProduct
-
-    return matchesSearch && matchesProduct
-  })
-
-  // Get unique products
-  const uniqueProducts = [...new Set(viewData.map((view) => view.productId))]
-
-  if (loading) {
-    return <LoadingState />
+  // Get device icon
+  const getDeviceIcon = (type) => {
+    switch (type?.toLowerCase()) {
+      case "desktop":
+        return <Monitor className="h-5 w-5 text-purple-500" />
+      case "mobile":
+        return <Smartphone className="h-5 w-5 text-green-500" />
+      case "tablet":
+        return <Laptop className="h-5 w-5 text-indigo-500" />
+      default:
+        return <Cpu className="h-5 w-5 text-gray-500" />
+    }
   }
 
-  if (error) {
-    return <ErrorState error={error} onRetry={fetchViewData} />
+  // Get OS icon
+  const getOSIcon = (os) => {
+    switch (os?.toLowerCase()) {
+      case "windows":
+        return <Monitor className="h-5 w-5 text-blue-500" />
+      case "macos":
+        return <Laptop className="h-5 w-5 text-gray-700" />
+      case "ios":
+        return <Smartphone className="h-5 w-5 text-gray-700" />
+      case "android":
+        return <Smartphone className="h-5 w-5 text-green-500" />
+      case "linux":
+        return <Laptop className="h-5 w-5 text-orange-500" />
+      default:
+        return <Cpu className="h-5 w-5 text-gray-500" />
+    }
+  }
+
+  // Extract domain from referrer
+  const getReferrerDomain = (url) => {
+    if (!url) return "Direct"
+    try {
+      const domain = new URL(url).hostname
+      return domain
+    } catch (e) {
+      return url
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Product View Analytics</h1>
-            <p className="text-gray-500 mt-1">Track where your products are being viewed</p>
+    <div className="space-y-6">
+      {/* Main tracking card */}
+      <Card className="rounded-[5px] border-green-200 shadow-sm overflow-hidden bg-gradient-to-r from-green-50 to-blue-50">
+        <CardHeader className="bg-green-100 pb-2">
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-green-700">User View #{id}</CardTitle>
+              <CardDescription>Tracking data for product view</CardDescription>
+            </div>
+            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+              {relativeTime}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-100 p-2 rounded-full">
+                <User className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Product ID</p>
+                <p className="font-medium truncate max-w-[200px]">{productId}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="bg-green-100 p-2 rounded-full">
+                <MapPin className="h-5 w-5 text-green-500" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Location</p>
+                <p className="font-medium">
+                  {geoData.city || "Unknown"}, {geoData.country_name || "Unknown"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="bg-purple-100 p-2 rounded-full">{getDeviceIcon(device?.type)}</div>
+              <div>
+                <p className="text-sm text-gray-500">Device</p>
+                <p className="font-medium">
+                  {device?.type || "Unknown"} / {device?.os || "Unknown"}
+                </p>
+              </div>
+            </div>
           </div>
 
-          <button
-            onClick={fetchViewData}
-            disabled={refreshing}
-            className="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-4 mb-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="location">Location</TabsTrigger>
+              <TabsTrigger value="device">Device</TabsTrigger>
+              <TabsTrigger value="referrer">Referrer</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard
+                  title="Geographic Information"
+                  icon={<Globe className="h-5 w-5 text-blue-500" />}
+                  items={[
+                    { label: "Country", value: geoData.country_name },
+                    { label: "City", value: geoData.city },
+                    { label: "Region", value: geoData.region },
+                    { label: "IP Address", value: ipAddress },
+                  ]}
+                  bgColor={cardBgColors[0]}
+                />
+                <InfoCard
+                  title="Device Information"
+                  icon={getDeviceIcon(device?.type)}
+                  items={[
+                    { label: "Device Type", value: device?.type },
+                    { label: "Operating System", value: device?.os },
+                    { label: "Browser", value: device?.browser },
+                  ]}
+                  bgColor={cardBgColors[1]}
+                />
+              </div>
+              <InfoCard
+                title="Referrer Information"
+                icon={<ExternalLink className="h-5 w-5 text-purple-500" />}
+                items={[
+                  { label: "Referrer", value: getReferrerDomain(referrer) },
+                  { label: "Full URL", value: referrer },
+                  { label: "Viewed At", value: formattedDate },
+                ]}
+                bgColor={cardBgColors[2]}
+              />
+            </TabsContent>
+
+            <TabsContent value="location" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard
+                  title="Country Information"
+                  icon={<Flag className="h-5 w-5 text-red-500" />}
+                  items={[
+                    { label: "Country", value: geoData.country_name },
+                    { label: "Country Code", value: geoData.country_code },
+                    { label: "ISO3 Code", value: geoData.country_code_iso3 },
+                    { label: "Capital", value: geoData.country_capital },
+                    { label: "Population", value: formatNumber(geoData.country_population) },
+                    { label: "Area", value: `${formatNumber(geoData.country_area)} km²` },
+                    { label: "TLD", value: geoData.country_tld },
+                    { label: "Calling Code", value: geoData.country_calling_code },
+                  ]}
+                  bgColor={cardBgColors[3]}
+                />
+                <InfoCard
+                  title="Regional Information"
+                  icon={<MapPin className="h-5 w-5 text-green-500" />}
+                  items={[
+                    { label: "City", value: geoData.city },
+                    { label: "Region", value: geoData.region },
+                    { label: "Region Code", value: geoData.region_code },
+                    { label: "Postal Code", value: geoData.postal },
+                    { label: "Latitude", value: geoData.latitude },
+                    { label: "Longitude", value: geoData.longitude },
+                    { label: "Timezone", value: geoData.timezone },
+                    { label: "UTC Offset", value: geoData.utc_offset },
+                  ]}
+                  bgColor={cardBgColors[4]}
+                />
+              </div>
+              <InfoCard
+                title="Additional Information"
+                icon={<Info className="h-5 w-5 text-blue-500" />}
+                items={[
+                  { label: "Continent", value: geoData.continent_code },
+                  { label: "Currency", value: `${geoData.currency} (${geoData.currency_name})` },
+                  { label: "Languages", value: geoData.languages },
+                  { label: "Network", value: geoData.network },
+                  { label: "ASN", value: geoData.asn },
+                  { label: "Organization", value: geoData.org },
+                  { label: "IP Version", value: geoData.version },
+                  { label: "In EU", value: geoData.in_eu ? "Yes" : "No" },
+                ]}
+                bgColor={cardBgColors[5]}
+              />
+            </TabsContent>
+
+            <TabsContent value="device" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard
+                  title="Device Details"
+                  icon={getDeviceIcon(device?.type)}
+                  items={[
+                    { label: "Device Type", value: device?.type },
+                    { label: "Operating System", value: device?.os },
+                    { label: "Browser", value: device?.browser },
+                  ]}
+                  bgColor={cardBgColors[6]}
+                />
+                <InfoCard
+                  title="User Agent"
+                  icon={<Info className="h-5 w-5 text-blue-500" />}
+                  items={[{ label: "Full User Agent", value: userAgent }]}
+                  bgColor={cardBgColors[7]}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="referrer" className="space-y-4">
+              <InfoCard
+                title="Referrer Details"
+                icon={<ExternalLink className="h-5 w-5 text-purple-500" />}
+                items={[
+                  { label: "Referrer Domain", value: getReferrerDomain(referrer) },
+                  { label: "Full Referrer URL", value: referrer },
+                  { label: "Viewed At", value: formattedDate },
+                  { label: "Tracking ID", value: id },
+                ]}
+                bgColor={cardBgColors[0]}
+              />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+        <CardFooter className="bg-blue-50 border-t border-blue-100 flex justify-between">
+          <div className="flex items-center text-sm text-gray-600">
+            <Clock className="h-4 w-4 mr-1" />
+            Tracked on {format(new Date(viewedAt), "PPP")} at {format(new Date(viewedAt), "p")}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-[5px] border-green-200 text-green-700 hover:bg-green-50"
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-            {refreshing ? "Refreshing..." : "Refresh Data"}
-          </button>
-        </div>
+            <ArrowUpRight className="h-4 w-4 mr-1" />
+            View Details
+          </Button>
+        </CardFooter>
+      </Card>
 
-        {viewData.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="space-y-6">
-            <AnalyticsSummary viewData={viewData} />
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search by product ID, country, city, or browser..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <select
-                    value={selectedProduct || ""}
-                    onChange={(e) => setSelectedProduct(e.target.value || null)}
-                    className="w-full md:w-64 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">All Products</option>
-                    {uniqueProducts.map((product) => (
-                      <option key={product} value={product}>
-                        {product}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Product ID
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Location
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Device
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Time
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Referrer
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {filteredData.length > 0 ? (
-                      filteredData.map((view) => (
-                        <tr key={view.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <div className="font-medium truncate max-w-[150px]">{view.productId}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3 text-gray-400" />
-                              <span>
-                                {view.data?.geo?.data?.data?.city || "Unknown"},{" "}
-                                {view.data?.geo?.data?.data?.country_name || "Unknown"}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div className="flex items-center gap-1">
-                              <Monitor className="h-3 w-3 text-gray-400" />
-                              <span>
-                                {view.data?.device?.type || "Unknown"} / {view.data?.device?.browser || "Unknown"}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3 text-gray-400" />
-                              <span>{format(new Date(view.viewedAt), "MMM d, yyyy h:mm a")}</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            <div className="flex items-center gap-1">
-                              <ArrowUpRight className="h-3 w-3 text-gray-400" />
-                              <span className="truncate max-w-[200px]">{view.data?.referrer || "Direct"}</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
-                          No results found for your search. Try different keywords or clear filters.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {filteredData.length > 0 && (
-                <div className="mt-4 text-sm text-gray-500 text-right">
-                  Showing {filteredData.length} of {viewData.length} views
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <LocationBreakdown viewData={filteredData.length > 0 ? filteredData : viewData} />
-              <DeviceBreakdown viewData={filteredData.length > 0 ? filteredData : viewData} />
-            </div>
-          </div>
-        )}
+      {/* Quick stats cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <QuickStatCard
+          title="Location"
+          value={`${geoData.city || "Unknown"}, ${geoData.country_name || "Unknown"}`}
+          icon={<MapPin className="h-5 w-5 text-green-500" />}
+          color="green"
+          subtext={geoData.region || "Unknown region"}
+          bgColor={cardBgColors[0]}
+        />
+        <QuickStatCard
+          title="Device"
+          value={`${device?.type || "Unknown"} / ${device?.browser || "Unknown"}`}
+          icon={getBrowserIcon(device?.browser)}
+          color="blue"
+          subtext={device?.os || "Unknown OS"}
+          bgColor={cardBgColors[1]}
+        />
+        <QuickStatCard
+          title="Referrer"
+          value={getReferrerDomain(referrer) || "Direct"}
+          icon={<ExternalLink className="h-5 w-5 text-purple-500" />}
+          color="purple"
+          subtext={relativeTime}
+          bgColor={cardBgColors[2]}
+        />
       </div>
     </div>
   )
 }
 
-function AnalyticsSummary({ viewData }) {
-  // Count unique products
-  const uniqueProducts = new Set(viewData.map((view) => view.productId)).size
-
-  // Count unique locations
-  const uniqueLocations = new Set(
-    viewData
-      .filter((view) => view.data?.geo?.data?.data?.country_name)
-      .map((view) => view.data.geo.data.data.country_name),
-  ).size
-
-  // Count views from India
-  const indiaViews = viewData.filter(
-    (view) => view.data?.geo?.data?.data?.country_name === "India" || view.data?.geo?.data?.data?.country === "IN",
-  ).length
-
-  // Calculate India percentage
-  const indiaPercentage = viewData.length > 0 ? Math.round((indiaViews / viewData.length) * 100) : 0
-
+// Helper component for information cards
+function InfoCard({ title, icon, items, bgColor }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <StatCard title="Total Views" value={viewData.length} icon={<Eye className="h-5 w-5 text-blue-500" />} />
-
-      <StatCard title="Unique Products" value={uniqueProducts} icon={<Package className="h-5 w-5 text-purple-500" />} />
-
-      <StatCard
-        title="Views from India"
-        value={indiaViews}
-        subtext={`${indiaPercentage}% of total`}
-        icon={<MapPin className="h-5 w-5 text-orange-500" />}
-        highlight={true}
-      />
-
-      <StatCard title="Unique Locations" value={uniqueLocations} icon={<Globe className="h-5 w-5 text-green-500" />} />
-    </div>
-  )
-}
-
-function LocationBreakdown({ viewData }) {
-  // Count views by country
-  const countryData = viewData.reduce((acc, view) => {
-    const country = view.data?.geo?.data?.data?.country_name || "Unknown"
-    acc[country] = (acc[country] || 0) + 1
-    return acc
-  }, {})
-
-  // Sort countries by view count
-  const sortedCountries = Object.entries(countryData)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 10) // Top 10 countries
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Location Breakdown</h2>
-
-      {sortedCountries.length > 0 ? (
-        <div className="space-y-4">
-          {sortedCountries.map(([country, count]) => (
-            <div key={country} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-700">{country}</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-32 bg-gray-100 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${country === "India" ? "bg-orange-500" : "bg-blue-500"}`}
-                    style={{ width: `${Math.round((count / viewData.length) * 100)}%` }}
-                  ></div>
-                </div>
-                <div className="text-gray-700 font-medium w-10 text-right">{count}</div>
-                <div className="text-xs text-gray-500 w-12 text-right">
-                  {Math.round((count / viewData.length) * 100)}%
-                </div>
-              </div>
+    <div className={`${bgColor} rounded-[5px] border border-gray-200 shadow-sm overflow-hidden`}>
+      <div className="px-4 py-3 bg-white border-b border-gray-200 flex items-center gap-2">
+        {icon}
+        <h3 className="font-medium">{title}</h3>
+      </div>
+      <div className="p-4">
+        <dl className="space-y-2">
+          {items.map((item, index) => (
+            <div key={index} className="grid grid-cols-3 gap-2">
+              <dt className="text-sm font-medium text-gray-600 col-span-1">{item.label}:</dt>
+              <dd className="text-sm text-gray-700 col-span-2 break-words">{item.value || "N/A"}</dd>
             </div>
           ))}
-        </div>
-      ) : (
-        <div className="text-gray-500 text-center py-4">No location data available</div>
-      )}
+        </dl>
+      </div>
     </div>
   )
 }
 
-function DeviceBreakdown({ viewData }) {
-  // Count views by device type
-  const deviceData = viewData.reduce((acc, view) => {
-    const deviceType = view.data?.device?.type || "Unknown"
-    acc[deviceType] = (acc[deviceType] || 0) + 1
-    return acc
-  }, {})
-
-  // Count views by browser
-  const browserData = viewData.reduce((acc, view) => {
-    const browser = view.data?.device?.browser || "Unknown"
-    acc[browser] = (acc[browser] || 0) + 1
-    return acc
-  }, {})
-
-  // Sort by count
-  const sortedDevices = Object.entries(deviceData).sort((a, b) => b[1] - a[1])
-  const sortedBrowsers = Object.entries(browserData).sort((a, b) => b[1] - a[1])
-
+// Helper component for quick stat cards
+function QuickStatCard({ title, value, icon, color, subtext, bgColor }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Device Breakdown</h2>
-
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-3">Device Type</h3>
-          <div className="space-y-3">
-            {sortedDevices.map(([device, count]) => (
-              <div key={device} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Monitor className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-700">{device}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-32 bg-gray-100 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full bg-purple-500"
-                      style={{ width: `${Math.round((count / viewData.length) * 100)}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-gray-700 font-medium w-10 text-right">{count}</div>
-                  <div className="text-xs text-gray-500 w-12 text-right">
-                    {Math.round((count / viewData.length) * 100)}%
-                  </div>
-                </div>
-              </div>
-            ))}
+    <Card className={`rounded-[5px] border-${color}-200 ${bgColor}`}>
+      <CardContent className="p-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-sm text-gray-600 font-medium mb-1">{title}</p>
+            <p className="text-lg font-semibold mb-1 truncate max-w-[200px]">{value}</p>
+            {subtext && <p className="text-xs text-gray-600">{subtext}</p>}
           </div>
+          <div className={`p-2 rounded-full bg-white shadow-sm`}>{icon}</div>
         </div>
-
-        <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-3">Browser</h3>
-          <div className="space-y-3">
-            {sortedBrowsers.map(([browser, count]) => (
-              <div key={browser} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-700">{browser}</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-32 bg-gray-100 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full bg-green-500"
-                      style={{ width: `${Math.round((count / viewData.length) * 100)}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-gray-700 font-medium w-10 text-right">{count}</div>
-                  <div className="text-xs text-gray-500 w-12 text-right">
-                    {Math.round((count / viewData.length) * 100)}%
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
 
-function StatCard({ title, value, subtext, icon, highlight }) {
-  return (
-    <div className={`bg-white rounded-xl shadow-sm border ${highlight ? "border-orange-200" : "border-gray-100"} p-6`}>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className={`text-3xl font-bold ${highlight ? "text-orange-600" : "text-gray-800"} mt-1`}>{value}</p>
-          {subtext && <p className="text-xs text-gray-500 mt-1">{subtext}</p>}
-        </div>
-        <div className={`${highlight ? "bg-orange-50" : "bg-gray-50"} p-3 rounded-full`}>{icon}</div>
-      </div>
-    </div>
-  )
+// Helper function to format numbers with commas
+function formatNumber(num) {
+  if (!num) return "N/A"
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 }
 
-function LoadingState() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-500 mb-4"></div>
-        <h2 className="text-xl font-semibold text-gray-700">Loading analytics data...</h2>
-        <p className="text-gray-500 mt-2">Please wait while we fetch your view data.</p>
-      </div>
-    </div>
-  )
-}
+// Helper function to get relative time
+function getRelativeTime(date) {
+  const now = new Date()
+  const diffInSeconds = Math.floor((now - date) / 1000)
 
-function ErrorState({ error, onRetry }) {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center max-w-md mx-auto p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500 mb-4">
-          <AlertTriangle className="h-8 w-8" />
-        </div>
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Failed to load data</h2>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <button
-          onClick={onRetry}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Try Again
-        </button>
-      </div>
-    </div>
-  )
-}
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} seconds ago`
+  }
 
-function EmptyState() {
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 text-blue-500 mb-4">
-        <Eye className="h-8 w-8" />
-      </div>
-      <h2 className="text-xl font-semibold text-gray-800 mb-2">No view data yet</h2>
-      <p className="text-gray-600 max-w-md mx-auto mb-6">
-        When users view your products, the data will appear here. Check back later or refresh to see new data.
-      </p>
-      <button
-        onClick={() => window.location.reload()}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-      >
-        Refresh Data
-      </button>
-    </div>
-  )
-}
+  const diffInMinutes = Math.floor(diffInSeconds / 60)
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`
+  }
 
-// Icon components
-function Eye(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  )
-}
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) {
+    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`
+  }
 
-function Package(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m7.5 4.27 9 5.15" />
-      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-      <path d="m3.3 7 8.7 5 8.7-5" />
-      <path d="M12 22V12" />
-    </svg>
-  )
-}
+  const diffInDays = Math.floor(diffInHours / 24)
+  if (diffInDays < 30) {
+    return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`
+  }
 
-function AlertTriangle(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-      <path d="M12 9v4" />
-      <path d="M12 17h.01" />
-    </svg>
-  )
+  const diffInMonths = Math.floor(diffInDays / 30)
+  if (diffInMonths < 12) {
+    return `${diffInMonths} ${diffInMonths === 1 ? "month" : "months"} ago`
+  }
+
+  const diffInYears = Math.floor(diffInMonths / 12)
+  return `${diffInYears} ${diffInYears === 1 ? "year" : "years"} ago`
 }
