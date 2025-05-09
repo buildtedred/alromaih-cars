@@ -41,32 +41,30 @@ export default function TrackingDashboard() {
   const [sortDirection, setSortDirection] = useState("desc")
   const [loadingBrands, setLoadingBrands] = useState({})
 
-  // Color palette for the UI
+  // Alromaih Cars theme colors
   const colors = {
-    primary: "green",
-    secondary: "purple",
-    accent1: "blue",
-    accent2: "orange",
-    accent3: "pink",
-    accent4: "teal",
-    accent5: "amber",
-    accent6: "indigo",
+    primary: "#00A651", // Green
+    secondary: "#0072BC", // Blue
+    accent: "#F7941D", // Orange
+    neutral: "#58595B", // Gray
+    light: "#F1F1F2", // Light Gray
+    dark: "#231F20", // Dark Gray
+    success: "#00A651", // Green
+    warning: "#F7941D", // Orange
+    error: "#ED1C24", // Red
+    info: "#0072BC", // Blue
   }
 
   // Card background colors
   const cardBgColors = [
-    "bg-green-50",
-    "bg-blue-50",
-    "bg-purple-50",
-    "bg-orange-50",
-    "bg-pink-50",
-    "bg-teal-50",
-    "bg-amber-50",
-    "bg-indigo-50",
-    "bg-rose-50",
-    "bg-cyan-50",
-    "bg-emerald-50",
-    "bg-violet-50",
+    "bg-[#E6F5ED]", // Light Green
+    "bg-[#E6F0F7]", // Light Blue
+    "bg-[#FEF2E6]", // Light Orange
+    "bg-[#EEEEF0]", // Light Gray
+    "bg-[#F9E6E7]", // Light Red
+    "bg-[#E6F5F7]", // Light Cyan
+    "bg-[#F0E6F7]", // Light Purple
+    "bg-[#F7F7E6]", // Light Yellow
   ]
 
   // Fetch tracking data
@@ -105,35 +103,19 @@ export default function TrackingDashboard() {
 
   // Fetch brand name for a product ID
   const fetchBrandName = async (productId) => {
-    if (brandNames[productId]) return // Skip if we already have it
-
     try {
-      setLoadingBrands((prev) => ({ ...prev, [productId]: true }))
-      const response = await fetch(`/api/supabasPrisma/carbrands/${productId}`)
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch brand for ${productId}`)
-      }
-
-      const brandData = await response.json()
-
-      if (brandData) {
-        setBrandNames((prev) => ({
-          ...prev,
-          [productId]: brandData.name || "Unknown Brand",
-        }))
-      }
-    } catch (err) {
-      console.error(`Error fetching brand for ${productId}:`, err)
+      const response = await fetch(`/api/supabasPrisma/carbrands/${productId}`);
+      const data = await response.json();
+  
+      // Directly set brand name using response
       setBrandNames((prev) => ({
         ...prev,
-        [productId]: "Unknown Brand",
-      }))
-    } finally {
-      setLoadingBrands((prev) => ({ ...prev, [productId]: false }))
+        [productId]: data?.en?.name,
+      }));
+    } catch (err) {
+      console.error(`Error fetching brand for ${productId}:`, err);
     }
-  }
-
+  };
   // Load data on initial render
   useEffect(() => {
     fetchTrackingData()
@@ -246,37 +228,37 @@ export default function TrackingDashboard() {
 
   // Get color for browser badge
   const getBrowserColor = (browser) => {
-    if (!browser) return "gray"
+    if (!browser) return colors.neutral
 
     const browserMap = {
-      chrome: "green",
-      firefox: "orange",
-      safari: "blue",
-      edge: "blue",
-      opera: "red",
-      ie: "blue",
+      chrome: colors.success,
+      firefox: colors.warning,
+      safari: colors.info,
+      edge: colors.info,
+      opera: colors.error,
+      ie: colors.info,
     }
 
-    return browserMap[browser.toLowerCase()] || "purple"
+    return browserMap[browser.toLowerCase()] || colors.secondary
   }
 
   // Get color for country badge
   const getCountryColor = (country) => {
-    if (!country) return "gray"
+    if (!country) return colors.neutral
 
     const countryMap = {
-      Pakistan: "green",
-      "United States": "blue",
-      "United Kingdom": "red",
-      India: "orange",
-      China: "red",
-      Germany: "yellow",
-      France: "blue",
-      Japan: "red",
-      Australia: "teal",
+      Pakistan: colors.success,
+      "United States": colors.info,
+      "United Kingdom": colors.error,
+      India: colors.warning,
+      China: colors.error,
+      Germany: "#FFD700", // Yellow
+      France: colors.info,
+      Japan: colors.error,
+      Australia: "#20B2AA", // Teal
     }
 
-    return countryMap[country] || "indigo"
+    return countryMap[country] || colors.secondary
   }
 
   if (loading && trackingData.length === 0) {
@@ -284,7 +266,7 @@ export default function TrackingDashboard() {
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">User Tracking Dashboard</h1>
+            <h1 className="text-2xl font-bold text-[#231F20]">User Tracking Dashboard</h1>
             <Button disabled className="rounded-[5px]">
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
               Loading...
@@ -293,7 +275,7 @@ export default function TrackingDashboard() {
           <Card className="rounded-[5px]">
             <CardContent className="p-8">
               <div className="flex justify-center items-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00A651]"></div>
                 <p className="ml-4 text-gray-500">Loading tracking data...</p>
               </div>
             </CardContent>
@@ -308,10 +290,10 @@ export default function TrackingDashboard() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00A651] to-[#0072BC] bg-clip-text text-transparent">
               User Tracking Dashboard
             </h1>
-            <p className="text-gray-500">Monitor and analyze user activity on your site</p>
+            <p className="text-[#58595B]">Monitor and analyze user activity on your site</p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -322,20 +304,20 @@ export default function TrackingDashboard() {
                 placeholder="Search by brand, country, city..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-[5px] focus:outline-none focus:ring-2 focus:ring-green-500 w-full md:w-64"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-[5px] focus:outline-none focus:ring-2 focus:ring-[#00A651] w-full md:w-64"
               />
             </div>
 
             <Button
               onClick={fetchTrackingData}
               disabled={refreshing}
-              className="bg-green-600 hover:bg-green-700 rounded-[5px]"
+              className="bg-[#00A651] hover:bg-[#008C44] rounded-[5px]"
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
               {refreshing ? "Refreshing..." : "Refresh"}
             </Button>
 
-            <Button variant="outline" className="rounded-[5px]">
+            <Button variant="outline" className="rounded-[5px] border-[#0072BC] text-[#0072BC] hover:bg-[#E6F0F7]">
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
@@ -347,34 +329,34 @@ export default function TrackingDashboard() {
           <StatCard
             title="Total Views"
             value={stats.total}
-            icon={<Eye className="h-5 w-5 text-blue-600" />}
-            color={colors.accent1}
-            bgColor={cardBgColors[0]}
+            icon={<Eye className="h-5 w-5 text-[#0072BC]" />}
+            color={colors.info}
+            bgColor={cardBgColors[1]}
           />
 
           <StatCard
             title="Pakistan Views"
             value={stats.pakistan}
-            icon={<MapPin className="h-5 w-5 text-green-600" />}
-            color={colors.primary}
-            bgColor={cardBgColors[1]}
+            icon={<MapPin className="h-5 w-5 text-[#00A651]" />}
+            color={colors.success}
+            bgColor={cardBgColors[0]}
             percentage={stats.total > 0 ? Math.round((stats.pakistan / stats.total) * 100) : 0}
           />
 
           <StatCard
             title="Unique Products"
             value={stats.uniqueProducts}
-            icon={<Package className="h-5 w-5 text-purple-600" />}
-            color={colors.secondary}
+            icon={<Package className="h-5 w-5 text-[#F7941D]" />}
+            color={colors.warning}
             bgColor={cardBgColors[2]}
           />
 
           <StatCard
             title="Unique Countries"
             value={stats.uniqueCountries}
-            icon={<Globe className="h-5 w-5 text-orange-600" />}
-            color={colors.accent2}
-            bgColor={cardBgColors[3]}
+            icon={<Globe className="h-5 w-5 text-[#ED1C24]" />}
+            color={colors.error}
+            bgColor={cardBgColors[4]}
           />
         </div>
 
@@ -383,25 +365,25 @@ export default function TrackingDashboard() {
           <TabsList className="mb-4 bg-white p-1 rounded-[5px] border border-gray-200">
             <TabsTrigger
               value="all"
-              className={`rounded-[5px] ${activeTab === "all" ? "bg-green-50 text-green-700" : ""}`}
+              className={`rounded-[5px] ${activeTab === "all" ? "bg-[#E6F5ED] text-[#00A651]" : ""}`}
             >
               All Views ({stats.total})
             </TabsTrigger>
             <TabsTrigger
               value="pakistan"
-              className={`rounded-[5px] ${activeTab === "pakistan" ? "bg-green-50 text-green-700" : ""}`}
+              className={`rounded-[5px] ${activeTab === "pakistan" ? "bg-[#E6F5ED] text-[#00A651]" : ""}`}
             >
               Pakistan ({stats.pakistan})
             </TabsTrigger>
             <TabsTrigger
               value="desktop"
-              className={`rounded-[5px] ${activeTab === "desktop" ? "bg-green-50 text-green-700" : ""}`}
+              className={`rounded-[5px] ${activeTab === "desktop" ? "bg-[#E6F5ED] text-[#00A651]" : ""}`}
             >
               Desktop ({stats.desktop})
             </TabsTrigger>
             <TabsTrigger
               value="mobile"
-              className={`rounded-[5px] ${activeTab === "mobile" ? "bg-green-50 text-green-700" : ""}`}
+              className={`rounded-[5px] ${activeTab === "mobile" ? "bg-[#E6F5ED] text-[#00A651]" : ""}`}
             >
               Mobile ({stats.mobile})
             </TabsTrigger>
@@ -409,19 +391,19 @@ export default function TrackingDashboard() {
 
           <TabsContent value={activeTab}>
             {error ? (
-              <Card className="rounded-[5px] mb-6 bg-red-50">
+              <Card className="rounded-[5px] mb-6 bg-[#F9E6E7]">
                 <CardContent className="p-6 text-center">
-                  <p className="text-red-500 mb-4">{error}</p>
-                  <Button onClick={fetchTrackingData} className="rounded-[5px]">
+                  <p className="text-[#ED1C24] mb-4">{error}</p>
+                  <Button onClick={fetchTrackingData} className="rounded-[5px] bg-[#00A651]">
                     Try Again
                   </Button>
                 </CardContent>
               </Card>
             ) : filteredData.length === 0 ? (
-              <Card className="rounded-[5px] mb-6 bg-amber-50">
+              <Card className="rounded-[5px] mb-6 bg-[#FEF2E6]">
                 <CardContent className="p-6 text-center">
-                  <p className="text-amber-700 mb-4">No tracking data found matching your criteria.</p>
-                  <Button onClick={() => setSearchTerm("")} className="rounded-[5px]">
+                  <p className="text-[#F7941D] mb-4">No tracking data found matching your criteria.</p>
+                  <Button onClick={() => setSearchTerm("")} className="rounded-[5px] bg-[#00A651]">
                     Clear Filters
                   </Button>
                 </CardContent>
@@ -433,23 +415,23 @@ export default function TrackingDashboard() {
                   <DistributionCard
                     title="Browser Distribution"
                     data={browserDistribution}
-                    icon={<Monitor className="h-5 w-5 text-blue-600" />}
-                    color={colors.accent1}
-                    bgColor={cardBgColors[4]}
+                    icon={<Monitor className="h-5 w-5 text-[#0072BC]" />}
+                    color={colors.info}
+                    bgColor={cardBgColors[1]}
                   />
 
                   <DistributionCard
                     title="Country Distribution"
                     data={countryDistribution}
-                    icon={<Globe className="h-5 w-5 text-green-600" />}
-                    color={colors.primary}
-                    bgColor={cardBgColors[5]}
+                    icon={<Globe className="h-5 w-5 text-[#00A651]" />}
+                    color={colors.success}
+                    bgColor={cardBgColors[0]}
                   />
                 </div>
 
                 {/* Tracking Table */}
                 <Card className="rounded-[5px] mb-6 overflow-hidden border border-gray-200">
-                  <CardHeader className="bg-gradient-to-r from-blue-50 to-green-50 pb-2">
+                  <CardHeader className="bg-gradient-to-r from-[#E6F0F7] to-[#E6F5ED] pb-2">
                     <div className="flex justify-between items-center">
                       <div>
                         <CardTitle>Recent Views</CardTitle>
@@ -539,17 +521,17 @@ export default function TrackingDashboard() {
                             const countryColor = getCountryColor(country)
                             const browserColor = getBrowserColor(browser)
                             // Alternate row background colors for better readability
-                            const rowBgColor = index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                            const rowBgColor = index % 2 === 0 ? "bg-white" : "bg-[#F9F9F9]"
 
                             return (
-                              <tr key={view.id} className={`hover:bg-blue-50 ${rowBgColor}`}>
+                              <tr key={view.id} className={`hover:bg-[#E6F5ED] ${rowBgColor}`}>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                   <div className="flex flex-col">
                                     <div className="font-medium text-gray-900">
                                       {loadingBrands[view.productId] ? (
                                         <div className="h-5 w-24 bg-gray-200 animate-pulse rounded"></div>
                                       ) : (
-                                        <span className="text-blue-600">
+                                        <span className="text-[#0072BC]">
                                           {brandNames[view.productId] || "Loading..."}
                                         </span>
                                       )}
@@ -568,7 +550,12 @@ export default function TrackingDashboard() {
                                     <div className="mt-1">
                                       <Badge
                                         variant="outline"
-                                        className={`bg-${countryColor}-50 text-${countryColor}-700 border-${countryColor}-200 text-xs`}
+                                        className="text-xs"
+                                        style={{
+                                          backgroundColor: `${countryColor}20`, // 20% opacity
+                                          color: countryColor,
+                                          borderColor: `${countryColor}40`, // 40% opacity
+                                        }}
                                       >
                                         {country}
                                       </Badge>
@@ -584,7 +571,12 @@ export default function TrackingDashboard() {
                                     <div className="mt-1">
                                       <Badge
                                         variant="outline"
-                                        className={`bg-${browserColor}-50 text-${browserColor}-700 border-${browserColor}-200 text-xs`}
+                                        className="text-xs"
+                                        style={{
+                                          backgroundColor: `${browserColor}20`, // 20% opacity
+                                          color: browserColor,
+                                          borderColor: `${browserColor}40`, // 40% opacity
+                                        }}
                                       >
                                         {browser}
                                       </Badge>
@@ -606,7 +598,7 @@ export default function TrackingDashboard() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    className="rounded-[5px] border-green-200 text-green-700 hover:bg-green-50"
+                                    className="rounded-[5px] border-[#00A651] text-[#00A651] hover:bg-[#E6F5ED]"
                                     onClick={() => setSelectedView(view)}
                                   >
                                     View Details
@@ -664,7 +656,7 @@ export default function TrackingDashboard() {
                                 variant={currentPage === pageNum ? "default" : "outline"}
                                 size="sm"
                                 className={`rounded-[5px] w-8 h-8 p-0 ${
-                                  currentPage === pageNum ? "bg-green-600 hover:bg-green-700" : ""
+                                  currentPage === pageNum ? "bg-[#00A651] hover:bg-[#008C44]" : ""
                                 }`}
                                 onClick={() => setCurrentPage(pageNum)}
                               >
@@ -706,14 +698,19 @@ export default function TrackingDashboard() {
         {selectedView && (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              <h2 className="text-xl font-bold bg-gradient-to-r from-[#00A651] to-[#0072BC] bg-clip-text text-transparent">
                 View Details: {brandNames[selectedView.productId] || "Loading..."}
               </h2>
-              <Button variant="outline" size="sm" className="rounded-[5px]" onClick={() => setSelectedView(null)}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-[5px] border-[#00A651] text-[#00A651] hover:bg-[#E6F5ED]"
+                onClick={() => setSelectedView(null)}
+              >
                 Close
               </Button>
             </div>
-            <UserTrackingCards trackingData={selectedView} />
+            <UserTrackingCards trackingData={selectedView} colors={colors} cardBgColors={cardBgColors} />
           </div>
         )}
       </div>
@@ -724,8 +721,8 @@ export default function TrackingDashboard() {
 // Stat Card Component
 function StatCard({ title, value, icon, color, bgColor, percentage }) {
   return (
-    <Card className={`rounded-[5px] border-${color}-200 overflow-hidden ${bgColor}`}>
-      <div className={`h-1 bg-${color}-500`}></div>
+    <Card className={`rounded-[5px] border-[${color}40] overflow-hidden ${bgColor}`}>
+      <div className="h-1" style={{ backgroundColor: color }}></div>
       <CardContent className="p-6">
         <div className="flex justify-between items-start">
           <div>
@@ -733,14 +730,14 @@ function StatCard({ title, value, icon, color, bgColor, percentage }) {
             <p className="text-3xl font-bold mb-1">{value}</p>
             {percentage !== undefined && (
               <div className="flex items-center">
-                <div className="w-full bg-white rounded-full h-1.5 mr-2">
-                  <div className={`h-1.5 rounded-full bg-${color}-500`} style={{ width: `${percentage}%` }}></div>
+                <div className="w-full bg-white rounded-full h-1.5 mr-2 shadow-inner">
+                  <div className="h-1.5 rounded-full" style={{ width: `${percentage}%`, backgroundColor: color }}></div>
                 </div>
                 <p className="text-xs text-gray-600 font-medium">{percentage}%</p>
               </div>
             )}
           </div>
-          <div className={`p-2 rounded-full bg-white shadow-sm`}>{icon}</div>
+          <div className="p-2 rounded-full bg-white shadow-sm">{icon}</div>
         </div>
       </CardContent>
     </Card>
@@ -757,9 +754,18 @@ function DistributionCard({ title, data, icon, color, bgColor }) {
 
   const total = Object.values(data).reduce((sum, count) => sum + count, 0)
 
+  // Alromaih Cars theme colors for bars
+  const barColors = [
+    "#00A651", // Green
+    "#0072BC", // Blue
+    "#F7941D", // Orange
+    "#ED1C24", // Red
+    "#8A2BE2", // Purple
+  ]
+
   return (
     <Card className={`rounded-[5px] overflow-hidden ${bgColor}`}>
-      <div className={`h-1 bg-${color}-500`}></div>
+      <div className="h-1" style={{ backgroundColor: color }}></div>
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <div className="p-1.5 bg-white rounded-full shadow-sm">{icon}</div>
@@ -769,9 +775,7 @@ function DistributionCard({ title, data, icon, color, bgColor }) {
       <CardContent>
         <div className="space-y-4">
           {sortedData.map((item, index) => {
-            // Use different colors for each bar
-            const colors = ["green", "blue", "purple", "orange", "teal"]
-            const barColor = colors[index % colors.length]
+            const barColor = barColors[index % barColors.length]
             const percentage = Math.round((item.count / total) * 100)
 
             return (
@@ -779,10 +783,15 @@ function DistributionCard({ title, data, icon, color, bgColor }) {
                 <div className="font-medium">{item.name}</div>
                 <div className="flex items-center gap-4">
                   <div className="w-32 bg-white rounded-full h-2 shadow-inner">
-                    <div className={`h-2 rounded-full bg-${barColor}-500`} style={{ width: `${percentage}%` }}></div>
+                    <div
+                      className="h-2 rounded-full"
+                      style={{ width: `${percentage}%`, backgroundColor: barColor }}
+                    ></div>
                   </div>
                   <div className="text-gray-700 font-medium w-10 text-right">{item.count}</div>
-                  <div className={`text-xs text-${barColor}-700 w-12 text-right font-medium`}>{percentage}%</div>
+                  <div className="text-xs w-12 text-right font-medium" style={{ color: barColor }}>
+                    {percentage}%
+                  </div>
                 </div>
               </div>
             )

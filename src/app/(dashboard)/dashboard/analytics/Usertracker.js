@@ -24,19 +24,33 @@ import {
 } from "lucide-react"
 import { format } from "date-fns"
 
-export function UserTrackingCards({ trackingData }) {
+export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
   const [activeTab, setActiveTab] = useState("overview")
 
-  // Card background colors
-  const cardBgColors = [
-    "bg-green-50",
-    "bg-blue-50",
-    "bg-purple-50",
-    "bg-orange-50",
-    "bg-pink-50",
-    "bg-teal-50",
-    "bg-amber-50",
-    "bg-indigo-50",
+  // Default colors if not provided
+  const defaultColors = colors || {
+    primary: "#00A651", // Green
+    secondary: "#0072BC", // Blue
+    accent: "#F7941D", // Orange
+    neutral: "#58595B", // Gray
+    light: "#F1F1F2", // Light Gray
+    dark: "#231F20", // Dark Gray
+    success: "#00A651", // Green
+    warning: "#F7941D", // Orange
+    error: "#ED1C24", // Red
+    info: "#0072BC", // Blue
+  }
+
+  // Default background colors if not provided
+  const defaultBgColors = cardBgColors || [
+    "bg-[#E6F5ED]", // Light Green
+    "bg-[#E6F0F7]", // Light Blue
+    "bg-[#FEF2E6]", // Light Orange
+    "bg-[#EEEEF0]", // Light Gray
+    "bg-[#F9E6E7]", // Light Red
+    "bg-[#E6F5F7]", // Light Cyan
+    "bg-[#F0E6F7]", // Light Purple
+    "bg-[#F7F7E6]", // Light Yellow
   ]
 
   if (!trackingData) {
@@ -65,11 +79,11 @@ export function UserTrackingCards({ trackingData }) {
   const getBrowserIcon = (browser) => {
     switch (browser?.toLowerCase()) {
       case "chrome":
-        return <Chrome className="h-5 w-5 text-blue-500" />
+        return <Chrome className="h-5 w-5 text-[#0072BC]" />
       case "firefox":
-        return <Firefox className="h-5 w-5 text-orange-500" />
+        return <Firefox className="h-5 w-5 text-[#F7941D]" />
       case "safari":
-        return <Safari className="h-5 w-5 text-blue-400" />
+        return <Safari className="h-5 w-5 text-[#0072BC]" />
       default:
         return <Globe className="h-5 w-5 text-gray-500" />
     }
@@ -79,11 +93,11 @@ export function UserTrackingCards({ trackingData }) {
   const getDeviceIcon = (type) => {
     switch (type?.toLowerCase()) {
       case "desktop":
-        return <Monitor className="h-5 w-5 text-purple-500" />
+        return <Monitor className="h-5 w-5 text-[#8A2BE2]" />
       case "mobile":
-        return <Smartphone className="h-5 w-5 text-green-500" />
+        return <Smartphone className="h-5 w-5 text-[#00A651]" />
       case "tablet":
-        return <Laptop className="h-5 w-5 text-indigo-500" />
+        return <Laptop className="h-5 w-5 text-[#0072BC]" />
       default:
         return <Cpu className="h-5 w-5 text-gray-500" />
     }
@@ -93,15 +107,15 @@ export function UserTrackingCards({ trackingData }) {
   const getOSIcon = (os) => {
     switch (os?.toLowerCase()) {
       case "windows":
-        return <Monitor className="h-5 w-5 text-blue-500" />
+        return <Monitor className="h-5 w-5 text-[#0072BC]" />
       case "macos":
         return <Laptop className="h-5 w-5 text-gray-700" />
       case "ios":
         return <Smartphone className="h-5 w-5 text-gray-700" />
       case "android":
-        return <Smartphone className="h-5 w-5 text-green-500" />
+        return <Smartphone className="h-5 w-5 text-[#00A651]" />
       case "linux":
-        return <Laptop className="h-5 w-5 text-orange-500" />
+        return <Laptop className="h-5 w-5 text-[#F7941D]" />
       default:
         return <Cpu className="h-5 w-5 text-gray-500" />
     }
@@ -121,14 +135,14 @@ export function UserTrackingCards({ trackingData }) {
   return (
     <div className="space-y-6">
       {/* Main tracking card */}
-      <Card className="rounded-[5px] border-green-200 shadow-sm overflow-hidden bg-gradient-to-r from-green-50 to-blue-50">
-        <CardHeader className="bg-green-100 pb-2">
+      <Card className="rounded-[5px] border-[#00A651] shadow-sm overflow-hidden bg-gradient-to-r from-[#E6F5ED] to-[#E6F0F7]">
+        <CardHeader className="bg-[#E6F5ED] pb-2">
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="text-green-700">User View #{id}</CardTitle>
+              <CardTitle className="text-[#00A651]">User View #{id}</CardTitle>
               <CardDescription>Tracking data for product view</CardDescription>
             </div>
-            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+            <Badge variant="outline" className="text-[#00A651] border-[#00A651] bg-white">
               {relativeTime}
             </Badge>
           </div>
@@ -136,8 +150,8 @@ export function UserTrackingCards({ trackingData }) {
         <CardContent className="pt-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-100 p-2 rounded-full">
-                <User className="h-5 w-5 text-blue-500" />
+              <div className="bg-[#E6F0F7] p-2 rounded-full">
+                <User className="h-5 w-5 text-[#0072BC]" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Product ID</p>
@@ -145,8 +159,8 @@ export function UserTrackingCards({ trackingData }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="bg-green-100 p-2 rounded-full">
-                <MapPin className="h-5 w-5 text-green-500" />
+              <div className="bg-[#E6F5ED] p-2 rounded-full">
+                <MapPin className="h-5 w-5 text-[#00A651]" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Location</p>
@@ -156,7 +170,7 @@ export function UserTrackingCards({ trackingData }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="bg-purple-100 p-2 rounded-full">{getDeviceIcon(device?.type)}</div>
+              <div className="bg-[#FEF2E6] p-2 rounded-full">{getDeviceIcon(device?.type)}</div>
               <div>
                 <p className="text-sm text-gray-500">Device</p>
                 <p className="font-medium">
@@ -178,14 +192,14 @@ export function UserTrackingCards({ trackingData }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoCard
                   title="Geographic Information"
-                  icon={<Globe className="h-5 w-5 text-blue-500" />}
+                  icon={<Globe className="h-5 w-5 text-[#0072BC]" />}
                   items={[
                     { label: "Country", value: geoData.country_name },
                     { label: "City", value: geoData.city },
                     { label: "Region", value: geoData.region },
                     { label: "IP Address", value: ipAddress },
                   ]}
-                  bgColor={cardBgColors[0]}
+                  bgColor={defaultBgColors[1]}
                 />
                 <InfoCard
                   title="Device Information"
@@ -195,18 +209,18 @@ export function UserTrackingCards({ trackingData }) {
                     { label: "Operating System", value: device?.os },
                     { label: "Browser", value: device?.browser },
                   ]}
-                  bgColor={cardBgColors[1]}
+                  bgColor={defaultBgColors[0]}
                 />
               </div>
               <InfoCard
                 title="Referrer Information"
-                icon={<ExternalLink className="h-5 w-5 text-purple-500" />}
+                icon={<ExternalLink className="h-5 w-5 text-[#8A2BE2]" />}
                 items={[
                   { label: "Referrer", value: getReferrerDomain(referrer) },
                   { label: "Full URL", value: referrer },
                   { label: "Viewed At", value: formattedDate },
                 ]}
-                bgColor={cardBgColors[2]}
+                bgColor={defaultBgColors[6]}
               />
             </TabsContent>
 
@@ -214,7 +228,7 @@ export function UserTrackingCards({ trackingData }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoCard
                   title="Country Information"
-                  icon={<Flag className="h-5 w-5 text-red-500" />}
+                  icon={<Flag className="h-5 w-5 text-[#ED1C24]" />}
                   items={[
                     { label: "Country", value: geoData.country_name },
                     { label: "Country Code", value: geoData.country_code },
@@ -225,11 +239,11 @@ export function UserTrackingCards({ trackingData }) {
                     { label: "TLD", value: geoData.country_tld },
                     { label: "Calling Code", value: geoData.country_calling_code },
                   ]}
-                  bgColor={cardBgColors[3]}
+                  bgColor={defaultBgColors[4]}
                 />
                 <InfoCard
                   title="Regional Information"
-                  icon={<MapPin className="h-5 w-5 text-green-500" />}
+                  icon={<MapPin className="h-5 w-5 text-[#00A651]" />}
                   items={[
                     { label: "City", value: geoData.city },
                     { label: "Region", value: geoData.region },
@@ -240,12 +254,12 @@ export function UserTrackingCards({ trackingData }) {
                     { label: "Timezone", value: geoData.timezone },
                     { label: "UTC Offset", value: geoData.utc_offset },
                   ]}
-                  bgColor={cardBgColors[4]}
+                  bgColor={defaultBgColors[0]}
                 />
               </div>
               <InfoCard
                 title="Additional Information"
-                icon={<Info className="h-5 w-5 text-blue-500" />}
+                icon={<Info className="h-5 w-5 text-[#0072BC]" />}
                 items={[
                   { label: "Continent", value: geoData.continent_code },
                   { label: "Currency", value: `${geoData.currency} (${geoData.currency_name})` },
@@ -256,7 +270,7 @@ export function UserTrackingCards({ trackingData }) {
                   { label: "IP Version", value: geoData.version },
                   { label: "In EU", value: geoData.in_eu ? "Yes" : "No" },
                 ]}
-                bgColor={cardBgColors[5]}
+                bgColor={defaultBgColors[1]}
               />
             </TabsContent>
 
@@ -270,13 +284,13 @@ export function UserTrackingCards({ trackingData }) {
                     { label: "Operating System", value: device?.os },
                     { label: "Browser", value: device?.browser },
                   ]}
-                  bgColor={cardBgColors[6]}
+                  bgColor={defaultBgColors[2]}
                 />
                 <InfoCard
                   title="User Agent"
-                  icon={<Info className="h-5 w-5 text-blue-500" />}
+                  icon={<Info className="h-5 w-5 text-[#0072BC]" />}
                   items={[{ label: "Full User Agent", value: userAgent }]}
-                  bgColor={cardBgColors[7]}
+                  bgColor={defaultBgColors[1]}
                 />
               </div>
             </TabsContent>
@@ -284,19 +298,19 @@ export function UserTrackingCards({ trackingData }) {
             <TabsContent value="referrer" className="space-y-4">
               <InfoCard
                 title="Referrer Details"
-                icon={<ExternalLink className="h-5 w-5 text-purple-500" />}
+                icon={<ExternalLink className="h-5 w-5 text-[#8A2BE2]" />}
                 items={[
                   { label: "Referrer Domain", value: getReferrerDomain(referrer) },
                   { label: "Full Referrer URL", value: referrer },
                   { label: "Viewed At", value: formattedDate },
                   { label: "Tracking ID", value: id },
                 ]}
-                bgColor={cardBgColors[0]}
+                bgColor={defaultBgColors[6]}
               />
             </TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="bg-blue-50 border-t border-blue-100 flex justify-between">
+        <CardFooter className="bg-[#E6F0F7] border-t border-[#0072BC20] flex justify-between">
           <div className="flex items-center text-sm text-gray-600">
             <Clock className="h-4 w-4 mr-1" />
             Tracked on {format(new Date(viewedAt), "PPP")} at {format(new Date(viewedAt), "p")}
@@ -304,7 +318,7 @@ export function UserTrackingCards({ trackingData }) {
           <Button
             variant="outline"
             size="sm"
-            className="rounded-[5px] border-green-200 text-green-700 hover:bg-green-50"
+            className="rounded-[5px] border-[#00A651] text-[#00A651] hover:bg-[#E6F5ED]"
           >
             <ArrowUpRight className="h-4 w-4 mr-1" />
             View Details
@@ -317,26 +331,26 @@ export function UserTrackingCards({ trackingData }) {
         <QuickStatCard
           title="Location"
           value={`${geoData.city || "Unknown"}, ${geoData.country_name || "Unknown"}`}
-          icon={<MapPin className="h-5 w-5 text-green-500" />}
-          color="green"
+          icon={<MapPin className="h-5 w-5 text-[#00A651]" />}
+          color={defaultColors.success}
           subtext={geoData.region || "Unknown region"}
-          bgColor={cardBgColors[0]}
+          bgColor={defaultBgColors[0]}
         />
         <QuickStatCard
           title="Device"
           value={`${device?.type || "Unknown"} / ${device?.browser || "Unknown"}`}
           icon={getBrowserIcon(device?.browser)}
-          color="blue"
+          color={defaultColors.info}
           subtext={device?.os || "Unknown OS"}
-          bgColor={cardBgColors[1]}
+          bgColor={defaultBgColors[1]}
         />
         <QuickStatCard
           title="Referrer"
           value={getReferrerDomain(referrer) || "Direct"}
-          icon={<ExternalLink className="h-5 w-5 text-purple-500" />}
-          color="purple"
+          icon={<ExternalLink className="h-5 w-5 text-[#8A2BE2]" />}
+          color="#8A2BE2"
           subtext={relativeTime}
-          bgColor={cardBgColors[2]}
+          bgColor={defaultBgColors[6]}
         />
       </div>
     </div>
@@ -368,7 +382,7 @@ function InfoCard({ title, icon, items, bgColor }) {
 // Helper component for quick stat cards
 function QuickStatCard({ title, value, icon, color, subtext, bgColor }) {
   return (
-    <Card className={`rounded-[5px] border-${color}-200 ${bgColor}`}>
+    <Card className={`rounded-[5px] border-[${color}40] ${bgColor}`}>
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
           <div>
@@ -376,7 +390,7 @@ function QuickStatCard({ title, value, icon, color, subtext, bgColor }) {
             <p className="text-lg font-semibold mb-1 truncate max-w-[200px]">{value}</p>
             {subtext && <p className="text-xs text-gray-600">{subtext}</p>}
           </div>
-          <div className={`p-2 rounded-full bg-white shadow-sm`}>{icon}</div>
+          <div className="p-2 rounded-full bg-white shadow-sm">{icon}</div>
         </div>
       </CardContent>
     </Card>
