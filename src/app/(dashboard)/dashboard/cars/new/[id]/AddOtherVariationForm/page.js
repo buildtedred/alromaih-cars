@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -37,13 +38,19 @@ import ImageGallery from "@/app/(dashboard)/dashboard/images-gallery/image-galle
 export default function AddOtherVariationForm() {
   const { id: carId } = useParams()
   const router = useRouter()
+  const [activeLang, setActiveLang] = useState("english")
 
   const [variation, setVariation] = useState({
+    // English fields
     name: "",
     colorName: "",
     colorHex: "#000000",
     price: "",
     images: [],
+
+    // Arabic fields
+    name_ar: "",
+    colorName_ar: "",
   })
 
   const [carData, setCarData] = useState(null)
@@ -128,7 +135,11 @@ export default function AddOtherVariationForm() {
       // Format the data for the API
       const formattedVariation = {
         carId,
-        ...variation,
+        name: variation.name,
+        name_ar: variation.name_ar,
+        colorName: variation.colorName,
+        colorName_ar: variation.colorName_ar,
+        colorHex: variation.colorHex,
         price: Number.parseFloat(variation.price),
         images: variation.images.map((img) => img.url),
       }
@@ -145,6 +156,8 @@ export default function AddOtherVariationForm() {
         colorHex: "#000000",
         price: "",
         images: [],
+        name_ar: "",
+        colorName_ar: "",
       })
 
       // Refresh data
@@ -388,120 +401,175 @@ export default function AddOtherVariationForm() {
             <CardDescription className="text-xs">Enter the details for the new variation</CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4 pt-4 px-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <Label htmlFor="name" className="text-sm font-medium">
-                  Variation Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="name"
-                  placeholder="e.g. Sport Edition"
-                  value={variation.name}
-                  onChange={(e) => handleVariationChange("name", e.target.value)}
-                  className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
-                  required
-                />
-                <p className="text-xs text-muted-foreground">Enter the name of this variation</p>
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="price" className="text-sm font-medium">
-                  Price <span className="text-red-500">*</span>
-                </Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="price"
-                    type="number"
-                    placeholder="0.00"
-                    value={variation.price}
-                    onChange={(e) => handleVariationChange("price", e.target.value)}
-                    className="pl-8 h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
-                    required
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">Enter the price for this variation</p>
-              </div>
+          <Tabs value={activeLang} onValueChange={setActiveLang} className="flex-1">
+            <div className="px-4 pt-2">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="english">English</TabsTrigger>
+                <TabsTrigger value="arabic">العربية</TabsTrigger>
+              </TabsList>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <Label htmlFor="colorName" className="text-sm font-medium">
-                  Color Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="colorName"
-                  placeholder="e.g. Ruby Red"
-                  value={variation.colorName}
-                  onChange={(e) => handleVariationChange("colorName", e.target.value)}
-                  className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
-                  required
-                />
-                <p className="text-xs text-muted-foreground">Enter the name of the color</p>
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="colorHex" className="text-sm font-medium flex items-center gap-1">
-                  <Palette className="h-4 w-4" /> Color <span className="text-red-500">*</span>
-                </Label>
-                <div className="flex gap-2 items-center">
-                  <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                      <div
-                        className="h-4 w-4 rounded-[50%] border"
-                        style={{ backgroundColor: variation.colorHex || "#000000" }}
-                      />
-                    </div>
+            <TabsContent value="english" className="m-0">
+              <CardContent className="space-y-4 pt-4 px-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      Variation Name <span className="text-red-500">*</span>
+                    </Label>
                     <Input
-                      id="colorHex"
-                      value={variation.colorHex || ""}
-                      onChange={(e) => handleVariationChange("colorHex", e.target.value)}
-                      placeholder="#000000"
-                      className="pl-10 h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
+                      id="name"
+                      placeholder="e.g. Sport Edition"
+                      value={variation.name}
+                      onChange={(e) => handleVariationChange("name", e.target.value)}
+                      className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
                       required
                     />
+                    <p className="text-xs text-muted-foreground">Enter the name of this variation</p>
                   </div>
 
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-9 h-9 p-0 border-2 rounded-[5px]"
-                        style={{
-                          backgroundColor: variation.colorHex || "#ffffff",
-                          borderColor: variation.colorHex ? "transparent" : undefined,
-                        }}
-                      >
-                        <span className="sr-only">Pick a color</span>
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-3" align="end">
-                      <div className="space-y-3">
-                        <HexColorPicker
-                          color={variation.colorHex}
-                          onChange={(color) => handleVariationChange("colorHex", color)}
-                        />
-                        <div className="flex items-center">
-                          <span className="mr-2 text-sm font-medium">HEX:</span>
-                          <HexColorInput
-                            color={variation.colorHex}
-                            onChange={(color) => handleVariationChange("colorHex", color)}
-                            prefixed
-                            className="w-full h-8 px-2 border rounded-[5px] text-sm"
+                  <div className="space-y-1">
+                    <Label htmlFor="price" className="text-sm font-medium">
+                      Price <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="price"
+                        type="number"
+                        placeholder="0.00"
+                        value={variation.price}
+                        onChange={(e) => handleVariationChange("price", e.target.value)}
+                        className="pl-8 h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
+                        required
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">Enter the price for this variation</p>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="colorName" className="text-sm font-medium">
+                      Color Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="colorName"
+                      placeholder="e.g. Ruby Red"
+                      value={variation.colorName}
+                      onChange={(e) => handleVariationChange("colorName", e.target.value)}
+                      className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">Enter the name of the color</p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="colorHex" className="text-sm font-medium flex items-center gap-1">
+                      <Palette className="h-4 w-4" /> Color <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="flex gap-2 items-center">
+                      <div className="relative flex-1">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <div
+                            className="h-4 w-4 rounded-[50%] border"
+                            style={{ backgroundColor: variation.colorHex || "#000000" }}
                           />
                         </div>
+                        <Input
+                          id="colorHex"
+                          value={variation.colorHex || ""}
+                          onChange={(e) => handleVariationChange("colorHex", e.target.value)}
+                          placeholder="#000000"
+                          className="pl-10 h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
+                          required
+                        />
                       </div>
-                    </PopoverContent>
-                  </Popover>
+
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-9 h-9 p-0 border-2 rounded-[5px]"
+                            style={{
+                              backgroundColor: variation.colorHex || "#ffffff",
+                              borderColor: variation.colorHex ? "transparent" : undefined,
+                            }}
+                          >
+                            <span className="sr-only">Pick a color</span>
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-3" align="end">
+                          <div className="space-y-3">
+                            <HexColorPicker
+                              color={variation.colorHex}
+                              onChange={(color) => handleVariationChange("colorHex", color)}
+                            />
+                            <div className="flex items-center">
+                              <span className="mr-2 text-sm font-medium">HEX:</span>
+                              <HexColorInput
+                                color={variation.colorHex}
+                                onChange={(color) => handleVariationChange("colorHex", color)}
+                                prefixed
+                                className="w-full h-8 px-2 border rounded-[5px] text-sm"
+                              />
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Select or enter the color hex code</p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Select or enter the color hex code</p>
-              </div>
-            </div>
+              </CardContent>
+            </TabsContent>
 
-            <Separator className="my-2" />
+            <TabsContent value="arabic" className="m-0">
+              <CardContent className="space-y-4 pt-4 px-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="name_ar" className="text-sm font-medium">
+                      Variation Name (Arabic) <span className="text-muted-foreground text-xs">(optional)</span>
+                    </Label>
+                    <Input
+                      id="name_ar"
+                      placeholder="أدخل اسم النسخة"
+                      value={variation.name_ar}
+                      onChange={(e) => handleVariationChange("name_ar", e.target.value)}
+                      className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px] text-right"
+                      dir="rtl"
+                    />
+                    <p className="text-xs text-muted-foreground">Enter the Arabic name for this variation</p>
+                  </div>
 
+                  <div className="space-y-1">
+                    <Label htmlFor="colorName_ar" className="text-sm font-medium">
+                      Color Name (Arabic) <span className="text-muted-foreground text-xs">(optional)</span>
+                    </Label>
+                    <Input
+                      id="colorName_ar"
+                      placeholder="أدخل اسم اللون"
+                      value={variation.colorName_ar}
+                      onChange={(e) => handleVariationChange("colorName_ar", e.target.value)}
+                      className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px] text-right"
+                      dir="rtl"
+                    />
+                    <p className="text-xs text-muted-foreground">Enter the Arabic name for the color</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-muted/30 rounded-[5px] border">
+                  <p className="text-sm text-center">
+                    Note: Color code and price are shared between English and Arabic versions
+                  </p>
+                </div>
+              </CardContent>
+            </TabsContent>
+          </Tabs>
+
+          <Separator className="my-2" />
+
+          <CardContent className="space-y-4 pt-4 px-4">
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
                 <Label className="text-sm font-medium">

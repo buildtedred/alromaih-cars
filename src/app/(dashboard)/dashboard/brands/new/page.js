@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, ImageIcon, Check, Upload, X, AlertCircle, ChevronRight } from "lucide-react"
+import { ArrowLeft, Loader2, ImageIcon, Check, Upload, X, AlertCircle, ChevronRight, Globe } from "lucide-react"
 import Link from "next/link"
 import axios from "axios"
+import slugify from "slugify"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,20 +14,38 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ImageGallery from "../../images-gallery/image-gallery"
 
 export default function NewBrandPage() {
   const router = useRouter()
-  const [name, setName] = useState("")
+  const [brandData, setBrandData] = useState({
+    name_en: "",
+    name_ar: "",
+    slug: "",
+  })
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState(null)
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState("english")
 
-  const handleNameChange = (e) => {
-    const newName = e.target.value
-    setName(newName)
+  // Generate slug from English name
+  useEffect(() => {
+    if (brandData.name_en) {
+      const generatedSlug = slugify(brandData.name_en, {
+        lower: true,
+        strict: true,
+        trim: true,
+      })
+      setBrandData((prev) => ({ ...prev, slug: generatedSlug }))
+    }
+  }, [brandData.name_en])
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setBrandData((prev) => ({ ...prev, [name]: value }))
   }
 
   // Handle image selection
@@ -40,8 +59,10 @@ export default function NewBrandPage() {
     setError(null)
     setUploadStatus(null)
 
-    if (!name.trim()) {
-      setError("Brand name is required")
+    // Validate form - only English name is required
+    if (!brandData.name_en.trim()) {
+      setError("English brand name is required")
+      setActiveTab("english")
       return
     }
 
@@ -54,7 +75,9 @@ export default function NewBrandPage() {
       setLoading(true)
 
       const payload = {
-        name,
+        name: brandData.name_en,
+        name_ar: brandData.name_ar, // This can be empty
+        slug: brandData.slug,
         image: selectedImageUrl,
       }
 
@@ -63,17 +86,21 @@ export default function NewBrandPage() {
 
       // Handle success response
       setUploadStatus("Brand created successfully!")
-      router.push("/dashboard/brands")
-      router.refresh()
+
+      // Redirect after a short delay
+      setTimeout(() => {
+        router.push("/dashboard/brands")
+        router.refresh()
+      }, 1500)
     } catch (error) {
       // Handle errors
       console.error("Error creating brand:", error)
 
       // Check if error is an Axios error and handle it
       if (error.response) {
-        setError(error.response.data.error || "Failed to create brand already exists")
+        setError(error.response.data.error || "Failed to create brand. Brand may already exist.")
       } else {
-        setError("Failed to create brand already exists")
+        setError("Failed to create brand. Please try again.")
       }
     } finally {
       setLoading(false)
@@ -109,7 +136,7 @@ export default function NewBrandPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h1 className="text-xl font-bold tracking-tight text-brand-primary">Add New Car Brand</h1>
-            <p className="text-xs text-muted-foreground">Create a new car brand to add to your catalog</p>
+            <p className="text-xs text-muted-foreground">Create a new car brand with English and Arabic names</p>
           </div>
           <Button
             variant="outline"
@@ -144,27 +171,62 @@ export default function NewBrandPage() {
       <Card className="shadow-md border-brand-primary/10 overflow-hidden rounded-[5px]">
         <form onSubmit={handleSubmit} className="rounded-[5px]">
           <CardHeader className="bg-brand-light/30 border-b border-brand-primary/10 py-3 px-4">
-            <CardTitle className="text-base text-brand-primary">Brand Details</CardTitle>
-            <CardDescription className="text-xs">Enter the details for the new car brand</CardDescription>
+            <CardTitle className="text-base text-brand-primary flex items-center">
+              <Globe className="h-4 w-4 mr-2" />
+              Bilingual Brand Details
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Enter the brand details in English (required) and Arabic (optional)
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4 pt-4 px-4">
-            <div className="space-y-1">
-              <Label htmlFor="name" className="text-sm font-medium">
-                Brand Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={handleNameChange}
-                placeholder="Enter brand name"
-                className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
-                required
-              />
-              <p className="text-xs text-muted-foreground">Enter the official name of the car brand</p>
-            </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid grid-cols-2 mb-4">
+                <TabsTrigger value="english">English</TabsTrigger>
+                <TabsTrigger value="arabic">العربية</TabsTrigger>
+              </TabsList>
 
-            <div className="space-y-1.5">
+              <TabsContent value="english" className="mt-0">
+                <div className="space-y-1">
+                  <Label htmlFor="name_en" className="text-sm font-medium">
+                    Brand Name (English) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="name_en"
+                    name="name_en"
+                    value={brandData.name_en}
+                    onChange={handleInputChange}
+                    placeholder="Enter brand name in English"
+                    className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">Enter the official English name of the car brand</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="arabic" className="mt-0">
+                <div className="space-y-1">
+                  <Label htmlFor="name_ar" className="text-sm font-medium flex items-center">
+                    Brand Name (Arabic) <span className="text-muted-foreground text-xs ml-2">(optional)</span>
+                  </Label>
+                  <Input
+                    id="name_ar"
+                    name="name_ar"
+                    value={brandData.name_ar}
+                    onChange={handleInputChange}
+                    placeholder="أدخل اسم العلامة التجارية بالعربية"
+                    className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px] text-right"
+                    dir="rtl"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Enter the official Arabic name of the car brand (optional)
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <div className="space-y-1.5 pt-2">
               <div className="flex justify-between items-center">
                 <Label className="text-sm font-medium">
                   Brand Logo <span className="text-red-500">*</span>
@@ -251,10 +313,16 @@ export default function NewBrandPage() {
             </Button>
             <Button
               type="submit"
-              disabled={loading || !selectedImageUrl || !name.trim()}
+              disabled={loading || !selectedImageUrl || !brandData.name_en.trim()}
               className="h-8 text-xs bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
             >
-              Create Brand
+              {loading ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> Creating...
+                </>
+              ) : (
+                "Create Brand"
+              )}
             </Button>
           </CardFooter>
         </form>

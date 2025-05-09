@@ -1,11 +1,14 @@
 "use client"
 
-import { Plus, Trash2, X } from "lucide-react"
+import { useState } from "react"
+import { Plus, Trash2, X, Languages } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Label } from "@/components/ui/label"
 
 const EditeSpecifications = ({
   addSpecDetail,
@@ -17,9 +20,18 @@ const EditeSpecifications = ({
   removeSpecification,
   disabled = false,
 }) => {
+  const [activeTab, setActiveTab] = useState("english")
+
   return (
     <div className="space-y-4 p-1 shadow-sm">
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-between">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-[200px]">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="english">English</TabsTrigger>
+            <TabsTrigger value="arabic">Arabic</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
         <Button
           type="button"
           onClick={addSpecification}
@@ -48,15 +60,34 @@ const EditeSpecifications = ({
                 <div className="flex h-full">
                   {/* Left side - Category */}
                   <div className="bg-brand-light/20 p-2 flex flex-col w-1/3 border-r border-brand-light/30">
-                    <div className="flex items-center justify-between mb-2">
-                      <Input
-                        className="bg-background h-7 text-sm rounded-[5px] w-full"
-                        placeholder="Category Title"
-                        value={category.title}
-                        onChange={(e) => handleSpecTitleChange(catIndex, e.target.value)}
-                        required
-                        disabled={disabled}
-                      />
+                    <div className="flex flex-col gap-2">
+                      {activeTab === "english" ? (
+                        <div>
+                          <Label className="text-xs mb-1 block">Category Title</Label>
+                          <Input
+                            className="bg-background h-7 text-sm rounded-[5px] w-full"
+                            placeholder="Category Title"
+                            value={category.title || ""}
+                            onChange={(e) => handleSpecTitleChange(catIndex, e.target.value, "title")}
+                            required
+                            disabled={disabled}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <Label className="text-xs mb-1 block">
+                            Category Title (Arabic) <span className="text-muted-foreground">(Optional)</span>
+                          </Label>
+                          <Input
+                            className="bg-background h-7 text-sm rounded-[5px] w-full text-right"
+                            placeholder="عنوان الفئة"
+                            value={category.titleAr || ""}
+                            onChange={(e) => handleSpecTitleChange(catIndex, e.target.value, "titleAr")}
+                            dir="rtl"
+                            disabled={disabled}
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className="flex justify-between items-center mt-auto">
                       <Badge variant="outline" className="text-xs rounded-full px-2 py-0 h-5">
@@ -82,22 +113,53 @@ const EditeSpecifications = ({
                       {category.details.map((detail, detailIndex) => (
                         <div key={detailIndex} className="flex items-center gap-2">
                           <div className="flex-1 flex gap-2">
-                            <Input
-                              placeholder="Label"
-                              value={detail.label}
-                              onChange={(e) => handleSpecDetailChange(catIndex, detailIndex, "label", e.target.value)}
-                              required
-                              className="h-7 text-xs rounded-[5px] flex-1"
-                              disabled={disabled}
-                            />
-                            <Input
-                              placeholder="Value"
-                              value={detail.value}
-                              onChange={(e) => handleSpecDetailChange(catIndex, detailIndex, "value", e.target.value)}
-                              required
-                              className="h-7 text-xs rounded-[5px] flex-1"
-                              disabled={disabled}
-                            />
+                            {activeTab === "english" ? (
+                              <>
+                                <Input
+                                  placeholder="Label"
+                                  value={detail.label || ""}
+                                  onChange={(e) =>
+                                    handleSpecDetailChange(catIndex, detailIndex, "label", e.target.value)
+                                  }
+                                  required
+                                  className="h-7 text-xs rounded-[5px] flex-1"
+                                  disabled={disabled}
+                                />
+                                <Input
+                                  placeholder="Value"
+                                  value={detail.value || ""}
+                                  onChange={(e) =>
+                                    handleSpecDetailChange(catIndex, detailIndex, "value", e.target.value)
+                                  }
+                                  required
+                                  className="h-7 text-xs rounded-[5px] flex-1"
+                                  disabled={disabled}
+                                />
+                              </>
+                            ) : (
+                              <>
+                                <Input
+                                  placeholder="التسمية"
+                                  value={detail.labelAr || ""}
+                                  onChange={(e) =>
+                                    handleSpecDetailChange(catIndex, detailIndex, "labelAr", e.target.value)
+                                  }
+                                  className="h-7 text-xs rounded-[5px] flex-1 text-right"
+                                  dir="rtl"
+                                  disabled={disabled}
+                                />
+                                <Input
+                                  placeholder="القيمة"
+                                  value={detail.valueAr || ""}
+                                  onChange={(e) =>
+                                    handleSpecDetailChange(catIndex, detailIndex, "valueAr", e.target.value)
+                                  }
+                                  className="h-7 text-xs rounded-[5px] flex-1 text-right"
+                                  dir="rtl"
+                                  disabled={disabled}
+                                />
+                              </>
+                            )}
                           </div>
                           <Button
                             type="button"
@@ -132,6 +194,14 @@ const EditeSpecifications = ({
           </div>
         </ScrollArea>
       )}
+
+      {/* Language indicator */}
+      <div className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
+        <Languages className="h-3.5 w-3.5" />
+        <span>
+          {activeTab === "english" ? "English" : "Arabic"} fields {activeTab === "arabic" && "(Optional)"}
+        </span>
+      </div>
     </div>
   )
 }

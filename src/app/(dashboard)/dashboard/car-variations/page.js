@@ -63,7 +63,7 @@ export default function CarVariations() {
       const text = await response.text()
       let data
 
-      try { 
+      try {
         // Try to parse the response as JSON
         data = JSON.parse(text)
       } catch (parseError) {
@@ -77,7 +77,14 @@ export default function CarVariations() {
         }
       }
 
-      setVariations(data)
+      // Check if the response has the new bilingual format
+      if (data && data.en) {
+        // Use English data by default
+        setVariations(data.en)
+      } else {
+        // Fallback to the old format or empty array
+        setVariations(data || [])
+      }
     } catch (error) {
       console.error("Error fetching variations:", error)
       setError(error.message)
@@ -485,16 +492,44 @@ export default function CarVariations() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative flex-1 max-w-md w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search variations by name, color, or car model..."
-            className="pl-8 w-full rounded-[5px] border-gray-300 focus-visible:ring-brand-primary"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            disabled={isDeleting}
-          />
+        <div className="flex gap-2 items-center w-full sm:w-auto">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search variations by name, color, or car model..."
+              className="pl-8 w-full rounded-[5px] border-gray-300 focus-visible:ring-brand-primary"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              disabled={isDeleting}
+            />
+          </div>
+
+          <select
+            className="h-10 rounded-[5px] border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            onChange={(e) => {
+              setLoading(true)
+              fetch("/api/supabasPrisma/othervariations/")
+                .then((res) => res.json())
+                .then((data) => {
+                  if (data && data[e.target.value]) {
+                    setVariations(data[e.target.value])
+                  } else {
+                    setVariations([])
+                  }
+                  setLoading(false)
+                })
+                .catch((err) => {
+                  console.error(err)
+                  setError("Failed to fetch variations")
+                  setLoading(false)
+                })
+            }}
+            disabled={isDeleting || loading}
+          >
+            <option value="en">English</option>
+            <option value="ar">Arabic</option>
+          </select>
         </div>
 
         <Button

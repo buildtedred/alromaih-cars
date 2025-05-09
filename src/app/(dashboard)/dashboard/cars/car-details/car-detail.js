@@ -54,7 +54,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { format } from "date-fns"
 
-export default function CarDetail({ id }) {
+export function CarDetail({ slug, language = "en" }) {
   const router = useRouter()
   const [car, setCar] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -66,22 +66,20 @@ export default function CarDetail({ id }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [variationToDelete, setVariationToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  // 1. Remove the viewMode state since we're only using table view
-  // Find and remove this line:
-  // const [viewMode, setViewMode] = useState("table") // "grid" or "table"
 
   useEffect(() => {
-    if (id) {
-      fetchCarDetails(id)
+    if (slug) {
+      fetchCarDetails(slug)
     }
-  }, [id])
+  }, [slug, language])
 
-  async function fetchCarDetails(carId) {
+  async function fetchCarDetails(carSlug) {
     try {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/supabasPrisma/cars/${carId}`)
+      // Use the slug-based API endpoint instead of ID-based
+      const response = await fetch(`/api/supabasPrisma/cars/slug/${carSlug}`)
 
       if (!response.ok) {
         throw new Error(`Failed to fetch car details. Status: ${response.status}`)
@@ -104,7 +102,13 @@ export default function CarDetail({ id }) {
         }
       }
 
-      setCar(data)
+      // The response now contains both 'en' and 'ar' data
+      // Set the car data based on the selected language
+      if (data && (data.en || data.ar)) {
+        setCar(data[language] || data.en) // Fallback to English if selected language data is missing
+      } else {
+        throw new Error("Invalid data format received from API")
+      }
     } catch (error) {
       console.error("Error fetching car details:", error)
       setError(error.message)
@@ -138,7 +142,7 @@ export default function CarDetail({ id }) {
       }
 
       // Refresh car data after deletion
-      fetchCarDetails(id)
+      fetchCarDetails(slug)
     } catch (error) {
       console.error("Error deleting variation:", error)
     } finally {
@@ -199,7 +203,7 @@ export default function CarDetail({ id }) {
             <h2 className="text-base font-semibold">Error Loading Car Details</h2>
           </div>
           <p className="text-sm mb-3">{error}</p>
-          <Button size="sm" onClick={() => fetchCarDetails(id)}>
+          <Button size="sm" onClick={() => fetchCarDetails(slug)}>
             Try Again
           </Button>
         </div>
@@ -374,10 +378,10 @@ export default function CarDetail({ id }) {
                       <div className="space-y-0.5">
                         <span className="text-[10px] text-muted-foreground">Brand</span>
                         <div className="flex items-center gap-1">
-                          {car.brand?.image && (
+                          {car.brand?.logo && (
                             <div className="h-3 w-3 rounded overflow-hidden bg-muted">
                               <img
-                                src={car.brand.image || "/placeholder.svg"}
+                                src={car.brand.logo || "/placeholder.svg"}
                                 alt={car.brand.name}
                                 className="h-full w-full object-contain"
                               />
@@ -652,9 +656,9 @@ export default function CarDetail({ id }) {
             </TabsContent>
 
             <TabsContent value="specifications" className="space-y-3 mt-0">
-              {car.spacification && car.spacification.length > 0 ? (
+              {car.specifications && car.specifications.length > 0 ? (
                 <div className="space-y-3">
-                  {car.spacification.map((spec, index) => (
+                  {car.specifications.map((spec, index) => (
                     <div key={index} className="space-y-2">
                       <h3 className="text-xs font-medium">{spec.title || `Specification Group ${index + 1}`}</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -682,208 +686,10 @@ export default function CarDetail({ id }) {
             <TabsContent value="variations" className="space-y-3 mt-0">
               {car.otherVariations && car.otherVariations.length > 0 ? (
                 <div className="space-y-2">
-                  {/* 2. Update the variations tab content to remove the grid/table toggle and only show table view */}
-                  {/* Replace the variations tab header section with this: */}
                   <div className="flex justify-between items-center">
                     <h3 className="text-xs font-medium">Available Variations</h3>
                   </div>
 
-                  {/* 3. Remove the viewMode toggle buttons */}
-                  {/* Find and remove this code: */}
-                  {/* <div className="flex gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setViewMode("grid")}
-                      className={`h-6 px-1.5 rounded-[5px] border-gray-300 ${viewMode === "grid" ? "bg-brand-light text-brand-primary" : "hover:bg-brand-light/50"}`}
-                    >
-                      <Grid2x2 className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setViewMode("table")}
-                      className={`h-6 px-1.5 rounded-[5px] border-gray-300 ${viewMode === "table" ? "bg-brand-light text-brand-primary" : "hover:bg-brand-light/50"}`}
-                    >
-                      <ListIcon className="h-3 w-3" />
-                    </Button>
-                  </div> */}
-
-                  {/* 4. Remove the viewMode conditional rendering and grid view */}
-                  {/* Replace this code: */}
-                  {/* {viewMode === "table" ? (
-                    <div className="border border-gray-200 rounded-[5px] overflow-hidden">
-                      <Table>
-                        <TableHeader className="bg-brand-light/30">
-                          <TableRow>
-                            <TableHead className="w-[60px]">Image</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Color</TableHead>
-                            <TableHead>Price</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {car.otherVariations.map((variation) => (
-                            <TableRow key={variation.id} className="hover:bg-brand-light/30">
-                              <TableCell className="py-1.5">
-                                <div className="h-8 w-8 rounded-[5px] overflow-hidden bg-muted">
-                                  {variation.images && variation.images.length > 0 ? (
-                                    <img
-                                      src={variation.images[0] || "/placeholder.svg"}
-                                      alt={variation.name}
-                                      className="h-full w-full object-cover"
-                                      onError={(e) => {
-                                        e.target.onerror = null
-                                        e.target.src = "/placeholder.svg?height=32&width=32"
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="h-full w-full flex items-center justify-center">
-                                      <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                                    </div>
-                                  )}
-                                </div>
-                              </TableCell>
-                              <TableCell className="font-medium text-xs py-1.5">{variation.name}</TableCell>
-                              <TableCell className="py-1.5">
-                                <div className="flex items-center gap-1">
-                                  <div
-                                    className="h-2.5 w-2.5 rounded-full border"
-                                    style={{ backgroundColor: variation.colorHex || "#cccccc" }}
-                                  />
-                                  <span className="text-[10px]">{variation.colorName}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-1.5">
-                                <Badge variant="outline" className="text-[10px] py-0 h-4">
-                                  <DollarSign className="h-2.5 w-2.5 mr-0.5" />
-                                  {variation.price?.toLocaleString() || "N/A"}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right py-1.5">
-                                <div className="flex justify-end gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
-                                    asChild
-                                    disabled={isDeleting}
-                                  >
-                                    <Link href={`/dashboard/variations/${variation.id}`}>
-                                      <Eye className="h-3 w-3" />
-                                    </Link>
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
-                                    asChild
-                                    disabled={isDeleting}
-                                  >
-                                    <Link href={`/dashboard/cars/new/EditVariationForm?id=${variation.id}`}>
-                                      <Pencil className="h-3 w-3" />
-                                    </Link>
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 rounded-[5px] hover:bg-destructive/10"
-                                    onClick={() => confirmDeleteVariation(variation)}
-                                    disabled={isDeleting}
-                                  >
-                                    <Trash2 className="h-3 w-3 text-red-500" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {car.otherVariations.map((variation) => (
-                        <Card key={variation.id} className="overflow-hidden rounded-[5px] shadow-sm">
-                          <div className="relative aspect-video bg-muted">
-                            {variation.images && variation.images.length > 0 ? (
-                              <img
-                                src={variation.images[0] || "/placeholder.svg"}
-                                alt={variation.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  e.target.onerror = null
-                                  e.target.src = "/placeholder.svg?height=120&width=200"
-                                }}
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                              </div>
-                            )}
-                          </div>
-
-                          <CardContent className="p-2 space-y-2">
-                            <div>
-                              <h3 className="text-xs font-medium">{variation.name}</h3>
-                              <div className="flex items-center gap-1.5 mt-0.5">
-                                <div className="flex items-center gap-1">
-                                  <div
-                                    className="h-2.5 w-2.5 rounded-full border"
-                                    style={{ backgroundColor: variation.colorHex || "#cccccc" }}
-                                  />
-                                  <span className="text-[10px] text-muted-foreground">{variation.colorName}</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                              <Badge variant="outline" className="px-1.5 py-0 h-4 text-[10px]">
-                                <DollarSign className="h-2.5 w-2.5 mr-0.5" />
-                                {variation.price?.toLocaleString() || "N/A"}
-                              </Badge>
-
-                              <div className="flex gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
-                                  asChild
-                                  disabled={isDeleting}
-                                >
-                                  <Link href={`/dashboard/variations/${variation.id}`}>
-                                    <Eye className="h-3 w-3" />
-                                  </Link>
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 hover:bg-brand-light hover:text-brand-primary rounded-[5px]"
-                                  asChild
-                                  disabled={isDeleting}
-                                >
-                                  <Link href={`/dashboard/variations/edit?id=${variation.id}`}>
-                                    <Pencil className="h-3 w-3" />
-                                  </Link>
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 text-destructive hover:bg-destructive/10 rounded-[5px]"
-                                  onClick={() => confirmDeleteVariation(variation)}
-                                  disabled={isDeleting}
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )} */}
-
-                  {/* With this simpler table-only version: */}
                   <div className="border border-gray-200 rounded-[5px] overflow-hidden">
                     <Table>
                       <TableHeader className="bg-brand-light/30">
@@ -1152,10 +958,10 @@ export default function CarDetail({ id }) {
               <h3 className="text-xs font-medium">Brand Information</h3>
 
               <div className="flex items-center gap-2 p-2 bg-brand-light/30 rounded-[5px] border border-brand-primary/10">
-                {car.brand.image && (
+                {car.brand.logo && (
                   <div className="h-8 w-8 rounded-[5px] overflow-hidden bg-muted flex-shrink-0">
                     <img
-                      src={car.brand.image || "/placeholder.svg"}
+                      src={car.brand.logo || "/placeholder.svg"}
                       alt={car.brand.name}
                       className="h-full w-full object-contain"
                       onError={(e) => {

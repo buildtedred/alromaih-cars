@@ -51,6 +51,11 @@ export default function BrandDetail({ id }) {
   const [sortDirection, setSortDirection] = useState("asc")
   const [imagePreviewOpen, setImagePreviewOpen] = useState(false)
 
+
+  ///////////////////////////
+
+  ////////////////////////
+
   useEffect(() => {
     if (id) {
       fetchBrandDetails(id)

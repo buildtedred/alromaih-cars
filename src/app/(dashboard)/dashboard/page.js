@@ -6,24 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  User,
-  ThumbsUp,
-  ShoppingCart,
-  Settings,
-  Bell,
-  Search,
-  MoreVertical,
-  Users,
-  MousePointer,
-  Package,
-  ShoppingBag,
-  ArrowUp,
-  Car,
-  RefreshCw,
-  Filter,
-} from "lucide-react"
-import { fetchCars, fetchCarBrands, checkApiAvailability } from "./api-service"
+import { User, ThumbsUp, ShoppingCart, Settings, Bell, Search, MoreVertical, Users, MousePointer, Package, ShoppingBag, ArrowUp, Car, RefreshCw, Filter, Globe } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Line,
   LineChart,
@@ -40,7 +24,7 @@ import {
 // Try to import chart components, but provide fallbacks if they don't exist
 let ChartContainer, ChartTooltip, ChartTooltipContent
 try {
-  const chartModule = require("@/components/ui/chart")
+  // const chartModule = require("@/components/ui/chart")
   ChartContainer = chartModule.ChartContainer
   ChartTooltip = chartModule.ChartTooltip
   ChartTooltipContent = chartModule.ChartTooltipContent
@@ -71,6 +55,47 @@ try {
   }
 }
 
+// Updated API service functions to handle bilingual data
+const fetchCars = async (language = 'en') => {
+
+  
+  try {
+    const response = await fetch("/api/supabasPrisma/cars")
+    if (!response.ok) throw new Error("Failed to fetch cars")
+    
+    const data = await response.json()
+    // Return the data for the selected language, or fallback to English
+    return data[language] || data.en || []
+  } catch (error) {
+    console.error("Error fetching cars:", error)
+    throw error
+  }
+}
+
+const fetchCarBrands = async (language = 'en') => {
+  try {
+    const response = await fetch("/api/supabasPrisma/carbrands")
+    if (!response.ok) throw new Error("Failed to fetch car brands")
+    
+    const data = await response.json()
+    // Return the data for the selected language, or fallback to English
+    return data[language] || data.en || []
+  } catch (error) {
+    console.error("Error fetching car brands:", error)
+    throw error
+  }
+}
+
+
+const checkApiAvailability = async () => {
+  try {
+    const response = await fetch("/api/health-check", { method: "HEAD" })
+    return response.ok
+  } catch (error) {
+    return false
+  }
+}
+
 export default function Dashboard() {
   const [cars, setCars] = useState([])
   const [brands, setBrands] = useState([])
@@ -80,6 +105,11 @@ export default function Dashboard() {
   const [refreshInterval, setRefreshInterval] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [isAutoRefresh, setIsAutoRefresh] = useState(false)
+  const [language, setLanguage] = useState('en') // Default language is English
+
+  /////////////////////////////////////////////
+
+  ////////////////////////////////////////////////////
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -90,8 +120,12 @@ export default function Dashboard() {
       const isApiAvailable = await checkApiAvailability()
       setApiAvailable(isApiAvailable)
 
-      // Fetch data
-      const [carsData, brandsData] = await Promise.all([fetchCars(), fetchCarBrands()])
+      // Fetch data with the selected language
+      const [carsData, brandsData] = await Promise.all([
+        fetchCars(language), 
+        fetchCarBrands(language)
+      ])
+      
       setCars(carsData || [])
       setBrands(brandsData || [])
       setLastUpdated(new Date())
@@ -101,7 +135,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [language]) // Add language as a dependency
 
   // Toggle auto-refresh
   const toggleAutoRefresh = useCallback(() => {
@@ -121,6 +155,11 @@ export default function Dashboard() {
       setIsAutoRefresh(true)
     }
   }, [isAutoRefresh, refreshInterval, loadData])
+
+  // Handle language change
+  const handleLanguageChange = (newLanguage) => {
+    setLanguage(newLanguage)
+  }
 
   useEffect(() => {
     loadData()
@@ -491,7 +530,38 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
       <main className="p-3 md:p-4">
-        {/* Real-time status indicator */}
+        {/* Language selector */}
+        <div className="mb-4">
+          <Tabs value={language} onValueChange={handleLanguageChange} className="w-[200px]">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="en" className="flex items-center gap-1">
+                <Globe className="h-4 w-4" />
+                English
+              </TabsTrigger>
+              <TabsTrigger value="ar" className="flex items-center gap-1">
+                <Globe className="h-4 w-4" />
+                العربية
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {/* Last updated and refresh button */}
+        <div className="flex justify-between items-center mb-4">
+          <div className="text-sm text-gray-500">
+            Last updated: {lastUpdated.toLocaleTimeString()}
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={loadData} 
+            disabled={loading}
+            className="flex items-center gap-1 rounded-[5px]"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left Column - Metric Cards in 2x2 Grid */}

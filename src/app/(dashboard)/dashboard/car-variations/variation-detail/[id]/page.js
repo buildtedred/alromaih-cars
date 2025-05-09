@@ -7,6 +7,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function VariationDetailPage() {
   const { id } = useParams()
@@ -16,10 +17,11 @@ export default function VariationDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [language, setLanguage] = useState("en")
 
   useEffect(() => {
     fetchVariationDetails()
-  }, [id])
+  }, [id, language])
 
   async function fetchVariationDetails() {
     try {
@@ -32,14 +34,29 @@ export default function VariationDetailPage() {
         throw new Error(`Failed to fetch variation details`)
       }
       const variationData = await variationResponse.json()
-      setVariation(variationData)
+
+      // Check if the response has the new bilingual format
+      if (variationData && (variationData.en || variationData.ar)) {
+        // Use the selected language or fallback to English
+        setVariation(variationData[language] || variationData.en)
+      } else {
+        // Fallback to the old format
+        setVariation(variationData)
+      }
 
       // Fetch car data if we have a car ID
-      if (variationData.carId) {
+      if (variation?.carId) {
         const carsResponse = await fetch(`/api/supabasPrisma/cars`)
         if (carsResponse.ok) {
           const carsData = await carsResponse.json()
-          const carData = carsData.find((c) => c.id === variationData.carId)
+
+          // Check if cars data has bilingual format
+          let carsArray = carsData
+          if (carsData && (carsData.en || carsData.ar)) {
+            carsArray = carsData[language] || carsData.en
+          }
+
+          const carData = carsArray.find((c) => c.id === variation.carId)
           if (carData) {
             setCar(carData)
 
@@ -48,7 +65,14 @@ export default function VariationDetailPage() {
               const brandsResponse = await fetch(`/api/supabasPrisma/carbrands`)
               if (brandsResponse.ok) {
                 const brandsData = await brandsResponse.json()
-                const brandData = brandsData.find((b) => b.id === carData.brandId)
+
+                // Check if brands data has bilingual format
+                let brandsArray = brandsData
+                if (brandsData && (brandsData.en || brandsData.ar)) {
+                  brandsArray = brandsData[language] || brandsData.en
+                }
+
+                const brandData = brandsArray.find((b) => b.id === carData.brandId)
                 if (brandData) {
                   setBrand(brandData)
                 }
@@ -101,23 +125,32 @@ export default function VariationDetailPage() {
 
   return (
     <div className="container mx-auto p-6">
-      {/* Header with breadcrumb */}
-      <div className="flex items-center mb-8">
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard/car-variations">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back
+      {/* Header with breadcrumb and language selector */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/dashboard/car-variations">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+            </Link>
+          </Button>
+          <span className="text-muted-foreground mx-2">/</span>
+          <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
+            Dashboard
           </Link>
-        </Button>
-        <span className="text-muted-foreground mx-2">/</span>
-        <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
-          Dashboard
-        </Link>
-        <span className="text-muted-foreground mx-2">/</span>
-        <Link href="/dashboard/cars" className="text-muted-foreground hover:text-foreground">
-          Cars
-        </Link>
-        <span className="text-muted-foreground mx-2">/</span>
-        <span className="font-medium truncate max-w-[200px]">{variation.name}</span>
+          <span className="text-muted-foreground mx-2">/</span>
+          <Link href="/dashboard/cars" className="text-muted-foreground hover:text-foreground">
+            Cars
+          </Link>
+          <span className="text-muted-foreground mx-2">/</span>
+          <span className="font-medium truncate max-w-[200px]">{variation.name}</span>
+        </div>
+
+        <Tabs value={language} onValueChange={setLanguage} className="w-auto">
+          <TabsList className="grid w-[200px] grid-cols-2">
+            <TabsTrigger value="en">English</TabsTrigger>
+            <TabsTrigger value="ar">العربية</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -333,14 +366,17 @@ function VariationDetailSkeleton() {
   return (
     <div className="container mx-auto p-6">
       {/* Header with breadcrumb */}
-      <div className="flex items-center mb-8">
-        <Skeleton className="h-9 w-20" />
-        <span className="text-muted-foreground mx-2">/</span>
-        <Skeleton className="h-4 w-20" />
-        <span className="text-muted-foreground mx-2">/</span>
-        <Skeleton className="h-4 w-24" />
-        <span className="text-muted-foreground mx-2">/</span>
-        <Skeleton className="h-4 w-32" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center">
+          <Skeleton className="h-9 w-20" />
+          <span className="text-muted-foreground mx-2">/</span>
+          <Skeleton className="h-4 w-20" />
+          <span className="text-muted-foreground mx-2">/</span>
+          <Skeleton className="h-4 w-24" />
+          <span className="text-muted-foreground mx-2">/</span>
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <Skeleton className="h-10 w-[200px]" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

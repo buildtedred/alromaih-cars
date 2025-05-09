@@ -13,12 +13,16 @@ import { Separator } from "@/components/ui/separator"
 import { Bell, RefreshCw, Search, Settings, User } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { TypesProvider } from "./dashboard/context/types-provider/Types-provider"
+
 
 
 export default function DashboardLayout({ children }) {
   return (
-    <html lang="en">
+    <html >
       <body className="w-full h-screen flex">
+      
+      <TypesProvider>
         <SidebarProvider>
           {/* Sidebar */}
           <AppSidebar />
@@ -87,6 +91,10 @@ export default function DashboardLayout({ children }) {
             <main className="w-full flex-1 overflow-auto p-6">{children}</main>
           </SidebarInset>
         </SidebarProvider>
+
+      </TypesProvider>
+       
+  
       </body>
     </html>
   )

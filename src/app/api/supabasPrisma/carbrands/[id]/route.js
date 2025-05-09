@@ -7,10 +7,15 @@ export async function GET(request, { params }) {
 
     const brand = await prisma.carBrand.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        name_ar: true,
+        slug: true,
+        image: true,
         cars: {
           include: {
-            otherVariations: true, // Includes variations for each car
+            otherVariations: true,
           },
         },
       },
@@ -20,43 +25,59 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "Brand not found" }, { status: 404 });
     }
 
-    return NextResponse.json(brand, { status: 200 });
+    const en = {
+      id: brand.id,
+      name: brand.name,
+      slug: brand.slug,
+      image: brand.image,
+      cars: brand.cars,
+    };
+
+    const ar = brand.name_ar
+      ? {
+          id: brand.id,
+          name_ar: brand.name_ar,
+          slug: brand.slug,
+          image: brand.image,
+          cars: brand.cars,
+        }
+      : null;
+
+    return NextResponse.json({ en, ar }, { status: 200 });
   } catch (error) {
     console.error("❌ Error fetching brand:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
+
 export async function PUT(request, { params }) {
   try {
     const { id } = params;
-    const { name, image } = await request.json();
+    const { name, name_ar, image } = await request.json();
 
     if (!name || !image) {
       return NextResponse.json({ error: "Name and image are required" }, { status: 400 });
     }
 
-    // Generate a slug
     const slug = name.toLowerCase().replace(/\s+/g, "-");
 
-    // Update brand in database
     const updatedBrand = await prisma.carBrand.update({
       where: { id },
       data: {
         name,
+        name_ar: name_ar || null,
         slug,
-        image, // Updating image URL
+        image,
       },
     });
 
-    console.log("✅ Brand updated:", updatedBrand);
-
     return NextResponse.json(updatedBrand, { status: 200 });
   } catch (error) {
-    console.error("❌ Error updating brand:", error);
     return NextResponse.json({ error: "Failed to update car brand" }, { status: 500 });
   }
 }
+
 
 export async function DELETE(request, { params }) {
   try {

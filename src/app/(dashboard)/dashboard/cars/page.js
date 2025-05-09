@@ -32,7 +32,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
-import Image from "next/image"
 
 export default function AllCarsPage() {
   const [cars, setCars] = useState([])
@@ -65,7 +64,8 @@ export default function AllCarsPage() {
       }
 
       const data = await response.json()
-      setCars(data)
+      // Use the English data from the API response
+      setCars(data.en || [])
     } catch (error) {
       console.error("Error fetching cars:", error)
       setError(error.message)
@@ -314,6 +314,16 @@ export default function AllCarsPage() {
                       (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
                   </div>
                 </TableHead>
+                <TableHead
+                  className={`${!isDeleting ? "cursor-pointer hover:text-brand-primary" : ""}`}
+                  onClick={() => !isDeleting && handleSort("slug")}
+                >
+                  <div className="flex items-center gap-1">
+                    Slug
+                    {sortField === "slug" &&
+                      (sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+                  </div>
+                </TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -334,12 +344,10 @@ export default function AllCarsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-center items-center h-12 w-12 rounded-[5px] overflow-hidden bg-muted border">
-                      <Image
+                      <img
                         src={car?.images?.[0] || placeholderImage}
                         alt={car?.model}
-                        className="object-cover"
-                        width={48}
-                        height={48}
+                        className="h-full w-full object-cover"
                         onError={(e) => {
                           e.target.onerror = null
                           e.target.src = placeholderImage
@@ -361,6 +369,9 @@ export default function AllCarsPage() {
                       <span className="text-muted-foreground text-sm">Unknown</span>
                     )}
                   </TableCell>
+                  <TableCell className="text-xs text-muted-foreground truncate max-w-[150px]">
+                    {car.slug || "N/A"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button
@@ -370,7 +381,7 @@ export default function AllCarsPage() {
                         disabled={isDeleting}
                         className="rounded-[5px] hover:bg-brand-light hover:text-brand-primary"
                       >
-                        <Link href={`/dashboard/cars/car-details/${car.id}`}>
+                        <Link href={`/dashboard/cars/car-details/${car.slug || car.id}`}>
                           <Eye className="h-4 w-4" />
                           <span className="sr-only">View</span>
                         </Link>

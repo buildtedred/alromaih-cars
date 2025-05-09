@@ -150,7 +150,7 @@ export function AppSidebar() {
         }
 
         const data = await response.json()
-        setLogo(data)
+        setLogo(data[0])
       } catch (error) {
         console.error("Error fetching logo:", error)
       } finally {
@@ -217,7 +217,20 @@ export function AppSidebar() {
             { title: "Carousel", path: "/dashboard/car-carousel", icon: Film },
           ],
         },
-        { title: "Parts & Accessories", path: "/dashboard/parts", icon: Gauge },
+        {
+          title: "Parts & Accessories",
+          path: "/dashboard/parts",
+          icon: Gauge,
+          dropdownKey: "partsAccessories",
+          subItems: [
+            { title: "Fuel Types", path: "/dashboard/types/fueltypes", icon: Truck },
+            { title: "Transmission Types", path: "/dashboard/types/transmission-types", icon: Sliders },
+            { title: "Condition Types", path: "/dashboard/types/condition-types", icon: Tag },
+            { title: "Wheel Drive Types", path: "/dashboard/types/wheel-drive-types", icon: Settings },
+            { title: "Body Types", path: "/dashboard/types/body-types", icon: Car },
+            { title: "Safety Ratings", path: "/dashboard/types/safety-ratings", icon: FileText },
+          ],
+        },
       ],
     },
     {
@@ -405,11 +418,11 @@ export function AppSidebar() {
             <Link href="/dashboard" className="flex items-center gap-2">
               {logoLoading ? (
                 <div className="h-6 w-32 animate-pulse rounded bg-gray-200"></div>
-              ) : logo[0]?.imageUrl ? (
+              ) : logo?.imageUrl ? (
                 <div className="h-8 max-w-[140px]">
                   <img
-                    src={logo[0]?.imageUrl || "/placeholder.svg"}
-                    alt={logo[0]?.title || "Company Logo"}
+                    src={logo?.imageUrl || "/placeholder.svg"}
+                    alt={logo?.title || "Company Logo"}
                     className="h-full object-contain"
                     onError={(e) => {
                       e.target.onerror = null
@@ -418,7 +431,7 @@ export function AppSidebar() {
                     }}
                   />
                   <span className="font-bold text-lg text-brand-primary hidden" style={{ display: "none" }}>
-                    {logo.title || "CarAdmin"}
+                    {logo?.title || "CarAdmin"}
                   </span>
                 </div>
               ) : (
@@ -529,7 +542,7 @@ export function AppSidebar() {
                   className="rounded-[5px] px-2 py-1.5 text-sm text-red-600 cursor-pointer hover:bg-red-50"
                   disabled={isProcessing}
                 >
-                  <button onClick={handleLogout}  className="flex items-center w-full">
+                  <button onClick={handleLogout} className="flex items-center w-full">
                     <LogOut className="mr-2 h-4 w-4" />
                     {isLoggingOut ? "Logging out..." : "Logout"}
                   </button>
