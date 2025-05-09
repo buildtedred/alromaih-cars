@@ -100,14 +100,14 @@ function getClientIp(headers) {
 async function getGeoLocation(ip) {
   // Skip API call for localhost or invalid IPs
 
-  if (ip === '127.0.0.1' || !isValidIp(ip)) {
-    return { city: null, country: null, region: null, timezone: null };
-  }
+  // if (ip === '127.0.0.1' || !isValidIp(ip)) {
+  //   return { city: null, country: null, region: null, timezone: null };
+  // }
 
-  // Check cache first
-  if (geoCache.has(ip)) {
-    return geoCache.get(ip);
-  }
+  // // Check cache first
+  // if (geoCache.has(ip)) {
+  //   return geoCache.get(ip);
+  // }
 
   try {
     const response = await fetch(`https://ipapi.co/${ip}/json/`);

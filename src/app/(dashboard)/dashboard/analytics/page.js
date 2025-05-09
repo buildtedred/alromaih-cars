@@ -39,6 +39,7 @@ import {
   LineChartIcon,
   Download,
 } from "lucide-react"
+import AnalyticsPage2 from "./Usertracker"
 
 // API service for fetching analytics data
 const fetchAnalyticsData = async (language = "en", dateRange = null, filters = {}) => {
@@ -795,6 +796,7 @@ export default function AnalyticsPage() {
   // Render the main content
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      <AnalyticsPage2/>
       {/* Header with controls */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
