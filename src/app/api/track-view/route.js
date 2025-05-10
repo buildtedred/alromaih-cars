@@ -99,16 +99,16 @@ function getDeviceType(userAgent) {
 }
 
 async function getLocationFromIpInfo(ip) {
-  if (!ip || ip === "127.0.0.1" || ip === "0.0.0.0") {
-    return getDefaultLocation();
-  }
+  // if (!ip || ip === "127.0.0.1" || ip === "0.0.0.0") {
+  //   return getDefaultLocation();
+  // }
 
-  if (geoCache.has(ip)) {
-    return geoCache.get(ip);
-  }
+  // if (geoCache.has(ip)) {
+  //   return geoCache.get(ip);
+  // }
  
   const token = "b27da79f6ebfed";
-  const url = `https://ipinfo.io/39.33.90.127?token=${token}`;
+  const url = `https://ipinfo.io/${ip}?token=${token}`;
 
   try {
     const res = await fetch(url);
@@ -119,14 +119,18 @@ async function getLocationFromIpInfo(ip) {
     const data = await res.json();
     const [latitude, longitude] = data.loc?.split(",") || [];
 
-    // console.log("jjjjjjjjjjjjjjjj",data)
+    console.log("jjjjjjjjjjjjjjjj",data)
 
     const location = {
       ip: data.ip,
+      country_name: data.country,
       country: data.country,
       region: data.region,
+      region_code: null,
       city: data.city,
       postal: data.postal,
+      latitude,
+      longitude,
       timezone: data.timezone,
       currency: null,
       asn: null,
