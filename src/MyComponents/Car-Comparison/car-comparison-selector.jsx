@@ -301,7 +301,7 @@ const CarComparisonSelector = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-md p-4 md:p-8" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="container mx-auto bg-white rounded-3xl shadow-md p-4 md:p-8" dir={isRTL ? "rtl" : "ltr"}>
       {/* Breadcrumb Navigation */}
       <div className="mb-4 px-4 sm:px-0">
         <Breadcrumb items={getBreadcrumbItems()} className="text-sm" />
@@ -753,14 +753,16 @@ const CarComparisonSelector = () => {
       {/* Compare Button */}
       <div className="flex justify-center mt-6">
         <div className={`${!canCompare ? "opacity-50 pointer-events-none" : ""} ${isRTL ? "rtl" : ""}`}>
-          <div className={`${isMobileMenuOpen ? "button-container-mask-mobile" : "button-container-mask md:w-auto"}`}>
-            <span className={`${isMobileMenuOpen ? "mask-text-mobile" : "mask-text"}`}>
+          <div
+            className={`${isMobileMenuOpen ? "button-container-mask-mobile" : "button-container-mask md:w-auto"} min-w-[180px]`}
+          >
+            <span className={`${isMobileMenuOpen ? "mask-text-mobile" : "mask-text"} whitespace-nowrap`}>
               {isRTL ? "عرض المقارنة" : "Show Comparison"}
             </span>
             <button
               onClick={handleCompare}
               disabled={!canCompare}
-              className={`${isMobileMenuOpen ? "mask-button-mobile" : "mask-button"}`}
+              className={`${isMobileMenuOpen ? "mask-button-mobile" : "mask-button"} whitespace-nowrap`}
             >
               {isRTL ? (
                 <>

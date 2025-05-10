@@ -1,9 +1,7 @@
 "use client"
-
-import * as React from "react"
 import { useRouter } from "next/navigation"
 import Slider from "react-slick"
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useLanguageContext } from "@/contexts/LanguageSwitcherContext"
 import { useEffect, useState } from "react"
 import carsData from "@/app/api/mock-data"
@@ -88,6 +86,7 @@ function BrandShowcase() {
     autoplay: true,
     autoplaySpeed: 3000,
     arrows: !isMobile,
+    dots: false, // Disable dots globally
     prevArrow: <CustomArrow direction="prev" isArabic={isArabic} />,
     nextArrow: <CustomArrow direction="next" isArabic={isArabic} />,
     beforeChange: (current, next) => setCurrentSlide(next),
@@ -98,6 +97,7 @@ function BrandShowcase() {
           slidesToShow: 5,
           centerPadding: "20px",
           arrows: true,
+          dots: false, // Ensure dots are disabled
         },
       },
       {
@@ -106,6 +106,7 @@ function BrandShowcase() {
           slidesToShow: 4,
           centerPadding: "15px",
           arrows: true,
+          dots: false, // Ensure dots are disabled
         },
       },
       {
@@ -114,7 +115,7 @@ function BrandShowcase() {
           slidesToShow: 3,
           centerPadding: "10px",
           arrows: false,
-          dots: true,
+          dots: false, // Disable dots for iPad
         },
       },
       {
@@ -123,7 +124,7 @@ function BrandShowcase() {
           slidesToShow: 2,
           centerPadding: "5px",
           arrows: false,
-          dots: true,
+          dots: false, // Disable dots for mobile
         },
       },
     ],
@@ -139,10 +140,10 @@ function BrandShowcase() {
   return (
     <div className="container mx-auto w-full py-10">
       <div>
-        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-8 text-right">
+        <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-8 ${isArabic ? "text-right" : "text-left"}`}>
           {isEnglish ? "Authorized Distributor" : "موزع معتمد"}
         </h2>
-        
+
         {/* Add CSS styles inline instead of manipulating DOM */}
         <style jsx global>{`
           @media (max-width: 767px) {
@@ -158,8 +159,22 @@ function BrandShowcase() {
           .slick-slider {
             padding: 0 20px;
           }
+          
+          /* Hide dots completely */
+          .slick-dots {
+            display: none !important;
+          }
+          
+          /* Alternative: If you want to show limited dots, uncomment this and comment out the above */
+          /*
+          .slick-dots {
+            max-width: 100px;
+            margin: 0 auto;
+            overflow: hidden;
+          }
+          */
         `}</style>
-        
+
         <Slider {...settings} className="slider-container">
           {carsData.map((brand, index) => (
             <div key={index} className="px-2 py-4">

@@ -10,16 +10,52 @@ export default function Footer() {
   const locale = params?.locale || "ar" // Default to Arabic if locale not found
 
   return (
-    <div className=" bg-white">
+    <div className="bg-white">
+      {/* Add the same CSS styles as in the header */}
+      <style jsx global>{`
+        /* Basic styles without transitions */
+        .header-content-container {
+          width: calc(100% - 2rem);
+          margin-left: auto;
+          margin-right: auto;
+        }
+        
+        @media (min-width: 640px) {
+          .header-content-container {
+            width: calc(100% - 4rem);
+          }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1023px) {
+          /* Reduced spacing specifically for iPad/tablet view */
+          .header-content-container {
+            width: calc(100% - 3rem); /* 1.5rem on each side */
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .header-content-container {
+            width: calc(100% - 10rem);
+          }
+        }
+        
+        @media (min-width: 1280px) {
+          .header-content-container {
+            width: calc(100% - 14rem); /* Consistent 7rem on each side */
+            max-width: 1600px; /* Prevent excessive width on ultra-wide screens */
+          }
+        }
+      `}</style>
+
       {/* Top border line with padding and adjusted width */}
-      <div className="max-w-[100%] mx-auto h-[2px] bg-brand-primary mt-8"></div>
+      <div className=" h-[2px] bg-brand-primary mt-8"></div>
 
       {/* White Section with Logo and Links */}
       <div className="bg-white pt-8 relative">
         {/* Section divider line */}
-        <div className="max-w-[1400px] mx-auto h-[1px] bg-brand-600"></div>
+        <div className="header-content-container h-[1px] bg-brand-600"></div>
 
-        <div className={`max-w-[1300px] mx-auto px-4 py-8 ${locale === "ar" ? "rtl" : ""}`}>
+        <div className={`header-content-container py-8 ${locale === "ar" ? "rtl" : ""}`}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-0">
             {/* Company Info - Right side for Arabic, Left for English */}
             <div
@@ -38,7 +74,7 @@ export default function Footer() {
                 }`}
               >
                 {locale === "ar"
-                  ? "الرميح للسيارات منذ 1996 نقدم أفضل خدمات بيع السيارات الجديدة والخادمة بأسعار تنافسية. نحرص على توفير تجربة شراء مميزة تشمل تسهيلات تمويلية خيارات متنوعة خدمة ما بعد البيع لدينا فروع متعددة ونعمل باستمرار على التوسع والتطوير لضمان رضا عملائنا تواصل معنا اليوم!"
+                  ? "الرميح للسيارات منذ 1996 نقدم أفضل خدمات بيع السيارات الجديدة ��الخادمة بأسعار تنافسية. نحرص على توفير تجربة شراء مميزة تشمل تسهيلات تمويلية خيارات متنوعة خدمة ما بعد البيع لدينا فروع متعددة ونعمل باستمرار على التوسع والتطوير لضمان رضا عملائنا تواصل معنا اليوم!"
                   : "Alromaih Cars, since 1996, offers the best new and used car sales services at competitive prices. We are committed to providing a distinctive buying experience that includes financing facilities, various options, and after-sales service. We have multiple branches and continuously work on expansion and development to ensure customer satisfaction. Contact us today!"}
               </p>
               {/* Social Media Icons */}
@@ -188,7 +224,7 @@ export default function Footer() {
 
       {/* Purple Section with Contact Info */}
       <div className="bg-brand-primary">
-        <div className="max-w-[1300px] mx-auto px-4 py-6">
+        <div className="header-content-container py-6">
           <div className={`flex flex-col md:flex-row justify-between items-center ${locale === "ar" ? "rtl" : ""}`}>
             {/* Phone and Email in one parent div */}
             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-[15px] mb-6 md:mb-0 w-full md:w-auto">
@@ -235,7 +271,7 @@ export default function Footer() {
 
       {/* White Section with Payment Methods */}
       <div className="bg-white">
-        <div className="max-w-[1300px] mx-auto px-4 py-4">
+        <div className="header-content-container py-4">
           <div
             className={`flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4 ${locale === "ar" ? "rtl" : ""}`}
           >

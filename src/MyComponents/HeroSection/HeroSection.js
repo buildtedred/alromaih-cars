@@ -395,7 +395,7 @@ export default function HeroSection() {
     )
   }
   return (
-    <div className="container m-auto" ref={containerRef} dir={isRTL ? "rtl" : "ltr"}>
+    <div className="container mt-4 m-auto" ref={containerRef} dir={isRTL ? "rtl" : "ltr"}>
       <div className="relative  mb-[100px]">
         {/* Main content area */}
         <div className="relative bg-brand-dark rounded-3xl overflow-hidden">
