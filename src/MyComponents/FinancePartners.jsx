@@ -61,7 +61,7 @@ export const FinancePartners = () => {
   return (
    
       <div className="container mx-auto  py-16">
-        <div className=" mx-auto px-4">
+        <div className=" mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">{content.title}</h2>
             <p className="text-gray-600">{content.description}</p>
@@ -71,7 +71,7 @@ export const FinancePartners = () => {
             {partners.map((partner) => (
               <div
                 key={isArabic ? partner.name.ar : partner.name.en}
-                className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-brand-light rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
               >
                 <img
                   src={partner.logo || "/placeholder.svg"}

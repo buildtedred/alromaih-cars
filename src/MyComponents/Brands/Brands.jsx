@@ -30,19 +30,7 @@ const Brands = () => {
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
-      <svg
-        className="absolute inset-0 w-full h-full"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 1440 320"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        <path
-          fill="#71308A"
-          fillOpacity="0.05"
-          d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-        ></path>
-      </svg>
-      <div className="container mx-auto px-4 py-12 lg:px-36 relative z-10">
+      <div className="container mx-auto py-12 relative z-10">
         {/* Breadcrumb Navigation */}
         <div className="mb-6">
           <Breadcrumb items={getBreadcrumbItems()} />
@@ -54,7 +42,7 @@ const Brands = () => {
         {loadingBrand ? (
           <LoadingUi />
         ) : (
-          <div className=" grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {carsData.map((brand, index) => (
               <BrandCard key={index} brand={brand} isEnglish={isEnglish} />
             ))}
@@ -75,14 +63,21 @@ const BrandCard = ({ brand, isEnglish }) => {
   const currentLocale = pathLocale
   const router = useRouter()
 
+  // Helper function to get text based on current language
+  const getText = (textObj) => {
+    if (!textObj) return ""
+    return typeof textObj === "object" ? textObj[currentLocale] || textObj.en || "" : String(textObj)
+  }
+
   const handleBrands = () => {
     router.push(`/${currentLocale}/all-cars`)
     setbrands(brand)
   }
+
   return (
     <div onClick={handleBrands}>
       <motion.div
-        className=" bg-brand-light rounded-[10px] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-purple-100"
+        className="bg-brand-light rounded-[10px] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-purple-100"
         whileHover={{ y: -5 }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -93,11 +88,13 @@ const BrandCard = ({ brand, isEnglish }) => {
               src={brand?.brandLogo || "/placeholder.svg"}
               width={20}
               height={20}
-              alt={brand?.brand}
+              alt={getText(brand?.brand)}
               className="h-12 w-auto object-contain filter grayscale hover:grayscale-0 transition-all"
             />
           </div>
-          <h3 className="text-center font-semibold text-sm text-[#71308A] mb-2 truncate w-full">{brand?.brand}</h3>
+          <h3 className="text-center font-semibold text-sm text-[#71308A] mb-2 truncate w-full">
+            {getText(brand?.brand)}
+          </h3>
           <motion.p
             className="text-center text-xs text-gray-600 line-clamp-2 overflow-hidden"
             initial={{ opacity: 0, height: 0 }}
