@@ -6,7 +6,8 @@ import { NextResponse } from "next/server";
 const geoCache = new Map();
 
 export async function POST(req) {
-  const reqHeaders = headers(); // Get headers using next/headers
+  const reqHeaders = await headers(); // ✅ Await this
+
 
   let body;
   try {
@@ -79,29 +80,34 @@ function getClientIp(headers) {
 }
 
 async function getGeoLocation(ip) {
+  if (ip === '127.0.0.1' || !isValidIp(ip)) {
+    return { city: null, country: null, region: null, timezone: null };
+  }
+
   if (geoCache.has(ip)) {
     return geoCache.get(ip);
   }
 
   try {
-    const res = await fetch(`https://ipapi.co/${ip}/json/`);
-    if (!res.ok) throw new Error("GeoIP fetch failed");
+    const response = await fetch(`https://ipapi.co/${ip}/json/`);
+    if (!response.ok) throw new Error('IP API request failed');
+    
+    const data = await response.json();
+    if (data.error) throw new Error(data.reason || 'IP API error');
 
-    const data = await res.json();
-
-    const result = {
-      city: data.city,
-      country: data.country_name,
-      region: data.region,
-      timezone: data.timezone,
+    const geoData = {
+      city: data.city || null,
+      region: data.region || null,
+      country: data.country_name || null,
+      timezone: data.timezone || null,
     };
 
-    geoCache.set(ip, result);
-    setTimeout(() => geoCache.delete(ip), 3600000);
+    geoCache.set(ip, geoData);
+    setTimeout(() => geoCache.delete(ip), 3600000); // Cache clear after 1 hour
 
-    return result;
+    return geoData;
   } catch (error) {
-    console.warn(`Geo lookup failed for ${ip}:`, error.message);
+    console.warn(`GeoIP lookup failed for ${ip}:`, error.message);
     return { city: null, country: null, region: null, timezone: null };
   }
 }
