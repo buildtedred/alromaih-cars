@@ -63,20 +63,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
 
-// Alromaih Cars theme colors
-const colors = {
-  primary: "#46194F", // Deep Purple
-  secondary: "#6A1B9A", // Royal Purple
-  accent: "#9C27B0", // Bright Purple
-  neutral: "#4E4E50", // Charcoal Gray
-  light: "#F3E5F5", // Lavender Tint
-  dark: "#2C0E30", // Grape Dark
-  success: "#7B1FA2", // Amethyst
-  warning: "#FFB300", // Golden Yellow
-  error: "#C62828", // Crimson Red
-  info: "#7C4DFF", // Electric Violet
-}
-
 // Create a context for the app state
 export const AppStateContext = createContext({
   isDeleting: false,
@@ -324,52 +310,48 @@ export function AppSidebar() {
 
         return (
           <Collapsible key={item.path} open={isDropdownOpen} onOpenChange={() => toggleDropdown(item.dropdownKey)}>
-            <SidebarMenuItem className="perspective-1000">
+            <SidebarMenuItem>
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton
                   isActive={isAnyChildActive}
                   className={`py-3 rounded-[5px] ${
                     isAnyChildActive
-                      ? "bg-[#F3E5F5] border-l-4 border-[#46194F] shadow-[0_5px_15px_-3px_rgba(70,25,79,0.3)]"
-                      : "bg-white hover:bg-[#F3E5F5]/50 hover:shadow-[0_5px_15px_-5px_rgba(70,25,79,0.2)]"
-                  } shadow-sm transition-all duration-300 transform hover:translate-y-[-2px]`}
+                      ? "bg-brand-light border-l-4 border-brand-primary"
+                      : "bg-white hover:bg-brand-light/50"
+                  } shadow-sm transition-all duration-200`}
                   disabled={isProcessing}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-full ${isAnyChildActive ? "bg-[#46194F]/10" : ""}`}>
-                      <item.icon className={`h-5 w-5 ${isAnyChildActive ? "text-[#46194F]" : "text-gray-600"}`} />
-                    </div>
-                    <span className={`text-sm font-medium ${isAnyChildActive ? "text-[#46194F]" : "text-gray-700"}`}>
+                    <item.icon className={`h-5 w-5 ${isAnyChildActive ? "text-brand-primary" : "text-gray-600"}`} />
+                    <span
+                      className={`text-sm font-medium ${isAnyChildActive ? "text-brand-primary" : "text-gray-700"}`}
+                    >
                       {item.title}
                     </span>
                   </div>
                   <ChevronDown
-                    className={`ml-auto h-4 w-4 text-gray-500 transition-transform duration-300 ${
+                    className={`ml-auto h-4 w-4 text-gray-500 transition-transform duration-200 ${
                       isDropdownOpen ? "rotate-180" : ""
                     }`}
                   />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
-              <CollapsibleContent className="mt-1 pl-2 overflow-hidden transition-all duration-300">
+              <CollapsibleContent className="mt-1 pl-2">
                 <SidebarMenuSub className="w-full">
                   {item.subItems.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.path} className="mt-1 w-full perspective-800">
+                    <SidebarMenuSubItem key={subItem.path} className="mt-1 w-full">
                       <SidebarMenuSubButton
                         asChild
                         isActive={isActive(subItem.path)}
                         className={`py-2.5 px-3 w-full rounded-[5px] ${
-                          isActive(subItem.path)
-                            ? "bg-[#46194F]/10 text-[#46194F] shadow-[0_4px_10px_-3px_rgba(70,25,79,0.25)]"
-                            : "hover:bg-[#F3E5F5]/70 hover:shadow-[0_4px_10px_-5px_rgba(70,25,79,0.15)]"
-                        } transition-all duration-300 transform hover:translate-x-1`}
+                          isActive(subItem.path) ? "bg-brand-primary/10 text-brand-primary" : "hover:bg-brand-light/70"
+                        } transition-colors duration-200`}
                         disabled={isProcessing}
                       >
                         <Link href={subItem.path} className="flex items-center gap-3 w-full">
-                          <div className={`p-1 rounded-full ${isActive(subItem.path) ? "bg-[#46194F]/5" : ""}`}>
-                            <subItem.icon
-                              className={`h-4 w-4 ${isActive(subItem.path) ? "text-[#46194F]" : "text-gray-500"}`}
-                            />
-                          </div>
+                          <subItem.icon
+                            className={`h-4 w-4 ${isActive(subItem.path) ? "text-brand-primary" : "text-gray-500"}`}
+                          />
                           <span className={`text-sm ${isActive(subItem.path) ? "font-medium" : "font-normal"}`}>
                             {subItem.title}
                           </span>
@@ -386,22 +368,20 @@ export function AppSidebar() {
       // Otherwise render as regular menu item
       else {
         return (
-          <SidebarMenuItem key={item.path} className="perspective-1000">
+          <SidebarMenuItem key={item.path}>
             <SidebarMenuButton
               asChild
               isActive={isActive(item.path)}
               className={`py-3 rounded-[5px] ${
                 isActive(item.path)
-                  ? "bg-[#F3E5F5] border-l-4 border-[#46194F] shadow-[0_5px_15px_-3px_rgba(70,25,79,0.3)]"
-                  : "bg-white hover:bg-[#F3E5F5]/50 hover:shadow-[0_5px_15px_-5px_rgba(70,25,79,0.2)]"
-              } shadow-sm transition-all duration-300 transform hover:translate-y-[-2px]`}
+                  ? "bg-brand-light border-l-4 border-brand-primary"
+                  : "bg-white hover:bg-brand-light/50"
+              } shadow-sm transition-all duration-200`}
               disabled={isProcessing}
             >
               <Link href={item.path} className="flex items-center gap-3">
-                <div className={`p-1.5 rounded-full ${isActive(item.path) ? "bg-[#46194F]/10" : ""}`}>
-                  <item.icon className={`h-5 w-5 ${isActive(item.path) ? "text-[#46194F]" : "text-gray-600"}`} />
-                </div>
-                <span className={`text-sm font-medium ${isActive(item.path) ? "text-[#46194F]" : "text-gray-700"}`}>
+                <item.icon className={`h-5 w-5 ${isActive(item.path) ? "text-brand-primary" : "text-gray-600"}`} />
+                <span className={`text-sm font-medium ${isActive(item.path) ? "text-brand-primary" : "text-gray-700"}`}>
                   {item.title}
                 </span>
               </Link>
@@ -417,11 +397,9 @@ export function AppSidebar() {
       {/* Page overlay during any processing (deletion, submission, or logout) */}
       {isProcessing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
-          <Card className="w-[300px] p-6 flex flex-col items-center justify-center space-y-4 rounded-[10px] shadow-[0_20px_60px_-15px_rgba(70,25,79,0.6)] border border-[#46194F]/20 bg-white/95">
-            <div className="p-3 bg-[#F3E5F5] rounded-full shadow-[0_10px_30px_-10px_rgba(70,25,79,0.5)]">
-              <Loader2 className="h-8 w-8 text-[#46194F] animate-spin" />
-            </div>
-            <p className="text-center font-medium text-[#46194F]">
+          <Card className="w-[300px] p-6 flex flex-col items-center justify-center space-y-4">
+            <Loader2 className="h-8 w-8 text-brand-primary animate-spin" />
+            <p className="text-center font-medium">
               {isLoggingOut
                 ? "Logging out... Please wait"
                 : isDeleting
@@ -435,49 +413,40 @@ export function AppSidebar() {
       <AppStateContext.Provider
         value={{ isDeleting, setIsDeleting, isSubmitting, setIsSubmitting, isLoggingOut, setIsLoggingOut }}
       >
-        <Sidebar className="border-r border-[#46194F]/10 bg-white shadow-[5px_0_30px_-15px_rgba(70,25,79,0.2)] perspective-1000">
-          <SidebarHeader className="p-8 border-b border-[#46194F]/10 bg-gradient-to-b from-white to-[#F3E5F5]/30">
-            <Link
-              href="/dashboard"
-              className="flex items-center transform transition-transform duration-300 hover:scale-105"
-            >
+        <Sidebar className="border-r border-gray-200 bg-white">
+          <SidebarHeader className="flex items-center justify-between p-4 border-b border-gray-100">
+            <Link href="/dashboard" className="flex items-center gap-2">
               {logoLoading ? (
-                <div className="h-6 w-32 animate-pulse rounded bg-[#46194F]/10"></div>
+                <div className="h-6 w-32 animate-pulse rounded bg-gray-200"></div>
               ) : logo?.imageUrl ? (
-                <div className="h-8 max-w-[140px] relative">
-                  <div className="absolute inset-0 bg-[#46194F]/5 filter blur-md rounded-full opacity-50"></div>
+                <div className="h-8 max-w-[140px]">
                   <img
                     src={logo?.imageUrl || "/placeholder.svg"}
                     alt={logo?.title || "Company Logo"}
-                    className="h-full object-contain relative z-10"
+                    className="h-full object-contain"
                     onError={(e) => {
                       e.target.onerror = null
                       e.target.style.display = "none"
                       e.target.nextSibling.style.display = "block"
                     }}
                   />
-                  <span
-                    className="font-bold text-lg bg-gradient-to-r from-[#46194F] to-[#7B1FA2] bg-clip-text text-transparent hidden"
-                    style={{ display: "none" }}
-                  >
+                  <span className="font-bold text-lg text-brand-primary hidden" style={{ display: "none" }}>
                     {logo?.title || "CarAdmin"}
                   </span>
                 </div>
               ) : (
-                <span className="font-bold text-lg bg-gradient-to-r from-[#46194F] to-[#7B1FA2] bg-clip-text text-transparent">
-                  {logo?.title || "CarAdmin"}
-                </span>
+                <span className="font-bold text-lg text-brand-primary">{logo?.title || "CarAdmin"}</span>
               )}
             </Link>
           </SidebarHeader>
 
-          <SidebarContent className="px-3 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-[#46194F]/20 scrollbar-track-transparent">
+          <SidebarContent className="px-3 py-4">
             {menuData.map((section, index) => (
               <div key={section.section} className={index > 0 ? "mt-6" : ""}>
-                {index > 0 && <SidebarSeparator className="mb-4 bg-[#46194F]/10" />}
+                {index > 0 && <SidebarSeparator className="mb-4 bg-gray-200" />}
 
                 <SidebarGroup>
-                  <SidebarGroupLabel className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#46194F]/70">
+                  <SidebarGroupLabel className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gray-500">
                     {section.section}
                   </SidebarGroupLabel>
                   <SidebarGroupContent>
@@ -488,18 +457,18 @@ export function AppSidebar() {
             ))}
           </SidebarContent>
 
-          <SidebarFooter className="p-4 border-t border-[#46194F]/10 bg-gradient-to-t from-white to-[#F3E5F5]/30">
+          <SidebarFooter className="p-4 border-t border-gray-100">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="w-full flex items-center justify-between rounded-[5px] bg-[#F3E5F5]/50 px-3 py-2.5 hover:bg-[#F3E5F5] transition-all duration-300 shadow-[0_5px_15px_-5px_rgba(70,25,79,0.2)] hover:shadow-[0_8px_20px_-5px_rgba(70,25,79,0.3)] transform hover:translate-y-[-2px]"
+                  className="w-full flex items-center justify-between rounded-[5px] bg-brand-light/50 px-3 py-2.5 hover:bg-brand-light transition-colors duration-200"
                   disabled={isProcessing}
                 >
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8 border-2 border-[#46194F]/20 shadow-[0_5px_15px_-5px_rgba(70,25,79,0.3)]">
+                    <Avatar className="h-8 w-8 border-2 border-brand-primary/20">
                       {userLoading ? (
-                        <div className="h-full w-full animate-pulse bg-[#46194F]/10 rounded-full"></div>
+                        <div className="h-full w-full animate-pulse bg-gray-200 rounded-full"></div>
                       ) : (
                         <>
                           <Image
@@ -509,7 +478,7 @@ export function AppSidebar() {
                             objectFit="cover"
                             alt={user?.user_metadata?.name || user?.email || "User"}
                           />
-                          <AvatarFallback className="bg-[#46194F]/10 text-[#46194F] font-medium">
+                          <AvatarFallback className="bg-brand-primary/10 text-brand-primary font-medium">
                             {getUserInitials()}
                           </AvatarFallback>
                         </>
@@ -518,8 +487,8 @@ export function AppSidebar() {
                     <div className="flex flex-col items-start">
                       {userLoading ? (
                         <>
-                          <div className="h-4 w-24 animate-pulse bg-[#46194F]/10 rounded mb-1"></div>
-                          <div className="h-3 w-32 animate-pulse bg-[#46194F]/10 rounded"></div>
+                          <div className="h-4 w-24 animate-pulse bg-gray-200 rounded mb-1"></div>
+                          <div className="h-3 w-32 animate-pulse bg-gray-200 rounded"></div>
                         </>
                       ) : (
                         <>
@@ -533,12 +502,12 @@ export function AppSidebar() {
                       )}
                     </div>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-[#46194F]/70" />
+                  <ChevronRight className="h-4 w-4 text-gray-500" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 rounded-[10px] border border-[#46194F]/10 bg-white p-1.5 shadow-[0_20px_50px_-15px_rgba(70,25,79,0.4)] backdrop-blur-sm bg-white/95"
+                className="w-56 rounded-[5px] border border-gray-200 bg-white p-1.5 shadow-lg"
                 onOpenChange={(open) => {
                   // Prevent closing the dropdown during any processing
                   if (isProcessing && !open) {
@@ -546,31 +515,31 @@ export function AppSidebar() {
                   }
                 }}
               >
-                <DropdownMenuLabel className="px-2 py-1.5 text-sm font-medium text-[#46194F]">
+                <DropdownMenuLabel className="px-2 py-1.5 text-sm font-medium text-gray-700">
                   My Account
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="my-1 bg-[#46194F]/10" />
+                <DropdownMenuSeparator className="my-1 bg-gray-200" />
                 <DropdownMenuItem
-                  className="rounded-[5px] px-2 py-1.5 text-sm text-gray-700 cursor-pointer hover:bg-[#F3E5F5] transition-all duration-200 transform hover:translate-x-1"
+                  className="rounded-[5px] px-2 py-1.5 text-sm text-gray-700 cursor-pointer hover:bg-brand-light/50"
                   disabled={isProcessing}
                 >
                   <Link href="/dashboard/profile" className="flex items-center w-full">
-                    <UserCog className="mr-2 h-4 w-4 text-[#46194F]" />
+                    <UserCog className="mr-2 h-4 w-4" />
                     Profile
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="rounded-[5px] px-2 py-1.5 text-sm text-gray-700 cursor-pointer hover:bg-[#F3E5F5] transition-all duration-200 transform hover:translate-x-1"
+                  className="rounded-[5px] px-2 py-1.5 text-sm text-gray-700 cursor-pointer hover:bg-brand-light/50"
                   disabled={isProcessing}
                 >
                   <Link href="/dashboard/settings" className="flex items-center w-full">
-                    <Settings className="mr-2 h-4 w-4 text-[#46194F]" />
+                    <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="my-1 bg-[#46194F]/10" />
+                <DropdownMenuSeparator className="my-1 bg-gray-200" />
                 <DropdownMenuItem
-                  className="rounded-[5px] px-2 py-1.5 text-sm text-red-600 cursor-pointer hover:bg-red-50 transition-all duration-200 transform hover:translate-x-1"
+                  className="rounded-[5px] px-2 py-1.5 text-sm text-red-600 cursor-pointer hover:bg-red-50"
                   disabled={isProcessing}
                 >
                   <button onClick={handleLogout} className="flex items-center w-full">
