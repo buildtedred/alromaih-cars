@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
 import {
   RefreshCw,
   Search,
@@ -104,18 +103,32 @@ export default function TrackingDashboard() {
   // Fetch brand name for a product ID
   const fetchBrandName = async (productId) => {
     try {
-      const response = await fetch(`/api/supabasPrisma/carbrands/${productId}`);
-      const data = await response.json();
-  
-      // Directly set brand name using response
+      setLoadingBrands((prev) => ({ ...prev, [productId]: true }))
+      const response = await fetch(`/api/supabasPrisma/carbrands/${productId}`)
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch brand for ${productId}`)
+      }
+
+      const data = await response.json()
+
+      if (data) {
+        setBrandNames((prev) => ({
+          ...prev,
+          [productId]: data?.en?.name || "Unknown Brand",
+        }))
+      }
+    } catch (err) {
+      console.error(`Error fetching brand for ${productId}:`, err)
       setBrandNames((prev) => ({
         ...prev,
-        [productId]: data?.en?.name,
-      }));
-    } catch (err) {
-      console.error(`Error fetching brand for ${productId}:`, err);
+        [productId]: "Unknown Brand",
+      }))
+    } finally {
+      setLoadingBrands((prev) => ({ ...prev, [productId]: false }))
     }
-  };
+  }
+
   // Load data on initial render
   useEffect(() => {
     fetchTrackingData()
@@ -139,15 +152,14 @@ export default function TrackingDashboard() {
         searchTerm === "" ||
         (brandNames[view.productId] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         view.productId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (view.data?.geo?.data?.data?.country_name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (view.data?.geo?.data?.data?.city || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (view.data?.location?.country || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (view.data?.location?.city || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (view.data?.device?.browser || "").toLowerCase().includes(searchTerm.toLowerCase())
 
       if (activeTab === "all") return matchesSearch
       if (activeTab === "pakistan")
         return (
-          matchesSearch &&
-          (view.data?.geo?.data?.data?.country === "PK" || view.data?.geo?.data?.data?.country_name === "Pakistan")
+          matchesSearch && (view.data?.location?.countryCode === "PK" || view.data?.location?.country === "Pakistan")
         )
       if (activeTab === "desktop") return matchesSearch && view.data?.device?.type === "Desktop"
       if (activeTab === "mobile") return matchesSearch && view.data?.device?.type === "Mobile"
@@ -166,8 +178,8 @@ export default function TrackingDashboard() {
           valueB = brandNames[b.productId] || ""
           break
         case "location":
-          valueA = `${a.data?.geo?.data?.data?.city || ""}, ${a.data?.geo?.data?.data?.country_name || ""}`
-          valueB = `${b.data?.geo?.data?.data?.city || ""}, ${b.data?.geo?.data?.data?.country_name || ""}`
+          valueA = `${a.data?.location?.city || ""}, ${a.data?.location?.country || ""}`
+          valueB = `${b.data?.location?.city || ""}, ${b.data?.location?.country || ""}`
           break
         case "device":
           valueA = `${a.data?.device?.type || ""}`
@@ -195,15 +207,13 @@ export default function TrackingDashboard() {
   const stats = {
     total: trackingData.length,
     pakistan: trackingData.filter(
-      (view) => view.data?.geo?.data?.data?.country === "PK" || view.data?.geo?.data?.data?.country_name === "Pakistan",
+      (view) => view.data?.location?.countryCode === "PK" || view.data?.location?.country === "Pakistan",
     ).length,
     desktop: trackingData.filter((view) => view.data?.device?.type === "Desktop").length,
     mobile: trackingData.filter((view) => view.data?.device?.type === "Mobile").length,
     uniqueProducts: new Set(trackingData.map((view) => view.productId)).size,
     uniqueCountries: new Set(
-      trackingData
-        .filter((view) => view.data?.geo?.data?.data?.country_name)
-        .map((view) => view.data.geo.data.data.country_name),
+      trackingData.filter((view) => view.data?.location?.country).map((view) => view.data.location.country),
     ).size,
   }
 
@@ -216,7 +226,7 @@ export default function TrackingDashboard() {
 
   // Get country distribution
   const countryDistribution = trackingData.reduce((acc, view) => {
-    const country = view.data?.geo?.data?.data?.country_name || "Unknown"
+    const country = view.data?.location?.country || "Unknown"
     acc[country] = (acc[country] || 0) + 1
     return acc
   }, {})
@@ -516,7 +526,7 @@ export default function TrackingDashboard() {
                         </thead>
                         <tbody className="divide-y divide-gray-200 bg-white">
                           {paginatedData.map((view, index) => {
-                            const country = view.data?.geo?.data?.data?.country_name || "Unknown"
+                            const country = view.data?.location?.country || "Unknown"
                             const browser = view.data?.device?.browser || "Unknown"
                             const countryColor = getCountryColor(country)
                             const browserColor = getBrowserColor(browser)
@@ -543,9 +553,7 @@ export default function TrackingDashboard() {
                                   <div className="flex flex-col">
                                     <div className="flex items-center gap-1">
                                       <MapPin className="h-3 w-3 text-gray-400" />
-                                      <span className="font-medium">
-                                        {view.data?.geo?.data?.data?.city || "Unknown"}
-                                      </span>
+                                      <span className="font-medium">{view.data?.location?.city || "Unknown"}</span>
                                     </div>
                                     <div className="mt-1">
                                       <Badge

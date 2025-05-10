@@ -68,8 +68,7 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
   }
 
   const { id, productId, data, viewedAt } = trackingData
-  const { geo, device, referrer, ipAddress, userAgent } = data
-  const geoData = geo?.data?.data || {}
+  const { location, device, referrer, ipAddress, userAgent, timestamp } = data
 
   // Format date for display
   const formattedDate = format(new Date(viewedAt), "PPpp")
@@ -107,6 +106,7 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
   const getOSIcon = (os) => {
     switch (os?.toLowerCase()) {
       case "windows":
+      case "windows 10":
         return <Monitor className="h-5 w-5 text-[#0072BC]" />
       case "macos":
         return <Laptop className="h-5 w-5 text-gray-700" />
@@ -165,7 +165,7 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
               <div>
                 <p className="text-sm text-gray-500">Location</p>
                 <p className="font-medium">
-                  {geoData.city || "Unknown"}, {geoData.country_name || "Unknown"}
+                  {location?.city || "Unknown"}, {location?.country || "Unknown"}
                 </p>
               </div>
             </div>
@@ -194,10 +194,10 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
                   title="Geographic Information"
                   icon={<Globe className="h-5 w-5 text-[#0072BC]" />}
                   items={[
-                    { label: "Country", value: geoData.country_name },
-                    { label: "City", value: geoData.city },
-                    { label: "Region", value: geoData.region },
-                    { label: "IP Address", value: ipAddress },
+                    { label: "Country", value: location?.country },
+                    { label: "City", value: location?.city },
+                    { label: "Region", value: location?.region },
+                    { label: "IP Address", value: ipAddress || location?.ip },
                   ]}
                   bgColor={defaultBgColors[1]}
                 />
@@ -208,6 +208,7 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
                     { label: "Device Type", value: device?.type },
                     { label: "Operating System", value: device?.os },
                     { label: "Browser", value: device?.browser },
+                    { label: "Version", value: device?.version },
                   ]}
                   bgColor={defaultBgColors[0]}
                 />
@@ -219,6 +220,7 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
                   { label: "Referrer", value: getReferrerDomain(referrer) },
                   { label: "Full URL", value: referrer },
                   { label: "Viewed At", value: formattedDate },
+                  { label: "Timestamp", value: timestamp ? format(new Date(timestamp), "PPpp") : "N/A" },
                 ]}
                 bgColor={defaultBgColors[6]}
               />
@@ -230,48 +232,29 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
                   title="Country Information"
                   icon={<Flag className="h-5 w-5 text-[#ED1C24]" />}
                   items={[
-                    { label: "Country", value: geoData.country_name },
-                    { label: "Country Code", value: geoData.country_code },
-                    { label: "ISO3 Code", value: geoData.country_code_iso3 },
-                    { label: "Capital", value: geoData.country_capital },
-                    { label: "Population", value: formatNumber(geoData.country_population) },
-                    { label: "Area", value: `${formatNumber(geoData.country_area)} km²` },
-                    { label: "TLD", value: geoData.country_tld },
-                    { label: "Calling Code", value: geoData.country_calling_code },
+                    { label: "Country", value: location?.country },
+                    { label: "Country Code", value: location?.countryCode },
+                    { label: "Region", value: location?.region },
+                    { label: "Region Code", value: location?.regionCode },
+                    { label: "Currency", value: location?.currency },
+                    { label: "Timezone", value: location?.timezone },
                   ]}
                   bgColor={defaultBgColors[4]}
                 />
                 <InfoCard
-                  title="Regional Information"
+                  title="Location Details"
                   icon={<MapPin className="h-5 w-5 text-[#00A651]" />}
                   items={[
-                    { label: "City", value: geoData.city },
-                    { label: "Region", value: geoData.region },
-                    { label: "Region Code", value: geoData.region_code },
-                    { label: "Postal Code", value: geoData.postal },
-                    { label: "Latitude", value: geoData.latitude },
-                    { label: "Longitude", value: geoData.longitude },
-                    { label: "Timezone", value: geoData.timezone },
-                    { label: "UTC Offset", value: geoData.utc_offset },
+                    { label: "City", value: location?.city },
+                    { label: "Postal Code", value: location?.postalCode },
+                    { label: "Latitude", value: location?.latitude },
+                    { label: "Longitude", value: location?.longitude },
+                    { label: "ISP", value: location?.isp },
+                    { label: "ASN", value: location?.asn },
                   ]}
                   bgColor={defaultBgColors[0]}
                 />
               </div>
-              <InfoCard
-                title="Additional Information"
-                icon={<Info className="h-5 w-5 text-[#0072BC]" />}
-                items={[
-                  { label: "Continent", value: geoData.continent_code },
-                  { label: "Currency", value: `${geoData.currency} (${geoData.currency_name})` },
-                  { label: "Languages", value: geoData.languages },
-                  { label: "Network", value: geoData.network },
-                  { label: "ASN", value: geoData.asn },
-                  { label: "Organization", value: geoData.org },
-                  { label: "IP Version", value: geoData.version },
-                  { label: "In EU", value: geoData.in_eu ? "Yes" : "No" },
-                ]}
-                bgColor={defaultBgColors[1]}
-              />
             </TabsContent>
 
             <TabsContent value="device" className="space-y-4">
@@ -283,6 +266,7 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
                     { label: "Device Type", value: device?.type },
                     { label: "Operating System", value: device?.os },
                     { label: "Browser", value: device?.browser },
+                    { label: "Version", value: device?.version },
                   ]}
                   bgColor={defaultBgColors[2]}
                 />
@@ -303,6 +287,7 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
                   { label: "Referrer Domain", value: getReferrerDomain(referrer) },
                   { label: "Full Referrer URL", value: referrer },
                   { label: "Viewed At", value: formattedDate },
+                  { label: "Timestamp", value: timestamp ? format(new Date(timestamp), "PPpp") : "N/A" },
                   { label: "Tracking ID", value: id },
                 ]}
                 bgColor={defaultBgColors[6]}
@@ -330,10 +315,10 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <QuickStatCard
           title="Location"
-          value={`${geoData.city || "Unknown"}, ${geoData.country_name || "Unknown"}`}
+          value={`${location?.city || "Unknown"}, ${location?.country || "Unknown"}`}
           icon={<MapPin className="h-5 w-5 text-[#00A651]" />}
           color={defaultColors.success}
-          subtext={geoData.region || "Unknown region"}
+          subtext={location?.region || "Unknown region"}
           bgColor={defaultBgColors[0]}
         />
         <QuickStatCard
