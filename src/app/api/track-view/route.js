@@ -106,7 +106,7 @@ async function getLocationFromIpInfo(ip) {
   if (geoCache.has(ip)) {
     return geoCache.get(ip);
   }
-
+ 
   const token = "b27da79f6ebfed";
   const url = `https://ipinfo.io/${ip}?token=${token}`;
 
