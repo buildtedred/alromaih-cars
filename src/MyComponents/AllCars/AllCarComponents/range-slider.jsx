@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
-import { Plus, Minus } from "lucide-react"
+import { Plus, Minus } from 'lucide-react'
 
 export function CarPriceSlider({
   min = 40000,

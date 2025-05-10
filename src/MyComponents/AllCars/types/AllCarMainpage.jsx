@@ -12,6 +12,23 @@ import * as SliderPrimitive from "@radix-ui/react-slider"
 import { useDetailContext } from "@/contexts/detailProvider"
 import { Breadcrumb } from "../../breadcrumb" // Import the Breadcrumb component
 
+// Helper function to safely get text from an object or string
+const getText = (textObj, language) => {
+  if (textObj === null || textObj === undefined) return ""
+  if (typeof textObj !== "object") return String(textObj)
+  return textObj[language] || textObj.en || ""
+}
+
+// Helper function to safely get brand string
+const getBrandString = (brand, language) => {
+  return getText(brand, language)
+}
+
+// Helper function to safely get lowercase brand
+const getBrandLowerCase = (brand, language) => {
+  return getBrandString(brand, language).toLowerCase()
+}
+
 // Add this new component for selected filters display
 const SelectedFilters = ({ selectedFilters, onRemoveFilter, onClearAll, language }) => {
   if (!selectedFilters || selectedFilters.length === 0) return null
@@ -20,7 +37,7 @@ const SelectedFilters = ({ selectedFilters, onRemoveFilter, onClearAll, language
     <div className="flex flex-wrap items-center gap-2 mb-4">
       <Button
         onClick={onClearAll}
-        className="bg-brand-primary text-white hover:bg-brand-primary/90 rounded-full px-4 py-2 h-9 flex items-center gap-1"
+        className="bg-brand-primary text-white hover:bg-brand-primary/90 rounded-[5px] px-4 py-2 h-9 flex items-center gap-1"
       >
         <RefreshCw className="h-4 w-4" />
         {language === "ar" ? "مسح الكل" : "Clear All"}
@@ -29,7 +46,7 @@ const SelectedFilters = ({ selectedFilters, onRemoveFilter, onClearAll, language
       {selectedFilters.map((filter, index) => (
         <div
           key={index}
-          className="bg-white border border-brand-primary text-brand-primary rounded-full px-3 py-1 flex items-center gap-1"
+          className="bg-white border border-brand-primary text-brand-primary rounded-[5px] px-3 py-1 flex items-center gap-1"
         >
           <span className="text-sm font-medium">{filter.label}</span>
           <button
@@ -114,13 +131,13 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
   const maxScale = 1.0 + maxNormalized * 0.6 // Scale from 1.0 to 1.6
 
   return (
-    <div className="relative pt-1 pb-2 bg-brand-light p-1 rounded-lg" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="relative pt-1 pb-2 bg-brand-light p-1 rounded-[5px]" dir={isRTL ? "rtl" : "ltr"}>
       {/* Car icons with slider */}
       <div className="relative h-16 mb-4">
         <div className="relative w-full h-full">
           {/* First car (left/min) */}
           <div
-            className="absolute transition-all duration-300"
+            className="absolute transition-all pl-3 duration-300"
             style={{
               left: `${minPercent}%`,
               top: "5px",
@@ -183,13 +200,13 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
         <div className="flex items-center">
           <button
             onClick={decrementMin}
-            className="w-5 h-5 flex items-center justify-center border-2 border-brand-primary rounded-[4px]"
+            className="w-5 h-5 flex items-center justify-center border-2 border-brand-primary rounded-[5px]"
             aria-label="Decrease minimum price"
           >
             <Minus size={10} strokeWidth={4} className="text-brand-primary" />
           </button>
 
-          <div className="mx-1 px-1 py-0.5 rounded-[4px] text-center">
+          <div className="mx-1 px-1 py-0.5 rounded-[5px] text-center">
             <div className="flex items-center justify-center">
               <span className="text-brand-primary font-bold text-[10px] flex items-center gap-1">
                 <img src="/icons/Currency.svg" alt="Currency" className="w-3 h-3" />
@@ -199,7 +216,7 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
           </div>
           <button
             onClick={incrementMin}
-            className="w-5 h-5 flex items-center justify-center border-2 border-brand-primary rounded-[4px]"
+            className="w-5 h-5 flex items-center justify-center border-2 border-brand-primary rounded-[5px]"
             aria-label="Increase minimum price"
           >
             <Plus size={10} strokeWidth={4} className="text-brand-primary" />
@@ -210,12 +227,12 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
         <div className="flex items-center ">
           <button
             onClick={decrementMax}
-            className="w-5 h-5 flex items-center justify-center border-2 border-brand-primary rounded-[4px]"
+            className="w-5 h-5 flex items-center justify-center border-2 border-brand-primary rounded-[5px]"
             aria-label="Decrease maximum price"
           >
             <Minus size={10} strokeWidth={4} className="text-brand-primary " />
           </button>
-          <div className="mx-1 px-1 py-0.5 border rounded-[4px] text-center">
+          <div className="mx-1 px-1 py-0.5 border rounded-[5px] text-center">
             <div className="flex items-center justify-center">
               <span className="text-brand-primary font-bold text-[10px] flex items-center gap-1">
                 <img src="/icons/Currency.svg" alt="Currency" className="w-3 h-3" />
@@ -225,7 +242,7 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
           </div>
           <button
             onClick={incrementMax}
-            className="w-5 h-5 flex items-center justify-center border-2 border-brand-primary rounded-[4px]"
+            className="w-5 h-5 flex items-center justify-center border-2 border-brand-primary rounded-[5px]"
             aria-label="Increase maximum price"
           >
             <Plus size={10} strokeWidth={4} className="text-brand-primary" />
@@ -240,7 +257,7 @@ const RangeSlider = ({ min, max, value, onValueChange, step = 1000, isRTL = true
 const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = false, onClose }) => {
   const { searchbrands } = useDetailContext()
   const [expandedBrands, setExpandedBrands] = useState([])
-  const [searchTerm, setSearchTerm] = useState(searchbrands?.brand)
+  const [searchTerm, setSearchTerm] = useState(searchbrands?.brand ? getText(searchbrands.brand, language) : "")
   // Add state to track which sections are expanded
   const [expandedSections, setExpandedSections] = useState({
     priceRange: true,
@@ -250,6 +267,15 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
     transmission: false,
     seats: false,
   })
+
+  // Add temporary filters state for mobile
+  const [tempFilters, setTempFilters] = useState(filters)
+  const [isApplying, setIsApplying] = useState(false)
+
+  // Update tempFilters when filters prop changes
+  useEffect(() => {
+    setTempFilters(filters)
+  }, [filters])
 
   // Get max price for range slider
   const maxPrice = useMemo(() => {
@@ -265,10 +291,16 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   const modelsByBrand = useMemo(() => {
     const models = {}
     brands.forEach((brand) => {
-      models[brand] = cars
-        .filter((car) => car.brand === brand)
+      // Use getBrandString to safely get the brand name
+      const brandKey = getBrandString(brand, language)
+      models[brandKey] = cars
+        .filter((car) => {
+          const carBrand = getBrandString(car.brand, language)
+          const currentBrand = getBrandString(brand, language)
+          return carBrand === currentBrand
+        })
         .map((car) => {
-          const modelName = typeof car.name === "object" ? car.name[language] || car.name.en : car.name
+          const modelName = getText(car.name, language)
           return { id: car.id, name: modelName }
         })
     })
@@ -278,12 +310,20 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   // Filter brands based on search term
   const filteredBrands = useMemo(() => {
     if (!searchTerm) return brands
-    return brands.filter(
-      (brand) =>
-        brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        modelsByBrand[brand]?.some((model) => model.name.toLowerCase().includes(searchTerm.toLowerCase())),
-    )
-  }, [brands, modelsByBrand, searchTerm])
+
+    return brands.filter((brand) => {
+      // Use getBrandLowerCase to safely get lowercase brand name
+      const brandStr = getBrandLowerCase(brand, language)
+      const searchTermLower = searchTerm.toLowerCase()
+
+      // Check if brand name contains search term
+      if (brandStr.includes(searchTermLower)) return true
+
+      // Check if any model of this brand contains search term
+      const brandKey = getBrandString(brand, language)
+      return modelsByBrand[brandKey]?.some((model) => model.name.toLowerCase().includes(searchTermLower))
+    })
+  }, [brands, modelsByBrand, searchTerm, language])
 
   // Toggle section expansion
   const toggleSection = (section, e) => {
@@ -308,55 +348,105 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
   // Check if all models of a brand are selected
   const areAllModelsSelected = useCallback(
     (brand) => {
-      const brandModels = modelsByBrand[brand] || []
+      // Use getBrandString to safely get the brand name
+      const brandKey = getBrandString(brand, language)
+      const brandModels = modelsByBrand[brandKey] || []
       if (brandModels.length === 0) return false
 
-      return brandModels.every((model) => filters.selectedModels?.includes(model.id))
+      if (isMobile) {
+        return brandModels.every((model) => tempFilters.selectedModels?.includes(model.id))
+      } else {
+        return brandModels.every((model) => filters.selectedModels?.includes(model.id))
+      }
     },
-    [filters.selectedModels, modelsByBrand],
+    [filters.selectedModels, tempFilters?.selectedModels, modelsByBrand, language, isMobile],
   )
 
   // Handle brand checkbox change
   const handleBrandCheck = useCallback(
     (brand, checked) => {
-      const brandModels = modelsByBrand[brand] || []
+      // Use getBrandString to safely get the brand name
+      const brandKey = getBrandString(brand, language)
+      const brandModels = modelsByBrand[brandKey] || []
       const modelIds = brandModels.map((model) => model.id)
 
-      let updatedModels = [...(filters.selectedModels || [])]
+      if (isMobile) {
+        // For mobile, update the temporary filters
+        let updatedModels = [...(tempFilters.selectedModels || [])]
 
-      if (checked) {
-        // Add all models of this brand that aren't already selected
-        modelIds.forEach((id) => {
-          if (!updatedModels.includes(id)) {
-            updatedModels.push(id)
-          }
-        })
+        if (checked) {
+          // Add all models of this brand that aren't already selected
+          modelIds.forEach((id) => {
+            if (!updatedModels.includes(id)) {
+              updatedModels.push(id)
+            }
+          })
+        } else {
+          // Remove all models of this brand
+          updatedModels = updatedModels.filter((id) => !modelIds.includes(id))
+        }
+
+        setTempFilters((prev) => ({
+          ...prev,
+          selectedModels: updatedModels,
+        }))
       } else {
-        // Remove all models of this brand
-        updatedModels = updatedModels.filter((id) => !modelIds.includes(id))
-      }
+        // For desktop, update filters directly
+        let updatedModels = [...(filters.selectedModels || [])]
 
-      onFilterChange({ selectedModels: updatedModels })
+        if (checked) {
+          // Add all models of this brand that aren't already selected
+          modelIds.forEach((id) => {
+            if (!updatedModels.includes(id)) {
+              updatedModels.push(id)
+            }
+          })
+        } else {
+          // Remove all models of this brand
+          updatedModels = updatedModels.filter((id) => !modelIds.includes(id))
+        }
+
+        onFilterChange({ selectedModels: updatedModels })
+      }
     },
-    [filters.selectedModels, modelsByBrand, onFilterChange],
+    [filters.selectedModels, tempFilters, modelsByBrand, onFilterChange, language, isMobile],
   )
 
   // Handle model checkbox change
   const handleModelCheck = useCallback(
     (modelId, checked) => {
-      let updatedModels = [...(filters.selectedModels || [])]
+      if (isMobile) {
+        // For mobile, update the temporary filters
+        let updatedModels = [...(tempFilters.selectedModels || [])]
 
-      if (checked) {
-        if (!updatedModels.includes(modelId)) {
-          updatedModels.push(modelId)
+        if (checked) {
+          if (!updatedModels.includes(modelId)) {
+            updatedModels.push(modelId)
+          }
+        } else {
+          updatedModels = updatedModels.filter((id) => id !== modelId)
         }
-      } else {
-        updatedModels = updatedModels.filter((id) => id !== modelId)
-      }
 
-      onFilterChange({ selectedModels: updatedModels })
+        setTempFilters((prev) => ({
+          ...prev,
+          selectedModels: updatedModels,
+        }))
+      } else {
+        // For desktop, update filters directly
+        let updatedModels = [...(filters.selectedModels || [])]
+
+        if (checked) {
+          if (!updatedModels.includes(modelId)) {
+            updatedModels.push(modelId)
+          }
+        } else {
+          updatedModels = updatedModels.filter((id) => id !== modelId)
+        }
+
+        onFilterChange({ selectedModels: updatedModels })
+      }
     },
-    [filters.selectedModels, onFilterChange],
+    [filters.selectedModels, tempFilters, onFilterChange, isMobile],
   )
 
   const formatPrice = (price) => {
@@ -365,53 +455,117 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
 
   // Update the handleYearChange function to toggle selection
   const handleYearChange = (year) => {
-    // If the year is already selected, unselect it by setting to empty string
-    // Otherwise, select the year
-    onFilterChange({
-      year: filters.year === year.toString() ? "" : year.toString(),
-    })
+    if (isMobile) {
+      // For mobile, update the temporary filters
+      setTempFilters((prev) => ({
+        ...prev,
+        year: prev.year === year.toString() ? "" : year.toString(),
+      }))
+    } else {
+      // For desktop, update filters directly
+      onFilterChange({
+        year: filters.year === year.toString() ? "" : year.toString(),
+      })
+    }
   }
 
   const handleFuelTypeChange = (fuelType, checked) => {
-    let updatedFuelTypes = Array.isArray(filters.fuelTypes) ? [...filters.fuelTypes] : []
+    if (isMobile) {
+      // For mobile, update the temporary filters
+      let updatedFuelTypes = Array.isArray(tempFilters.fuelTypes) ? [...tempFilters.fuelTypes] : []
 
-    if (checked) {
-      if (!updatedFuelTypes.includes(fuelType)) {
-        updatedFuelTypes.push(fuelType)
+      if (checked) {
+        if (!updatedFuelTypes.includes(fuelType)) {
+          updatedFuelTypes.push(fuelType)
+        }
+      } else {
+        updatedFuelTypes = updatedFuelTypes.filter((type) => type !== fuelType)
       }
-    } else {
-      updatedFuelTypes = updatedFuelTypes.filter((type) => type !== fuelType)
-    }
 
-    onFilterChange({ fuelTypes: updatedFuelTypes })
+      setTempFilters((prev) => ({
+        ...prev,
+        fuelTypes: updatedFuelTypes,
+      }))
+    } else {
+      // For desktop, update filters directly
+      let updatedFuelTypes = Array.isArray(filters.fuelTypes) ? [...filters.fuelTypes] : []
+
+      if (checked) {
+        if (!updatedFuelTypes.includes(fuelType)) {
+          updatedFuelTypes.push(fuelType)
+        }
+      } else {
+        updatedFuelTypes = updatedFuelTypes.filter((type) => type !== fuelType)
+      }
+
+      onFilterChange({ fuelTypes: updatedFuelTypes })
+    }
   }
 
   const handleTransmissionChange = (transmission, checked) => {
-    let updatedTransmission = Array.isArray(filters.transmission) ? [...filters.transmission] : []
+    if (isMobile) {
+      // For mobile, update the temporary filters
+      let updatedTransmission = Array.isArray(tempFilters.transmission) ? [...tempFilters.transmission] : []
 
-    if (checked) {
-      if (!updatedTransmission.includes(transmission)) {
-        updatedTransmission.push(transmission)
+      if (checked) {
+        if (!updatedTransmission.includes(transmission)) {
+          updatedTransmission.push(transmission)
+        }
+      } else {
+        updatedTransmission = updatedTransmission.filter((trans) => trans !== transmission)
       }
-    } else {
-      updatedTransmission = updatedTransmission.filter((trans) => trans !== transmission)
-    }
 
-    onFilterChange({ transmission: updatedTransmission })
+      setTempFilters((prev) => ({
+        ...prev,
+        transmission: updatedTransmission,
+      }))
+    } else {
+      // For desktop, update filters directly
+      let updatedTransmission = Array.isArray(filters.transmission) ? [...filters.transmission] : []
+
+      if (checked) {
+        if (!updatedTransmission.includes(transmission)) {
+          updatedTransmission.push(transmission)
+        }
+      } else {
+        updatedTransmission = updatedTransmission.filter((trans) => trans !== transmission)
+      }
+
+      onFilterChange({ transmission: updatedTransmission })
+    }
   }
 
   const handleSeatChange = (seatOption, checked) => {
-    let updatedSeats = filters.seats ? [...filters.seats] : []
+    if (isMobile) {
+      // For mobile, update the temporary filters
+      let updatedSeats = tempFilters.seats ? [...tempFilters.seats] : []
 
-    if (checked) {
-      if (!updatedSeats.includes(seatOption)) {
-        updatedSeats.push(seatOption)
+      if (checked) {
+        if (!updatedSeats.includes(seatOption)) {
+          updatedSeats.push(seatOption)
+        }
+      } else {
+        updatedSeats = updatedSeats.filter((seat) => seat !== seatOption)
       }
-    } else {
-      updatedSeats = updatedSeats.filter((seat) => seat !== seatOption)
-    }
 
-    onFilterChange({ seats: updatedSeats })
+      setTempFilters((prev) => ({
+        ...prev,
+        seats: updatedSeats,
+      }))
+    } else {
+      // For desktop, update filters directly
+      let updatedSeats = filters.seats ? [...filters.seats] : []
+
+      if (checked) {
+        if (!updatedSeats.includes(seatOption)) {
+          updatedSeats.push(seatOption)
+        }
+      } else {
+        updatedSeats = updatedSeats.filter((seat) => seat !== seatOption)
+      }
+
+      onFilterChange({ seats: updatedSeats })
+    }
   }
 
   // Handle price range change
@@ -421,27 +575,52 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         Math.max(0, Math.min(maxPrice, Number(newValue[0]) || 0)),
         Math.max(0, Math.min(maxPrice, Number(newValue[1]) || maxPrice)),
       ]
-      onFilterChange({ priceRange: validatedValue })
+
+      if (isMobile) {
+        // For mobile, update the temporary filters
+        setTempFilters((prev) => ({
+          ...prev,
+          priceRange: validatedValue,
+        }))
+      } else {
+        // For desktop, update filters directly
+        onFilterChange({ priceRange: validatedValue })
+      }
     }
+  }
+
+  // Apply filters function for mobile
+  const applyFilters = () => {
+    setIsApplying(true)
+    // Apply all temporary filters at once
+    onFilterChange(tempFilters)
+    // Close the sidebar
+    if (onClose) onClose()
+    setIsApplying(false)
   }
 
   // Calculate active filters count
   const getActiveFiltersCount = () => {
     let count = 0
-    if (filters.selectedModels?.length > 0) count++
-    if (filters.year) count++
-    if (filters.fuelTypes?.length > 0) count++
-    if (filters.transmission?.length > 0) count++
-    if (filters.seats?.length > 0) count++
+    if (tempFilters.selectedModels?.length > 0) count++
+    if (tempFilters.year) count++
+    if (tempFilters.fuelTypes?.length > 0) count++
+    if (tempFilters.transmission?.length > 0) count++
+    if (tempFilters.seats?.length > 0) count++
     // Check if price range is different from default
-    if (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice) count++
+    if (tempFilters.priceRange[0] > 40000 || tempFilters.priceRange[1] < 250000) count++
     return count
   }
 
   // Helper function to get brand logo
   const getBrandLogo = (brandName) => {
     // Find a car with this brand
-    const car = cars.find((car) => car.brand?.toLowerCase() === brandName.toLowerCase())
+    const car = cars.find((car) => {
+      // Use getBrandLowerCase to safely compare brand names
+      const carBrandStr = getBrandLowerCase(car.brand, language)
+      const brandNameStr = getBrandLowerCase(brandName, language)
+      return carBrandStr === brandNameStr
+    })
     // Return the brand logo if found, otherwise return a placeholder
     return car?.brandLogo || `/placeholder.svg?height=20&width=20`
   }
@@ -450,27 +629,27 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
 
   return (
     <div
-      className="h-full flex flex-col rounded-xl overflow-hidden bg-brand-light shadow-md"
+      className="h-full flex flex-col rounded-[5px] overflow-hidden bg-brand-light shadow-md"
       dir={language === "ar" ? "rtl" : "ltr"}
     >
-      <div className="flex items-center justify-end text-brand-primary hover:text-brand-primary bg-brand-light p-3 border-b border-brand-primary/25 sm:p-0 sm:border-0">
+      <div className="flex items-center justify-between text-brand-primary bg-brand-light p-3 border-b border-brand-primary/25">
+        <h3 className="text-lg font-bold text-brand-primary">
+          {language === "ar" ? "فلترة النتائج" : "Filter Results"}
+        </h3>
         {isMobile && (
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-6 w-6 rounded-full p-0 hover:bg-transparent hover:text-brand-primary hover:border-brand-primary hover:border"
+            className="h-8 w-8 rounded-full p-0 hover:bg-transparent hover:text-brand-primary hover:border-brand-primary hover:border"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </Button>
         )}
       </div>
 
       {/* Filter header */}
-      <div className="text-brand-primary p-4 flex justify-between items-center rounded-t-xl border-b border-brand-primary/25">
-        <h3 className="text-xl font-bold text-brand-primary">
-          {language === "ar" ? "فلترة النتائج" : "Filter Results"}
-        </h3>
+      <div className="text-brand-primary p-3 flex justify-between items-center border-b border-brand-primary/25">
         <button
           onClick={() => {
             const resetFilters = {
@@ -481,27 +660,39 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
               transmission: [],
               seats: [],
             }
-            onFilterChange(resetFilters)
+            if (isMobile) {
+              setTempFilters(resetFilters)
+            } else {
+              onFilterChange(resetFilters)
+            }
           }}
-          className="text-brand-primary font-medium text-sm hover:underline"
+          className="text-brand-primary font-medium text-sm hover:underline flex items-center gap-1"
         >
+          <RefreshCw className="h-3.5 w-3.5" />
           <span>{language === "ar" ? "إعادة تعيين" : "Reset"}</span>
         </button>
+
+        {isMobile && activeFiltersCount > 0 && (
+          <div className="text-sm text-brand-primary">
+            <span className="font-medium">{activeFiltersCount}</span>{" "}
+            {language === "ar" ? "فلتر نشط" : "active filters"}
+          </div>
+        )}
       </div>
 
       {/* Scrollable content */}
       <div
-        className="flex-1 overflow-y-auto p-4"
+        className="flex-1 overflow-y-auto p-3"
         style={{
-          maxHeight: isMobile ? "calc(100vh - 0px)" : "calc(100vh - 0px)",
+          maxHeight: isMobile ? "calc(80vh - 180px)" : "calc(100vh - 0px)",
           scrollbarWidth: "thin",
           scrollbarColor: "#46194F transparent",
         }}
       >
         {/* Price Range Section */}
-        <div className="border-b border-brand-primary/25 pb-3 mb-3">
+        <div className="pb-3 mb-3">
           <div
-            className="flex justify-between items-center cursor-pointer py-1"
+            className="flex justify-between items-center cursor-pointer py-2 hover:bg-brand-light/50 rounded-[5px]"
             onClick={(e) => toggleSection("priceRange", e)}
           >
             <h4 className="font-bold text-brand-primary text-base">
@@ -509,9 +700,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
             </h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.priceRange ? (
-                <ChevronUp className="h-5 w-5 text-brand-primary" />
+                <ChevronUp className="h-4 w-4 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-brand-primary" />
+                <ChevronDown className="h-4 w-4 text-brand-primary" />
               )}
             </div>
           </div>
@@ -521,7 +712,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
               <RangeSlider
                 min={40000}
                 max={250000}
-                value={filters.priceRange}
+                value={isMobile ? tempFilters.priceRange : filters.priceRange}
                 onValueChange={handlePriceRangeChange}
                 step={10000}
                 isRTL={language === "ar"}
@@ -531,9 +722,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         </div>
 
         {/* Brands + Models Section */}
-        <div className="border-b border-brand-primary/25 pb-3 mb-3">
+        <div className="pb-3 mb-3">
           <div
-            className="flex justify-between items-center cursor-pointer py-1"
+            className="flex justify-between items-center cursor-pointer py-2 hover:bg-brand-light/50 rounded-[5px]"
             onClick={(e) => toggleSection("brandsAndModels", e)}
           >
             <h4 className="font-bold text-brand-primary text-base">
@@ -541,9 +732,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
             </h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.brandsAndModels ? (
-                <ChevronUp className="h-5 w-5 text-brand-primary" />
+                <ChevronUp className="h-4 w-4 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-brand-primary" />
+                <ChevronDown className="h-4 w-4 text-brand-primary" />
               )}
             </div>
           </div>
@@ -553,100 +744,120 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
               {/* Search box */}
               <div className="relative mb-3 ">
                 <div className="relative ">
-                  <Search className="absolute left-2 top-1/2  transform -translate-y-1/2 text-brand-primary/40  h-3 w-3" />
+                  <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-brand-primary/40 h-3 w-3" />
                   <input
                     type="text"
                     placeholder={language === "ar" ? "ابحث..." : "Search..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full border bg-brand-light border-brand-primary rounded-[5px] py-1 text-brand-primary  px-7 text-xs focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                    className="w-full border bg-brand-light border-brand-primary rounded-[5px] py-1 text-brand-primary px-7 text-xs focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   />
                 </div>
               </div>
 
               {/* Brand list */}
               <div className="space-y-2">
-                {filteredBrands.map((brand) => (
-                  <div key={brand} className="mb-4">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id={`brand-${brand}`}
-                        checked={areAllModelsSelected(brand)}
-                        onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
-                        className="h-4 w-4 rounded-[5px] border-2 border-brand-primary focus:ring-brand-primary"
-                        style={{
-                          backgroundColor: areAllModelsSelected(brand) ? "#46194F" : "transparent",
-                          borderColor: areAllModelsSelected(brand) ? "#46194F" : "",
-                        }}
-                      />
-                      <Label
-                        htmlFor={`brand-${brand}`}
-                        className="text-xs font-medium cursor-pointer flex items-center gap-1 flex-1"
-                      >
-                        <img
-                          src={getBrandLogo(brand) || "/placeholder.svg"}
-                          alt={brand}
-                          className="h-5 w-5 object-contain"
+                {filteredBrands.map((brand) => {
+                  // Use getBrandString to safely get the brand name
+                  const brandStr = getBrandString(brand, language)
+                  return (
+                    <div key={brandStr} className="mb-4">
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id={`brand-${brandStr}`}
+                          checked={areAllModelsSelected(brand)}
+                          onCheckedChange={(checked) => handleBrandCheck(brand, checked)}
+                          className="h-4 w-4 rounded-[5px] border-2 border-brand-primary focus:ring-brand-primary"
+                          style={{
+                            backgroundColor: areAllModelsSelected(brand) ? "#46194F" : "transparent",
+                            borderColor: areAllModelsSelected(brand) ? "#46194F" : "",
+                          }}
                         />
-                        {brand}
-                      </Label>
-                      <div className="text-xs text-gray-500 mr-2">({modelsByBrand[brand]?.length || 0})</div>
-                      <button
-                        onClick={(e) => toggleBrand(brand, e)}
-                        className="h-6 w-6 flex items-center justify-center text-brand-primary"
-                      >
-                        {expandedBrands.includes(brand) ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-
-                    {/* Models list - shown when brand is expanded */}
-                    {expandedBrands.includes(brand) && (
-                      <div className="ml-6 mt-2 space-y-1 border-l-2 border-brand-primary/20 pl-3">
-                        {modelsByBrand[brand]?.map((model) => (
-                          <div key={model.id} className="flex items-center gap-2">
-                            <Checkbox
-                              id={`model-${model.id}`}
-                              checked={filters.selectedModels?.includes(model.id)}
-                              onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
-                              className="h-3.5 w-3.5  rounded-[5px] border-brand-primary focus:ring-brand-primary"
-                              style={{
-                                backgroundColor: filters.selectedModels?.includes(model.id) ? "#46194F" : "transparent",
-                                borderColor: filters.selectedModels?.includes(model.id) ? "#46194F" : "",
-                              }}
-                            />
-                            <Label
-                              htmlFor={`model-${model.id}`}
-                              className="text-[10px] font-medium cursor-pointer text-gray-700"
-                            >
-                              {model.name}
-                            </Label>
-                          </div>
-                        ))}
+                        <Label
+                          htmlFor={`brand-${brandStr}`}
+                          className="text-xs font-medium cursor-pointer flex items-center gap-1 flex-1"
+                        >
+                          <img
+                            src={getBrandLogo(brand) || "/placeholder.svg"}
+                            alt={brandStr}
+                            className="h-5 w-5 object-contain"
+                          />
+                          {brandStr}
+                        </Label>
+                        <div className="text-xs text-gray-500 mr-2">({modelsByBrand[brandStr]?.length || 0})</div>
+                        <button
+                          onClick={(e) => toggleBrand(brand, e)}
+                          className="h-6 w-6 flex items-center justify-center text-brand-primary"
+                        >
+                          {expandedBrands.includes(brand) ? (
+                            <ChevronUp className="h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4" />
+                          )}
+                        </button>
                       </div>
-                    )}
-                  </div>
-                ))}
+
+                      {/* Models list - shown when brand is expanded */}
+                      {expandedBrands.includes(brand) && (
+                        <div className="ml-6 mt-2 space-y-1 border-l-2 border-brand-primary/20 pl-3">
+                          {modelsByBrand[brandStr]?.map((model) => (
+                            <div key={model.id} className="flex items-center gap-2">
+                              <Checkbox
+                                id={`model-${model.id}`}
+                                checked={
+                                  isMobile
+                                    ? tempFilters.selectedModels?.includes(model.id)
+                                    : filters.selectedModels?.includes(model.id)
+                                }
+                                onCheckedChange={(checked) => handleModelCheck(model.id, checked)}
+                                className="h-3.5 w-3.5 rounded-[5px] border-brand-primary focus:ring-brand-primary"
+                                style={{
+                                  backgroundColor: (
+                                    isMobile
+                                      ? tempFilters.selectedModels?.includes(model.id)
+                                      : filters.selectedModels?.includes(model.id)
+                                  )
+                                    ? "#46194F"
+                                    : "transparent",
+                                  borderColor: (
+                                    isMobile
+                                      ? tempFilters.selectedModels?.includes(model.id)
+                                      : filters.selectedModels?.includes(model.id)
+                                  )
+                                    ? "#46194F"
+                                    : "",
+                                }}
+                              />
+                              <Label
+                                htmlFor={`model-${model.id}`}
+                                className="text-[10px] font-medium cursor-pointer text-gray-700"
+                              >
+                                {model.name}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
         </div>
 
         {/* Year Section */}
-        <div className="border-b border-brand-primary/25 pb-3 mb-3">
+        <div className="pb-3 mb-3">
           <div
-            className="flex justify-between items-center cursor-pointer py-1"
+            className="flex justify-between items-center cursor-pointer py-2 hover:bg-brand-light/50 rounded-[5px]"
             onClick={(e) => toggleSection("year", e)}
           >
             <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "السنة" : "Year"}</h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.year ? (
-                <ChevronUp className="h-5 w-5 text-brand-primary" />
+                <ChevronUp className="h-4 w-4 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-brand-primary" />
+                <ChevronDown className="h-4 w-4 text-brand-primary" />
               )}
             </div>
           </div>
@@ -662,10 +873,12 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                     <div className="flex items-center cursor-pointer" onClick={() => handleYearChange(year)}>
                       <div
                         className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${
-                          filters.year === year.toString() ? "border-brand-primary" : "border-brand-primary"
+                          (isMobile ? tempFilters.year : filters.year) === year.toString()
+                            ? "border-brand-primary"
+                            : "border-brand-primary"
                         }`}
                       >
-                        {filters.year === year.toString() && (
+                        {(isMobile ? tempFilters.year : filters.year) === year.toString() && (
                           <div className="h-2 w-2 rounded-full bg-brand-primary"></div>
                         )}
                       </div>
@@ -678,17 +891,17 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         </div>
 
         {/* Fuel Type Section */}
-        <div className="border-b border-brand-primary/25 pb-3 mb-3">
+        <div className="pb-3 mb-3">
           <div
-            className="flex justify-between items-center cursor-pointer py-1"
+            className="flex justify-between items-center cursor-pointer py-2 hover:bg-brand-light/50 rounded-[5px]"
             onClick={(e) => toggleSection("fuelType", e)}
           >
             <h4 className="font-bold text-brand-primary text-base">{language === "ar" ? "نوع الوقود" : "Fuel Type"}</h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.fuelType ? (
-                <ChevronUp className="h-5 w-5 text-brand-primary" />
+                <ChevronUp className="h-4 w-4 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-brand-primary" />
+                <ChevronDown className="h-4 w-4 text-brand-primary" />
               )}
             </div>
           </div>
@@ -700,9 +913,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                 ...new Set(
                   cars.map((car) => {
                     // Handle both object and string fuel types
-                    return typeof car.specs?.fuelType === "object"
-                      ? car.specs.fuelType[language] || car.specs.fuelType.en
-                      : car.specs?.fuelType
+                    return getText(car.specs?.fuelType, language)
                   }),
                 ),
               ]
@@ -711,16 +922,23 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                   <div key={fuelType} className="flex items-center mb-2">
                     <Checkbox
                       id={`fuel-${fuelType}`}
-                      checked={Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)}
+                      checked={
+                        Array.isArray(isMobile ? tempFilters.fuelTypes : filters.fuelTypes) &&
+                        (isMobile ? tempFilters.fuelTypes : filters.fuelTypes).includes(fuelType)
+                      }
                       onCheckedChange={(checked) => handleFuelTypeChange(fuelType, checked)}
                       className="h-4 w-4 rounded-[5px] border-brand-primary border-2 focus:ring-brand-primary"
                       style={{
                         backgroundColor:
-                          Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType)
+                          Array.isArray(isMobile ? tempFilters.fuelTypes : filters.fuelTypes) &&
+                          (isMobile ? tempFilters.fuelTypes : filters.fuelTypes).includes(fuelType)
                             ? "#46194F"
                             : "transparent",
                         borderColor:
-                          Array.isArray(filters.fuelTypes) && filters.fuelTypes.includes(fuelType) ? "#46194F" : "",
+                          Array.isArray(isMobile ? tempFilters.fuelTypes : filters.fuelTypes) &&
+                          (isMobile ? tempFilters.fuelTypes : filters.fuelTypes).includes(fuelType)
+                            ? "#46194F"
+                            : "",
                       }}
                     />
                     <Label htmlFor={`fuel-${fuelType}`} className="ml-2 text-sm font-medium text-gray-700">
@@ -733,9 +951,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         </div>
 
         {/* Transmission Section */}
-        <div className="border-b border-brand-primary/25 pb-3 mb-3">
+        <div className="pb-3 mb-3">
           <div
-            className="flex justify-between items-center cursor-pointer py-1"
+            className="flex justify-between items-center cursor-pointer py-2 hover:bg-brand-light/50 rounded-[5px]"
             onClick={(e) => toggleSection("transmission", e)}
           >
             <h4 className="font-bold text-brand-primary text-base">
@@ -743,9 +961,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
             </h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.transmission ? (
-                <ChevronUp className="h-5 w-5 text-brand-primary" />
+                <ChevronUp className="h-4 w-4 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-brand-primary" />
+                <ChevronDown className="h-4 w-4 text-brand-primary" />
               )}
             </div>
           </div>
@@ -757,9 +975,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                 ...new Set(
                   cars.map((car) => {
                     // Handle both object and string transmission types
-                    return typeof car.specs?.transmission === "object"
-                      ? car.specs.transmission[language] || car.specs.transmission.en
-                      : car.specs?.transmission
+                    return getText(car.specs?.transmission, language)
                   }),
                 ),
               ]
@@ -768,16 +984,21 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                   <div key={transmission} className="flex items-center mb-2">
                     <Checkbox
                       id={`transmission-${transmission}`}
-                      checked={Array.isArray(filters.transmission) && filters.transmission.includes(transmission)}
+                      checked={
+                        Array.isArray(isMobile ? tempFilters.transmission : filters.transmission) &&
+                        (isMobile ? tempFilters.transmission : filters.transmission).includes(transmission)
+                      }
                       onCheckedChange={(checked) => handleTransmissionChange(transmission, checked)}
                       className="h-4 w-4 rounded-[5px] border-brand-primary border-2 focus:ring-brand-primary"
                       style={{
                         backgroundColor:
-                          Array.isArray(filters.transmission) && filters.transmission.includes(transmission)
+                          Array.isArray(isMobile ? tempFilters.transmission : filters.transmission) &&
+                          (isMobile ? tempFilters.transmission : filters.transmission).includes(transmission)
                             ? "#46194F"
                             : "transparent",
                         borderColor:
-                          Array.isArray(filters.transmission) && filters.transmission.includes(transmission)
+                          Array.isArray(isMobile ? tempFilters.transmission : filters.transmission) &&
+                          (isMobile ? tempFilters.transmission : filters.transmission).includes(transmission)
                             ? "#46194F"
                             : "",
                       }}
@@ -792,9 +1013,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
         </div>
 
         {/* Seats Section */}
-        <div className="border-b border-brand-primary/25 pb-3 mb-3">
+        <div className="pb-3 mb-3">
           <div
-            className="flex justify-between items-center cursor-pointer py-1"
+            className="flex justify-between items-center cursor-pointer py-2 hover:bg-brand-light/50 rounded-[5px]"
             onClick={(e) => toggleSection("seats", e)}
           >
             <h4 className="font-bold text-brand-primary text-base">
@@ -802,9 +1023,9 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
             </h4>
             <div className="h-6 w-6 flex items-center justify-center">
               {expandedSections.seats ? (
-                <ChevronUp className="h-5 w-5 text-brand-primary" />
+                <ChevronUp className="h-4 w-4 text-brand-primary" />
               ) : (
-                <ChevronDown className="h-5 w-5 text-brand-primary" />
+                <ChevronDown className="h-4 w-4 text-brand-primary" />
               )}
             </div>
           </div>
@@ -816,9 +1037,7 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                 ...new Set(
                   cars.map((car) => {
                     // Handle both object and string seats types
-                    return typeof car.specs?.seats === "object"
-                      ? car.specs.seats[language] || car.specs.seats.en
-                      : car.specs?.seats
+                    return getText(car.specs?.seats, language)
                   }),
                 ),
               ]
@@ -827,12 +1046,16 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
                   <div key={seatOption} className="flex items-center mb-2">
                     <Checkbox
                       id={`seats-${seatOption}`}
-                      checked={filters.seats?.includes(seatOption)}
+                      checked={(isMobile ? tempFilters.seats : filters.seats)?.includes(seatOption)}
                       onCheckedChange={(checked) => handleSeatChange(seatOption, checked)}
                       className="h-4 w-4 rounded-[5px] border-brand-primary border-2 focus:ring-brand-primary"
                       style={{
-                        backgroundColor: filters.seats?.includes(seatOption) ? "#46194F" : "transparent",
-                        borderColor: filters.seats?.includes(seatOption) ? "#46194F" : "",
+                        backgroundColor: (isMobile ? tempFilters.seats : filters.seats)?.includes(seatOption)
+                          ? "#46194F"
+                          : "transparent",
+                        borderColor: (isMobile ? tempFilters.seats : filters.seats)?.includes(seatOption)
+                          ? "#46194F"
+                          : "",
                       }}
                     />
                     <Label htmlFor={`seats-${seatOption}`} className="ml-2 text-sm font-medium text-gray-700">
@@ -843,15 +1066,34 @@ const CarFilterSidebar = ({ onFilterChange, filters, language, cars, isMobile = 
             </div>
           )}
         </div>
+
+        {/* Add some bottom padding to ensure the Apply button doesn't cover content */}
+        {isMobile && <div className="h-16"></div>}
       </div>
 
-      {/* Filter footer */}
-      {/* <div
-        className="bg-brand-light border-t border-gray-200 p-4 rounded-b-xl shadow-sm"
-        style={{ boxShadow: "0 -2px 6px rgba(0, 0, 0, 0.05)" }}
-      >
-       
-      </div> */}
+      {/* Apply button for mobile */}
+      {isMobile && (
+        <div className="sticky bottom-0 left-0 right-0 bg-brand-light p-3 border-t border-brand-primary/25 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+          <Button
+            onClick={applyFilters}
+            disabled={isApplying}
+            className="w-full bg-brand-primary text-white hover:bg-brand-primary transition-colors duration-200 py-3 h-auto text-base font-medium rounded-[5px] shadow-md"
+          >
+            {isApplying
+              ? language === "ar"
+                ? "جاري التطبيق..."
+                : "Applying..."
+              : language === "ar"
+                ? "تطبيق الفلاتر"
+                : "Apply Filters"}
+            {activeFiltersCount > 0 && (
+              <span className="ml-2 bg-white text-brand-primary rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold">
+                {activeFiltersCount}
+              </span>
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
@@ -902,6 +1144,24 @@ const AllCarMainpage = () => {
     }
   }, [isSidebarOpen])
 
+  // Replace it with this updated version that also handles the header:
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = "hidden"
+      // Add class to hide header when bottom sheet is open
+      document.body.classList.add("bottom-sheet-open")
+    } else {
+      document.body.style.overflow = "auto"
+      // Remove class when bottom sheet is closed
+      document.body.classList.remove("bottom-sheet-open")
+    }
+
+    return () => {
+      document.body.style.overflow = "auto"
+      document.body.classList.remove("bottom-sheet-open")
+    }
+  }, [isSidebarOpen])
+
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters) => {
     setFilters((prevFilters) => ({
@@ -940,10 +1200,7 @@ const AllCarMainpage = () => {
 
         // Filter by fuel type
         if (filters.fuelTypes?.length > 0) {
-          const carFuelType =
-            typeof car.specs?.fuelType === "object"
-              ? car.specs.fuelType[currentLocale] || car.specs.fuelType.en
-              : car.specs?.fuelType
+          const carFuelType = getText(car.specs?.fuelType, currentLocale)
           if (!carFuelType || !filters.fuelTypes.includes(carFuelType)) {
             return false
           }
@@ -951,10 +1208,7 @@ const AllCarMainpage = () => {
 
         // Filter by transmission
         if (filters.transmission?.length > 0) {
-          const carTransmission =
-            typeof car.specs?.transmission === "object"
-              ? car.specs.transmission[currentLocale] || car.specs.transmission.en
-              : car.specs?.transmission
+          const carTransmission = getText(car.specs?.transmission, currentLocale)
           if (!carTransmission || !filters.transmission.includes(carTransmission)) {
             return false
           }
@@ -962,10 +1216,7 @@ const AllCarMainpage = () => {
 
         // Filter by seats
         if (filters.seats?.length > 0) {
-          const carSeats =
-            typeof car.specs?.seats === "object"
-              ? car.specs.seats[currentLocale] || car.specs.seats.en
-              : car.specs?.seats
+          const carSeats = getText(car.specs?.seats, currentLocale)
           if (!carSeats || !filters.seats.includes(carSeats)) {
             return false
           }
@@ -1009,12 +1260,12 @@ const AllCarMainpage = () => {
     filters.selectedModels.forEach((modelId) => {
       const car = cars.find((car) => car.id === modelId)
       if (car?.brand) {
-        brands.add(car.brand)
+        brands.add(getBrandString(car.brand, currentLocale))
       }
     })
 
     return Array.from(brands)
-  }, [filters.selectedModels, cars])
+  }, [filters.selectedModels, cars, currentLocale])
 
   // Generate breadcrumb items with brand name if available
   // UPDATED: Only show brand in breadcrumb if exactly ONE brand is selected
@@ -1056,7 +1307,7 @@ const AllCarMainpage = () => {
       filters.selectedModels.forEach((modelId) => {
         const car = cars.find((car) => car.id === modelId)
         if (car && car.brand) {
-          selectedBrands.add(car.brand)
+          selectedBrands.add(getBrandString(car.brand, currentLocale))
         }
       })
 
@@ -1125,7 +1376,7 @@ const AllCarMainpage = () => {
             ...prevFilters,
             selectedModels: prevFilters.selectedModels.filter((modelId) => {
               const car = cars.find((car) => car.id === modelId)
-              return car && car.brand !== filterId
+              return car && getBrandString(car.brand, currentLocale) !== filterId
             }),
           }))
           break
@@ -1157,7 +1408,7 @@ const AllCarMainpage = () => {
           break
       }
     },
-    [cars],
+    [cars, currentLocale],
   )
 
   // Function to clear all filters
@@ -1177,7 +1428,7 @@ const AllCarMainpage = () => {
     <div className="container mx-auto py-0 sm:py-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Desktop Sidebar - Only shown on desktop */}
-        <div className="hidden lg:block lg:w-[280px] sticky top-4 self-start max-h-[calc(100vh-2rem)] rounded-xl overflow-hidden shadow-md">
+        <div className="hidden lg:block lg:w-[280px] sticky top-[100px] self-start max-h-[calc(100vh-rem)] rounded-xl overflow-hidden shadow-md">
           <CarFilterSidebar
             onFilterChange={handleFilterChange}
             filters={filters}
@@ -1189,7 +1440,6 @@ const AllCarMainpage = () => {
 
         {/* Main content */}
         <div className="flex-1">
-
           {/* Breadcrumb Navigation - Moved to where tags were */}
           <div className="mb-4">
             <Breadcrumb items={getBreadcrumbItems()} />
@@ -1212,9 +1462,9 @@ const AllCarMainpage = () => {
               <span>{currentLocale === "ar" ? "فلترة النتائج" : "Filter Results"}</span>
             </button>
           </div>
-          
+
           {/* Available Cars Header with Tags moved here */}
-          <div className="bg-brand-light rounded-[10px] p-4 mb-6 shadow-sm">
+          <div className="bg-brand-light rounded-[5px] p-4 mb-6 shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
               <div>
                 <h2 className="text-xl font-bold text-brand-primary mb-2 md:mb-0 flex items-center gap-2">
@@ -1243,15 +1493,14 @@ const AllCarMainpage = () => {
                 </div>
               </div>
             </div>
-
           </div>
-            {/* Selected Filters - Moved to Available Cars section */}
-            <SelectedFilters
-              selectedFilters={getSelectedFilters()}
-              onRemoveFilter={handleRemoveFilter}
-              onClearAll={handleClearAllFilters}
-              language={currentLocale}
-            />
+          {/* Selected Filters - Moved to Available Cars section */}
+          <SelectedFilters
+            selectedFilters={getSelectedFilters()}
+            onRemoveFilter={handleRemoveFilter}
+            onClearAll={handleClearAllFilters}
+            language={currentLocale}
+          />
 
           {/* Results Section */}
           <div id="results-top" style={{ animation: "0.2s ease-out forwards fadeIn" }}>
@@ -1289,7 +1538,7 @@ const AllCarMainpage = () => {
                       <Button
                         onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        className="w-10 h-10 rounded-full flex items-center justify-center border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
+                        className="w-10 h-10 rounded-[5px] flex items-center justify-center border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
                         aria-label={isRTL ? "الصفحة السابقة" : "Previous Page"}
                       >
                         <ChevronDown className={`h-5 w-5 ${isRTL ? "rotate-90" : "-rotate-90"}`} />
@@ -1299,7 +1548,7 @@ const AllCarMainpage = () => {
                         <Button
                           key={i + 1}
                           onClick={() => handlePageChange(i + 1)}
-                          className={`w-10 h-10 rounded-full flex items-center justify-center p-0 ${
+                          className={`w-10 h-10 rounded-[5px] flex items-center justify-center p-0 ${
                             currentPage === i + 1
                               ? "bg-brand-primary text-white"
                               : "border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10"
@@ -1314,7 +1563,7 @@ const AllCarMainpage = () => {
                       <Button
                         onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        className="w-10 h-10 rounded-full flex items-center justify-center border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
+                        className="w-10 h-10 rounded-[5px] flex items-center justify-center border border-brand-primary bg-white text-brand-primary hover:bg-brand-primary/10 disabled:opacity-50 disabled:cursor-not-allowed p-0"
                         aria-label={isRTL ? "الصفحة التالية" : "Next Page"}
                       >
                         <ChevronDown className={`h-5 w-5 ${isRTL ? "-rotate-90" : "rotate-90"}`} />
@@ -1336,8 +1585,11 @@ const AllCarMainpage = () => {
             onClick={() => setIsSidebarOpen(false)}
           />
           <div
-            className="fixed top-0 left-0 right-0 bottom-0 bg-white z-50 overflow-y-auto shadow-lg"
-            style={{ animation: "0.3s ease-out forwards slideIn" }}
+            className="fixed bottom-0 left-0 right-0 max-h-[90vh] md:max-h-[95vh] lg:max-h-[90vh] bg-white z-50 overflow-y-auto shadow-lg rounded-t-[20px]"
+            style={{
+              animation: "0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards slideInBottom",
+              transform: "translateY(100%)",
+            }}
           >
             <CarFilterSidebar
               onFilterChange={handleFilterChange}
@@ -1350,6 +1602,38 @@ const AllCarMainpage = () => {
           </div>
         </>
       )}
+
+      {/* Add animation keyframes */}
+      <style jsx global>{`
+        @keyframes slideInBottom {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        
+        /* Apply blur effect to header when bottom sheet is open */
+        header {
+          transition: all 0.3s ease;
+        }
+        
+        body.bottom-sheet-open header {
+          filter: blur(8px);
+          opacity: 0.6;
+          pointer-events: none;
+        }
+      `}</style>
     </div>
   )
 }

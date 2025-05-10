@@ -109,38 +109,34 @@ const Header = () => {
       <style jsx global>{`
         /* Basic styles without transitions */
         .header-content-container {
-          width: 100%;
+          width: calc(100% - 2rem);
           margin-left: auto;
           margin-right: auto;
-          padding-left: 1rem;
-          padding-right: 1rem;
         }
         
         @media (min-width: 640px) {
           .header-content-container {
-            padding-left: 2rem;
-            padding-right: 2rem;
+            width: calc(100% - 4rem);
           }
         }
         
-        @media (min-width: 768px) {
+        @media (min-width: 768px) and (max-width: 1023px) {
+          /* Reduced spacing specifically for iPad/tablet view */
           .header-content-container {
-            {/* padding-left: 3rem;
-            padding-right: 3rem; */}
+            width: calc(100% - 3rem); /* 1.5rem on each side */
           }
         }
         
         @media (min-width: 1024px) {
           .header-content-container {
-            padding-left: 5rem;
-            padding-right: 5rem;
+            width: calc(100% - 10rem);
           }
         }
         
         @media (min-width: 1280px) {
           .header-content-container {
-            padding-left: 7rem;
-            padding-right: 7rem;
+            width: calc(100% - 14rem); /* Consistent 7rem on each side */
+            max-width: 1600px; /* Prevent excessive width on ultra-wide screens */
           }
         }
 
@@ -259,6 +255,25 @@ const Header = () => {
           align-items: center;
           justify-content: center;
         }
+        
+        /* Sidebar header with proper alignment */
+        .sidebar-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+          border-bottom: 1px solid #f3f4f6;
+        }
+        
+        /* Logo container with left padding to align with nav links */
+        .sidebar-logo-container {
+          padding-left: 1.25rem; /* 20px, matches the nav links padding */
+        }
+        
+        /* Close button container */
+        .sidebar-close-button {
+          padding-right: 0.5rem;
+        }
       `}</style>
 
       {/* Header container - always fixed */}
@@ -270,7 +285,7 @@ const Header = () => {
             backgroundColor: "rgba(255, 255, 255, 0.98)",
           }}
         >
-          {/* Content container with 7rem padding on desktop */}
+          {/* Content container with consistent 7rem padding on larger screens */}
           <div className="header-content-container">
             <div className="flex items-center justify-between h-20">
               {/* Logo - smaller on mobile */}
@@ -449,29 +464,33 @@ const Header = () => {
                 transition={{ type: "spring", damping: 30, stiffness: 300 }}
                 className={`lg:hidden fixed top-0 ${
                   isRTL ? "right-0" : "left-0"
-                } h-full w-[85%] max-w-[320px] bg-white shadow-xl z-50 overflow-y-auto pb-20`}
+                } h-full w-[85%] max-w-[320px] bg-white shadow-xl z-50 overflow-y-auto pb-20 pt-6`}
               >
-                {/* Mobile menu header with left-aligned logo */}
-                <div className="flex justify-between items-center py-2 px-1 border-b border-gray-100">
-                  <Link href={isRTL ? "/ar" : "/en"} className="block">
-                    <Image
-                      src={logo9 || "/placeholder.svg"}
-                      width={120}
-                      height={40}
-                      alt={"Logo"}
-                      className="object-contain"
-                    />
-                  </Link>
-                  <button
-                    onClick={toggleMobileMenu}
-                    className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200 text-[#46194F]"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+                {/* Mobile menu header with aligned logo */}
+                <div className="sidebar-header">
+                  <div className="sidebar-logo-container">
+                    <Link href={isRTL ? "/ar" : "/en"} className="block">
+                      <Image
+                        src={logo9 || "/placeholder.svg"}
+                        width={120}
+                        height={40}
+                        alt={"Logo"}
+                        className="object-contain"
+                      />
+                    </Link>
+                  </div>
+                  <div className="sidebar-close-button">
+                    <button
+                      onClick={toggleMobileMenu}
+                      className="p-2 rounded-full hover:bg-gray-100 active:bg-gray-200 text-[#46194F]"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
 
-                {/* Mobile navigation */}
-                <div className="py-2">
+                {/* Mobile navigation with increased top padding */}
+                <div className="pb-2">
                   <Nav isMobile={true} setIsMobileMenuOpen={setIsMobileMenuOpen} showCallButton={true} />
                 </div>
               </motion.div>

@@ -164,10 +164,11 @@ body {
   gap: 8px;
 }
 
-.mask-button:hover {
+/* Removed hover animation */
+/* .mask-button:hover {
   -webkit-animation: ani 0.7s steps(22) forwards;
   animation: ani 0.7s steps(22) forwards;
-}
+} */
 
 /* Mobile version with full width */
 .button-container-mask-mobile {
@@ -221,7 +222,8 @@ body {
   gap: 8px;
 }
 
-.mask-button-mobile:hover {
+/* Removed hover animation */
+/* .mask-button-mobile:hover {
   -webkit-animation: ani 0.7s steps(22) forwards;
   animation: ani 0.7s steps(22) forwards;
-}
+} */
