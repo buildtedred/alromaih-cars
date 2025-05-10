@@ -414,8 +414,8 @@ export function AppSidebar() {
         value={{ isDeleting, setIsDeleting, isSubmitting, setIsSubmitting, isLoggingOut, setIsLoggingOut }}
       >
         <Sidebar className="border-r border-gray-200 bg-white">
-          <SidebarHeader className="flex items-center justify-between p-4 border-b border-gray-100">
-            <Link href="/dashboard" className="flex items-center gap-2">
+          <SidebarHeader className=" p-8 border-gray-100">
+            <Link href="/dashboard" className="flex items-center">
               {logoLoading ? (
                 <div className="h-6 w-32 animate-pulse rounded bg-gray-200"></div>
               ) : logo?.imageUrl ? (

@@ -1,34 +1,48 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState, useEffect, useCallback } from "react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
+  RefreshCw,
+  Search,
+  Calendar,
+  Download,
   MapPin,
-  Globe,
-  Clock,
   Monitor,
-  Smartphone,
-  Laptop,
-  Chrome,
-  ChromeIcon as Firefox,
-  AppleIcon as Safari,
-  ExternalLink,
-  Info,
-  User,
-  Cpu,
-  Flag,
-  ArrowUpRight,
+  Globe,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Eye,
+  Package,
+  Filter,
+  ArrowUpDown,
 } from "lucide-react"
 import { format } from "date-fns"
+import { Badge } from "@/components/ui/badge"
+import { UserTrackingCards } from "./Usertracker"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
-export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
-  const [activeTab, setActiveTab] = useState("overview")
+export default function TrackingDashboard() {
+  const [trackingData, setTrackingData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedView, setSelectedView] = useState(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const [brandNames, setBrandNames] = useState({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [sortField, setSortField] = useState("viewedAt")
+  const [sortDirection, setSortDirection] = useState("desc")
+  const [loadingBrands, setLoadingBrands] = useState({})
 
-  // Default colors if not provided
-  const defaultColors = colors || {
+  // Alromaih Cars theme colors
+  const colors = {
     primary: "#00A651", // Green
     secondary: "#0072BC", // Blue
     accent: "#F7941D", // Orange
@@ -41,8 +55,8 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
     info: "#0072BC", // Blue
   }
 
-  // Default background colors if not provided
-  const defaultBgColors = cardBgColors || [
+  // Card background colors
+  const cardBgColors = [
     "bg-[#E6F5ED]", // Light Green
     "bg-[#E6F0F7]", // Light Blue
     "bg-[#FEF2E6]", // Light Orange
@@ -53,327 +67,758 @@ export function UserTrackingCards({ trackingData, colors, cardBgColors }) {
     "bg-[#F7F7E6]", // Light Yellow
   ]
 
-  if (!trackingData) {
+  // Prepare data for the line chart
+  const prepareChartData = (data, brandNames) => {
+    const groupedData = {}
+
+    data.forEach((item) => {
+      const date = format(new Date(item.viewedAt), "yyyy-MM-dd")
+      const productId = item.productId
+
+      if (!groupedData[date]) {
+        groupedData[date] = {}
+      }
+
+      if (!groupedData[date][productId]) {
+        groupedData[date][productId] = 0
+      }
+
+      groupedData[date][productId]++
+    })
+
+    const chartData = Object.keys(groupedData).map((date) => {
+      const dataPoint = { date }
+      Object.keys(groupedData[date]).forEach((productId) => {
+        dataPoint[productId] = groupedData[date][productId]
+      })
+      return dataPoint
+    })
+
+    return chartData
+  }
+
+  const colorsArray = [
+    "#00A651", // Green
+    "#0072BC", // Blue
+    "#F7941D", // Orange
+    "#ED1C24", // Red
+    "#8A2BE2", // Purple
+    "#A52A2A", // Brown
+    "#DEB887", // BurlyWood
+    "#5F9EA0", // CadetBlue
+    "#7FFF00", // Chartreuse
+    "#D2691E", // Chocolate
+  ]
+
+  // Fetch tracking data
+  const fetchTrackingData = useCallback(async () => {
+    try {
+      setRefreshing(true)
+      const response = await fetch("/api/track-view")
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch tracking data")
+      }
+
+      const result = await response.json()
+
+      if (result.success) {
+        setTrackingData(result.data || [])
+
+        // Fetch brand names for all product IDs
+        const productIds = [...new Set((result.data || []).map((item) => item.productId))]
+        productIds.forEach((id) => {
+          fetchBrandName(id)
+        })
+
+        setError(null)
+      } else {
+        setError(result.message || "Failed to load data")
+      }
+    } catch (err) {
+      console.error("Error fetching tracking data:", err)
+      setError("Failed to load tracking data. Please try again.")
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }, [])
+
+  // Fetch brand name for a product ID
+  const fetchBrandName = useCallback(async (productId) => {
+    try {
+      setLoadingBrands((prev) => ({ ...prev, [productId]: true }))
+      const response = await fetch(`/api/supabasPrisma/carbrands/${productId}`)
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch brand for ${productId}`)
+      }
+
+      const data = await response.json()
+
+      if (data) {
+        setBrandNames((prev) => ({
+          ...prev,
+          [productId]: data?.en?.name || "Unknown Brand",
+        }))
+      }
+    } catch (err) {
+      console.error(`Error fetching brand for ${productId}:`, err)
+      setBrandNames((prev) => ({
+        ...prev,
+        [productId]: "Unknown Brand",
+      }))
+    } finally {
+      setLoadingBrands((prev) => ({ ...prev, [productId]: false }))
+    }
+  }, [])
+
+  // Load data on initial render
+  useEffect(() => {
+    fetchTrackingData()
+  }, [fetchTrackingData])
+
+  // Handle sort change
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
+  }
+
+  // Filter and sort data
+  const processData = () => {
+    // First filter the data
+    const filtered = trackingData.filter((view) => {
+      const matchesSearch =
+        searchTerm === "" ||
+        (brandNames[view.productId] || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        view.productId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (view.data?.location?.country || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (view.data?.location?.city || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (view.data?.device?.browser || "").toLowerCase().includes(searchTerm.toLowerCase())
+
+      if (activeTab === "all") return matchesSearch
+      if (activeTab === "pakistan")
+        return (
+          matchesSearch && (view.data?.location?.countryCode === "PK" || view.data?.location?.country === "Pakistan")
+        )
+      if (activeTab === "desktop") return matchesSearch && view.data?.device?.type === "Desktop"
+      if (activeTab === "mobile") return matchesSearch && view.data?.device?.type === "Mobile"
+
+      return matchesSearch
+    })
+
+    // Then sort the filtered data
+    return filtered.sort((a, b) => {
+      let valueA, valueB
+
+      // Handle different sort fields
+      switch (sortField) {
+        case "brand":
+          valueA = brandNames[a.productId] || ""
+          valueB = brandNames[b.productId] || ""
+          break
+        case "location":
+          valueA = `${a.data?.location?.city || ""}, ${a.data?.location?.country || ""}`
+          valueB = `${b.data?.location?.city || ""}, ${b.data?.location?.country || ""}`
+          break
+        case "device":
+          valueA = `${a.data?.device?.type || ""}`
+          valueB = `${b.data?.device?.type || ""}`
+          break
+        case "viewedAt":
+        default:
+          valueA = new Date(a.viewedAt).getTime()
+          valueB = new Date(b.viewedAt).getTime()
+          break
+      }
+
+      // Sort based on direction
+      if (sortDirection === "asc") {
+        return valueA > valueB ? 1 : -1
+      } else {
+        return valueA < valueB ? 1 : -1
+      }
+    })
+  }
+
+  const filteredData = processData()
+
+  // Get stats
+  const stats = {
+    total: trackingData.length,
+    pakistan: trackingData.filter(
+      (view) => view.data?.location?.countryCode === "PK" || view.data?.location?.country === "Pakistan",
+    ).length,
+    desktop: trackingData.filter((view) => view.data?.device?.type === "Desktop").length,
+    mobile: trackingData.filter((view) => view.data?.device?.type === "Mobile").length,
+    uniqueProducts: new Set(trackingData.map((view) => view.productId)).size,
+    uniqueCountries: new Set(
+      trackingData.filter((view) => view.data?.location?.country).map((view) => view.data.location.country),
+    ).size,
+  }
+
+  // Get browser distribution
+  const browserDistribution = trackingData.reduce((acc, view) => {
+    const browser = view.data?.device?.browser || "Unknown"
+    acc[browser] = (acc[browser] || 0) + 1
+    return acc
+  }, {})
+
+  // Get country distribution
+  const countryDistribution = trackingData.reduce((acc, view) => {
+    const country = view.data?.location?.country || "Unknown"
+    acc[country] = (acc[country] || 0) + 1
+    return acc
+  }, {})
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage)
+
+  // Get color for browser badge
+  const getBrowserColor = (browser) => {
+    if (!browser) return colors.neutral
+
+    const browserMap = {
+      chrome: colors.success,
+      firefox: colors.warning,
+      safari: colors.info,
+      edge: colors.info,
+      opera: colors.error,
+      ie: colors.info,
+    }
+
+    return browserMap[browser.toLowerCase()] || colors.secondary
+  }
+
+  // Get color for country badge
+  const getCountryColor = (country) => {
+    if (!country) return colors.neutral
+
+    const countryMap = {
+      Pakistan: colors.success,
+      "United States": colors.info,
+      "United Kingdom": colors.error,
+      India: colors.warning,
+      China: colors.error,
+      Germany: "#FFD700", // Yellow
+      France: colors.info,
+      Japan: colors.error,
+      Australia: "#20B2AA", // Teal
+    }
+
+    return countryMap[country] || colors.secondary
+  }
+
+  // Prepare data for the line chart
+  const chartData = prepareChartData(filteredData, brandNames)
+
+  if (loading && trackingData.length === 0) {
     return (
-      <Card className="rounded-[5px] border-gray-200 shadow-sm">
-        <CardHeader>
-          <CardTitle>User Tracking</CardTitle>
-          <CardDescription>No tracking data available</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-500">No user tracking data is available for this view.</p>
-        </CardContent>
-      </Card>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-[#231F20]">User Tracking Dashboard</h1>
+            <Button disabled className="rounded-[5px]">
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              Loading...
+            </Button>
+          </div>
+          <Card className="rounded-[5px]">
+            <CardContent className="p-8">
+              <div className="flex justify-center items-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00A651]"></div>
+                <p className="ml-4 text-gray-500">Loading tracking data...</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     )
   }
 
-  const { id, productId, data, viewedAt } = trackingData
-  const { location, device, referrer, ipAddress, userAgent, timestamp } = data
-
-  // Format date for display
-  const formattedDate = format(new Date(viewedAt), "PPpp")
-  const relativeTime = getRelativeTime(new Date(viewedAt))
-
-  // Get browser icon
-  const getBrowserIcon = (browser) => {
-    switch (browser?.toLowerCase()) {
-      case "chrome":
-        return <Chrome className="h-5 w-5 text-[#0072BC]" />
-      case "firefox":
-        return <Firefox className="h-5 w-5 text-[#F7941D]" />
-      case "safari":
-        return <Safari className="h-5 w-5 text-[#0072BC]" />
-      default:
-        return <Globe className="h-5 w-5 text-gray-500" />
-    }
-  }
-
-  // Get device icon
-  const getDeviceIcon = (type) => {
-    switch (type?.toLowerCase()) {
-      case "desktop":
-        return <Monitor className="h-5 w-5 text-[#8A2BE2]" />
-      case "mobile":
-        return <Smartphone className="h-5 w-5 text-[#00A651]" />
-      case "tablet":
-        return <Laptop className="h-5 w-5 text-[#0072BC]" />
-      default:
-        return <Cpu className="h-5 w-5 text-gray-500" />
-    }
-  }
-
-  // Get OS icon
-  const getOSIcon = (os) => {
-    switch (os?.toLowerCase()) {
-      case "windows":
-      case "windows 10":
-        return <Monitor className="h-5 w-5 text-[#0072BC]" />
-      case "macos":
-        return <Laptop className="h-5 w-5 text-gray-700" />
-      case "ios":
-        return <Smartphone className="h-5 w-5 text-gray-700" />
-      case "android":
-        return <Smartphone className="h-5 w-5 text-[#00A651]" />
-      case "linux":
-        return <Laptop className="h-5 w-5 text-[#F7941D]" />
-      default:
-        return <Cpu className="h-5 w-5 text-gray-500" />
-    }
-  }
-
-  // Extract domain from referrer
-  const getReferrerDomain = (url) => {
-    if (!url) return "Direct"
-    try {
-      const domain = new URL(url).hostname
-      return domain
-    } catch (e) {
-      return url
-    }
-  }
-
   return (
-    <div className="space-y-6">
-      {/* Main tracking card */}
-      <Card className="rounded-[5px] border-[#00A651] shadow-sm overflow-hidden bg-gradient-to-r from-[#E6F5ED] to-[#E6F0F7]">
-        <CardHeader className="bg-[#E6F5ED] pb-2">
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-[#00A651]">User View #{id}</CardTitle>
-              <CardDescription>Tracking data for product view</CardDescription>
-            </div>
-            <Badge variant="outline" className="text-[#00A651] border-[#00A651] bg-white">
-              {relativeTime}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-[#E6F0F7] p-2 rounded-full">
-                <User className="h-5 w-5 text-[#0072BC]" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Product ID</p>
-                <p className="font-medium truncate max-w-[200px]">{productId}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="bg-[#E6F5ED] p-2 rounded-full">
-                <MapPin className="h-5 w-5 text-[#00A651]" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Location</p>
-                <p className="font-medium">
-                  {location?.city || "Unknown"}, {location?.country || "Unknown"}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="bg-[#FEF2E6] p-2 rounded-full">{getDeviceIcon(device?.type)}</div>
-              <div>
-                <p className="text-sm text-gray-500">Device</p>
-                <p className="font-medium">
-                  {device?.type || "Unknown"} / {device?.os || "Unknown"}
-                </p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00A651] to-[#0072BC] bg-clip-text text-transparent">
+              User Tracking Dashboard
+            </h1>
+            <p className="text-[#58595B]">Monitor and analyze user activity on your site</p>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 mb-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="location">Location</TabsTrigger>
-              <TabsTrigger value="device">Device</TabsTrigger>
-              <TabsTrigger value="referrer">Referrer</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoCard
-                  title="Geographic Information"
-                  icon={<Globe className="h-5 w-5 text-[#0072BC]" />}
-                  items={[
-                    { label: "Country", value: location?.country },
-                    { label: "City", value: location?.city },
-                    { label: "Region", value: location?.region },
-                    { label: "IP Address", value: ipAddress || location?.ip },
-                  ]}
-                  bgColor={defaultBgColors[1]}
-                />
-                <InfoCard
-                  title="Device Information"
-                  icon={getDeviceIcon(device?.type)}
-                  items={[
-                    { label: "Device Type", value: device?.type },
-                    { label: "Operating System", value: device?.os },
-                    { label: "Browser", value: device?.browser },
-                    { label: "Version", value: device?.version },
-                  ]}
-                  bgColor={defaultBgColors[0]}
-                />
-              </div>
-              <InfoCard
-                title="Referrer Information"
-                icon={<ExternalLink className="h-5 w-5 text-[#8A2BE2]" />}
-                items={[
-                  { label: "Referrer", value: getReferrerDomain(referrer) },
-                  { label: "Full URL", value: referrer },
-                  { label: "Viewed At", value: formattedDate },
-                  { label: "Timestamp", value: timestamp ? format(new Date(timestamp), "PPpp") : "N/A" },
-                ]}
-                bgColor={defaultBgColors[6]}
+          <div className="flex flex-wrap gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by brand, country, city..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-[5px] focus:outline-none focus:ring-2 focus:ring-[#00A651] w-full md:w-64"
               />
-            </TabsContent>
+            </div>
 
-            <TabsContent value="location" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoCard
-                  title="Country Information"
-                  icon={<Flag className="h-5 w-5 text-[#ED1C24]" />}
-                  items={[
-                    { label: "Country", value: location?.country },
-                    { label: "Country Code", value: location?.countryCode },
-                    { label: "Region", value: location?.region },
-                    { label: "Region Code", value: location?.regionCode },
-                    { label: "Currency", value: location?.currency },
-                    { label: "Timezone", value: location?.timezone },
-                  ]}
-                  bgColor={defaultBgColors[4]}
-                />
-                <InfoCard
-                  title="Location Details"
-                  icon={<MapPin className="h-5 w-5 text-[#00A651]" />}
-                  items={[
-                    { label: "City", value: location?.city },
-                    { label: "Postal Code", value: location?.postalCode },
-                    { label: "Latitude", value: location?.latitude },
-                    { label: "Longitude", value: location?.longitude },
-                    { label: "ISP", value: location?.isp },
-                    { label: "ASN", value: location?.asn },
-                  ]}
-                  bgColor={defaultBgColors[0]}
-                />
-              </div>
-            </TabsContent>
+            <Button
+              onClick={fetchTrackingData}
+              disabled={refreshing}
+              className="bg-[#00A651] hover:bg-[#008C44] rounded-[5px]"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </Button>
 
-            <TabsContent value="device" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoCard
-                  title="Device Details"
-                  icon={getDeviceIcon(device?.type)}
-                  items={[
-                    { label: "Device Type", value: device?.type },
-                    { label: "Operating System", value: device?.os },
-                    { label: "Browser", value: device?.browser },
-                    { label: "Version", value: device?.version },
-                  ]}
-                  bgColor={defaultBgColors[2]}
-                />
-                <InfoCard
-                  title="User Agent"
-                  icon={<Info className="h-5 w-5 text-[#0072BC]" />}
-                  items={[{ label: "Full User Agent", value: userAgent }]}
-                  bgColor={defaultBgColors[1]}
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="referrer" className="space-y-4">
-              <InfoCard
-                title="Referrer Details"
-                icon={<ExternalLink className="h-5 w-5 text-[#8A2BE2]" />}
-                items={[
-                  { label: "Referrer Domain", value: getReferrerDomain(referrer) },
-                  { label: "Full Referrer URL", value: referrer },
-                  { label: "Viewed At", value: formattedDate },
-                  { label: "Timestamp", value: timestamp ? format(new Date(timestamp), "PPpp") : "N/A" },
-                  { label: "Tracking ID", value: id },
-                ]}
-                bgColor={defaultBgColors[6]}
-              />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-        <CardFooter className="bg-[#E6F0F7] border-t border-[#0072BC20] flex justify-between">
-          <div className="flex items-center text-sm text-gray-600">
-            <Clock className="h-4 w-4 mr-1" />
-            Tracked on {format(new Date(viewedAt), "PPP")} at {format(new Date(viewedAt), "p")}
+            <Button variant="outline" className="rounded-[5px] border-[#0072BC] text-[#0072BC] hover:bg-[#E6F0F7]">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-[5px] border-[#00A651] text-[#00A651] hover:bg-[#E6F5ED]"
-          >
-            <ArrowUpRight className="h-4 w-4 mr-1" />
-            View Details
-          </Button>
-        </CardFooter>
-      </Card>
+        </div>
 
-      {/* Quick stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <QuickStatCard
-          title="Location"
-          value={`${location?.city || "Unknown"}, ${location?.country || "Unknown"}`}
-          icon={<MapPin className="h-5 w-5 text-[#00A651]" />}
-          color={defaultColors.success}
-          subtext={location?.region || "Unknown region"}
-          bgColor={defaultBgColors[0]}
-        />
-        <QuickStatCard
-          title="Device"
-          value={`${device?.type || "Unknown"} / ${device?.browser || "Unknown"}`}
-          icon={getBrowserIcon(device?.browser)}
-          color={defaultColors.info}
-          subtext={device?.os || "Unknown OS"}
-          bgColor={defaultBgColors[1]}
-        />
-        <QuickStatCard
-          title="Referrer"
-          value={getReferrerDomain(referrer) || "Direct"}
-          icon={<ExternalLink className="h-5 w-5 text-[#8A2BE2]" />}
-          color="#8A2BE2"
-          subtext={relativeTime}
-          bgColor={defaultBgColors[6]}
-        />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <StatCard
+            title="Total Views"
+            value={stats.total}
+            icon={<Eye className="h-5 w-5 text-[#0072BC]" />}
+            color={colors.info}
+            bgColor={cardBgColors[1]}
+          />
+
+          <StatCard
+            title="Pakistan Views"
+            value={stats.pakistan}
+            icon={<MapPin className="h-5 w-5 text-[#00A651]" />}
+            color={colors.success}
+            bgColor={cardBgColors[0]}
+            percentage={stats.total > 0 ? Math.round((stats.pakistan / stats.total) * 100) : 0}
+          />
+
+          <StatCard
+            title="Unique Products"
+            value={stats.uniqueProducts}
+            icon={<Package className="h-5 w-5 text-[#F7941D]" />}
+            color={colors.warning}
+            bgColor={cardBgColors[2]}
+          />
+
+          <StatCard
+            title="Unique Countries"
+            value={stats.uniqueCountries}
+            icon={<Globe className="h-5 w-5 text-[#ED1C24]" />}
+            color={colors.error}
+            bgColor={cardBgColors[4]}
+          />
+        </div>
+
+        {/* Tabs and Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList className="mb-4 bg-white p-1 rounded-[5px] border border-gray-200">
+            <TabsTrigger
+              value="all"
+              className={`rounded-[5px] ${activeTab === "all" ? "bg-[#E6F5ED] text-[#00A651]" : ""}`}
+            >
+              All Views ({stats.total})
+            </TabsTrigger>
+            <TabsTrigger
+              value="pakistan"
+              className={`rounded-[5px] ${activeTab === "pakistan" ? "bg-[#E6F5ED] text-[#00A651]" : ""}`}
+            >
+              Pakistan ({stats.pakistan})
+            </TabsTrigger>
+            <TabsTrigger
+              value="desktop"
+              className={`rounded-[5px] ${activeTab === "desktop" ? "bg-[#E6F5ED] text-[#00A651]" : ""}`}
+            >
+              Desktop ({stats.desktop})
+            </TabsTrigger>
+            <TabsTrigger
+              value="mobile"
+              className={`rounded-[5px] ${activeTab === "mobile" ? "bg-[#E6F5ED] text-[#00A651]" : ""}`}
+            >
+              Mobile ({stats.mobile})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value={activeTab}>
+            {error ? (
+              <Card className="rounded-[5px] mb-6 bg-[#F9E6E7]">
+                <CardContent className="p-6 text-center">
+                  <p className="text-[#ED1C24] mb-4">{error}</p>
+                  <Button onClick={fetchTrackingData} className="rounded-[5px] bg-[#00A651]">
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : filteredData.length === 0 ? (
+              <Card className="rounded-[5px] mb-6 bg-[#FEF2E6]">
+                <CardContent className="p-6 text-center">
+                  <p className="text-[#F7941D] mb-4">No tracking data found matching your criteria.</p>
+                  <Button onClick={() => setSearchTerm("")} className="rounded-[5px] bg-[#00A651]">
+                    Clear Filters
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* Distribution Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <DistributionCard
+                    title="Browser Distribution"
+                    data={browserDistribution}
+                    icon={<Monitor className="h-5 w-5 text-[#0072BC]" />}
+                    color={colors.info}
+                    bgColor={cardBgColors[1]}
+                  />
+
+                  <DistributionCard
+                    title="Country Distribution"
+                    data={countryDistribution}
+                    icon={<Globe className="h-5 w-5 text-[#00A651]" />}
+                    color={colors.success}
+                    bgColor={cardBgColors[0]}
+                  />
+                </div>
+
+                {/* Line Chart */}
+                <Card className="rounded-[5px] mb-6">
+                  <CardHeader>
+                    <CardTitle>Product Views Over Time</CardTitle>
+                    <CardDescription>Shows views per product and location over time</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        {Object.keys(brandNames).map((productId, index) => (
+                          <Line
+                            key={productId}
+                            type="monotone"
+                            dataKey={productId}
+                            stroke={colorsArray[index % colorsArray.length]}
+                            name={brandNames[productId] || productId}
+                          />
+                        ))}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                {/* Tracking Table */}
+                <Card className="rounded-[5px] mb-6 overflow-hidden border border-gray-200">
+                  <CardHeader className="bg-gradient-to-r from-[#E6F0F7] to-[#E6F5ED] pb-2">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <CardTitle>Recent Views</CardTitle>
+                        <CardDescription>
+                          Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredData.length)} of{" "}
+                          {filteredData.length} views
+                        </CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <select
+                          value={itemsPerPage}
+                          onChange={(e) => {
+                            setItemsPerPage(Number(e.target.value))
+                            setCurrentPage(1)
+                          }}
+                          className="border border-gray-300 rounded-[5px] px-2 py-1 text-sm"
+                        >
+                          <option value={5}>5 per page</option>
+                          <option value={10}>10 per page</option>
+                          <option value={20}>20 per page</option>
+                          <option value={50}>50 per page</option>
+                        </select>
+                        <Button variant="outline" size="sm" className="rounded-[5px]">
+                          <Filter className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-gray-50 border-y border-gray-200">
+                            <th
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                              onClick={() => handleSort("brand")}
+                            >
+                              <div className="flex items-center gap-1">
+                                Brand
+                                {sortField === "brand" && (
+                                  <ArrowUpDown className={`h-3 w-3 ${sortDirection === "asc" ? "rotate-180" : ""}`} />
+                                )}
+                              </div>
+                            </th>
+                            <th
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                              onClick={() => handleSort("location")}
+                            >
+                              <div className="flex items-center gap-1">
+                                Location
+                                {sortField === "location" && (
+                                  <ArrowUpDown className={`h-3 w-3 ${sortDirection === "asc" ? "rotate-180" : ""}`} />
+                                )}
+                              </div>
+                            </th>
+                            <th
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                              onClick={() => handleSort("device")}
+                            >
+                              <div className="flex items-center gap-1">
+                                Device
+                                {sortField === "device" && (
+                                  <ArrowUpDown className={`h-3 w-3 ${sortDirection === "asc" ? "rotate-180" : ""}`} />
+                                )}
+                              </div>
+                            </th>
+                            <th
+                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                              onClick={() => handleSort("viewedAt")}
+                            >
+                              <div className="flex items-center gap-1">
+                                Time
+                                {sortField === "viewedAt" && (
+                                  <ArrowUpDown className={`h-3 w-3 ${sortDirection === "asc" ? "rotate-180" : ""}`} />
+                                )}
+                              </div>
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 bg-white">
+                          {paginatedData.map((view, index) => {
+                            const country = view.data?.location?.country || "Unknown"
+                            const browser = view.data?.device?.browser || "Unknown"
+                            const countryColor = getCountryColor(country)
+                            const browserColor = getBrowserColor(browser)
+                            // Alternate row background colors for better readability
+                            const rowBgColor = index % 2 === 0 ? "bg-white" : "bg-[#F9F9F9]"
+
+                            return (
+                              <tr key={view.id} className={`hover:bg-[#E6F5ED] ${rowBgColor}`}>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex flex-col">
+                                    <div className="font-medium text-gray-900">
+                                      {loadingBrands[view.productId] ? (
+                                        <div className="h-5 w-24 bg-gray-200 animate-pulse rounded"></div>
+                                      ) : (
+                                        <span className="text-[#0072BC]">
+                                          {brandNames[view.productId] || "Loading..."}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="text-xs text-gray-500 truncate max-w-[150px]">{view.productId}</div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex flex-col">
+                                    <div className="flex items-center gap-1">
+                                      <MapPin className="h-3 w-3 text-gray-400" />
+                                      <span className="font-medium">{view.data?.location?.city || "Unknown"}</span>
+                                    </div>
+                                    <div className="mt-1">
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs"
+                                        style={{
+                                          backgroundColor: `${countryColor}20`, // 20% opacity
+                                          color: countryColor,
+                                          borderColor: `${countryColor}40`, // 40% opacity
+                                        }}
+                                      >
+                                        {country}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex flex-col">
+                                    <div className="flex items-center gap-1">
+                                      <Monitor className="h-3 w-3 text-gray-400" />
+                                      <span className="font-medium">{view.data?.device?.type || "Unknown"}</span>
+                                    </div>
+                                    <div className="mt-1">
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs"
+                                        style={{
+                                          backgroundColor: `${browserColor}20`, // 20% opacity
+                                          color: browserColor,
+                                          borderColor: `${browserColor}40`, // 40% opacity
+                                        }}
+                                      >
+                                        {browser}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex flex-col">
+                                    <div className="flex items-center gap-1 font-medium">
+                                      <Calendar className="h-3 w-3 text-gray-400" />
+                                      <span>{format(new Date(view.viewedAt), "MMM d, yyyy")}</span>
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {format(new Date(view.viewedAt), "h:mm a")}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="rounded-[5px] border-[#00A651] text-[#00A651] hover:bg-[#E6F5ED]"
+                                    onClick={() => setSelectedView(view)}
+                                  >
+                                    View Details
+                                  </Button>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-6 py-3">
+                    <div className="text-sm text-gray-500">
+                      Page {currentPage} of {totalPages || 1}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-[5px]"
+                        disabled={currentPage === 1 || totalPages === 0}
+                        onClick={() => setCurrentPage(1)}
+                      >
+                        <ChevronsLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-[5px]"
+                        disabled={currentPage === 1 || totalPages === 0}
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+
+                      <div className="flex items-center gap-1">
+                        {[...Array(Math.min(5, Math.max(1, totalPages)))].map((_, i) => {
+                          // Show pages around current page
+                          let pageNum
+                          if (totalPages <= 5) {
+                            pageNum = i + 1
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNum = totalPages - 4 + i
+                          } else {
+                            pageNum = currentPage - 2 + i
+                          }
+
+                          if (pageNum > 0 && pageNum <= totalPages) {
+                            return (
+                              <Button
+                                key={i}
+                                variant={currentPage === pageNum ? "default" : "outline"}
+                                size="sm"
+                                className={`rounded-[5px] w-8 h-8 p-0 ${
+                                  currentPage === pageNum ? "bg-[#00A651] hover:bg-[#008C44]" : ""
+                                }`}
+                                onClick={() => setCurrentPage(pageNum)}
+                              >
+                                {pageNum}
+                              </Button>
+                            )
+                          }
+                          return null
+                        })}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-[5px]"
+                        disabled={currentPage === totalPages || totalPages === 0}
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-[5px]"
+                        disabled={currentPage === totalPages || totalPages === 0}
+                        onClick={() => setCurrentPage(totalPages)}
+                      >
+                        <ChevronsRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardFooter>
+                </Card>
+              </>
+            )}
+          </TabsContent>
+        </Tabs>
+
+        {/* Selected View Details */}
+        {selectedView && (
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold bg-gradient-to-r from-[#00A651] to-[#0072BC] bg-clip-text text-transparent">
+                View Details: {brandNames[selectedView.productId] || "Loading..."}
+              </h2>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-[5px] border-[#00A651] text-[#00A651] hover:bg-[#E6F5ED]"
+                onClick={() => setSelectedView(null)}
+              >
+                Close
+              </Button>
+            </div>
+            <UserTrackingCards trackingData={selectedView} colors={colors} cardBgColors={cardBgColors} />
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
-// Helper component for information cards
-function InfoCard({ title, icon, items, bgColor }) {
+// Stat Card Component
+function StatCard({ title, value, icon, color, bgColor, percentage }) {
   return (
-    <div className={`${bgColor} rounded-[5px] border border-gray-200 shadow-sm overflow-hidden`}>
-      <div className="px-4 py-3 bg-white border-b border-gray-200 flex items-center gap-2">
-        {icon}
-        <h3 className="font-medium">{title}</h3>
-      </div>
-      <div className="p-4">
-        <dl className="space-y-2">
-          {items.map((item, index) => (
-            <div key={index} className="grid grid-cols-3 gap-2">
-              <dt className="text-sm font-medium text-gray-600 col-span-1">{item.label}:</dt>
-              <dd className="text-sm text-gray-700 col-span-2 break-words">{item.value || "N/A"}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </div>
-  )
-}
-
-// Helper component for quick stat cards
-function QuickStatCard({ title, value, icon, color, subtext, bgColor }) {
-  return (
-    <Card className={`rounded-[5px] border-[${color}40] ${bgColor}`}>
-      <CardContent className="p-4">
+    <Card className={`rounded-[5px] border-[${color}40] overflow-hidden ${bgColor}`}>
+      <div className="h-1" style={{ backgroundColor: color }}></div>
+      <CardContent className="p-6">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-sm text-gray-600 font-medium mb-1">{title}</p>
-            <p className="text-lg font-semibold mb-1 truncate max-w-[200px]">{value}</p>
-            {subtext && <p className="text-xs text-gray-600">{subtext}</p>}
+            <p className="text-3xl font-bold mb-1">{value}</p>
+            {percentage !== undefined && (
+              <div className="flex items-center">
+                <div className="w-full bg-white rounded-full h-1.5 mr-2 shadow-inner">
+                  <div className="h-1.5 rounded-full" style={{ width: `${percentage}%`, backgroundColor: color }}></div>
+                </div>
+                <p className="text-xs text-gray-600 font-medium">{percentage}%</p>
+              </div>
+            )}
           </div>
           <div className="p-2 rounded-full bg-white shadow-sm">{icon}</div>
         </div>
@@ -382,41 +827,60 @@ function QuickStatCard({ title, value, icon, color, subtext, bgColor }) {
   )
 }
 
-// Helper function to format numbers with commas
-function formatNumber(num) {
-  if (!num) return "N/A"
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-}
+// Distribution Card Component
+function DistributionCard({ title, data, icon, color, bgColor }) {
+  // Convert data object to array and sort by count
+  const sortedData = Object.entries(data)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5) // Top 5
 
-// Helper function to get relative time
-function getRelativeTime(date) {
-  const now = new Date()
-  const diffInSeconds = Math.floor((now - date) / 1000)
+  const total = Object.values(data).reduce((sum, count) => sum + count, 0)
 
-  if (diffInSeconds < 60) {
-    return `${diffInSeconds} seconds ago`
-  }
+  // Alromaih Cars theme colors for bars
+  const barColors = [
+    "#00A651", // Green
+    "#0072BC", // Blue
+    "#F7941D", // Orange
+    "#ED1C24", // Red
+    "#8A2BE2", // Purple
+  ]
 
-  const diffInMinutes = Math.floor(diffInSeconds / 60)
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`
-  }
+  return (
+    <Card className={`rounded-[5px] overflow-hidden ${bgColor}`}>
+      <div className="h-1" style={{ backgroundColor: color }}></div>
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-white rounded-full shadow-sm">{icon}</div>
+          <CardTitle>{title}</CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {sortedData.map((item, index) => {
+            const barColor = barColors[index % barColors.length]
+            const percentage = Math.round((item.count / total) * 100)
 
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  if (diffInHours < 24) {
-    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`
-  }
-
-  const diffInDays = Math.floor(diffInHours / 24)
-  if (diffInDays < 30) {
-    return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`
-  }
-
-  const diffInMonths = Math.floor(diffInDays / 30)
-  if (diffInMonths < 12) {
-    return `${diffInMonths} ${diffInMonths === 1 ? "month" : "months"} ago`
-  }
-
-  const diffInYears = Math.floor(diffInMonths / 12)
-  return `${diffInYears} ${diffInYears === 1 ? "year" : "years"} ago`
+            return (
+              <div key={item.name} className="flex items-center justify-between">
+                <div className="font-medium">{item.name}</div>
+                <div className="flex items-center gap-4">
+                  <div className="w-32 bg-white rounded-full h-2 shadow-inner">
+                    <div
+                      className="h-2 rounded-full"
+                      style={{ width: `${percentage}%`, backgroundColor: barColor }}
+                    ></div>
+                  </div>
+                  <div className="text-gray-700 font-medium w-10 text-right">{item.count}</div>
+                  <div className="text-xs w-12 text-right font-medium" style={{ color: barColor }}>
+                    {percentage}%
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
