@@ -16,7 +16,7 @@ export async function POST(req) {
       );
     }
 
-    const reqHeaders = headers();
+    const reqHeaders = await headers();
     const userAgent = reqHeaders.get("user-agent") || "Unknown";
     const referrer = reqHeaders.get("referer") || "Direct";
     const ipAddress = getClientIp(reqHeaders);
@@ -108,7 +108,7 @@ async function getLocationFromIpInfo(ip) {
   }
  
   const token = "b27da79f6ebfed";
-  const url = `https://ipinfo.io/${ip}?token=${token}`;
+  const url = `https://ipinfo.io/39.33.90.127?token=${token}`;
 
   try {
     const res = await fetch(url);
@@ -119,16 +119,14 @@ async function getLocationFromIpInfo(ip) {
     const data = await res.json();
     const [latitude, longitude] = data.loc?.split(",") || [];
 
+    // console.log("jjjjjjjjjjjjjjjj",data)
+
     const location = {
       ip: data.ip,
-      country_name: data.country,
       country: data.country,
       region: data.region,
-      region_code: null,
       city: data.city,
       postal: data.postal,
-      latitude,
-      longitude,
       timezone: data.timezone,
       currency: null,
       asn: null,
