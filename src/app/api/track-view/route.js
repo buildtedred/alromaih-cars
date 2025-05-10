@@ -1,15 +1,14 @@
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { detect } from 'detect-browser';
+import { detect } from "detect-browser";
 
-// Cache for geo IP data (in-memory, consider Redis for production)
-const geoCache = new Map();
+const geoCache = new Map(); // In-memory cache for geolocation
 
 export async function POST(req) {
   try {
-    // Parse request body
     const { productId, additionalData } = await req.json();
+
     if (!productId) {
       return NextResponse.json(
         { success: false, message: "productId is required" },
@@ -17,19 +16,13 @@ export async function POST(req) {
       );
     }
 
-    // Get client information
-    const reqHeaders = await headers();
+    const reqHeaders = headers();
     const userAgent = reqHeaders.get("user-agent") || "Unknown";
     const referrer = reqHeaders.get("referer") || "Direct";
     const ipAddress = getClientIp(reqHeaders);
-    
-    // Get browser and OS info
     const browserInfo = detect(userAgent);
-    
-    // Get location information from ipapi.co
-    const location = await getLocationFromIpApi(ipAddress);
-    
-    // Prepare complete tracking data
+    const location = await getLocationFromIpInfo(ipAddress);
+
     const viewData = {
       productId,
       ipAddress,
@@ -42,25 +35,10 @@ export async function POST(req) {
         os: browserInfo?.os || "Unknown",
         version: browserInfo?.version || "Unknown",
       },
-      location: {
-        ip: ipAddress,
-        country: location.country_name,
-        countryCode: location.country,
-        region: location.region,
-        regionCode: location.region_code,
-        city: location.city,
-        postalCode: location.postal,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        timezone: location.timezone,
-        currency: location.currency,
-        asn: location.asn,
-        isp: location.org,
-      },
+      location,
       additionalData: additionalData || null,
     };
 
-    // Save to database
     const view = await prisma.productView.create({
       data: {
         productId,
@@ -83,7 +61,8 @@ export async function POST(req) {
       {
         success: false,
         message: "Internal server error",
-        error: process.env.NODE_ENV === "development" ? error.message : undefined,
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
       },
       { status: 500 }
     );
@@ -105,10 +84,11 @@ export async function GET() {
   }
 }
 
-// Helper functions
+// ------------------ Helper Functions ------------------
+
 function getClientIp(headers) {
   const forwardedFor = headers.get("x-forwarded-for");
-  const realIp =  headers.get("x-real-ip");
+  const realIp = headers.get("x-real-ip");
   return (forwardedFor?.split(",")[0] || realIp || "0.0.0.0").trim();
 }
 
@@ -118,39 +98,49 @@ function getDeviceType(userAgent) {
   return "Desktop";
 }
 
-async function getLocationFromIpApi(ip) {
-  // Skip for localhost or invalid IPs
-  // if (ip === '127.0.0.1' || !isValidIp(ip)) {
-  //   return getDefaultLocation();
-  // }
+async function getLocationFromIpInfo(ip) {
+  if (!ip || ip === "127.0.0.1" || ip === "0.0.0.0") {
+    return getDefaultLocation();
+  }
 
-  // // Check cache first
-  // if (geoCache.has(ip)) {
-  //   return geoCache.get(ip);
-  // }
+  if (geoCache.has(ip)) {
+    return geoCache.get(ip);
+  }
+
+  const token = "b27da79f6ebfed";
+  const url = `https://ipinfo.io/${ip}?token=${token}`;
 
   try {
-    const response = await fetch(`https://ipapi.co/${ip}/json/`);
-
-    // console.log("objectssssssssssssssssss", response);
-    
-    if (!response.ok) {
-      throw new Error(`IP API request failed with status ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    if (data.error) {
-      throw new Error(data.reason || 'IP API error');
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`IPINFO failed with status ${res.status}`);
     }
 
-    // Cache the result for 1 hour
-    geoCache.set(ip, data);
-    setTimeout(() => geoCache.delete(ip), 3600000);
+    const data = await res.json();
+    const [latitude, longitude] = data.loc?.split(",") || [];
 
-    return data;
+    const location = {
+      ip: data.ip,
+      country_name: data.country,
+      country: data.country,
+      region: data.region,
+      region_code: null,
+      city: data.city,
+      postal: data.postal,
+      latitude,
+      longitude,
+      timezone: data.timezone,
+      currency: null,
+      asn: null,
+      org: data.org,
+    };
+
+    geoCache.set(ip, location);
+    setTimeout(() => geoCache.delete(ip), 60 * 60 * 1000); // 1 hour
+
+    return location;
   } catch (error) {
-    console.warn(`GeoIP lookup failed for ${ip}:`, error.message);
+    console.warn(`IPINFO lookup failed for ${ip}:`, error.message);
     return getDefaultLocation();
   }
 }
@@ -171,9 +161,4 @@ function getDefaultLocation() {
     asn: null,
     org: null,
   };
-}
-
-function isValidIp(ip) {
-  // Simple IP validation regex
-  return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip);
 }
