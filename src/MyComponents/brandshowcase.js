@@ -138,7 +138,7 @@ function BrandShowcase() {
   }
 
   return (
-    <div className="container mx-auto w-full py-10">
+    <div className="container mx-auto w-full py-5">
       <div>
         <h2 className={`text-xl md:text-2xl lg:text-3xl font-bold mb-8 ${isArabic ? "text-right" : "text-left"}`}>
           {isEnglish ? "Authorized Distributor" : "موزع معتمد"}

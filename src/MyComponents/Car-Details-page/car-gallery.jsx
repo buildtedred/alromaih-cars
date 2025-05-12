@@ -284,7 +284,7 @@ const CompactCarListing = ({ brand_Details }) => {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-[1440px] mx-auto py-8">
+      <div className="container mx-auto py-8">
         {/* Breadcrumb Navigation */}
         <div className="mb-6">
           <Breadcrumb items={getBreadcrumbItems()} />
@@ -559,7 +559,7 @@ const CarGallery = ({ carDetails, isLoading = false }) => {
   );
 
   const renderThumbnails = () => (
-    <div className="w-full sm:w-1/6 h-auto sm:h-[400px] mb-4">
+    <div className="w-full sm:w-1/6 h-auto sm:h-[460px] mb-4">
       <div className="flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-y-auto sm:h-full p-1">
         {isLoading
           ? Array(5)

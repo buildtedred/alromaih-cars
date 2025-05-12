@@ -107,9 +107,10 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
 
   return (
     <div
-      className="rounded-[10px] border-2 border-brand-primary bg-brand-light/40 overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl"
+      className="rounded-[10px] border-2 border-brand-primary bg-brand-light/40 overflow-hidden flex flex-col w-full h-full relative transition-all duration-500 hover:shadow-xl cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleViewDetails}
     >
       {/* Status Badge - Fixed positioning */}
       {car.status && (
@@ -203,7 +204,7 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
           <div className="grid grid-cols-2 gap-0">
             <div className="px-3">
               <p className="text-xs flex justify-start text-brand-primary mb-1">{isRTL ? "سعر الكاش" : "Cash Price"}</p>
-              <div className="font-bold text-brand-primary flex items-center">
+              <div className="font-bold text-brand-primary flex items-center gap-1">
                 <span className="mr-1 flex-shrink-0">
                   <Image src={car.icons?.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
                 </span>
@@ -212,11 +213,11 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
             </div>
 
             <div className="px-3">
-              <p className="text-xs text-brand-primary mb-1 truncate max-w-[110px] block">
+              <p className="text-xs text-brand-primary mb-1 text-start truncate max-w-[110px] block">
                 {isRTL ? "أقساط من" : "Installments from"}
               </p>
 
-              <div className="font-bold text-brand-primary flex items-center">
+              <div className="font-bold text-brand-primary flex gap-1 items-center">
                 <span className="mr-1 flex-shrink-0">
                   <Image src={car.icons?.currency || "/icons/Currency.svg"} alt="Currency" width={12} height={12} />
                 </span>
@@ -281,28 +282,46 @@ const CarCard = ({ car, onFavoriteToggle, isFavorite: initialIsFavorite, locale 
           </div>
         </div>
 
-        {/* View Details Link */}
-        <div className={`flex ${isRTL ? "justify-start" : "justify-end"} px-3 py-2 mx-2`}>
+        {/* View Details Link - Now both text and arrow animate */}
+        <div className="flex justify-end px-3 py-2 mx-2">
           <div
-            onClick={handleViewDetails}
-            className="cursor-pointer text-brand-primary text-sm flex items-center transition-all duration-300 hover:translate-x-1 hover:font-medium"
+            className="text-brand-primary text-sm flex items-center transition-all duration-300 pointer-events-none"
+            onClick={(e) => e.stopPropagation()} // Prevent click event from firing twice
           >
             {isRTL ? (
               <>
                 <span
-                  className="ml-1 transition-transform duration-300"
-                  style={{ transform: isHovered ? "translateX(-3px)" : "" }}
+                  className="transition-all duration-300 font-medium"
+                  style={{
+                    transform: isHovered ? "translateX(-4px)" : "translateX(0)",
+                  }}
                 >
-                  {"<"}
+                  عرض التفاصيل
                 </span>
-                <span>عرض التفاصيل</span>
+                <span
+                  className="mr-2 transition-all duration-300"
+                  style={{
+                    transform: isHovered ? "translateX(-4px)" : "translateX(0)",
+                  }}
+                >
+                  {">"}
+                </span>
               </>
             ) : (
               <>
-                <span>View Details</span>
                 <span
-                  className="ml-2 transition-transform duration-300"
-                  style={{ transform: isHovered ? "translateX(3px)" : "" }}
+                  className="transition-all duration-300 font-medium"
+                  style={{
+                    transform: isHovered ? "translateX(4px)" : "translateX(0)",
+                  }}
+                >
+                  View Details
+                </span>
+                <span
+                  className="ml-2 transition-all duration-300"
+                  style={{
+                    transform: isHovered ? "translateX(4px)" : "translateX(0)",
+                  }}
                 >
                   {">"}
                 </span>

@@ -257,7 +257,7 @@ const CarOverview = ({ carId = 1 }) => {
         <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setShowSpecDialog(false)} />
 
         {/* Dialog Content - Full screen on mobile, centered with max-width on larger screens */}
-        <div className="fixed inset-0 sm:relative sm:inset-auto transform transition-all w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl overflow-hidden bg-white sm:rounded-xl sm:mx-auto h-full sm:h-[80vh] shadow-2xl">
+        <div className="fixed inset-0 sm:relative sm:inset-auto transform transition-all w-full sm:max-w-lg md:max-w-2xl lg:max-w-4xl overflow-hidden bg-white sm:rounded-xl sm:mx-auto h-full sm:h-auto shadow-2xl">
           <div className="flex flex-col h-full">
             {/* Header - with left-aligned title and close button on right */}
             <div className="flex items-center justify-between p-4 bg-brand-primary text-white">
@@ -343,7 +343,7 @@ const CarOverview = ({ carId = 1 }) => {
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8 font-noto">
+    <div className="container m-auto space-y-6 sm:space-y-8 font-noto">
       {/* Car Information Section */}
       <div className="bg-white rounded-xl border border-brand-primary/10 shadow-md overflow-hidden">
         <div className="pt-4 sm:pt-6 pb-4 sm:pb-6">

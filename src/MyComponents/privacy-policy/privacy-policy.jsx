@@ -10,11 +10,11 @@ export default function PrivacyPolicyPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section with White Background */}
-      <div className="bg-white pt-20 pb-16">
-        <div className="max-w-[calc(100%-1.5rem)] sm:max-w-[calc(100%-3rem)] md:max-w-[calc(100%-6rem)] lg:max-w-[calc(100%-10rem)] xl:max-w-[1300px] mx-auto">
+      <div className="bg-white pt-10 pb-16">
+        <div className="container mx-auto">
           <div className={`${locale === "ar" ? "rtl" : ""}`}>
             {/* Hero Section - Now styled like other sections */}
-            <section className="bg-white rounded-xl p-4 mb-12">
+            <section className="bg-white rounded-xl pb-4 mb-12">
               <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
                 {/* Illustration - Using the same SVG for both languages */}
                 <div className={`w-full md:w-1/3 ${locale === "ar" ? "md:order-2" : "md:order-2"}`}>
@@ -48,7 +48,7 @@ export default function PrivacyPolicyPage() {
             {/* Privacy Policy Sections with reduced spacing */}
             <div className="space-y-2">
               {/* Section 1: Information We Collect */}
-              <section className="bg-white rounded-xl p-4">
+              <section className="bg-white rounded-xl pb-4">
                 <h2 className={`text-2xl font-bold text-brand-primary mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "١. المعلومات التي نجمعها" : "1. Information We Collect"}
                 </h2>
@@ -60,7 +60,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               {/* Section 2: How We Use Your Information */}
-              <section className="bg-white rounded-xl p-4">
+              <section className="bg-white rounded-xl pb-4">
                 <h2 className={`text-2xl font-bold text-brand-primary mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "٢. كيفية استخدام معلوماتك" : "2. How We Use Your Information"}
                 </h2>
@@ -72,7 +72,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               {/* Section 3: Information Sharing */}
-              <section className="bg-white rounded-xl p-4">
+              <section className="bg-white rounded-xl pb-4">
                 <h2 className={`text-2xl font-bold text-brand-primary mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "٣. مشاركة المعلومات" : "3. Information Sharing"}
                 </h2>
@@ -84,7 +84,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               {/* Section 4: Security */}
-              <section className="bg-white rounded-xl p-4">
+              <section className="bg-white rounded-xl pb-4">
                 <h2 className={`text-2xl font-bold text-brand-primary mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "٤. الأمان" : "4. Security"}
                 </h2>
@@ -96,7 +96,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               {/* Section 5: Your Choices */}
-              <section className="bg-white rounded-xl p-4">
+              <section className="bg-white rounded-xl pb-4">
                 <h2 className={`text-2xl font-bold text-brand-primary mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "٥. خياراتك" : "5. Your Choices"}
                 </h2>
@@ -108,7 +108,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               {/* Section 6: Changes to Privacy Policy */}
-              <section className="bg-white rounded-xl p-4">
+              <section className="bg-white rounded-xl pb-4">
                 <h2 className={`text-2xl font-bold text-brand-primary mb-4 ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar" ? "٦. التغييرات في إشعار الخصوصية هذا" : "6. Changes to This Privacy Policy"}
                 </h2>
@@ -120,7 +120,7 @@ export default function PrivacyPolicyPage() {
               </section>
 
               {/* Consent Section - Now with centered text */}
-              <section className="bg-white rounded-xl p-4">
+              <section className="bg-white rounded-xl pb-4">
                 <p className={`text-gray-600 text-center ${locale === "ar" ? "font-noto" : ""}`}>
                   {locale === "ar"
                     ? "باستخدامك لموقعنا الإلكتروني أو خدماتنا، فإنك توافق على جمع واستخدام معلوماتك كما هو موضح في إشعار الخصوصية هذا."

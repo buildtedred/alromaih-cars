@@ -733,7 +733,7 @@ const CarComparisonResults = ({ car1Id, car2Id, car3Id, onCompareAgain }) => {
   return (
     <div
       dir={isRTL ? "rtl" : "ltr"}
-      className="container w-full mx-auto pt-4 sm:pt-6 md:pt-8 lg:pt-0"
+      className="container mx-auto pt-4 sm:pt-6 md:pt-8 lg:pt-0"
       ref={contentRef}
     >
       {/* Breadcrumb Navigation */}
