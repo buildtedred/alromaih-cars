@@ -57,7 +57,7 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="container mx-auto ">
+    <main className="container min-h-screen mx-auto ">
       {/* Breadcrumb Navigation */}
       <div className="py-4">
         <Breadcrumb items={getBreadcrumbItems()} />
