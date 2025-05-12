@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
 import { ArrowLeft, Loader2, ImageIcon, Check, Upload, X, AlertCircle, ChevronRight, Globe } from "lucide-react"
 import Link from "next/link"
 import axios from "axios"
@@ -19,11 +20,6 @@ import ImageGallery from "../../images-gallery/image-gallery"
 
 export default function NewBrandPage() {
   const router = useRouter()
-  const [brandData, setBrandData] = useState({
-    name_en: "",
-    name_ar: "",
-    slug: "",
-  })
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState(null)
@@ -31,22 +27,35 @@ export default function NewBrandPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("english")
 
+  // Initialize react-hook-form
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name_en: "",
+      name_ar: "",
+      slug: "",
+    },
+  })
+
+  // Watch the English name to generate slug
+  const nameEn = watch("name_en")
+
   // Generate slug from English name
   useEffect(() => {
-    if (brandData.name_en) {
-      const generatedSlug = slugify(brandData.name_en, {
+    if (nameEn) {
+      const generatedSlug = slugify(nameEn, {
         lower: true,
         strict: true,
         trim: true,
       })
-      setBrandData((prev) => ({ ...prev, slug: generatedSlug }))
+      setValue("slug", generatedSlug)
     }
-  }, [brandData.name_en])
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setBrandData((prev) => ({ ...prev, [name]: value }))
-  }
+  }, [nameEn, setValue])
 
   // Handle image selection
   const handleImageSelect = (url) => {
@@ -54,18 +63,12 @@ export default function NewBrandPage() {
     setIsDialogOpen(false) // Close the dialog when image is selected
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  // Form submission handler
+  const onSubmit = async (data) => {
     setError(null)
     setUploadStatus(null)
 
-    // Validate form - only English name is required
-    if (!brandData.name_en.trim()) {
-      setError("English brand name is required")
-      setActiveTab("english")
-      return
-    }
-
+    // Validate image selection
     if (!selectedImageUrl) {
       setError("Please select an image from the gallery")
       return
@@ -74,15 +77,13 @@ export default function NewBrandPage() {
     try {
       setLoading(true)
 
-      const payload = {
-        name: brandData.name_en,
-        name_ar: brandData.name_ar, // This can be empty
-        slug: brandData.slug,
+      // Use Axios to send the POST request directly with the data
+      const response = await axios.post("/api/supabasPrisma/carbrands", {
+        name: data.name_en,
+        name_ar: data.name_ar,
+        slug: data.slug,
         image: selectedImageUrl,
-      }
-
-      // Use Axios to send the POST request
-      const response = await axios.post("/api/supabasPrisma/carbrands", payload)
+      })
 
       // Handle success response
       setUploadStatus("Brand created successfully!")
@@ -169,7 +170,7 @@ export default function NewBrandPage() {
       )}
 
       <Card className="shadow-md border-brand-primary/10 overflow-hidden rounded-[5px]">
-        <form onSubmit={handleSubmit} className="rounded-[5px]">
+        <form onSubmit={handleSubmit(onSubmit)} className="rounded-[5px]">
           <CardHeader className="bg-brand-light/30 border-b border-brand-primary/10 py-3 px-4">
             <CardTitle className="text-base text-brand-primary flex items-center">
               <Globe className="h-4 w-4 mr-2" />
@@ -194,14 +195,12 @@ export default function NewBrandPage() {
                   </Label>
                   <Input
                     id="name_en"
-                    name="name_en"
-                    value={brandData.name_en}
-                    onChange={handleInputChange}
+                    {...register("name_en", { required: "English brand name is required" })}
                     placeholder="Enter brand name in English"
                     className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
-                    required
                   />
                   <p className="text-xs text-muted-foreground">Enter the official English name of the car brand</p>
+                  {errors.name_en && <p className="text-xs text-red-500 mt-1">{errors.name_en.message}</p>}
                 </div>
               </TabsContent>
 
@@ -212,9 +211,7 @@ export default function NewBrandPage() {
                   </Label>
                   <Input
                     id="name_ar"
-                    name="name_ar"
-                    value={brandData.name_ar}
-                    onChange={handleInputChange}
+                    {...register("name_ar")}
                     placeholder="أدخل اسم العلامة التجارية بالعربية"
                     className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px] text-right"
                     dir="rtl"
@@ -313,7 +310,7 @@ export default function NewBrandPage() {
             </Button>
             <Button
               type="submit"
-              disabled={loading || !selectedImageUrl || !brandData.name_en.trim()}
+              disabled={loading || !selectedImageUrl || !watch("name_en").trim()}
               className="h-8 text-xs bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
             >
               {loading ? (

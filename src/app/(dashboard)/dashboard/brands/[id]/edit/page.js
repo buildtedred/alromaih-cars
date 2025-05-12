@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, ImageIcon, Check, Upload, X, AlertCircle, ChevronRight, Globe } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { ArrowLeft, Loader2, ImageIcon, Check, Upload, X, AlertCircle, ChevronRight, Globe } from 'lucide-react'
 import Link from "next/link"
 import axios from "axios"
 
@@ -23,10 +24,6 @@ export default function EditBrandPage() {
   const brandId = params?.id
 
   const [brand, setBrand] = useState(null)
-  const [brandData, setBrandData] = useState({
-    name: "",
-    name_ar: "",
-  })
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(true)
@@ -34,6 +31,24 @@ export default function EditBrandPage() {
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("english")
+
+  // Initialize react-hook-form
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      name: "",
+      name_ar: "",
+    },
+  })
+
+  // Watch form values
+  const name = watch("name")
 
   useEffect(() => {
     if (!brandId) return
@@ -53,7 +68,8 @@ export default function EditBrandPage() {
 
         // Set form data based on the nested structure returned by the API
         if (data && data.en) {
-          setBrandData({
+          // Use react-hook-form's reset to set all form values at once
+          reset({
             name: data.en.name || "",
             name_ar: data.ar?.name_ar || "",
           })
@@ -68,12 +84,7 @@ export default function EditBrandPage() {
     }
 
     fetchBrand()
-  }, [brandId])
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setBrandData((prev) => ({ ...prev, [name]: value }))
-  }
+  }, [brandId, reset])
 
   // Handle image selection
   const handleImageSelect = (url) => {
@@ -81,18 +92,12 @@ export default function EditBrandPage() {
     setIsDialogOpen(false) // Close the dialog when image is selected
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  // Form submission handler
+  const onSubmit = async (data) => {
     setError(null)
     setUploadStatus(null)
 
-    // Validate form - only English name is required
-    if (!brandData.name.trim()) {
-      setError("Brand name is required")
-      setActiveTab("english")
-      return
-    }
-
+    // Validate image selection
     if (!selectedImageUrl) {
       setError("Please select an image from the gallery")
       return
@@ -101,17 +106,12 @@ export default function EditBrandPage() {
     try {
       setLoading(true)
 
-      // Send payload in the format expected by the API (flat structure)
-      const payload = {
-        name: brandData.name,
-        name_ar: brandData.name_ar || "",
+      // Send request directly with the data
+      const response = await axios.put(`/api/supabasPrisma/carbrands/${brandId}`, {
+        name: data.name,
+        name_ar: data.name_ar || "",
         image: selectedImageUrl,
-      }
-
-      console.log("Submitting payload:", payload)
-
-      // Use Axios to send the PUT request
-      const response = await axios.put(`/api/supabasPrisma/carbrands/${brandId}`, payload)
+      })
 
       // Handle success response
       setUploadStatus("Brand updated successfully!")
@@ -242,7 +242,7 @@ export default function EditBrandPage() {
       )}
 
       <Card className="shadow-md border-brand-primary/10 overflow-hidden rounded-[5px]">
-        <form onSubmit={handleSubmit} className="rounded-[5px]">
+        <form onSubmit={handleSubmit(onSubmit)} className="rounded-[5px]">
           <CardHeader className="bg-brand-light/30 border-b border-brand-primary/10 py-3 px-4">
             <CardTitle className="text-base text-brand-primary flex items-center">
               <Globe className="h-4 w-4 mr-2" />
@@ -267,14 +267,12 @@ export default function EditBrandPage() {
                   </Label>
                   <Input
                     id="name"
-                    name="name"
-                    value={brandData.name}
-                    onChange={handleInputChange}
+                    {...register("name", { required: "Brand name is required" })}
                     placeholder="Enter brand name in English"
                     className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px]"
-                    required
                   />
                   <p className="text-xs text-muted-foreground">Enter the official English name of the car brand</p>
+                  {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
                 </div>
               </TabsContent>
 
@@ -285,9 +283,7 @@ export default function EditBrandPage() {
                   </Label>
                   <Input
                     id="name_ar"
-                    name="name_ar"
-                    value={brandData.name_ar}
-                    onChange={handleInputChange}
+                    {...register("name_ar")}
                     placeholder="أدخل اسم العلامة التجارية بالعربية"
                     className="h-9 text-sm focus-visible:ring-brand-primary rounded-[5px] text-right"
                     dir="rtl"
@@ -390,7 +386,7 @@ export default function EditBrandPage() {
             </Button>
             <Button
               type="submit"
-              disabled={loading || !selectedImageUrl || !brandData.name.trim()}
+              disabled={loading || !selectedImageUrl || !watch("name").trim()}
               className="h-8 text-xs bg-brand-primary hover:bg-brand-primary/90 rounded-[5px]"
             >
               {loading ? (
